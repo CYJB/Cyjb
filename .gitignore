@@ -1,6 +1,11 @@
 # Build Folders (you can keep bin if you'd like, to store dlls and pdbs)
 bin
 obj
+Properties
 
 # mstest test results
 TestResults
+
+# files
+*.suo
+*.snk
