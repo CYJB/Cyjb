@@ -51,7 +51,15 @@
     <Compile Include="CharExt.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="ExceptionResources.cs" />
+    <Compile Include="Interop\Kernel32.cs" />
+    <Compile Include="ResDescriptionAttribute.cs" />
+    <Compile Include="Resources.cs" />
     <Compile Include="StringExt.cs" />
+    <Compile Include="TextValuePair.cs" />
+    <Compile Include="TextValuePairCollection.cs" />
+    <Compile Include="TextValuePairCollection`1.cs" />
+    <Compile Include="TextValuePair`1.cs" />
+    <Compile Include="Tristate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CYJB_Code_Key.snk" />
@@ -62,6 +70,8 @@
   <ItemGroup>
     <EmbeddedResource Include="ExceptionResource.resx" />
     <EmbeddedResource Include="ExceptionResource.zh-CN.resx" />
+    <EmbeddedResource Include="Resource.resx" />
+    <EmbeddedResource Include="Resource.zh-CN.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
