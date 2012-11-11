@@ -51,13 +51,11 @@ namespace Cyjb
 				{
 					case 'x':
 						// \x 后面可以是 1 至 4 位。
-						for (hexLen = 0; hexLen < 4 && idx + hexLen + 1 < len && CharExt.IsHex(str, idx + hexLen + 1); hexLen++) ;
+						hexLen = GetHexLength(str, idx + 1, 4);
 						break;
 					case 'u':
 						// \u 后面必须是 4 位。
-						// 检测后面四位字符是否是十六进制字符。
-						if (idx + 4 < len && CharExt.IsHex(str, idx + 1) && CharExt.IsHex(str, idx + 2) &&
-							CharExt.IsHex(str, idx + 3) && CharExt.IsHex(str, idx + 4))
+						if (idx + 4 < len && GetHexLength(str, idx + 1, 4) == 4)
 						{
 							hexLen = 4;
 						}
@@ -68,11 +66,7 @@ namespace Cyjb
 						break;
 					case 'U':
 						// \U 后面必须是 8 位。
-						// 检测后面八位字符是否是十六进制字符。
-						if (idx + 8 < len && CharExt.IsHex(str, idx + 1) && CharExt.IsHex(str, idx + 2) &&
-							CharExt.IsHex(str, idx + 3) && CharExt.IsHex(str, idx + 4) &&
-							CharExt.IsHex(str, idx + 5) && CharExt.IsHex(str, idx + 6) &&
-							CharExt.IsHex(str, idx + 7) && CharExt.IsHex(str, idx + 8))
+						if (idx + 8 < len && GetHexLength(str, idx + 1, 8) == 8)
 						{
 							hexLen = 8;
 						}
@@ -107,6 +101,28 @@ namespace Cyjb
 				builder.Append(str.Substring(start));
 			}
 			return builder.ToString();
+		}
+		/// <summary>
+		/// 返回字符串指定索引位置之后的十六进制字符的个数。
+		/// </summary>
+		/// <param name="str">要获取十六进制字符个数的字符串。</param>
+		/// <param name="index">要开始计算十六进制字符个数的其实索引。</param>
+		/// <param name="maxLength">需要的最长的十六进制字符个数。</param>
+		/// <returns>实际的十六进制字符的个数。</returns>
+		internal static int GetHexLength(string str, int index, int maxLength)
+		{
+			if (index + maxLength > str.Length)
+			{
+				maxLength = str.Length - index;
+			}
+			for (int i = 0; i < maxLength; i++, index++)
+			{
+				if (!CharExt.IsHex(str, index))
+				{
+					return i;
+				}
+			}
+			return maxLength;
 		}
 		/// <summary>
 		/// 将字符串中不可显示字符（0x00~0x1F,0x7F之后）转义为 \\u 形式，其中十六进制以大写字母形式输出。
