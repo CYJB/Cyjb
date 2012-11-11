@@ -58,9 +58,9 @@ namespace Cyjb
 		/// </summary>
 		/// <value>一个 <see cref="System.Resources.ResourceManager"/> 对象。
 		/// </value>
-		public static ResourceManager Resources
+		public static ResourceManager ResManager
 		{
-			get { return GetLoader().resources; }
+			get { return GetLoader().resManager; }
 		}
 
 		#endregion
@@ -85,7 +85,7 @@ namespace Cyjb
 		/// </returns>
 		public static string GetString(string name)
 		{
-			return Resources.GetString(name, Culture);
+			return ResManager.GetString(name, Culture);
 		}
 		/// <summary>
 		/// 使用指定的 <see cref="System.String"/> 资源的值格式化参数序列。
@@ -108,14 +108,14 @@ namespace Cyjb
 		/// <summary>
 		/// 资源访问对象
 		/// </summary>
-		private readonly ResourceManager resources;
+		private readonly ResourceManager resManager;
 
 		/// <summary>
 		/// 初始化 <see cref="Cyjb.ExceptionResources"/> 类的新实例。
 		/// </summary>
 		private ExceptionResources()
 		{
-			this.resources = new ResourceManager("Cyjb.ExceptionResource", this.GetType().Assembly);
+			this.resManager = new ResourceManager("Cyjb.ExceptionResource", this.GetType().Assembly);
 		}
 	}
 }
