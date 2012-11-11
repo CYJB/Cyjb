@@ -20,20 +20,20 @@ namespace Cyjb
 		/// <summary>
 		/// 指示指定的 Unicode 字符是否属于十六进制数字类别。
 		/// </summary>
-		/// <param name="c">要计算的 Unicode 字符。</param>
-		/// <returns>如果 <paramref name="c"/> 是十进制数字，则为 <c>true</c>；
+		/// <param name="ch">要计算的 Unicode 字符。</param>
+		/// <returns>如果 <paramref name="ch"/> 是十进制数字，则为 <c>true</c>；
 		/// 否则，为 <c>false</c>。</returns>
-		public static bool IsHex(this char c)
+		public static bool IsHex(this char ch)
 		{
-			if (c <= 'f')
+			if (ch <= 'f')
 			{
-				if (c >= 'A')
+				if (ch >= 'A')
 				{
-					return c <= 'F' || c >= 'a';
+					return ch <= 'F' || ch >= 'a';
 				}
 				else
 				{
-					return c >= '0' && c <= '9';
+					return ch >= '0' && ch <= '9';
 				}
 			}
 			return false;
@@ -41,14 +41,14 @@ namespace Cyjb
 		/// <summary>
 		/// 指示指定字符串中位于指定位置处的字符是否属于十六进制数字类别。
 		/// </summary>
-		/// <param name="s">一个字符串。</param>
-		/// <param name="index">要计算的字符在 <paramref name="s"/> 中的位置。</param>
-		/// <returns>如果 <paramref name="s"/> 中位于 <paramref name="index"/> 处的字符是十进制数字，
+		/// <param name="str">一个字符串。</param>
+		/// <param name="index">要计算的字符在 <paramref name="str"/> 中的位置。</param>
+		/// <returns>如果 <paramref name="str"/> 中位于 <paramref name="index"/> 处的字符是十进制数字，
 		/// 则为 <c>true</c>；否则，为 <c>false</c>。</returns>
 		/// <exception cref="System.IndexOutOfRangeException"><paramref name="index"/> 大于等于字符串的长度或小于零。</exception>
-		public static bool IsHex(string s, int index)
+		public static bool IsHex(string str, int index)
 		{
-			return IsHex(s[index]);
+			return IsHex(str[index]);
 		}
 
 		#endregion // IsHex
