@@ -19,6 +19,7 @@ namespace UnitTestCyjb
 			Assert.AreEqual("English or 中文 or \u0061\u0308 or \uD834\uDD60", StringExt.DecodeUnicode("English or 中文 or \u0061\u0308 or \U0001D160"));
 			Assert.AreEqual("English or 中文 or \u0061\u0308 or \uD834\uDD60", StringExt.DecodeUnicode("English or 中文 or \\u0061\\u0308 or \\uD834\\uDD60"));
 			Assert.AreEqual("\x25 \u0061\u0308 or \uD834\uDD60\\", StringExt.DecodeUnicode("\x25 \\u0061\\u0308 or \\uD834\\uDD60\\"));
+			Assert.AreEqual("\x25\\x\x2\x25 \x25\x25 \u0061\u0308 or \uD834\uDD60\\", StringExt.DecodeUnicode("\x25\\x\\x2\\x25 \\x025\\x0025 \\u0061\\u0308 or \\uD834\\uDD60\\"));
 			Assert.AreEqual(null, StringExt.DecodeUnicode(null));
 			Assert.AreEqual("", StringExt.DecodeUnicode(""));
 			Assert.AreEqual("\\", StringExt.DecodeUnicode("\\"));
