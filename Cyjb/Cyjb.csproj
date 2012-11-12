@@ -49,9 +49,21 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="CharExt.cs" />
+    <Compile Include="Collections\ArrayAdapter`1.cs" />
+    <Compile Include="Collections\CollectionDebugView`1.cs" />
+    <Compile Include="Collections\ObjectModel\CollectionBase`1.cs" />
+    <Compile Include="Collections\ObjectModel\DictionaryBase`2.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Collections\ObjectModel\DictionaryEnumerator`2.cs" />
+    <Compile Include="Collections\ObjectModel\DictionaryKeyCollection`2.cs" />
+    <Compile Include="Collections\ObjectModel\ListBase`1.cs" />
+    <Compile Include="Collections\ObjectModel\ReadOnlyCollection`1.cs" />
+    <Compile Include="Collections\ObjectModel\ReadOnlyList`1.cs" />
+    <Compile Include="Collections\ObjectModel\DictionaryValueCollection`2.cs" />
+    <Compile Include="Collections\ObjectModel\ReadOnlyDictionary`2.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="ExceptionResources.cs" />
-    <Compile Include="Interop\Kernel32.cs" />
     <Compile Include="ResDescriptionAttribute.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="StringExt.cs" />

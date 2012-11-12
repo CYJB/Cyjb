@@ -6,6 +6,9 @@ Properties
 # mstest test results
 TestResults
 
+# my test project
+ConsoleTest
+
 # files
 *.suo
 *.snk

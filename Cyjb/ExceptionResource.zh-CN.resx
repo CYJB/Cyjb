@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ArgumentNegative" xml:space="preserve">
+    <value>参数 '{0}' 不能为负值。</value>
+    <comment>参数小于零。</comment>
+  </data>
   <data name="ArgumentOutOfRange" xml:space="preserve">
     <value>参数 {0} 超出了有效范围。</value>
     <comment>参数超出范围。</comment>
@@ -124,5 +128,41 @@
   <data name="ArgumentOutOfRangeBetween" xml:space="preserve">
     <value>参数 {0} 必须位于 {1} 和 {2} 之间。</value>
     <comment>参数超出范围。</comment>
+  </data>
+  <data name="ArgumentWrongType" xml:space="preserve">
+    <value>值“{0}”不是“{1}”类型。</value>
+    <comment>值不是特定类型。</comment>
+  </data>
+  <data name="ArrayNonZeroLowerBound" xml:space="preserve">
+    <value>目标数组的下限必须为 0。</value>
+    <comment>数组的下限必须为 0。</comment>
+  </data>
+  <data name="ArrayRankMultiDimNotSupported" xml:space="preserve">
+    <value>只支持一维数组。</value>
+    <comment>多维数组不被支持。</comment>
+  </data>
+  <data name="ArrayTooSmall" xml:space="preserve">
+    <value>目标数组的长度不足，请检查数组索引和长度。</value>
+    <comment>目标数组太小。</comment>
+  </data>
+  <data name="ArrayTypeInvalid" xml:space="preserve">
+    <value>目标数组类型与集合中项的类型不兼容。</value>
+    <comment>目标数组类型与集合中项的类型不兼容。</comment>
+  </data>
+  <data name="FixedSizeCollection" xml:space="preserve">
+    <value>集合是固定大小的。</value>
+    <comment>集合是固定大小的。</comment>
+  </data>
+  <data name="InvalidOffsetLength" xml:space="preserve">
+    <value>偏移量和长度超出数组的界限，或者计数大于从索引到源集合结尾处的元素数量。</value>
+    <comment>偏移量和长度超出界限。</comment>
+  </data>
+  <data name="KeyDuplicate" xml:space="preserve">
+    <value>已添加了具有相同键的项。</value>
+    <comment>键重复。</comment>
+  </data>
+  <data name="ReadOnlyCollection" xml:space="preserve">
+    <value>集合是只读的。</value>
+    <comment>集合是只读的。</comment>
   </data>
 </root>
