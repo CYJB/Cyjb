@@ -433,7 +433,7 @@ namespace Cyjb
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要随机排序的数组。</param>
 		/// <returns>要随机排序数组。</returns>
-		[CLSCompliant(false)]
+		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter"), CLSCompliant(false)]
 		public static T[][] Random<T>(this T[][] array)
 		{
 			for (int i = array.Length - 1; i >= 0; i--)
@@ -506,7 +506,7 @@ namespace Cyjb
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要随机排序的数组。</param>
 		/// <returns>要随机排序数组。</returns>
-		[CLSCompliant(false)]
+		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter"), CLSCompliant(false)]
 		public static T[][][] Random<T>(this T[][][] array)
 		{
 			for (int i = array.Length - 1; i >= 0; i--)
