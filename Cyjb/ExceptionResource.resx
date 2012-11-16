@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ArgumentMustBePositive" xml:space="preserve">
+    <value>The parameter {0} must be greater than zero.</value>
+    <comment>参数小于等于零。</comment>
+  </data>
   <data name="ArgumentNegative" xml:space="preserve">
     <value>The parameter {0} can not be negative.</value>
     <comment>参数小于零。</comment>
@@ -160,6 +164,10 @@
   <data name="KeyDuplicate" xml:space="preserve">
     <value>An item with the same key has already been added.</value>
     <comment>键重复。</comment>
+  </data>
+  <data name="ObjectDisposed" xml:space="preserve">
+    <value>The object has been disposed.</value>
+    <comment>对象已释放资源。</comment>
   </data>
   <data name="ReadOnlyCollection" xml:space="preserve">
     <value>Collection is read-only.</value>

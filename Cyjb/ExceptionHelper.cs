@@ -95,6 +95,15 @@ namespace Cyjb
 			return GetArgumentException("ArgumentWrongType", value, targetType);
 		}
 		/// <summary>
+		/// 返回参数小于等于零的异常。
+		/// </summary>
+		/// <param name="paramName">异常参数的名称。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		public static ArgumentException ArgumentMustBePositive(string paramName)
+		{
+			throw GetArgumentException("ArgumentMustBePositive", paramName);
+		}
+		/// <summary>
 		/// 返回参数小于零的异常。
 		/// </summary>
 		/// <param name="paramName">异常参数的名称。</param>
@@ -243,6 +252,19 @@ namespace Cyjb
 		}
 
 		#endregion // NotSupportedException
+
+		#region ObjectDisposedException
+
+		/// <summary>
+		/// 返回对象已释放资源的异常。
+		/// </summary>
+		/// <returns><see cref="System.ObjectDisposedException"/> 对象。</returns>
+		public static ObjectDisposedException ObjectDisposed()
+		{
+			return new ObjectDisposedException(ExceptionResources.GetString("ObjectDisposed"));
+		}
+
+		#endregion // ObjectDisposedException
 
 	}
 }

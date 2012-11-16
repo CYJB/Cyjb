@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ArgumentMustBePositive" xml:space="preserve">
+    <value>参数 '{0}' 必须大于 0。</value>
+    <comment>参数小于等于零。</comment>
+  </data>
   <data name="ArgumentNegative" xml:space="preserve">
     <value>参数 '{0}' 不能为负值。</value>
     <comment>参数小于零。</comment>
@@ -160,6 +164,10 @@
   <data name="KeyDuplicate" xml:space="preserve">
     <value>已添加了具有相同键的项。</value>
     <comment>键重复。</comment>
+  </data>
+  <data name="ObjectDisposed" xml:space="preserve">
+    <value>已释放该对象。</value>
+    <comment>对象已释放资源。</comment>
   </data>
   <data name="ReadOnlyCollection" xml:space="preserve">
     <value>集合是只读的。</value>

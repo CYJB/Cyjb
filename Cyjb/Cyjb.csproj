@@ -51,6 +51,10 @@
     <Compile Include="CharExt.cs" />
     <Compile Include="Collections\ArrayAdapter`1.cs" />
     <Compile Include="Collections\CollectionDebugView`1.cs" />
+    <Compile Include="Utility\LruCache`2.cs" />
+    <Compile Include="Utility\LruNode`2.cs" />
+    <Compile Include="Utility\LruNormalCache`2.cs" />
+    <Compile Include="Utility\LruNormalNode`2.cs" />
     <Compile Include="Collections\ObjectModel\CollectionBase`1.cs" />
     <Compile Include="Collections\ObjectModel\DictionaryBase`2.cs">
       <SubType>Code</SubType>
@@ -64,6 +68,7 @@
     <Compile Include="Collections\ObjectModel\ReadOnlyDictionary`2.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="ExceptionResources.cs" />
+    <Compile Include="Utility\ICache`2.cs" />
     <Compile Include="ResDescriptionAttribute.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="StringExt.cs" />
