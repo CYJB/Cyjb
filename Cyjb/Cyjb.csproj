@@ -47,10 +47,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArrayExt.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="CharExt.cs" />
     <Compile Include="Collections\ArrayAdapter`1.cs" />
     <Compile Include="Collections\CollectionDebugView`1.cs" />
+    <Compile Include="EnumerableExt.cs" />
+    <Compile Include="IntegerExt.cs" />
+    <Compile Include="RandomExt.cs" />
     <Compile Include="Utility\LruCache`2.cs" />
     <Compile Include="Utility\LruNode`2.cs" />
     <Compile Include="Utility\LruNormalCache`2.cs" />
