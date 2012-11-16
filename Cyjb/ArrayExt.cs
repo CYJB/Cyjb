@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Cyjb
 {
@@ -78,6 +79,8 @@ namespace Cyjb
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">要填充数组的值。</param>
 		/// <returns>要填充的数组。</returns>
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "0#")]
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[,] Fill<T>(this T[,] array, T value)
 		{
 			if (array != null)
@@ -99,6 +102,8 @@ namespace Cyjb
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">返回要填充数组的值的函数。</param>
 		/// <returns>要填充的数组。</returns>
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "0#")]
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[,] Fill<T>(this T[,] array, Func<T> value)
 		{
 			if (array != null)
@@ -120,6 +125,8 @@ namespace Cyjb
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">返回要填充数组指定索引的值的函数。</param>
 		/// <returns>要填充的数组。</returns>
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "0#")]
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[,] Fill<T>(this T[,] array, Func<int, int, T> value)
 		{
 			if (array != null)
@@ -214,6 +221,8 @@ namespace Cyjb
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">要填充数组的值。</param>
 		/// <returns>要填充的数组。</returns>
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "0#")]
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[, ,] Fill<T>(this T[, ,] array, T value)
 		{
 			if (array != null)
@@ -238,6 +247,8 @@ namespace Cyjb
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">返回要填充数组的值的函数。</param>
 		/// <returns>要填充的数组。</returns>
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "0#")]
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[, ,] Fill<T>(this T[, ,] array, Func<T> value)
 		{
 			if (array != null)
@@ -262,6 +273,8 @@ namespace Cyjb
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">返回要填充数组指定索引的值的函数。</param>
 		/// <returns>要填充的数组。</returns>
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "0#")]
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[, ,] Fill<T>(this T[, ,] array, Func<int, int, int, T> value)
 		{
 			if (array != null)
@@ -389,6 +402,8 @@ namespace Cyjb
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要随机排序的数组。</param>
 		/// <returns>要随机排序数组。</returns>
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "0#")]
 		public static T[,] Random<T>(this T[,] array)
 		{
 			for (int i = array.GetLength(0) - 1; i >= 0; i--)
@@ -448,6 +463,8 @@ namespace Cyjb
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要随机排序的数组。</param>
 		/// <returns>要随机排序数组。</returns>
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "0#"),]
+		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[, ,] Random<T>(this T[, ,] array)
 		{
 			for (int i = array.GetLength(0) - 1; i >= 0; i--)
