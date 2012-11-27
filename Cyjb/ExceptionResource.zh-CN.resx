@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ArgumentImplementIComparable" xml:space="preserve">
+    <value>必须至少有一个对象实现 IComparable。</value>
+    <comment>必须至少有一个对象实现 IComparable。</comment>
+  </data>
   <data name="ArgumentMustBePositive" xml:space="preserve">
     <value>参数 '{0}' 必须大于 0。</value>
     <comment>参数小于等于零。</comment>
@@ -153,6 +157,10 @@
     <value>目标数组类型与集合中项的类型不兼容。</value>
     <comment>目标数组类型与集合中项的类型不兼容。</comment>
   </data>
+  <data name="EnumFailedVersion" xml:space="preserve">
+    <value>集合已修改；可能无法执行枚举操作。</value>
+    <comment>无法执行枚举操作。</comment>
+  </data>
   <data name="FixedSizeCollection" xml:space="preserve">
     <value>集合是固定大小的。</value>
     <comment>集合是固定大小的。</comment>
@@ -172,5 +180,9 @@
   <data name="ReadOnlyCollection" xml:space="preserve">
     <value>集合是只读的。</value>
     <comment>集合是只读的。</comment>
+  </data>
+  <data name="UnknownEnumType" xml:space="preserve">
+    <value>未知的枚举类型。</value>
+    <comment>未知的枚举类型。</comment>
   </data>
 </root>

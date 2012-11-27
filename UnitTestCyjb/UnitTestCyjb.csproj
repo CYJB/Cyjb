@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="UnitTestCharExt.cs" />
+    <Compile Include="UnitTestConvertExt.cs" />
     <Compile Include="UnitTestStringExt.cs" />
   </ItemGroup>
   <ItemGroup>
