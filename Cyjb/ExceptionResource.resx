@@ -157,13 +157,25 @@
     <value>Target array type is not compatible with the type of items in the collection.</value>
     <comment>目标数组类型与集合中项的类型不兼容。</comment>
   </data>
+  <data name="BaseConvertNegativeValue" xml:space="preserve">
+    <value>String cannot contain a minus sign if the base is not 10.</value>
+    <comment>如果基不为 10，则此字符串不能包含减号。</comment>
+  </data>
   <data name="EnumFailedVersion" xml:space="preserve">
     <value>Collection was modified; enumeration operation may not execute.</value>
     <comment>无法执行枚举操作。</comment>
   </data>
+  <data name="ExtraJunkAtEnd" xml:space="preserve">
+    <value>Additional non-parsable characters are at the end of the string.</value>
+    <comment>字符串的末尾有其他无法分析的字符。</comment>
+  </data>
   <data name="FixedSizeCollection" xml:space="preserve">
     <value>Collection was of a fixed size.</value>
     <comment>集合是固定大小的。</comment>
+  </data>
+  <data name="InvalidBase" xml:space="preserve">
+    <value>Invalid Base.</value>
+    <comment>无效的基。</comment>
   </data>
   <data name="InvalidOffsetLength" xml:space="preserve">
     <value>Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection.</value>
@@ -173,9 +185,45 @@
     <value>An item with the same key has already been added.</value>
     <comment>键重复。</comment>
   </data>
+  <data name="NoParsibleDigits" xml:space="preserve">
+    <value>Could not find any recognizable digits.</value>
+    <comment>未能找到任何可识别的数字。</comment>
+  </data>
   <data name="ObjectDisposed" xml:space="preserve">
     <value>The object has been disposed.</value>
     <comment>对象已释放资源。</comment>
+  </data>
+  <data name="OverflowByte" xml:space="preserve">
+    <value>Value was either too large or too small for a Byte.</value>
+    <comment>值对于 Byte 太大或太小。</comment>
+  </data>
+  <data name="OverflowInt16" xml:space="preserve">
+    <value>Value was either too large or too small for an Int16.</value>
+    <comment>值对于 Int16 太大或太小。</comment>
+  </data>
+  <data name="OverflowInt32" xml:space="preserve">
+    <value>Value was either too large or too small for an Int32.</value>
+    <comment>值对于 Int32 太大或太小。</comment>
+  </data>
+  <data name="OverflowInt64" xml:space="preserve">
+    <value>Value was either too large or too small for an Int64.</value>
+    <comment>值对于 Int64 太大或太小。</comment>
+  </data>
+  <data name="OverflowSByte" xml:space="preserve">
+    <value>Value was either too large or too small for a SByte.</value>
+    <comment>值对于 SByte 太大或太小。</comment>
+  </data>
+  <data name="OverflowUInt16" xml:space="preserve">
+    <value>Value was either too large or too small for a UInt16.</value>
+    <comment>值对于 UInt16 太大或太小。</comment>
+  </data>
+  <data name="OverflowUInt32" xml:space="preserve">
+    <value>Value was either too large or too small for a UInt32.</value>
+    <comment>值对于 UInt32 太大或太小。</comment>
+  </data>
+  <data name="OverflowUInt64" xml:space="preserve">
+    <value>Value was either too large or too small for a UInt64.</value>
+    <comment>值对于 UInt64 太大或太小。</comment>
   </data>
   <data name="ReadOnlyCollection" xml:space="preserve">
     <value>Collection is read-only.</value>
