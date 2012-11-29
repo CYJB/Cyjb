@@ -175,7 +175,7 @@ namespace Cyjb
 		/// <param name="str">从该字符串返回最左端的字符。</param>
 		/// <param name="length">指示要返回的字符数的数值表达式。
 		/// 如果为 <c>0</c>，则返回零长度字符串 ("")。
-		/// 如果大于或等于 <c>str</c> 的长度，则返回整个字符串。</param>
+		/// 如果大于或等于 <paramref name="str"/> 的长度，则返回整个字符串。</param>
 		/// <returns>从指定字符串左端开始的指定数量的字符。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException">
 		/// <paramref name="length"/> 小于 <c>0</c>。</exception>
@@ -201,7 +201,7 @@ namespace Cyjb
 		/// <param name="str">从该字符串返回最右端的字符。</param>
 		/// <param name="length">指示要返回的字符数的数值表达式。
 		/// 如果为 <c>0</c>，则返回零长度字符串 ("")。
-		/// 如果大于或等于 <c>str</c> 的长度，则返回整个字符串。</param>
+		/// 如果大于或等于 <paramref name="str"/> 的长度，则返回整个字符串。</param>
 		/// <returns>从指定字符串右端开始的指定数量的字符。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException">
 		/// <paramref name="length"/> 小于 <c>0</c>。</exception>
@@ -236,6 +236,7 @@ namespace Cyjb
 		/// <paramref name="startIndex"/> 小于负的此实例的长度。</exception>
 		public static string SubstringEx(this string str, int startIndex)
 		{
+			ExceptionHelper.CheckArgumentNull(str, "str");
 			if (startIndex < 0)
 			{
 				startIndex += str.Length;
@@ -253,7 +254,7 @@ namespace Cyjb
 		/// <returns>与此实例中在 <paramref name="startIndex"/> 处开头、
 		/// 长度为 <paramref name="length"/> 的子字符串等效的一个字符串，
 		/// 如果 <paramref name="startIndex"/> 等于此实例的长度或 
-		/// <paramref name="length"/> 为零，则为 <see cref="System.String.Empty"/>。</returns>
+		/// <paramref name="length"/> 为零，则为空字符串（""）。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException">
 		/// <paramref name="startIndex"/> 加 <paramref name="length"/>
 		/// 之和指示的位置不在此实例中。</exception>
@@ -263,6 +264,7 @@ namespace Cyjb
 		/// <paramref name="length"/> 小于零。</exception>
 		public static string SubstringEx(this string str, int startIndex, int length)
 		{
+			ExceptionHelper.CheckArgumentNull(str, "str");
 			if (startIndex < 0)
 			{
 				startIndex += str.Length;
@@ -279,11 +281,12 @@ namespace Cyjb
 		/// <returns>与此实例中在 <paramref name="startIndex"/> 
 		/// 处开头到字符串结尾的子字符串等效的一个字符串，
 		/// 如果 <paramref name="startIndex"/> 等于此实例的长度或大于等于字符串的长度，
-		/// 则为 <see cref="System.String.Empty"/>。</returns>
+		/// 则为空字符串（""）。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException">
 		/// <paramref name="startIndex"/> 指示的位置不在此实例中。</exception>
 		public static string Slice(this string str, int startIndex)
 		{
+			ExceptionHelper.CheckArgumentNull(str, "str");
 			if (startIndex < 0)
 			{
 				startIndex += str.Length;
@@ -315,6 +318,7 @@ namespace Cyjb
 		/// 指示的位置不在此实例中。</exception>
 		public static string Slice(this string str, int startIndex, int endIndex)
 		{
+			ExceptionHelper.CheckArgumentNull(str, "str");
 			if (startIndex < 0)
 			{
 				startIndex += str.Length;
