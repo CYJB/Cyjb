@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Cyjb;
+using System.Collections.Generic;
+using System.Collections;
 
 namespace UnitTestCyjb
 {
@@ -11,38 +13,47 @@ namespace UnitTestCyjb
 	public class UnitTestTypeExt
 	{
 		/// <summary>
-		/// 对 <see cref="Cyjb.TypeExt.IsConvertableFrom"/> 方法进行测试。
+		/// 对 <see cref="Cyjb.TypeExt.IsImplicitFrom"/> 方法进行测试。
 		/// </summary>
 		[TestMethod]
 		public void TestIsConvertableFrom()
 		{
 			// Trues
-			Assert.IsTrue(typeof(object).IsConvertableFrom(typeof(object)));
-			Assert.IsTrue(typeof(object).IsConvertableFrom(typeof(string)));
-			Assert.IsTrue(typeof(object).IsConvertableFrom(typeof(uint)));
-			Assert.IsTrue(typeof(object).IsConvertableFrom(typeof(TestClass)));
-			Assert.IsTrue(typeof(TestClass).IsConvertableFrom(typeof(TestClass2)));
-			Assert.IsTrue(typeof(int).IsConvertableFrom(typeof(short)));
-			Assert.IsTrue(typeof(uint).IsConvertableFrom(typeof(ushort)));
-			Assert.IsTrue(typeof(int).IsConvertableFrom(typeof(TestClass)));
-			Assert.IsTrue(typeof(long).IsConvertableFrom(typeof(TestClass)));
-			Assert.IsTrue(typeof(decimal).IsConvertableFrom(typeof(TestClass)));
-			Assert.IsTrue(typeof(bool).IsConvertableFrom(typeof(TestClass2)));
-			Assert.IsTrue(typeof(Enum).IsConvertableFrom(typeof(Tristate)));
-			Assert.IsTrue(typeof(Delegate).IsConvertableFrom(typeof(Func<int>)));
-			Assert.IsTrue(typeof(int?).IsConvertableFrom(typeof(int)));
+			Assert.IsTrue(typeof(object).IsImplicitFrom(typeof(object)));
+			Assert.IsTrue(typeof(object).IsImplicitFrom(typeof(string)));
+			Assert.IsTrue(typeof(object).IsImplicitFrom(typeof(uint)));
+			Assert.IsTrue(typeof(object).IsImplicitFrom(typeof(TestClass)));
+			Assert.IsTrue(typeof(TestClass).IsImplicitFrom(typeof(TestClass2)));
+			Assert.IsTrue(typeof(int).IsImplicitFrom(typeof(short)));
+			Assert.IsTrue(typeof(uint).IsImplicitFrom(typeof(ushort)));
+			Assert.IsTrue(typeof(int).IsImplicitFrom(typeof(TestClass)));
+			Assert.IsTrue(typeof(long).IsImplicitFrom(typeof(TestClass)));
+			Assert.IsTrue(typeof(decimal).IsImplicitFrom(typeof(TestClass)));
+			Assert.IsTrue(typeof(bool).IsImplicitFrom(typeof(TestClass2)));
+			Assert.IsTrue(typeof(Enum).IsImplicitFrom(typeof(Tristate)));
+			Assert.IsTrue(typeof(Delegate).IsImplicitFrom(typeof(Func<int>)));
+			Assert.IsTrue(typeof(int?).IsImplicitFrom(typeof(int)));
+			Assert.IsTrue(typeof(long?).IsImplicitFrom(typeof(int?)));
+			Assert.IsTrue(typeof(Array).IsImplicitFrom(typeof(int[])));
+			Assert.IsTrue(typeof(Array).IsImplicitFrom(typeof(object[])));
+			Assert.IsTrue(typeof(IList<int>).IsImplicitFrom(typeof(List<int>)));
+			Assert.IsTrue(typeof(IList).IsImplicitFrom(typeof(List<int>)));
 			// Falses
-			Assert.IsFalse(typeof(TestClass).IsConvertableFrom(typeof(object)));
-			Assert.IsFalse(typeof(TestClass2).IsConvertableFrom(typeof(TestClass)));
-			Assert.IsFalse(typeof(TestClass).IsConvertableFrom(typeof(TestClass3)));
-			Assert.IsFalse(typeof(int).IsConvertableFrom(typeof(long)));
-			Assert.IsFalse(typeof(uint).IsConvertableFrom(typeof(short)));
-			Assert.IsFalse(typeof(short).IsConvertableFrom(typeof(TestClass)));
-			Assert.IsFalse(typeof(string).IsConvertableFrom(typeof(TestClass)));
-			Assert.IsFalse(typeof(int).IsConvertableFrom(typeof(TestClass3)));
-			Assert.IsFalse(typeof(Tristate).IsConvertableFrom(typeof(Enum)));
-			Assert.IsFalse(typeof(Func<int>).IsConvertableFrom(typeof(Delegate)));
-			Assert.IsFalse(typeof(int).IsConvertableFrom(typeof(int?)));
+			Assert.IsFalse(typeof(int?).IsImplicitFrom(typeof(long?)));
+			Assert.IsFalse(typeof(TestClass).IsImplicitFrom(typeof(object)));
+			Assert.IsFalse(typeof(TestClass2).IsImplicitFrom(typeof(TestClass)));
+			Assert.IsFalse(typeof(TestClass).IsImplicitFrom(typeof(TestClass3)));
+			Assert.IsFalse(typeof(int).IsImplicitFrom(typeof(long)));
+			Assert.IsFalse(typeof(uint).IsImplicitFrom(typeof(short)));
+			Assert.IsFalse(typeof(short).IsImplicitFrom(typeof(TestClass)));
+			Assert.IsFalse(typeof(string).IsImplicitFrom(typeof(TestClass)));
+			Assert.IsFalse(typeof(int).IsImplicitFrom(typeof(TestClass3)));
+			Assert.IsFalse(typeof(Tristate).IsImplicitFrom(typeof(Enum)));
+			Assert.IsFalse(typeof(Func<int>).IsImplicitFrom(typeof(Delegate)));
+			Assert.IsFalse(typeof(int).IsImplicitFrom(typeof(int?)));
+			Assert.IsFalse(typeof(int[]).IsImplicitFrom(typeof(Array)));
+			Assert.IsFalse(typeof(List<int>).IsImplicitFrom(typeof(IList<int>)));
+			Assert.IsFalse(typeof(List<int>).IsImplicitFrom(typeof(IList)));
 		}
 		/// <summary>
 		/// 对 <see cref="Cyjb.TypeExt.IsCastableFrom"/> 方法进行测试。
@@ -65,6 +76,8 @@ namespace UnitTestCyjb
 			Assert.IsTrue(typeof(Enum).IsCastableFrom(typeof(Tristate)));
 			Assert.IsTrue(typeof(Delegate).IsCastableFrom(typeof(Func<int>)));
 			Assert.IsTrue(typeof(int?).IsCastableFrom(typeof(int)));
+			Assert.IsTrue(typeof(long?).IsCastableFrom(typeof(int?)));
+			Assert.IsTrue(typeof(int?).IsCastableFrom(typeof(long?)));
 			Assert.IsTrue(typeof(TestClass).IsCastableFrom(typeof(object)));
 			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(long)));
 			Assert.IsTrue(typeof(uint).IsCastableFrom(typeof(short)));
@@ -74,9 +87,46 @@ namespace UnitTestCyjb
 			Assert.IsTrue(typeof(Func<int>).IsCastableFrom(typeof(Delegate)));
 			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(int?)));
 			Assert.IsTrue(typeof(TestClass2).IsCastableFrom(typeof(TestClass)));
+			Assert.IsTrue(typeof(Array).IsCastableFrom(typeof(int[])));
+			Assert.IsTrue(typeof(Array).IsCastableFrom(typeof(object[])));
+			Assert.IsTrue(typeof(IList<int>).IsCastableFrom(typeof(List<int>)));
+			Assert.IsTrue(typeof(IList).IsCastableFrom(typeof(List<int>)));
+			Assert.IsTrue(typeof(int[]).IsCastableFrom(typeof(Array)));
+			Assert.IsTrue(typeof(object[]).IsCastableFrom(typeof(Array)));
+			Assert.IsTrue(typeof(List<int>).IsCastableFrom(typeof(IList<int>)));
+			Assert.IsTrue(typeof(List<int>).IsCastableFrom(typeof(IList)));
 			// Falses
-			Assert.IsFalse(typeof(TestClass).IsConvertableFrom(typeof(TestClass3)));
+			Assert.IsFalse(typeof(TestClass).IsImplicitFrom(typeof(TestClass3)));
 			Assert.IsFalse(typeof(string).IsCastableFrom(typeof(TestClass)));
+		}
+		/// <summary>
+		/// 对 <see cref="Cyjb.TypeExt.IsCastableFromOpenGenericIsAssignableFrom"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestOpenGenericIsAssignableFrom()
+		{
+			Type[] genericArguments;
+			Assert.IsTrue(typeof(IEnumerable<>).OpenGenericIsAssignableFrom(typeof(IEnumerable<>), out genericArguments));
+			Assert.AreEqual(1, genericArguments.Length);
+			Assert.IsTrue(genericArguments[0].IsGenericParameter);
+			Assert.IsTrue(typeof(IEnumerable<>).OpenGenericIsAssignableFrom(typeof(IEnumerable<int>), out genericArguments));
+			Assert.AreEqual(1, genericArguments.Length);
+			Assert.AreEqual(typeof(int), genericArguments[0]);
+			Assert.IsTrue(typeof(IEnumerable<>).OpenGenericIsAssignableFrom(typeof(Dictionary<int, string>), out genericArguments));
+			Assert.AreEqual(1, genericArguments.Length);
+			Assert.AreEqual(typeof(KeyValuePair<int, string>), genericArguments[0]);
+			Assert.IsTrue(typeof(IDictionary<,>).OpenGenericIsAssignableFrom(typeof(Dictionary<int, string>), out genericArguments));
+			Assert.AreEqual(2, genericArguments.Length);
+			Assert.AreEqual(typeof(int), genericArguments[0]);
+			Assert.AreEqual(typeof(string), genericArguments[1]);
+			Assert.IsTrue(typeof(TestClass4<,>).OpenGenericIsAssignableFrom(typeof(TestClass5<>), out genericArguments));
+			Assert.AreEqual(2, genericArguments.Length);
+			Assert.AreEqual(typeof(int), genericArguments[0]);
+			Assert.IsTrue(genericArguments[1].IsGenericParameter);
+			Assert.IsTrue(typeof(TestClass4<,>).OpenGenericIsAssignableFrom(typeof(TestClass5<string>), out genericArguments));
+			Assert.AreEqual(2, genericArguments.Length);
+			Assert.AreEqual(typeof(int), genericArguments[0]);
+			Assert.AreEqual(typeof(string), genericArguments[1]);
 		}
 		private class TestClass
 		{
@@ -99,5 +149,7 @@ namespace UnitTestCyjb
 				return 0;
 			}
 		}
+		private class TestClass4<T1, T2> { }
+		private class TestClass5<T> : TestClass4<int, T> { }
 	}
 }
