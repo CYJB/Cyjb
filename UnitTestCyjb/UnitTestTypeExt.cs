@@ -1,8 +1,8 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Cyjb;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
+using Cyjb;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTestCyjb
 {
