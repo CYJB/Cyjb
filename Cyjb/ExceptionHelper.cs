@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Cyjb
 {
@@ -127,6 +128,16 @@ namespace Cyjb
 		public static ArgumentException BaseConvertNegativeValue()
 		{
 			return GetArgumentException("BaseConvertNegativeValue");
+		}
+		/// <summary>
+		/// 返回枚举参数类型不匹配的异常。
+		/// </summary>
+		/// <param name="argType">参数类型。</param>
+		/// <param name="baseType">基类型。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		public static ArgumentException EnumTypeDoesNotMatch(Type argType, Type baseType)
+		{
+			return GetArgumentException("EnumTypeDoesNotMatch", argType, baseType);
 		}
 		/// <summary>
 		/// 返回基无效的异常。
@@ -436,6 +447,43 @@ namespace Cyjb
 		}
 
 		#endregion // OverflowException
+
+		#region 动态委托异常
+
+		/// <summary>
+		/// 返回找到多个与绑定约束匹配的方法的异常。
+		/// </summary>
+		/// <returns><see cref="System.Reflection.AmbiguousMatchException"/> 对象。</returns>
+		internal static AmbiguousMatchException AmbiguousMatchMethod()
+		{
+			return new AmbiguousMatchException(ExceptionResources.GetString("AmbiguousMatchMethod"));
+		}
+		/// <summary>
+		/// 返回绑定到目标方法出错的异常。
+		/// </summary>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException BindTargetMethod()
+		{
+			throw GetArgumentException("BindTargetMethod");
+		}
+		/// <summary>
+		/// 返回类型必须从委托派生的异常。
+		/// </summary>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException MustBeDelegate()
+		{
+			throw GetArgumentException("MustBeDelegate");
+		}
+		/// <summary>
+		/// 返回不能是开放泛型类型的异常。
+		/// </summary>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException UnboundGenParam()
+		{
+			throw GetArgumentException("UnboundGenParam");
+		}
+
+		#endregion // 动态委托异常
 
 	}
 }

@@ -16,7 +16,7 @@ namespace UnitTestCyjb
 		/// 对 <see cref="Cyjb.TypeExt.IsImplicitFrom"/> 方法进行测试。
 		/// </summary>
 		[TestMethod]
-		public void TestIsConvertableFrom()
+		public void TestIsImplicitFrom()
 		{
 			// Trues
 			Assert.IsTrue(typeof(object).IsImplicitFrom(typeof(object)));
@@ -38,6 +38,17 @@ namespace UnitTestCyjb
 			Assert.IsTrue(typeof(Array).IsImplicitFrom(typeof(object[])));
 			Assert.IsTrue(typeof(IList<int>).IsImplicitFrom(typeof(List<int>)));
 			Assert.IsTrue(typeof(IList).IsImplicitFrom(typeof(List<int>)));
+			// Nullable<T>
+			Assert.IsTrue(typeof(TestStruct).IsImplicitFrom(typeof(TestStruct2)));
+			Assert.IsTrue(typeof(TestStruct?).IsImplicitFrom(typeof(TestStruct2?)));
+			Assert.IsTrue(typeof(TestStruct?).IsImplicitFrom(typeof(TestStruct2)));
+			Assert.IsTrue(typeof(TestStruct).IsImplicitFrom(typeof(TestStruct3)));
+			Assert.IsTrue(typeof(TestStruct?).IsImplicitFrom(typeof(TestStruct3?)));
+			Assert.IsTrue(typeof(TestClass6).IsImplicitFrom(typeof(short)));
+			Assert.IsTrue(typeof(TestClass6).IsImplicitFrom(typeof(int)));
+			Assert.IsTrue(typeof(TestClass6).IsImplicitFrom(typeof(TestClass8)));
+			Assert.IsTrue(typeof(TestClass7).IsImplicitFrom(typeof(TestClass6)));
+			Assert.IsTrue(typeof(long).IsImplicitFrom(typeof(TestClass6)));
 			// Falses
 			Assert.IsFalse(typeof(int?).IsImplicitFrom(typeof(long?)));
 			Assert.IsFalse(typeof(TestClass).IsImplicitFrom(typeof(object)));
@@ -54,6 +65,18 @@ namespace UnitTestCyjb
 			Assert.IsFalse(typeof(int[]).IsImplicitFrom(typeof(Array)));
 			Assert.IsFalse(typeof(List<int>).IsImplicitFrom(typeof(IList<int>)));
 			Assert.IsFalse(typeof(List<int>).IsImplicitFrom(typeof(IList)));
+			// Nullable<T>
+			Assert.IsFalse(typeof(TestStruct2).IsImplicitFrom(typeof(TestStruct)));
+			Assert.IsFalse(typeof(TestStruct2).IsImplicitFrom(typeof(TestStruct?)));
+			Assert.IsFalse(typeof(TestStruct2?).IsImplicitFrom(typeof(TestStruct)));
+			Assert.IsFalse(typeof(TestStruct2?).IsImplicitFrom(typeof(TestStruct?)));
+			Assert.IsFalse(typeof(TestStruct).IsImplicitFrom(typeof(TestStruct2?)));
+			Assert.IsFalse(typeof(TestStruct2?).IsImplicitFrom(typeof(TestStruct)));
+			Assert.IsFalse(typeof(TestStruct3).IsImplicitFrom(typeof(TestStruct)));
+			Assert.IsFalse(typeof(TestStruct3).IsImplicitFrom(typeof(TestStruct?)));
+			Assert.IsFalse(typeof(TestStruct3?).IsImplicitFrom(typeof(TestStruct)));
+			Assert.IsFalse(typeof(TestStruct3?).IsImplicitFrom(typeof(TestStruct?)));
+			Assert.IsFalse(typeof(TestStruct).IsImplicitFrom(typeof(TestStruct3?)));
 		}
 		/// <summary>
 		/// 对 <see cref="Cyjb.TypeExt.IsCastableFrom"/> 方法进行测试。
@@ -95,9 +118,31 @@ namespace UnitTestCyjb
 			Assert.IsTrue(typeof(object[]).IsCastableFrom(typeof(Array)));
 			Assert.IsTrue(typeof(List<int>).IsCastableFrom(typeof(IList<int>)));
 			Assert.IsTrue(typeof(List<int>).IsCastableFrom(typeof(IList)));
+			// Nullable<T>
+			Assert.IsTrue(typeof(TestStruct).IsCastableFrom(typeof(TestStruct2)));
+			Assert.IsTrue(typeof(TestStruct?).IsCastableFrom(typeof(TestStruct2?)));
+			Assert.IsTrue(typeof(TestStruct?).IsCastableFrom(typeof(TestStruct2)));
+			Assert.IsTrue(typeof(TestStruct).IsCastableFrom(typeof(TestStruct3)));
+			Assert.IsTrue(typeof(TestStruct?).IsCastableFrom(typeof(TestStruct3?)));
+			Assert.IsTrue(typeof(TestClass6).IsCastableFrom(typeof(short)));
+			Assert.IsTrue(typeof(TestClass6).IsCastableFrom(typeof(int)));
+			Assert.IsTrue(typeof(TestClass6).IsCastableFrom(typeof(TestClass8)));
+			Assert.IsTrue(typeof(TestClass7).IsCastableFrom(typeof(TestClass6)));
+			Assert.IsTrue(typeof(long).IsCastableFrom(typeof(TestClass6)));
+			Assert.IsTrue(typeof(TestStruct).IsCastableFrom(typeof(TestStruct2?)));
+			Assert.IsTrue(typeof(TestStruct).IsCastableFrom(typeof(TestStruct3?)));
 			// Falses
 			Assert.IsFalse(typeof(TestClass).IsImplicitFrom(typeof(TestClass3)));
 			Assert.IsFalse(typeof(string).IsCastableFrom(typeof(TestClass)));
+			Assert.IsFalse(typeof(TestStruct2).IsCastableFrom(typeof(TestStruct)));
+			Assert.IsFalse(typeof(TestStruct2).IsCastableFrom(typeof(TestStruct?)));
+			Assert.IsFalse(typeof(TestStruct2?).IsCastableFrom(typeof(TestStruct)));
+			Assert.IsFalse(typeof(TestStruct2?).IsCastableFrom(typeof(TestStruct?)));
+			Assert.IsFalse(typeof(TestStruct2?).IsCastableFrom(typeof(TestStruct)));
+			Assert.IsFalse(typeof(TestStruct3).IsCastableFrom(typeof(TestStruct)));
+			Assert.IsFalse(typeof(TestStruct3).IsCastableFrom(typeof(TestStruct?)));
+			Assert.IsFalse(typeof(TestStruct3?).IsCastableFrom(typeof(TestStruct)));
+			Assert.IsFalse(typeof(TestStruct3?).IsCastableFrom(typeof(TestStruct?)));
 		}
 		/// <summary>
 		/// 对 <see cref="Cyjb.TypeExt.IsCastableFromOpenGenericIsAssignableFrom"/> 方法进行测试。
@@ -151,5 +196,41 @@ namespace UnitTestCyjb
 		}
 		private class TestClass4<T1, T2> { }
 		private class TestClass5<T> : TestClass4<int, T> { }
+		private class TestClass6
+		{
+			public static implicit operator TestClass6(int t)
+			{
+				return new TestClass6();
+			}
+			public static implicit operator int(TestClass6 t)
+			{
+				return 1;
+			}
+			public static implicit operator TestClass6(TestClass7 t)
+			{
+				return new TestClass6();
+			}
+			public static implicit operator TestClass8(TestClass6 t)
+			{
+				return new TestClass8();
+			}
+		}
+		private class TestClass7 { }
+		private class TestClass8 : TestClass7 { }
+		private struct TestStruct
+		{
+			public static implicit operator TestStruct(TestStruct3 tc)
+			{
+				return new TestStruct();
+			}
+		}
+		private struct TestStruct2
+		{
+			public static implicit operator TestStruct(TestStruct2 tc)
+			{
+				return new TestStruct();
+			}
+		}
+		private struct TestStruct3 { }
 	}
 }

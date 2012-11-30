@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AmbiguousMatchMethod" xml:space="preserve">
+    <value>More than one method is found with the specified name and matching the specified binding constraints.</value>
+    <comment>找到多个有指定名称且与指定绑定约束匹配的方法。</comment>
+  </data>
   <data name="ArgumentImplementIComparable" xml:space="preserve">
     <value>At least one object must implement IComparable.</value>
     <comment>必须至少有一个对象实现 IComparable。</comment>
@@ -161,9 +165,17 @@
     <value>String cannot contain a minus sign if the base is not 10.</value>
     <comment>如果基不为 10，则此字符串不能包含减号。</comment>
   </data>
+  <data name="BindTargetMethod" xml:space="preserve">
+    <value>Error binding to target method.</value>
+    <comment>绑定到目标方法时出错。</comment>
+  </data>
   <data name="EnumFailedVersion" xml:space="preserve">
     <value>Collection was modified; enumeration operation may not execute.</value>
     <comment>无法执行枚举操作。</comment>
+  </data>
+  <data name="EnumTypeDoesNotMatch" xml:space="preserve">
+    <value>The argument type '{0}' is not the same as the enum type '{1}'.</value>
+    <comment>枚举参数类型不匹配。</comment>
   </data>
   <data name="ExtraJunkAtEnd" xml:space="preserve">
     <value>Additional non-parsable characters are at the end of the string.</value>
@@ -184,6 +196,10 @@
   <data name="KeyDuplicate" xml:space="preserve">
     <value>An item with the same key has already been added.</value>
     <comment>键重复。</comment>
+  </data>
+  <data name="MustBeDelegate" xml:space="preserve">
+    <value>Type must derive from Delegate.</value>
+    <comment>类型必须从委托派生。</comment>
   </data>
   <data name="NoParsibleDigits" xml:space="preserve">
     <value>Could not find any recognizable digits.</value>
@@ -228,6 +244,10 @@
   <data name="ReadOnlyCollection" xml:space="preserve">
     <value>Collection is read-only.</value>
     <comment>集合是只读的。</comment>
+  </data>
+  <data name="UnboundGenParam" xml:space="preserve">
+    <value>Late bound operations cannot be performed on types or methods for which ContainsGenericParameters is true.</value>
+    <comment>不能是开放式泛型类型。</comment>
   </data>
   <data name="UnknownEnumType" xml:space="preserve">
     <value>Unknown enum type.</value>

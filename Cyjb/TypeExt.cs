@@ -12,6 +12,100 @@ namespace Cyjb
 	public static class TypeExt
 	{
 
+		#region 类型转换运算符
+
+		/// <summary>
+		/// 类型的隐式和显式类型转换可以转换到的类型。
+		/// </summary>
+		private static readonly ICache<Type, Dictionary<Type, OperatorType>> TypeOperators =
+			new LruCache<Type, Dictionary<Type, OperatorType>>(100);
+		/// <summary>
+		/// 类型转换运算符的类型。
+		/// </summary>
+		[Flags]
+		private enum OperatorType
+		{
+			/// <summary>
+			/// 可以从指定类型隐式转换。
+			/// </summary>
+			ImplicitFrom = 1,
+			/// <summary>
+			/// 可以隐式转换为指定类型。
+			/// </summary>
+			ImplicitTo = 2,
+			/// <summary>
+			/// 可以从指定类型强制转换。
+			/// </summary>
+			ExplicitFrom = 4,
+			/// <summary>
+			/// 可以强制转换为指定类型。
+			/// </summary>
+			ExplicitTo = 8,
+			/// <summary>
+			/// 可以从指定类型转换。
+			/// </summary>
+			From = 5,
+			/// <summary>
+			/// 可以转换为指定类型。
+			/// </summary>
+			To = 0xA
+		}
+		/// <summary>
+		/// 返回指定类型可以转换到的类型。
+		/// </summary>
+		/// <param name="type">要获取类型转换的类型。</param>
+		/// <returns>指定类型可以转换到的类型。</returns>
+		private static Dictionary<Type, OperatorType> GetTypeOperators(Type type)
+		{
+			return TypeOperators.GetOrAdd(type, t =>
+			{
+				Dictionary<Type, OperatorType> dict = new Dictionary<Type, OperatorType>();
+				MethodInfo[] methods = t.GetMethods(BindingFlags.Public | BindingFlags.Static);
+				for (int i = 0; i < methods.Length; i++)
+				{
+					MethodInfo m = methods[i];
+					OperatorType op = OperatorType.ExplicitTo;
+					Type opType = null;
+					if (m.ReturnType == type)
+					{
+						opType = m.GetParameters()[0].ParameterType;
+						if (m.Name == "op_Implicit")
+						{
+							op = OperatorType.ImplicitFrom;
+						}
+						else if (m.Name == "op_Explicit")
+						{
+							op = OperatorType.ExplicitFrom;
+						}
+					}
+					else
+					{
+						opType = m.ReturnType;
+						if (m.Name == "op_Implicit")
+						{
+							op = OperatorType.ImplicitTo;
+						}
+						else if (m.Name == "op_Explicit")
+						{
+							op = OperatorType.ExplicitTo;
+						}
+					}
+					OperatorType oldOp;
+					if (dict.TryGetValue(opType, out oldOp))
+					{
+						dict[opType] = oldOp | op;
+					}
+					else
+					{
+						dict.Add(opType, op);
+					}
+				}
+				return dict;
+			});
+		}
+
+		#endregion // 类型转换运算符
+
 		#region 是否可以进行隐式类型转换
 
 		/// <summary>
@@ -30,52 +124,28 @@ namespace Cyjb
 			{ typeof(double), new HashSet<Type>(){ typeof(char), typeof(sbyte), typeof(byte), typeof(short), typeof(ushort),
 				typeof(int), typeof(uint), typeof(long), typeof(ulong), typeof(float) } },
 			{ typeof(decimal), new HashSet<Type>(){ typeof(char), typeof(sbyte), typeof(byte), typeof(short), typeof(ushort),
-				typeof(int), typeof(uint), typeof(long), typeof(ulong), typeof(decimal) } },
+				typeof(int), typeof(uint), typeof(long), typeof(ulong) } },
 		};
 		/// <summary>
-		/// 类型的隐式和显式类型转换可以转换到的类型。
+		/// 确定当前的 <see cref="System.Type"/> 的实例是否可以从指定 <see cref="System.Type"/> 
+		/// 的实例进行内置隐式类型转换。
 		/// </summary>
-		private static readonly ICache<Type, Dictionary<Type, bool>> TypeOperators = new LruCache<Type, Dictionary<Type, bool>>(100);
-		/// <summary>
-		/// 返回指定类型可以转换到的类型。
-		/// </summary>
-		/// <param name="type">要获取类型转换的类型。</param>
-		/// <returns>指定类型可以转换到的类型。</returns>
-		private static Dictionary<Type, bool> GetTypeOperators(Type type)
+		/// <param name="type">要判断的实例。</param>
+		/// <param name="fromType">要与当前类型进行比较的类型。</param>
+		/// <returns>如果当前 <see cref="System.Type"/> 可以从 <paramref name="fromType"/>
+		/// 的实例分配或进行内置隐式类型转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		private static bool IsAssignableFromEx(Type type, Type fromType)
 		{
-			return TypeOperators.GetOrAdd(type, t =>
+			if (type.IsAssignableFrom(fromType))
 			{
-				Dictionary<Type, bool> dict = new Dictionary<Type, bool>();
-				MethodInfo[] methods = t.GetMethods(BindingFlags.Public | BindingFlags.Static);
-				for (int i = 0; i < methods.Length; i++)
-				{
-					MethodInfo m = methods[i];
-					if (m.Name == "op_Implicit")
-					{
-						dict.Add(m.ReturnType, true);
-					}
-					else if (m.Name == "op_Explicit")
-					{
-						dict.Add(m.ReturnType, false);
-					}
-				}
-				return dict;
-			});
-		}
-		/// <summary>
-		/// 返回指定类型可以转换到的类型。
-		/// </summary>
-		/// <param name="type">要获取类型转换的类型。</param>
-		/// <param name="implicitOnly">是否只获取隐式类型转换。</param>
-		/// <returns>指定类型可以转换到的类型。</returns>
-		private static IEnumerable<Type> GetTypeOperators(Type type, bool implicitOnly)
-		{
-			IEnumerable<KeyValuePair<Type, bool>> iter = GetTypeOperators(type);
-			if (implicitOnly)
-			{
-				iter = iter.Where(pair => pair.Value);
+				return true;
 			}
-			return iter.Select(pair => pair.Key);
+			HashSet<Type> typeSet;
+			if (ConvertFromDict.TryGetValue(type, out typeSet))
+			{
+				return typeSet.Contains(fromType);
+			}
+			return false;
 		}
 		/// <summary>
 		/// 确定当前的 <see cref="System.Type"/> 的实例是否可以从指定 <see cref="System.Type"/> 
@@ -98,39 +168,29 @@ namespace Cyjb
 			}
 			// 对 Nullable<T> 的支持。
 			Type[] genericArguments;
-			if (typeof(Nullable<>).OpenGenericIsAssignableFrom(type, out genericArguments))
+			if (InInheritanceChain(typeof(Nullable<>), type, out genericArguments))
 			{
 				type = genericArguments[0];
-				if (typeof(Nullable<>).OpenGenericIsAssignableFrom(fromType, out genericArguments))
+				if (InInheritanceChain(typeof(Nullable<>), fromType, out genericArguments))
 				{
 					fromType = genericArguments[0];
 				}
 			}
 			// 判断是否可以从实例分配。
-			if (type.IsAssignableFrom(fromType))
+			if (IsAssignableFromEx(type, fromType))
 			{
 				return true;
 			}
 			// 对隐式类型转换运算符进行判断。
-			bool isImplicit;
-			if (GetTypeOperators(fromType).TryGetValue(type, out isImplicit) && isImplicit)
+			if (GetTypeOperators(type).Any(pair => pair.Value.HasFlag(OperatorType.ImplicitFrom) &&
+				IsAssignableFromEx(pair.Key, fromType)))
 			{
 				return true;
 			}
-			// 对内置类型进行判断。
-			HashSet<Type> typeSet;
-			if (ConvertFromDict.TryGetValue(type, out typeSet))
+			if (GetTypeOperators(fromType).Any(pair => pair.Value.HasFlag(OperatorType.ImplicitTo) &&
+				IsAssignableFromEx(type, pair.Key)))
 			{
-				if (fromType.IsPrimitive || fromType == typeof(decimal))
-				{
-					// 内置类型间的转换。
-					return typeSet.Contains(fromType);
-				}
-				else
-				{
-					// 先进行隐式类型转换，再进行内置类型间的转换。
-					return typeSet.Overlaps(GetTypeOperators(fromType, true));
-				}
+				return true;
 			}
 			return false;
 		}
@@ -160,6 +220,27 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 确定当前的 <see cref="System.Type"/> 的实例是否可以从指定 <see cref="System.Type"/> 
+		/// 的实例进行内置强制类型转换。
+		/// </summary>
+		/// <param name="type">要判断的实例。</param>
+		/// <param name="fromType">要与当前类型进行比较的类型。</param>
+		/// <returns>如果当前 <see cref="System.Type"/> 可以从 <paramref name="fromType"/>
+		/// 的实例分配或进行内置强制类型转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		private static bool IsAssignableFromCastEx(Type type, Type fromType)
+		{
+			if (type.IsAssignableFrom(fromType))
+			{
+				return true;
+			}
+			HashSet<Type> typeSet;
+			if (CastFromDict.TryGetValue(type, out typeSet))
+			{
+				return typeSet.Contains(fromType);
+			}
+			return false;
+		}
+		/// <summary>
+		/// 确定当前的 <see cref="System.Type"/> 的实例是否可以从指定 <see cref="System.Type"/> 
 		/// 的实例进行强制类型转换。
 		/// </summary>
 		/// <param name="type">要判断的实例。</param>
@@ -179,34 +260,29 @@ namespace Cyjb
 			}
 			// 对 Nullable<T> 的支持。
 			Type[] genericArguments;
-			if (typeof(Nullable<>).OpenGenericIsAssignableFrom(type, out genericArguments))
+			if (InInheritanceChain(typeof(Nullable<>), type, out genericArguments))
 			{
 				type = genericArguments[0];
 			}
+			if (InInheritanceChain(typeof(Nullable<>), fromType, out genericArguments))
+			{
+				fromType = genericArguments[0];
+			}
 			// 判断是否可以从实例分配，强制类型转换允许沿着继承链反向转换。
-			if (type.IsAssignableFrom(fromType) || fromType.IsAssignableFrom(type))
+			if (IsAssignableFromCastEx(type, fromType) || IsAssignableFromCastEx(fromType, type))
 			{
 				return true;
 			}
-			// 对类型转换运算符进行判断。
-			if (GetTypeOperators(fromType).ContainsKey(type))
+			// 对强制类型转换运算符进行判断。
+			if (GetTypeOperators(type).Any(pair => pair.Value.AnyFlag(OperatorType.From) &&
+				IsAssignableFromCastEx(pair.Key, fromType)))
 			{
 				return true;
 			}
-			// 对内置类型进行判断。
-			HashSet<Type> typeSet;
-			if (CastFromDict.TryGetValue(type, out typeSet))
+			if (GetTypeOperators(fromType).Any(pair => pair.Value.AnyFlag(OperatorType.To) &&
+				IsAssignableFromCastEx(type, pair.Key)))
 			{
-				if (fromType.IsPrimitive || fromType == typeof(decimal))
-				{
-					// 内置类型间的转换。
-					return typeSet.Contains(fromType);
-				}
-				else
-				{
-					// 先进行类型转换，再进行内置类型间的转换。
-					return typeSet.Overlaps(GetTypeOperators(fromType, false));
-				}
+				return true;
 			}
 			return false;
 		}
