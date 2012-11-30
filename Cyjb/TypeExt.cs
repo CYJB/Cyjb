@@ -315,21 +315,23 @@ namespace Cyjb
 		{
 			if (type != null && fromType != null && type.IsGenericType)
 			{
-				if (!type.IsInterface || fromType.IsInterface)
+				if (type.IsInterface == fromType.IsInterface)
 				{
-					// 如果 type 是接口而 fromType 是类型，则无需查找继承链。
 					if (InInheritanceChain(type, fromType, out genericArguments))
 					{
 						return true;
 					}
 				}
-				// 查找实现的接口。
-				Type[] interfaces = fromType.GetInterfaces();
-				for (int i = 0; i < interfaces.Length; i++)
+				if (type.IsInterface)
 				{
-					if (InInheritanceChain(type, interfaces[i], out genericArguments))
+					// 查找实现的接口。
+					Type[] interfaces = fromType.GetInterfaces();
+					for (int i = 0; i < interfaces.Length; i++)
 					{
-						return true;
+						if (InInheritanceChain(type, interfaces[i], out genericArguments))
+						{
+							return true;
+						}
 					}
 				}
 			}
