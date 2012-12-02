@@ -128,6 +128,10 @@ namespace UnitTestCyjb
 			Assert.IsTrue(typeof(TestClass6).IsCastableFrom(typeof(int)));
 			Assert.IsTrue(typeof(TestClass6).IsCastableFrom(typeof(TestClass8)));
 			Assert.IsTrue(typeof(TestClass7).IsCastableFrom(typeof(TestClass6)));
+			Assert.IsTrue(typeof(TestClass10).IsCastableFrom(typeof(TestClass9)));
+			Assert.IsTrue(typeof(TestClass11).IsCastableFrom(typeof(TestClass9)));
+			Assert.IsTrue(typeof(TestClass9).IsCastableFrom(typeof(TestClass10)));
+			Assert.IsTrue(typeof(TestClass9).IsCastableFrom(typeof(TestClass11)));
 			Assert.IsTrue(typeof(long).IsCastableFrom(typeof(TestClass6)));
 			Assert.IsTrue(typeof(TestStruct).IsCastableFrom(typeof(TestStruct2?)));
 			Assert.IsTrue(typeof(TestStruct).IsCastableFrom(typeof(TestStruct3?)));
@@ -217,6 +221,19 @@ namespace UnitTestCyjb
 		}
 		private class TestClass7 { }
 		private class TestClass8 : TestClass7 { }
+		private class TestClass9
+		{
+			public static explicit operator TestClass10(TestClass9 t)
+			{
+				return new TestClass10();
+			}
+			public static explicit operator TestClass9(TestClass11 t)
+			{
+				return new TestClass9();
+			}
+		}
+		private class TestClass10 { }
+		private class TestClass11 : TestClass10 { }
 		private struct TestStruct
 		{
 			public static implicit operator TestStruct(TestStruct3 tc)

@@ -228,7 +228,7 @@ namespace Cyjb
 		/// 的实例分配或进行内置强制类型转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		private static bool IsAssignableFromCastEx(Type type, Type fromType)
 		{
-			if (type.IsAssignableFrom(fromType))
+			if (type.IsAssignableFrom(fromType) || fromType.IsAssignableFrom(type))
 			{
 				return true;
 			}
@@ -269,7 +269,7 @@ namespace Cyjb
 				fromType = genericArguments[0];
 			}
 			// 判断是否可以从实例分配，强制类型转换允许沿着继承链反向转换。
-			if (IsAssignableFromCastEx(type, fromType) || IsAssignableFromCastEx(fromType, type))
+			if (IsAssignableFromCastEx(type, fromType))
 			{
 				return true;
 			}
