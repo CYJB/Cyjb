@@ -64,40 +64,31 @@ namespace Cyjb
 				for (int i = 0; i < methods.Length; i++)
 				{
 					MethodInfo m = methods[i];
-					OperatorType op = OperatorType.ExplicitTo;
-					Type opType = null;
-					if (m.ReturnType == type)
+					bool opImplicit = m.Name == "op_Implicit";
+					bool opExplicit = m.Name == "op_Explicit";
+					if (opImplicit || opExplicit)
 					{
-						opType = m.GetParameters()[0].ParameterType;
-						if (m.Name == "op_Implicit")
+						OperatorType op = OperatorType.ExplicitTo;
+						Type opType = null;
+						if (m.ReturnType == type)
 						{
-							op = OperatorType.ImplicitFrom;
+							opType = m.GetParameters()[0].ParameterType;
+							op = opImplicit ? OperatorType.ImplicitFrom : OperatorType.ExplicitFrom;
 						}
-						else if (m.Name == "op_Explicit")
+						else
 						{
-							op = OperatorType.ExplicitFrom;
+							opType = m.ReturnType;
+							op = opImplicit ? OperatorType.ImplicitTo : OperatorType.ExplicitTo;
 						}
-					}
-					else
-					{
-						opType = m.ReturnType;
-						if (m.Name == "op_Implicit")
+						OperatorType oldOp;
+						if (dict.TryGetValue(opType, out oldOp))
 						{
-							op = OperatorType.ImplicitTo;
+							dict[opType] = oldOp | op;
 						}
-						else if (m.Name == "op_Explicit")
+						else
 						{
-							op = OperatorType.ExplicitTo;
+							dict.Add(opType, op);
 						}
-					}
-					OperatorType oldOp;
-					if (dict.TryGetValue(opType, out oldOp))
-					{
-						dict[opType] = oldOp | op;
-					}
-					else
-					{
-						dict.Add(opType, op);
 					}
 				}
 				return dict;
