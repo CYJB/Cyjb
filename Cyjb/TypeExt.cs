@@ -191,24 +191,13 @@ namespace Cyjb
 		#region 是否可以进行强制类型转换
 
 		/// <summary>
-		/// 可以进行强制类型转换的类型字典。
+		/// 可以进行强制类型转换的类型集合。
 		/// </summary>
-		private static readonly Dictionary<Type, HashSet<Type>> CastFromDict = CreateCastFromDict();
-		/// <summary>
-		/// 构造可以进行强制类型转换的类型字典。
-		/// </summary>
-		private static Dictionary<Type, HashSet<Type>> CreateCastFromDict()
-		{
-			Dictionary<Type, HashSet<Type>> dict = new Dictionary<Type, HashSet<Type>>();
-			// 互相可以进行强制类型转换的类型。
-			HashSet<Type> set = new HashSet<Type>(){ typeof(char), typeof(sbyte), typeof(byte), typeof(short), typeof(ushort),
-				typeof(int), typeof(uint), typeof(long), typeof(ulong), typeof(float), typeof(double), typeof(decimal) };
-			foreach (Type type in set)
-			{
-				dict.Add(type, set);
-			}
-			return dict;
-		}
+		/// <remarks>内置的强制类型转换是 Char, SByte, Byte, Int16, UInt16, Int32, UInt32, 
+		/// Int64, UInt64, Single, Double 和 Decimal 之间的相互转换，没必要也是用字典来表示，用集合同样可以。</remarks>
+		private static readonly HashSet<Type> CastFromSet = new HashSet<Type>(){ 
+			typeof(char), typeof(sbyte), typeof(byte), typeof(short), typeof(ushort),
+			typeof(int), typeof(uint), typeof(long), typeof(ulong), typeof(float), typeof(double), typeof(decimal) };
 		/// <summary>
 		/// 确定当前的 <see cref="System.Type"/> 的实例是否可以从指定 <see cref="System.Type"/> 
 		/// 的实例进行内置强制类型转换。
@@ -223,12 +212,7 @@ namespace Cyjb
 			{
 				return true;
 			}
-			HashSet<Type> typeSet;
-			if (CastFromDict.TryGetValue(type, out typeSet))
-			{
-				return typeSet.Contains(fromType);
-			}
-			return false;
+			return CastFromSet.Contains(type) && CastFromSet.Contains(fromType);
 		}
 		/// <summary>
 		/// 确定当前的 <see cref="System.Type"/> 的实例是否可以从指定 <see cref="System.Type"/> 
