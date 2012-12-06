@@ -674,11 +674,11 @@ namespace Cyjb
 			{
 				throw ExceptionHelper.ArgumentOutOfRange("length");
 			}
-			if (array == null)
+			if (array == null || length == 0)
 			{
-				length = 0;
+				return new T[0];
 			}
-			else if (length > array.Length)
+			if (length > array.Length)
 			{
 				length = array.Length;
 			}
@@ -700,11 +700,11 @@ namespace Cyjb
 			{
 				throw ExceptionHelper.ArgumentOutOfRange("length");
 			}
-			if (array == null)
+			if (array == null || length == 0)
 			{
-				length = 0;
+				return new T[0];
 			}
-			else if (length > array.Length)
+			if (length > array.Length)
 			{
 				length = array.Length;
 			}
@@ -725,7 +725,7 @@ namespace Cyjb
 		/// <paramref name="startIndex"/> 小于负的数组的长度。</exception>
 		public static T[] Subarray<T>(this T[] array, int startIndex)
 		{
-			if (array == null)
+			if (array == null || startIndex == array.Length)
 			{
 				return new T[0];
 			}
@@ -750,7 +750,7 @@ namespace Cyjb
 		/// <paramref name="length"/> 小于零。</exception>
 		public static T[] Subarray<T>(this T[] array, int startIndex, int length)
 		{
-			if (array == null)
+			if (array == null || length == 0)
 			{
 				return new T[0];
 			}
@@ -780,7 +780,7 @@ namespace Cyjb
 		/// <paramref name="startIndex"/> 指示的位置不在此数组中。</exception>
 		public static T[] Slice<T>(this T[] array, int startIndex)
 		{
-			if (array == null)
+			if (array == null || startIndex == array.Length)
 			{
 				return new T[0];
 			}
@@ -788,14 +788,11 @@ namespace Cyjb
 			{
 				startIndex += array.Length;
 			}
-			if (startIndex < array.Length)
+			if (startIndex < 0 || startIndex > array.Length)
 			{
-				return SubarrayInternal(array, startIndex, array.Length);
+				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
 			}
-			else
-			{
-				return new T[0];
-			}
+			return SubarrayInternal(array, startIndex, array.Length);
 		}
 		/// <summary>
 		/// 从当前数组的指定索引开始截取到指定索引结束的一部分。
@@ -812,7 +809,7 @@ namespace Cyjb
 		/// 指示的位置不在此数组中。</exception>
 		public static T[] Slice<T>(this T[] array, int startIndex, int endIndex)
 		{
-			if (array == null)
+			if (array == null || startIndex == endIndex)
 			{
 				return new T[0];
 			}
@@ -823,6 +820,14 @@ namespace Cyjb
 			if (endIndex < 0)
 			{
 				endIndex += array.Length;
+			}
+			if (startIndex < 0 || startIndex > array.Length)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+			}
+			if (endIndex < 0 || endIndex > array.Length)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("endIndex");
 			}
 			if (startIndex < endIndex)
 			{
@@ -843,7 +848,7 @@ namespace Cyjb
 		/// <returns>截取得到的数组。</returns>
 		private static T[] SubarrayInternal<T>(T[] array, int startIndex, int endIndex)
 		{
-			T[] re = new T[endIndex];
+			T[] re = new T[endIndex - startIndex];
 			for (int idx = 0, i = startIndex; i < endIndex; idx++, i++)
 			{
 				re[idx] = array[i];
