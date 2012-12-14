@@ -36,7 +36,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static sbyte ToSByte(string value, int fromBase)
 		{
-			return (sbyte)ToByte(value, fromBase);
+			return unchecked((sbyte)ToByte(value, fromBase));
 		}
 
 		#endregion // ToInt16
@@ -66,7 +66,7 @@ namespace Cyjb
 		/// <see cref="System.Int16.MaxValue"/> 的数字。</exception>
 		public static short ToInt16(string value, int fromBase)
 		{
-			return (short)ToUInt16(value, fromBase);
+			return unchecked((short)ToUInt16(value, fromBase));
 		}
 
 		#endregion // ToInt16
@@ -96,7 +96,7 @@ namespace Cyjb
 		/// <see cref="System.Int32.MaxValue"/> 的数字。</exception>
 		public static int ToInt32(string value, int fromBase)
 		{
-			return (int)ToUInt32(value, fromBase);
+			return unchecked((int)ToUInt32(value, fromBase));
 		}
 
 		#endregion // ToInt32
@@ -126,7 +126,7 @@ namespace Cyjb
 		/// <see cref="System.Int64.MaxValue"/> 的数字。</exception>
 		public static long ToInt64(string value, int fromBase)
 		{
-			return (long)ToUInt64(value, fromBase);
+			return unchecked((long)ToUInt64(value, fromBase));
 		}
 
 		#endregion // ToInt64
@@ -161,7 +161,7 @@ namespace Cyjb
 			{
 				throw ExceptionHelper.OverflowByte();
 			}
-			return (byte)result;
+			return unchecked((byte)result);
 		}
 
 		#endregion // ToInt16
@@ -197,7 +197,7 @@ namespace Cyjb
 			{
 				throw ExceptionHelper.OverflowUInt16();
 			}
-			return (ushort)result;
+			return unchecked((ushort)result);
 		}
 
 		#endregion // ToUInt64
@@ -255,7 +255,7 @@ namespace Cyjb
 						throw ExceptionHelper.ExtraJunkAtEnd();
 					}
 				}
-				uint next = result * uBase + (uint)t;
+				uint next = unchecked(result * uBase + (uint)t);
 				// 判断是否超出 UInt32 的范围。
 				if (next < result)
 				{
@@ -321,7 +321,7 @@ namespace Cyjb
 						throw ExceptionHelper.ExtraJunkAtEnd();
 					}
 				}
-				ulong next = result * ulBase + (ulong)t;
+				ulong next = unchecked(result * ulBase + (ulong)t);
 				// 判断是否超出 UInt64 的范围。
 				if (next < result)
 				{
