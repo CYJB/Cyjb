@@ -31,7 +31,7 @@ namespace Cyjb
 		/// 类型转换运算符的类型。
 		/// </summary>
 		[Flags]
-		private enum OperatorType
+		internal enum OperatorType
 		{
 			/// <summary>
 			/// 可以从指定类型隐式转换。
