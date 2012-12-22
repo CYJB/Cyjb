@@ -15,10 +15,18 @@ namespace Cyjb
 		#region 类型转换运算符
 
 		/// <summary>
+		/// 隐式类型转换方法的名称。
+		/// </summary>
+		internal const string ImplicitOperatorName = "op_Implicit";
+		/// <summary>
+		/// 显式类型转换方法的名称。
+		/// </summary>
+		internal const string ExplicitOperatorName = "op_Explicit";
+		/// <summary>
 		/// 类型的隐式和显式类型转换可以转换到的类型。
 		/// </summary>
-		private static readonly ICache<Type, Dictionary<Type, OperatorType>> TypeOperators =
-			new LruCache<Type, Dictionary<Type, OperatorType>>(100);
+		private static readonly ICache<RuntimeTypeHandle, Dictionary<RuntimeTypeHandle, OperatorType>> TypeOperators =
+			new LruCache<RuntimeTypeHandle, Dictionary<RuntimeTypeHandle, OperatorType>>(100);
 		/// <summary>
 		/// 类型转换运算符的类型。
 		/// </summary>
@@ -55,29 +63,29 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="type">要获取类型转换的类型。</param>
 		/// <returns>指定类型可以转换到的类型。</returns>
-		private static Dictionary<Type, OperatorType> GetTypeOperators(Type type)
+		internal static Dictionary<RuntimeTypeHandle, OperatorType> GetTypeOperators(RuntimeTypeHandle type)
 		{
 			return TypeOperators.GetOrAdd(type, t =>
 			{
-				Dictionary<Type, OperatorType> dict = new Dictionary<Type, OperatorType>();
-				MethodInfo[] methods = t.GetMethods(BindingFlags.Public | BindingFlags.Static);
+				Dictionary<RuntimeTypeHandle, OperatorType> dict = new Dictionary<RuntimeTypeHandle, OperatorType>();
+				MethodInfo[] methods = Type.GetTypeFromHandle(t).GetMethods(BindingFlags.Public | BindingFlags.Static);
 				for (int i = 0; i < methods.Length; i++)
 				{
 					MethodInfo m = methods[i];
-					bool opImplicit = m.Name == "op_Implicit";
-					bool opExplicit = m.Name == "op_Explicit";
+					bool opImplicit = m.Name == ImplicitOperatorName;
+					bool opExplicit = m.Name == ExplicitOperatorName;
 					if (opImplicit || opExplicit)
 					{
 						OperatorType op = OperatorType.ExplicitTo;
-						Type opType = null;
+						RuntimeTypeHandle opType;
 						if (m.ReturnType == type)
 						{
-							opType = m.GetParameters()[0].ParameterType;
+							opType = m.GetParameters()[0].ParameterType.TypeHandle;
 							op = opImplicit ? OperatorType.ImplicitFrom : OperatorType.ExplicitFrom;
 						}
 						else
 						{
-							opType = m.ReturnType;
+							opType = m.ReturnType.TypeHandle;
 							op = opImplicit ? OperatorType.ImplicitTo : OperatorType.ExplicitTo;
 						}
 						OperatorType oldOp;
@@ -102,20 +110,32 @@ namespace Cyjb
 		/// <summary>
 		/// 可以进行隐式类型转换的类型字典。
 		/// </summary>
-		private static readonly Dictionary<Type, HashSet<Type>> ConvertFromDict = new Dictionary<Type, HashSet<Type>>() { 
-			{ typeof(short), new HashSet<Type>(){ typeof(sbyte), typeof(byte) } },
-			{ typeof(ushort), new HashSet<Type>(){ typeof(char), typeof(byte) } },
-			{ typeof(int), new HashSet<Type>(){ typeof(char), typeof(sbyte), typeof(byte), typeof(short), typeof(ushort) } },
-			{ typeof(uint), new HashSet<Type>(){ typeof(char), typeof(byte), typeof(ushort) } },
-			{ typeof(long), new HashSet<Type>(){ typeof(char), typeof(sbyte), typeof(byte), typeof(short), typeof(ushort),
-				typeof(int), typeof(uint) } },
-			{ typeof(ulong), new HashSet<Type>(){ typeof(char), typeof(byte), typeof(ushort), typeof(uint) } },
-			{ typeof(float), new HashSet<Type>(){ typeof(char), typeof(sbyte), typeof(byte), typeof(short), typeof(ushort),
-				typeof(int), typeof(uint), typeof(long), typeof(ulong) } },
-			{ typeof(double), new HashSet<Type>(){ typeof(char), typeof(sbyte), typeof(byte), typeof(short), typeof(ushort),
-				typeof(int), typeof(uint), typeof(long), typeof(ulong), typeof(float) } },
-			{ typeof(decimal), new HashSet<Type>(){ typeof(char), typeof(sbyte), typeof(byte), typeof(short), typeof(ushort),
-				typeof(int), typeof(uint), typeof(long), typeof(ulong) } },
+		private static readonly Dictionary<RuntimeTypeHandle, HashSet<RuntimeTypeHandle>> ConvertFromDict =
+			new Dictionary<RuntimeTypeHandle, HashSet<RuntimeTypeHandle>>() { 
+				{ typeof(short).TypeHandle, new HashSet<RuntimeTypeHandle>(){ typeof(sbyte).TypeHandle, typeof(byte).TypeHandle } },
+				{ typeof(ushort).TypeHandle, new HashSet<RuntimeTypeHandle>(){ typeof(char).TypeHandle, typeof(byte).TypeHandle } },
+				{ typeof(int).TypeHandle, new HashSet<RuntimeTypeHandle>(){ 
+					typeof(char).TypeHandle, typeof(sbyte).TypeHandle, typeof(byte).TypeHandle, 
+					typeof(short).TypeHandle, typeof(ushort).TypeHandle } },
+				{ typeof(uint).TypeHandle, new HashSet<RuntimeTypeHandle>(){ 
+					typeof(char).TypeHandle, typeof(byte).TypeHandle, typeof(ushort).TypeHandle } },
+				{ typeof(long).TypeHandle, new HashSet<RuntimeTypeHandle>(){ 
+					typeof(char).TypeHandle, typeof(sbyte).TypeHandle, typeof(byte).TypeHandle, 
+					typeof(short).TypeHandle, typeof(ushort).TypeHandle, typeof(int).TypeHandle, typeof(uint).TypeHandle } },
+				{ typeof(ulong).TypeHandle, new HashSet<RuntimeTypeHandle>(){ 
+					typeof(char).TypeHandle, typeof(byte).TypeHandle, typeof(ushort).TypeHandle, typeof(uint).TypeHandle } },
+				{ typeof(float).TypeHandle, new HashSet<RuntimeTypeHandle>(){ 
+					typeof(char).TypeHandle, typeof(sbyte).TypeHandle, typeof(byte).TypeHandle, typeof(short).TypeHandle, 
+					typeof(ushort).TypeHandle, typeof(int).TypeHandle, typeof(uint).TypeHandle, 
+					typeof(long).TypeHandle, typeof(ulong).TypeHandle } },
+				{ typeof(double).TypeHandle, new HashSet<RuntimeTypeHandle>(){ 
+					typeof(char).TypeHandle, typeof(sbyte).TypeHandle, typeof(byte).TypeHandle, typeof(short).TypeHandle, 
+					typeof(ushort).TypeHandle, typeof(int).TypeHandle, typeof(uint).TypeHandle, typeof(long).TypeHandle, 
+					typeof(ulong).TypeHandle, typeof(float).TypeHandle } },
+				{ typeof(decimal).TypeHandle, new HashSet<RuntimeTypeHandle>(){ 
+					typeof(char).TypeHandle, typeof(sbyte).TypeHandle, typeof(byte).TypeHandle, typeof(short).TypeHandle, 
+					typeof(ushort).TypeHandle, typeof(int).TypeHandle, typeof(uint).TypeHandle, 
+					typeof(long).TypeHandle, typeof(ulong).TypeHandle } },
 		};
 		/// <summary>
 		/// 确定当前的 <see cref="System.Type"/> 的实例是否可以从指定 <see cref="System.Type"/> 
@@ -131,10 +151,10 @@ namespace Cyjb
 			{
 				return true;
 			}
-			HashSet<Type> typeSet;
-			if (ConvertFromDict.TryGetValue(type, out typeSet))
+			HashSet<RuntimeTypeHandle> typeSet;
+			if (ConvertFromDict.TryGetValue(type.TypeHandle, out typeSet))
 			{
-				return typeSet.Contains(fromType);
+				return typeSet.Contains(fromType.TypeHandle);
 			}
 			return false;
 		}
@@ -153,7 +173,7 @@ namespace Cyjb
 				return false;
 			}
 			// 总是可以隐式类型转换为 Object。
-			if (type == typeof(object))
+			if (type.TypeHandle.Equals(typeof(object).TypeHandle))
 			{
 				return true;
 			}
@@ -173,13 +193,13 @@ namespace Cyjb
 				return true;
 			}
 			// 对隐式类型转换运算符进行判断。
-			if (GetTypeOperators(type).Any(pair => pair.Value.HasFlag(OperatorType.ImplicitFrom) &&
-				IsAssignableFromEx(pair.Key, fromType)))
+			if (GetTypeOperators(type.TypeHandle).Any(pair => pair.Value.HasFlag(OperatorType.ImplicitFrom) &&
+				IsAssignableFromEx(Type.GetTypeFromHandle(pair.Key), fromType)))
 			{
 				return true;
 			}
-			if (GetTypeOperators(fromType).Any(pair => pair.Value.HasFlag(OperatorType.ImplicitTo) &&
-				IsAssignableFromEx(type, pair.Key)))
+			if (GetTypeOperators(fromType.TypeHandle).Any(pair => pair.Value.HasFlag(OperatorType.ImplicitTo) &&
+				IsAssignableFromEx(type, Type.GetTypeFromHandle(pair.Key))))
 			{
 				return true;
 			}
@@ -195,9 +215,10 @@ namespace Cyjb
 		/// </summary>
 		/// <remarks>内置的强制类型转换是 Char, SByte, Byte, Int16, UInt16, Int32, UInt32, 
 		/// Int64, UInt64, Single, Double 和 Decimal 之间的相互转换，没必要也是用字典来表示，用集合同样可以。</remarks>
-		private static readonly HashSet<Type> CastFromSet = new HashSet<Type>(){ 
-			typeof(char), typeof(sbyte), typeof(byte), typeof(short), typeof(ushort),
-			typeof(int), typeof(uint), typeof(long), typeof(ulong), typeof(float), typeof(double), typeof(decimal) };
+		private static readonly HashSet<RuntimeTypeHandle> CastFromSet = new HashSet<RuntimeTypeHandle>(){ 
+			typeof(char).TypeHandle, typeof(sbyte).TypeHandle, typeof(byte).TypeHandle, typeof(short).TypeHandle, 
+			typeof(ushort).TypeHandle, typeof(int).TypeHandle, typeof(uint).TypeHandle, typeof(long).TypeHandle, 
+			typeof(ulong).TypeHandle, typeof(float).TypeHandle, typeof(double).TypeHandle, typeof(decimal).TypeHandle };
 		/// <summary>
 		/// 确定当前的 <see cref="System.Type"/> 的实例是否可以从指定 <see cref="System.Type"/> 
 		/// 的实例进行内置强制类型转换。
@@ -212,7 +233,7 @@ namespace Cyjb
 			{
 				return true;
 			}
-			return CastFromSet.Contains(type) && CastFromSet.Contains(fromType);
+			return CastFromSet.Contains(type.TypeHandle) && CastFromSet.Contains(fromType.TypeHandle);
 		}
 		/// <summary>
 		/// 确定当前的 <see cref="System.Type"/> 的实例是否可以从指定 <see cref="System.Type"/> 
@@ -249,13 +270,13 @@ namespace Cyjb
 				return true;
 			}
 			// 对强制类型转换运算符进行判断。
-			if (GetTypeOperators(type).Any(pair => pair.Value.AnyFlag(OperatorType.From) &&
-				IsAssignableFromCastEx(pair.Key, fromType)))
+			if (GetTypeOperators(type.TypeHandle).Any(pair => pair.Value.AnyFlag(OperatorType.From) &&
+				IsAssignableFromCastEx(Type.GetTypeFromHandle(pair.Key), fromType)))
 			{
 				return true;
 			}
-			if (GetTypeOperators(fromType).Any(pair => pair.Value.AnyFlag(OperatorType.To) &&
-				IsAssignableFromCastEx(type, pair.Key)))
+			if (GetTypeOperators(fromType.TypeHandle).Any(pair => pair.Value.AnyFlag(OperatorType.To) &&
+				IsAssignableFromCastEx(type, Type.GetTypeFromHandle(pair.Key))))
 			{
 				return true;
 			}
