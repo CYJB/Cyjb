@@ -159,6 +159,15 @@ namespace Cyjb
 			// 对 Nullable<T> 的支持。
 			NullableAssignableFrom(ref type);
 			NullableAssignableFrom(ref fromType);
+			// 对枚举的支持。
+			if (type.IsEnum)
+			{
+				type = Enum.GetUnderlyingType(type);
+			}
+			if (fromType.IsEnum)
+			{
+				fromType = Enum.GetUnderlyingType(fromType);
+			}
 			// 判断是否可以从实例分配，强制类型转换允许沿着继承链反向转换。
 			if (IsAssignableFromCastEx(type, fromType))
 			{
