@@ -39,26 +39,40 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayExt.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="CastBinder.cs" />
+    <Compile Include="CharComparer.cs" />
+    <Compile Include="CharComparison.cs" />
     <Compile Include="CharExt.cs" />
+    <Compile Include="CharIgnoreCaseComparer.cs" />
     <Compile Include="Collections\ArrayAdapter`1.cs" />
     <Compile Include="Collections\CollectionDebugView`1.cs" />
+    <Compile Include="Collections\ObjectModel\IteratorBase`1.cs" />
+    <Compile Include="Configurations\ConfigurationElementCollection`1.cs" />
+    <Compile Include="Configurations\ConfigurationElementCollection`2.cs" />
+    <Compile Include="ConversionCache.cs" />
+    <Compile Include="ConversionMethod.cs" />
+    <Compile Include="ConversionType.cs" />
+    <Compile Include="ConvertExt.cs" />
+    <Compile Include="DelegateBuilder.cs" />
     <Compile Include="EnumerableExt.cs" />
+    <Compile Include="EnumExt.cs" />
     <Compile Include="IntegerExt.cs" />
     <Compile Include="RandomExt.cs" />
+    <Compile Include="TypeExt.cs" />
+    <Compile Include="Utility\CacheCreateExceptionEventArgs.cs" />
+    <Compile Include="Utility\CacheElement.cs" />
+    <Compile Include="Utility\CacheElementCollection.cs" />
+    <Compile Include="Utility\CacheFactory.cs" />
+    <Compile Include="Utility\CacheSection.cs" />
     <Compile Include="Utility\LruCache`2.cs" />
     <Compile Include="Utility\LruNode`2.cs" />
-    <Compile Include="Utility\LruNormalCache`2.cs" />
-    <Compile Include="Utility\LruNormalNode`2.cs" />
     <Compile Include="Collections\ObjectModel\CollectionBase`1.cs" />
     <Compile Include="Collections\ObjectModel\DictionaryBase`2.cs">
       <SubType>Code</SubType>
