@@ -19,7 +19,7 @@ namespace Cyjb
 		[SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Flag")]
 		public static bool AnyFlag(this Enum baseEnum, Enum value)
 		{
-			if (!baseEnum.GetType().IsEquivalentTo(value.GetType()))
+			if (!Type.GetTypeHandle(baseEnum).Equals(Type.GetTypeHandle(value)))
 			{
 				throw ExceptionHelper.EnumTypeDoesNotMatch(value.GetType(), baseEnum.GetType());
 			}
