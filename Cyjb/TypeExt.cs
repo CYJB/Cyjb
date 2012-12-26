@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using Cyjb.Utility;
 
 namespace Cyjb
 {
@@ -11,99 +9,6 @@ namespace Cyjb
 	/// </summary>
 	public static class TypeExt
 	{
-
-		#region 类型转换运算符
-
-		/// <summary>
-		/// 隐式类型转换方法的名称。
-		/// </summary>
-		internal const string ImplicitOperatorName = "op_Implicit";
-		/// <summary>
-		/// 显式类型转换方法的名称。
-		/// </summary>
-		internal const string ExplicitOperatorName = "op_Explicit";
-		/// <summary>
-		/// 类型的隐式和显式类型转换可以转换到的类型。
-		/// </summary>
-		private static readonly ICache<RuntimeTypeHandle, Dictionary<RuntimeTypeHandle, OperatorType>> TypeOperators =
-			new LruCache<RuntimeTypeHandle, Dictionary<RuntimeTypeHandle, OperatorType>>(100);
-		/// <summary>
-		/// 类型转换运算符的类型。
-		/// </summary>
-		[Flags]
-		internal enum OperatorType
-		{
-			/// <summary>
-			/// 可以从指定类型隐式转换。
-			/// </summary>
-			ImplicitFrom = 1,
-			/// <summary>
-			/// 可以隐式转换为指定类型。
-			/// </summary>
-			ImplicitTo = 2,
-			/// <summary>
-			/// 可以从指定类型强制转换。
-			/// </summary>
-			ExplicitFrom = 4,
-			/// <summary>
-			/// 可以强制转换为指定类型。
-			/// </summary>
-			ExplicitTo = 8,
-			/// <summary>
-			/// 可以从指定类型转换。
-			/// </summary>
-			From = 5,
-			/// <summary>
-			/// 可以转换为指定类型。
-			/// </summary>
-			To = 0xA
-		}
-		/// <summary>
-		/// 返回指定类型可以转换到的类型。
-		/// </summary>
-		/// <param name="type">要获取类型转换的类型。</param>
-		/// <returns>指定类型可以转换到的类型。</returns>
-		internal static Dictionary<RuntimeTypeHandle, OperatorType> GetTypeOperators(RuntimeTypeHandle type)
-		{
-			return TypeOperators.GetOrAdd(type, t =>
-			{
-				Dictionary<RuntimeTypeHandle, OperatorType> dict = new Dictionary<RuntimeTypeHandle, OperatorType>();
-				MethodInfo[] methods = Type.GetTypeFromHandle(t).GetMethods(BindingFlags.Public | BindingFlags.Static);
-				for (int i = 0; i < methods.Length; i++)
-				{
-					MethodInfo m = methods[i];
-					bool opImplicit = m.Name == ImplicitOperatorName;
-					bool opExplicit = m.Name == ExplicitOperatorName;
-					if (opImplicit || opExplicit)
-					{
-						OperatorType op = OperatorType.ExplicitTo;
-						RuntimeTypeHandle opType;
-						if (m.ReturnType == type)
-						{
-							opType = m.GetParameters()[0].ParameterType.TypeHandle;
-							op = opImplicit ? OperatorType.ImplicitFrom : OperatorType.ExplicitFrom;
-						}
-						else
-						{
-							opType = m.ReturnType.TypeHandle;
-							op = opImplicit ? OperatorType.ImplicitTo : OperatorType.ExplicitTo;
-						}
-						OperatorType oldOp;
-						if (dict.TryGetValue(opType, out oldOp))
-						{
-							dict[opType] = oldOp | op;
-						}
-						else
-						{
-							dict.Add(opType, op);
-						}
-					}
-				}
-				return dict;
-			});
-		}
-
-		#endregion // 类型转换运算符
 
 		#region 是否可以进行隐式类型转换
 
@@ -178,14 +83,9 @@ namespace Cyjb
 				return true;
 			}
 			// 对 Nullable<T> 的支持。
-			Type[] genericArguments;
-			if (InInheritanceChain(typeof(Nullable<>), type, out genericArguments))
+			if (NullableAssignableFrom(ref type))
 			{
-				type = genericArguments[0];
-				if (InInheritanceChain(typeof(Nullable<>), fromType, out genericArguments))
-				{
-					fromType = genericArguments[0];
-				}
+				NullableAssignableFrom(ref fromType);
 			}
 			// 判断是否可以从实例分配。
 			if (IsAssignableFromEx(type, fromType))
@@ -193,13 +93,15 @@ namespace Cyjb
 				return true;
 			}
 			// 对隐式类型转换运算符进行判断。
-			if (GetTypeOperators(type.TypeHandle).Any(pair => pair.Value.HasFlag(OperatorType.ImplicitFrom) &&
-				IsAssignableFromEx(Type.GetTypeFromHandle(pair.Key), fromType)))
+			if (ConversionCache.GetTypeOperators(type.TypeHandle).Any(
+				pair => pair.Value.ConversionType.HasFlag(ConversionType.ImplicitFrom) &&
+					IsAssignableFromEx(Type.GetTypeFromHandle(pair.Key), fromType)))
 			{
 				return true;
 			}
-			if (GetTypeOperators(fromType.TypeHandle).Any(pair => pair.Value.HasFlag(OperatorType.ImplicitTo) &&
-				IsAssignableFromEx(type, Type.GetTypeFromHandle(pair.Key))))
+			if (ConversionCache.GetTypeOperators(fromType.TypeHandle).Any(
+				pair => pair.Value.ConversionType.HasFlag(ConversionType.ImplicitTo) &&
+					IsAssignableFromEx(type, Type.GetTypeFromHandle(pair.Key))))
 			{
 				return true;
 			}
@@ -255,28 +157,23 @@ namespace Cyjb
 				return true;
 			}
 			// 对 Nullable<T> 的支持。
-			Type[] genericArguments;
-			if (InInheritanceChain(typeof(Nullable<>), type, out genericArguments))
-			{
-				type = genericArguments[0];
-			}
-			if (InInheritanceChain(typeof(Nullable<>), fromType, out genericArguments))
-			{
-				fromType = genericArguments[0];
-			}
+			NullableAssignableFrom(ref type);
+			NullableAssignableFrom(ref fromType);
 			// 判断是否可以从实例分配，强制类型转换允许沿着继承链反向转换。
 			if (IsAssignableFromCastEx(type, fromType))
 			{
 				return true;
 			}
 			// 对强制类型转换运算符进行判断。
-			if (GetTypeOperators(type.TypeHandle).Any(pair => pair.Value.AnyFlag(OperatorType.From) &&
-				IsAssignableFromCastEx(Type.GetTypeFromHandle(pair.Key), fromType)))
+			if (ConversionCache.GetTypeOperators(type.TypeHandle).Any(
+				pair => pair.Value.ConversionType.AnyFlag(ConversionType.From) &&
+					IsAssignableFromCastEx(Type.GetTypeFromHandle(pair.Key), fromType)))
 			{
 				return true;
 			}
-			if (GetTypeOperators(fromType.TypeHandle).Any(pair => pair.Value.AnyFlag(OperatorType.To) &&
-				IsAssignableFromCastEx(type, Type.GetTypeFromHandle(pair.Key))))
+			if (ConversionCache.GetTypeOperators(fromType.TypeHandle).Any(
+				pair => pair.Value.ConversionType.AnyFlag(ConversionType.To) &&
+					IsAssignableFromCastEx(type, Type.GetTypeFromHandle(pair.Key))))
 			{
 				return true;
 			}
@@ -333,6 +230,23 @@ namespace Cyjb
 			}
 			genericArguments = null;
 			return false;
+		}
+		/// <summary>
+		/// 确定指定 <see cref="System.Type"/> 是否是 Nullable&lt;&gt; 泛型，如果是则返回泛型的参数。
+		/// </summary>
+		/// <param name="type">要判断是否可空类型的类型。如果是可空类型，则返回泛型类型参数；否则不变。</param>
+		/// <returns>如果 <paramref name="type"/> 是可空类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		internal static bool NullableAssignableFrom(ref Type type)
+		{
+			if (type.IsGenericType && type.GetGenericTypeDefinition().TypeHandle.Equals(typeof(Nullable<>).TypeHandle))
+			{
+				type = type.GetGenericArguments()[0];
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		/// <summary>
 		/// 确定当前的开放泛型类型是否在指定 <see cref="System.Type"/> 类型的继承链中，并返回泛型的参数。
