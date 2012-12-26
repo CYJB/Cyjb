@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace Cyjb.Collections.ObjectModel
@@ -21,7 +22,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// 获取空的只读泛型集合。
 		/// </summary>
 		/// <value>空的只读泛型集合。</value>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
+		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
 		public static IDictionary<TKey, TValue> Empty
 		{
 			get
@@ -36,7 +37,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 初始化 <see cref="ReadOnlyDictionary&lt;TKey,TValue&gt;"/> 类的新实例。
 		/// </summary>
-		protected ReadOnlyDictionary() { }
+		protected ReadOnlyDictionary() : base(true) { }
 		/// <summary>
 		/// 将 <see cref="ReadOnlyDictionary&lt;TKey,TValue&gt;"/> 类的新实例初始化为指定字典的包装。
 		/// </summary>
@@ -44,7 +45,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="dict"/> 为 <c>null</c>。</exception>
 		public ReadOnlyDictionary(IDictionary<TKey, TValue> dict)
-			: base(dict)
+			: base(dict, true)
 		{
 			ExceptionHelper.CheckArgumentNull(dict, "collection");
 		}
@@ -55,6 +56,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="array"/> 为 <c>null</c>。</exception>
 		public ReadOnlyDictionary(KeyValuePair<TKey, TValue>[] array)
+			: base(true)
 		{
 			ExceptionHelper.CheckArgumentNull(array, "array");
 			for (int i = 0; i < array.Length; i++)
@@ -69,6 +71,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="enumerable"/> 为 <c>null</c>。</exception>
 		public ReadOnlyDictionary(IEnumerable<KeyValuePair<TKey, TValue>> enumerable)
+			: base(true)
 		{
 			ExceptionHelper.CheckArgumentNull(enumerable, "enumerable");
 			foreach (KeyValuePair<TKey, TValue> pair in enumerable)
@@ -76,20 +79,5 @@ namespace Cyjb.Collections.ObjectModel
 				this.Items.Add(pair);
 			}
 		}
-
-		#region ICollection<KeyValuePair<TKey,TValue>> 成员
-
-		/// <summary>
-		/// 获取一个值，该值指示 <see cref="ReadOnlyDictionary&lt;TKey,TValue&gt;"/> 是否为只读。
-		/// </summary>
-		/// <value>如果 <see cref="ReadOnlyDictionary&lt;TKey,TValue&gt;"/> 为只读，则为 <c>true</c>；
-		/// 否则为 <c>false</c>。</value>
-		public override bool IsReadOnly
-		{
-			get { return true; }
-		}
-
-		#endregion // ICollection<KeyValuePair<TKey,TValue>> 成员
-
 	}
 }

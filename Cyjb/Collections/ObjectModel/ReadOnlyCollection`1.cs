@@ -36,7 +36,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 初始化 <see cref="ReadOnlyCollection&lt;T&gt;"/> 类的新实例。
 		/// </summary>
-		protected ReadOnlyCollection() { }
+		protected ReadOnlyCollection() : base(true) { }
 		/// <summary>
 		/// 将 <see cref="ReadOnlyCollection&lt;T&gt;"/> 类的新实例初始化为指定集合的包装。
 		/// </summary>
@@ -44,7 +44,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="collection"/> 为 <c>null</c>。</exception>
 		public ReadOnlyCollection(ICollection<T> collection)
-			: base(collection)
+			: base(collection, true)
 		{
 			ExceptionHelper.CheckArgumentNull(collection, "collection");
 		}
@@ -55,7 +55,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="array"/> 为 <c>null</c>。</exception>
 		public ReadOnlyCollection(T[] array)
-			: base(new ArrayAdapter<T>(array))
+			: base(new ArrayAdapter<T>(array), true)
 		{ }
 		/// <summary>
 		/// 将 <see cref="ReadOnlyCollection&lt;T&gt;"/> 类的新实例初始化为指定迭代器中数据的包装。
@@ -64,22 +64,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="enumerable"/> 为 <c>null</c>。</exception>
 		public ReadOnlyCollection(IEnumerable<T> enumerable)
-			: base(new ArrayAdapter<T>(enumerable.ToArray()))
+			: base(new ArrayAdapter<T>(enumerable.ToArray()), true)
 		{ }
-
-		#region ICollection<T> 成员
-
-		/// <summary>
-		/// 获取一个值，该值指示 <see cref="ReadOnlyCollection&lt;T&gt;"/> 是否为只读。
-		/// </summary>
-		/// <value>如果 <see cref="ReadOnlyCollection&lt;T&gt;"/> 为只读，则为 <c>true</c>；
-		/// 否则为 <c>false</c>。</value>
-		public override bool IsReadOnly
-		{
-			get { return true; }
-		}
-
-		#endregion // ICollection<T> 成员
-
 	}
 }

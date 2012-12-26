@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -37,7 +36,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 初始化 <see cref="ReadOnlyList&lt;T&gt;"/> 类的新实例。
 		/// </summary>
-		protected ReadOnlyList() { }
+		protected ReadOnlyList() : base(true) { }
 		/// <summary>
 		/// 将 <see cref="ReadOnlyList&lt;T&gt;"/> 类的新实例初始化为指定列表的包装。
 		/// </summary>
@@ -45,7 +44,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="list"/> 为 <c>null</c>。</exception>
 		public ReadOnlyList(IList<T> list)
-			: base(list)
+			: base(list, true)
 		{
 			ExceptionHelper.CheckArgumentNull(list, "list");
 		}
@@ -56,7 +55,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="array"/> 为 <c>null</c>。</exception>
 		public ReadOnlyList(T[] array)
-			: base(new ArrayAdapter<T>(array))
+			: base(new ArrayAdapter<T>(array), true)
 		{ }
 		/// <summary>
 		/// 将 <see cref="ReadOnlyList&lt;T&gt;"/> 类的新实例初始化为指定迭代器中数据的包装。
@@ -65,22 +64,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="enumerable"/> 为 <c>null</c>。</exception>
 		public ReadOnlyList(IEnumerable<T> enumerable)
-			: base(new ArrayAdapter<T>(enumerable.ToArray()))
+			: base(new ArrayAdapter<T>(enumerable.ToArray()), true)
 		{ }
-
-		#region ICollection<T> 成员
-
-		/// <summary>
-		/// 获取一个值，该值指示 <see cref="ReadOnlyList&lt;T&gt;"/> 是否为只读。
-		/// </summary>
-		/// <value>如果 <see cref="ReadOnlyList&lt;T&gt;"/> 为只读，则为 <c>true</c>；
-		/// 否则为 <c>false</c>。</value>
-		public override bool IsReadOnly
-		{
-			get { return true; }
-		}
-
-		#endregion // ICollection<T> 成员
-
 	}
 }
