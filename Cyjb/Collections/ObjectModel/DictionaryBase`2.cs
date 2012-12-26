@@ -23,6 +23,11 @@ namespace Cyjb.Collections.ObjectModel
 		[NonSerialized, DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private object syncRoot;
 		/// <summary>
+		/// 集合是否是只读的。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private readonly bool isReadOnly;
+		/// <summary>
 		/// 键集合。
 		/// </summary>
 		[NonSerialized, DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -45,12 +50,31 @@ namespace Cyjb.Collections.ObjectModel
 			this.items = new Dictionary<TKey, TValue>();
 		}
 		/// <summary>
+		/// 初始化 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 类的新实例。
+		/// </summary>
+		/// <param name="isReadOnly">集合是否是只读的。</param>
+		protected DictionaryBase(bool isReadOnly)
+		{
+			this.items = new Dictionary<TKey, TValue>();
+			this.isReadOnly = isReadOnly;
+		}
+		/// <summary>
 		/// 将 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 类的新实例初始化为指定字典的包装。
 		/// </summary>
 		/// <param name="dict">由新的字典包装的字典。</param>
 		protected DictionaryBase(IDictionary<TKey, TValue> dict)
 		{
 			this.items = dict;
+		}
+		/// <summary>
+		/// 将 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 类的新实例初始化为指定字典的包装。
+		/// </summary>
+		/// <param name="dict">由新的字典包装的字典。</param>
+		/// <param name="isReadOnly">集合的包装是否是只读的。</param>
+		protected DictionaryBase(IDictionary<TKey, TValue> dict, bool isReadOnly)
+		{
+			this.items = dict;
+			this.isReadOnly = isReadOnly;
 		}
 		/// <summary>
 		/// 确定 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 是否包含特定值。
@@ -90,7 +114,9 @@ namespace Cyjb.Collections.ObjectModel
 		/// 从 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 中移除所指定的键的值。
 		/// </summary>
 		/// <param name="key">要移除的元素的键。</param>
-		/// <returns>如果成功找到并移除该元素，则为 <c>true</c>；否则为 <c>false</c>。如果在 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 中没有找到 <paramref name="key"/>，此方法则返回 <c>false</c>。</returns>
+		/// <returns>如果成功找到并移除该元素，则为 <c>true</c>；否则为 <c>false</c>。
+		/// 如果在 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 中没有找到 <paramref name="key"/>，
+		/// 此方法则返回 <c>false</c>。</returns>
 		protected virtual bool RemoveItem(TKey key)
 		{
 			return this.items.Remove(key);
@@ -103,6 +129,20 @@ namespace Cyjb.Collections.ObjectModel
 		protected virtual void SetItem(TKey key, TValue value)
 		{
 			this.items[key] = value;
+		}
+		/// <summary>
+		/// 获取与指定的键相关联的值。
+		/// </summary>
+		/// <param name="key">要获取其值的键。</param>
+		/// <param name="queryValue">是否需要获取值。如果为 <c>true</c>，则需要获取值；
+		/// 否则只需要返回是否存在的布尔值。</param>
+		/// <param name="value">当此方法返回时，如果找到指定键，则返回与该键相关联的值；
+		/// 否则，将返回 <paramref name="key"/> 参数的类型的默认值。该参数未经初始化即被传递。</param>
+		/// <returns>如果 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 对象包含具有指定键的元素，
+		/// 则为 <c>true</c>；否则，为 <c>false</c>。</returns>
+		protected virtual bool TryGetValue(TKey key, bool queryValue, out TValue value)
+		{
+			return this.items.TryGetValue(key, out value);
 		}
 		/// <summary>
 		/// 获取 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 周围的 <see cref="IDictionary&lt;TKey,TValue&gt;"/> 包装。
@@ -172,7 +212,7 @@ namespace Cyjb.Collections.ObjectModel
 			}
 			set
 			{
-				if (this.IsReadOnly)
+				if (this.isReadOnly)
 				{
 					throw ExceptionHelper.ReadOnlyCollection();
 				}
@@ -191,13 +231,9 @@ namespace Cyjb.Collections.ObjectModel
 		/// 是只读的。</exception>
 		public void Add(TKey key, TValue value)
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				throw ExceptionHelper.ReadOnlyCollection();
-			}
-			if (this.ContainsKey(key))
-			{
-				throw ExceptionHelper.KeyDuplicate();
 			}
 			this.AddItem(key, value);
 		}
@@ -211,7 +247,7 @@ namespace Cyjb.Collections.ObjectModel
 		public bool ContainsKey(TKey key)
 		{
 			TValue value;
-			return this.TryGetValue(key, out value);
+			return this.TryGetValue(key, false, out value);
 		}
 
 		/// <summary>
@@ -225,7 +261,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 是只读的。</exception>
 		public bool Remove(TKey key)
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				throw ExceptionHelper.ReadOnlyCollection();
 			}
@@ -240,9 +276,9 @@ namespace Cyjb.Collections.ObjectModel
 		/// 否则，将返回 <paramref name="key"/> 参数的类型的默认值。该参数未经初始化即被传递。</param>
 		/// <returns>如果 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 对象包含具有指定键的元素，
 		/// 则为 <c>true</c>；否则，为 <c>false</c>。</returns>
-		public virtual bool TryGetValue(TKey key, out TValue value)
+		public bool TryGetValue(TKey key, out TValue value)
 		{
-			return this.items.TryGetValue(key, out value);
+			return this.TryGetValue(key, true, out value);
 		}
 
 		#endregion // IDictionary<TKey, TValue> 成员
@@ -263,9 +299,9 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		/// <value>如果 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 为只读，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</value>
-		public virtual bool IsReadOnly
+		public bool IsReadOnly
 		{
-			get { return items.IsReadOnly; }
+			get { return this.isReadOnly; }
 		}
 
 		/// <summary>
@@ -275,13 +311,9 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.NotSupportedException"><see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 是只读的。</exception>
 		public void Add(KeyValuePair<TKey, TValue> item)
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				throw ExceptionHelper.ReadOnlyCollection();
-			}
-			if (this.ContainsKey(item.Key))
-			{
-				throw ExceptionHelper.KeyDuplicate();
 			}
 			this.AddItem(item.Key, item.Value);
 		}
@@ -293,7 +325,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 是只读的。</exception>
 		public void Clear()
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				throw ExceptionHelper.ReadOnlyCollection();
 			}
@@ -360,7 +392,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 是只读的。</exception>
 		public bool Remove(KeyValuePair<TKey, TValue> item)
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				throw ExceptionHelper.ReadOnlyCollection();
 			}
@@ -399,7 +431,7 @@ namespace Cyjb.Collections.ObjectModel
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		bool IDictionary.IsReadOnly
 		{
-			get { return this.IsReadOnly; }
+			get { return this.isReadOnly; }
 		}
 
 		/// <summary>
@@ -460,7 +492,7 @@ namespace Cyjb.Collections.ObjectModel
 			}
 			set
 			{
-				if (this.IsReadOnly)
+				if (this.isReadOnly)
 				{
 					throw ExceptionHelper.ReadOnlyCollection();
 				}
@@ -487,7 +519,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 是只读的。</exception>
 		void IDictionary.Add(object key, object value)
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				throw ExceptionHelper.ReadOnlyCollection();
 			}
@@ -509,7 +541,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 是只读的。</exception>
 		void IDictionary.Clear()
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				throw ExceptionHelper.ReadOnlyCollection();
 			}
@@ -539,7 +571,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 是只读的。</exception>
 		void IDictionary.Remove(object key)
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				throw ExceptionHelper.ReadOnlyCollection();
 			}
