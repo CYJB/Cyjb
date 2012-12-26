@@ -20,6 +20,11 @@ namespace Cyjb.Collections.ObjectModel
 		[NonSerialized, DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private object syncRoot;
 		/// <summary>
+		/// 集合是否是只读的。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private readonly bool isReadOnly;
+		/// <summary>
 		/// 周围的 <see cref="IList&lt;T&gt;"/> 包装。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -32,14 +37,31 @@ namespace Cyjb.Collections.ObjectModel
 			this.items = new List<T>();
 		}
 		/// <summary>
+		/// 初始化 <see cref="ListBase&lt;T&gt;"/> 类的新实例。
+		/// </summary>
+		/// <param name="isReadOnly">集合是否是只读的。</param>
+		protected ListBase(bool isReadOnly)
+		{
+			this.items = new List<T>();
+			this.isReadOnly = isReadOnly;
+		}
+		/// <summary>
 		/// 将 <see cref="ListBase&lt;T&gt;"/> 类的新实例初始化为指定集合的包装。
 		/// </summary>
 		/// <param name="list">由新的集合包装的集合。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="list"/> 为 <c>null</c>。</exception>
 		protected ListBase(IList<T> list)
 		{
 			this.items = list;
+		}
+		/// <summary>
+		/// 将 <see cref="ListBase&lt;T&gt;"/> 类的新实例初始化为指定集合的包装。
+		/// </summary>
+		/// <param name="list">由新的集合包装的集合。</param>
+		/// <param name="isReadOnly">集合的包装是否是只读的。</param>
+		protected ListBase(IList<T> list, bool isReadOnly)
+		{
+			this.items = list;
+			this.isReadOnly = isReadOnly;
 		}
 		/// <summary>
 		/// 获取 <see cref="ListBase&lt;T&gt;"/> 周围的 <see cref="IList&lt;T&gt;"/> 包装。
@@ -101,7 +123,7 @@ namespace Cyjb.Collections.ObjectModel
 			}
 			set
 			{
-				if (this.IsReadOnly)
+				if (this.isReadOnly)
 				{
 					throw ExceptionHelper.ReadOnlyCollection();
 				}
@@ -135,7 +157,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="ListBase&lt;T&gt;"/> 是只读的。</exception>
 		public void Insert(int index, T item)
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				throw ExceptionHelper.ReadOnlyCollection();
 			}
@@ -156,7 +178,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="ListBase&lt;T&gt;"/> 是只读的。</exception>
 		public void RemoveAt(int index)
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				throw ExceptionHelper.ReadOnlyCollection();
 			}
@@ -190,7 +212,7 @@ namespace Cyjb.Collections.ObjectModel
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		bool IList.IsReadOnly
 		{
-			get { return this.IsReadOnly; }
+			get { return this.isReadOnly; }
 		}
 
 		/// <summary>
@@ -210,9 +232,13 @@ namespace Cyjb.Collections.ObjectModel
 			}
 			set
 			{
-				if (this.IsReadOnly)
+				if (this.isReadOnly)
 				{
 					ExceptionHelper.ReadOnlyCollection();
+				}
+				if (index < 0 || index >= this.Count)
+				{
+					throw ExceptionHelper.ArgumentOutOfRange("index");
 				}
 				if (value is T)
 				{
@@ -234,7 +260,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="ListBase&lt;T&gt;"/> 是只读的。</exception>
 		int IList.Add(object value)
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				ExceptionHelper.ReadOnlyCollection();
 			}
@@ -257,7 +283,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="ListBase&lt;T&gt;"/> 是只读的。</exception>
 		void IList.Clear()
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				ExceptionHelper.ReadOnlyCollection();
 			}
@@ -301,13 +327,17 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="ListBase&lt;T&gt;"/> 是只读的。</exception>
 		void IList.Insert(int index, object value)
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				ExceptionHelper.ReadOnlyCollection();
 			}
+			if (index < 0 || index >= this.Count)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("index");
+			}
 			if (value is T)
 			{
-				this.Insert(index, (T)value);
+				this.InsertItem(index, (T)value);
 			}
 			else
 			{
@@ -323,7 +353,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="ListBase&lt;T&gt;"/> 是只读的。</exception>
 		void IList.Remove(object value)
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				ExceptionHelper.ReadOnlyCollection();
 			}
@@ -347,9 +377,13 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="ListBase&lt;T&gt;"/> 是只读的。</exception>
 		void IList.RemoveAt(int index)
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				throw ExceptionHelper.ReadOnlyCollection();
+			}
+			if (index < 0 || index >= this.Count)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("index");
 			}
 			this.RemoveItem(index);
 		}
@@ -371,9 +405,9 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		/// <value>如果 <see cref="CollectionBase&lt;T&gt;"/> 为只读，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</value>
-		public virtual bool IsReadOnly
+		public bool IsReadOnly
 		{
-			get { return this.items.IsReadOnly; }
+			get { return this.isReadOnly; }
 		}
 		/// <summary>
 		/// 将某元素添加到 <see cref="CollectionBase&lt;T&gt;"/> 中。
@@ -383,7 +417,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="CollectionBase&lt;T&gt;"/> 是只读的。</exception>
 		public void Add(T item)
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				throw ExceptionHelper.ReadOnlyCollection();
 			}
@@ -396,7 +430,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="CollectionBase&lt;T&gt;"/> 是只读的。</exception>
 		public void Clear()
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				throw ExceptionHelper.ReadOnlyCollection();
 			}
@@ -460,7 +494,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="CollectionBase&lt;T&gt;"/> 是只读的。</exception>
 		public bool Remove(T item)
 		{
-			if (this.IsReadOnly)
+			if (this.isReadOnly)
 			{
 				throw ExceptionHelper.ReadOnlyCollection();
 			}
