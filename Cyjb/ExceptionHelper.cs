@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Reflection;
+using Cyjb.Utility;
 
 namespace Cyjb
 {
@@ -14,6 +16,14 @@ namespace Cyjb
 
 		#region 数组异常
 
+		/// <summary>
+		/// 返回数组为空的异常。
+		/// </summary>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		public static ArgumentException ArrayEmpty()
+		{
+			return GetArgumentException("ArrayEmpty");
+		}
 		/// <summary>
 		/// 返回数组下限不为 <c>0</c> 的异常。
 		/// </summary>
@@ -220,6 +230,22 @@ namespace Cyjb
 				throw ArgumentNull(paramName);
 			}
 		}
+		/// <summary>
+		/// 检查参数是否为 <c>null</c>，如果为 <c>null</c> 则抛出异常。
+		/// 对于值类型，不会抛出异常。
+		/// </summary>
+		/// <typeparam name="T">要检查的参数的类型。</typeparam>
+		/// <param name="value">要检查的参数值。</param>
+		/// <param name="paramName">要检查的参数名。</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="value"/> 为 <c>null</c>。</exception>
+		public static void CheckArgumentNull<T>(T value, string paramName)
+		{
+			if (value == null)
+			{
+				throw ArgumentNull(paramName);
+			}
+		}
 
 		#endregion // ArgumentNullException
 
@@ -281,6 +307,28 @@ namespace Cyjb
 		}
 
 		#endregion // FormatException
+
+		#region InvalidCastException
+
+		/// <summary>
+		/// 返回空对象不能转换为值类型的异常。
+		/// </summary>
+		/// <returns><see cref="System.InvalidCastException"/> 对象。</returns>
+		public static InvalidCastException CannotCastNullToValueType()
+		{
+			return GetInvalidCast("CannotCastNullToValueType");
+		}
+		/// <summary>
+		/// 返回转换无效的异常。
+		/// </summary>
+		/// <param name="resName">异常信息的资源名称。</param>
+		/// <returns><see cref="System.InvalidCastException"/> 对象。</returns>
+		private static InvalidCastException GetInvalidCast(string resName)
+		{
+			return new InvalidCastException(ExceptionResources.GetString(resName));
+		}
+
+		#endregion // InvalidCastException
 
 		#region  InvalidOperationException
 
@@ -448,6 +496,83 @@ namespace Cyjb
 
 		#endregion // OverflowException
 
+		#region 缓冲池工厂异常
+
+		/// <summary>
+		/// 返回缓冲池类型无效的异常。
+		/// </summary>
+		/// <param name="element">无效的缓冲池配置元素。</param>
+		/// <returns><see cref="System.Configuration.ConfigurationErrorsException"/> 对象。</returns>
+		internal static ConfigurationErrorsException InvalidCacheType(CacheElement element)
+		{
+			string message = ExceptionResources.GetString("InvalidCacheType", element.CacheType);
+			return new ConfigurationErrorsException(message,
+				element.ElementInformation.Source, element.ElementInformation.LineNumber);
+		}
+		/// <summary>
+		/// 返回缓冲池类型无效的异常。
+		/// </summary>
+		/// <param name="element">无效的缓冲池配置元素。</param>
+		/// <param name="innerException">内部的异常信息。</param>
+		/// <returns><see cref="System.Configuration.ConfigurationErrorsException"/> 对象。</returns>
+		internal static ConfigurationErrorsException InvalidCacheType(CacheElement element, Exception innerException)
+		{
+			string message = ExceptionResources.GetString("InvalidCacheType", element.CacheType);
+			return new ConfigurationErrorsException(message, innerException,
+				element.ElementInformation.Source, element.ElementInformation.LineNumber);
+		}
+		/// <summary>
+		/// 返回缓冲池类型无效-未实现 ICache 接口的异常。
+		/// </summary>
+		/// <param name="element">无效的缓冲池配置元素。</param>
+		/// <returns><see cref="System.Configuration.ConfigurationErrorsException"/> 对象。</returns>
+		internal static ConfigurationErrorsException InvalidCacheType_ICache(CacheElement element)
+		{
+			string message = ExceptionResources.GetString("InvalidCacheType_ICache", element.CacheType);
+			return new ConfigurationErrorsException(message,
+				element.ElementInformation.Source, element.ElementInformation.LineNumber);
+		}
+		/// <summary>
+		/// 返回缓冲池类型创建实例的异常。
+		/// </summary>
+		/// <param name="element">无效的缓冲池配置元素。</param>
+		/// <param name="innerException">内部的异常信息。</param>
+		/// <returns><see cref="System.Configuration.ConfigurationErrorsException"/> 对象。</returns>
+		internal static ConfigurationErrorsException InvalidCacheType_CreateInstance(CacheElement element,
+			Exception innerException)
+		{
+			string message = ExceptionResources.GetString("InvalidCacheType_CreateInstance", element.CacheType);
+			return new ConfigurationErrorsException(message,
+				element.ElementInformation.Source, element.ElementInformation.LineNumber);
+		}
+		/// <summary>
+		/// 返回缓冲池选项无效的异常。
+		/// </summary>
+		/// <param name="element">无效的缓冲池选项配置元素。</param>
+		/// <param name="type">选项的类型。</param>
+		/// <param name="innerException">内部的异常信息。</param>
+		/// <returns><see cref="System.Configuration.ConfigurationErrorsException"/> 对象。</returns>
+		internal static ConfigurationErrorsException InvalidCacheOption(NameValueConfigurationElement element,
+			Type type, Exception innerException)
+		{
+			string message = ExceptionResources.GetString("InvalidCacheOption", element.Name, element.Value, type);
+			return new ConfigurationErrorsException(message,
+				element.ElementInformation.Source, element.ElementInformation.LineNumber);
+		}
+		/// <summary>
+		/// 返回缓冲池选项无效的异常。
+		/// </summary>
+		/// <param name="element">无效的缓冲池配置元素。</param>
+		/// <returns><see cref="System.Configuration.ConfigurationErrorsException"/> 对象。</returns>
+		internal static ConfigurationErrorsException InvalidCacheOptions(CacheElement element)
+		{
+			string message = ExceptionResources.GetString("InvalidCacheOptions", element.CacheType);
+			return new ConfigurationErrorsException(message,
+				element.ElementInformation.Source, element.ElementInformation.LineNumber);
+		}
+
+		#endregion // 缓冲池工厂异常
+
 		#region 动态委托异常
 
 		/// <summary>
@@ -459,12 +584,36 @@ namespace Cyjb
 			return new AmbiguousMatchException(ExceptionResources.GetString("AmbiguousMatchMethod"));
 		}
 		/// <summary>
+		/// 返回找到多个与绑定约束匹配的属性的异常。
+		/// </summary>
+		/// <returns><see cref="System.Reflection.AmbiguousMatchException"/> 对象。</returns>
+		internal static AmbiguousMatchException AmbiguousMatchProperty()
+		{
+			return new AmbiguousMatchException(ExceptionResources.GetString("AmbiguousMatchProperty"));
+		}
+		/// <summary>
 		/// 返回绑定到目标方法出错的异常。
 		/// </summary>
 		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
 		internal static ArgumentException BindTargetMethod()
 		{
 			throw GetArgumentException("BindTargetMethod");
+		}
+		/// <summary>
+		/// 返回绑定到目标属性出错的异常。
+		/// </summary>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException BindTargetProperty()
+		{
+			throw GetArgumentException("BindTargetProperty");
+		}
+		/// <summary>
+		/// 返回绑定到目标字段出错的异常。
+		/// </summary>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException BindTargetField()
+		{
+			throw GetArgumentException("BindTargetField");
 		}
 		/// <summary>
 		/// 返回类型必须从委托派生的异常。

@@ -121,6 +121,10 @@
     <value>找到多个有指定名称且与指定绑定约束匹配的方法。</value>
     <comment>找到多个有指定名称且与指定绑定约束匹配的方法。</comment>
   </data>
+  <data name="AmbiguousMatchProperty" xml:space="preserve">
+    <value>找到多个有指定名称且与指定绑定约束匹配的属性。</value>
+    <comment>找到多个有指定名称且与指定绑定约束匹配的属性。</comment>
+  </data>
   <data name="ArgumentImplementIComparable" xml:space="preserve">
     <value>必须至少有一个对象实现 IComparable。</value>
     <comment>必须至少有一个对象实现 IComparable。</comment>
@@ -134,16 +138,20 @@
     <comment>参数小于零。</comment>
   </data>
   <data name="ArgumentOutOfRange" xml:space="preserve">
-    <value>参数 {0} 超出了有效范围。</value>
+    <value>参数 '{0}' 超出了有效范围。</value>
     <comment>参数超出范围。</comment>
   </data>
   <data name="ArgumentOutOfRangeBetween" xml:space="preserve">
-    <value>参数 {0} 必须位于 {1} 和 {2} 之间。</value>
+    <value>参数 '{0}' 必须位于 {1} 和 {2} 之间。</value>
     <comment>参数超出范围。</comment>
   </data>
   <data name="ArgumentWrongType" xml:space="preserve">
-    <value>值“{0}”不是“{1}”类型。</value>
+    <value>值 '{0}' 不是 '{1}' 类型。</value>
     <comment>值不是特定类型。</comment>
+  </data>
+  <data name="ArrayEmpty" xml:space="preserve">
+    <value>数组不得为空。</value>
+    <comment>数组为空。</comment>
   </data>
   <data name="ArrayNonZeroLowerBound" xml:space="preserve">
     <value>目标数组的下限必须为 0。</value>
@@ -165,16 +173,28 @@
     <value>如果基不为 10，则此字符串不能包含减号。</value>
     <comment>如果基不为 10，则此字符串不能包含减号。</comment>
   </data>
+  <data name="BindTargetField" xml:space="preserve">
+    <value>绑定到目标字段时出错。</value>
+    <comment>绑定到目标字段时出错。</comment>
+  </data>
   <data name="BindTargetMethod" xml:space="preserve">
     <value>绑定到目标方法时出错。</value>
     <comment>绑定到目标方法时出错。</comment>
+  </data>
+  <data name="BindTargetProperty" xml:space="preserve">
+    <value>绑定到目标属性时出错。</value>
+    <comment>绑定到目标属性时出错。</comment>
+  </data>
+  <data name="CannotCastNullToValueType" xml:space="preserve">
+    <value>空对象不能转换为值类型。</value>
+    <comment>空对象不能转换为值类型。</comment>
   </data>
   <data name="EnumFailedVersion" xml:space="preserve">
     <value>集合已修改；可能无法执行枚举操作。</value>
     <comment>无法执行枚举操作。</comment>
   </data>
   <data name="EnumTypeDoesNotMatch" xml:space="preserve">
-    <value>参数类型“{0}”与枚举类型“{1}”不相同。</value>
+    <value>参数类型 '{0}' 与枚举类型 '{1}' 不相同。</value>
     <comment>枚举参数类型不匹配。</comment>
   </data>
   <data name="ExtraJunkAtEnd" xml:space="preserve">
@@ -188,6 +208,26 @@
   <data name="InvalidBase" xml:space="preserve">
     <value>无效的基。</value>
     <comment>无效的基。</comment>
+  </data>
+  <data name="InvalidCacheOption" xml:space="preserve">
+    <value>无效的缓冲池选项 '{0}'，值 '{1}' 不是有效的 '{2}' 类型。</value>
+    <comment>缓冲池选项无效。</comment>
+  </data>
+  <data name="InvalidCacheOptions" xml:space="preserve">
+    <value>在缓冲池类型 '{0}' 中找不到与选项匹配的构造函数。</value>
+    <comment>缓冲池选项无效。</comment>
+  </data>
+  <data name="InvalidCacheType" xml:space="preserve">
+    <value>无效的缓冲池类型 '{0}'。</value>
+    <comment>缓冲池类型无效。</comment>
+  </data>
+  <data name="InvalidCacheType_CreateInstance" xml:space="preserve">
+    <value>创建缓冲池类型 '{0}' 的实例错误。</value>
+    <comment>缓冲池类型无效创建实例异常。</comment>
+  </data>
+  <data name="InvalidCacheType_ICache" xml:space="preserve">
+    <value>无效的缓冲池类型 '{0}'，没有实现 ICache&lt;TKey, TValue&gt; 接口。</value>
+    <comment>缓冲池类型无效-未实现 ICache 接口。</comment>
   </data>
   <data name="InvalidOffsetLength" xml:space="preserve">
     <value>偏移量和长度超出数组的界限，或者计数大于从索引到源集合结尾处的元素数量。</value>
