@@ -297,7 +297,7 @@ namespace Cyjb
 		/// <returns><see cref="System.FormatException"/> 对象。</returns>
 		public static FormatException ConvertInvalidValue(object value, Type type, Exception innerException)
 		{
-			string message = ExceptionResources.GetString("ConvertInvalidValue", value, type.Name);
+			string message = ExceptionResources.GetString("ConvertInvalidValue", value, type);
 			return new FormatException(message, innerException);
 		}
 		/// <summary>

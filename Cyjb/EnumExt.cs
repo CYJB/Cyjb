@@ -80,10 +80,10 @@ namespace Cyjb
 					case TypeCode.Int32:
 					case TypeCode.Int64:
 						long longValue = unchecked((long)value);
-						return longValue.ToString();
+						return longValue.ToString(CultureInfo.CurrentCulture);
 				}
 			}
-			return value.ToString();
+			return value.ToString(CultureInfo.CurrentCulture);
 		}
 
 		#endregion // 枚举描述
