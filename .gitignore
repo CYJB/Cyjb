@@ -12,3 +12,4 @@ ConsoleTest
 # files
 *.suo
 *.snk
+*.vspx
