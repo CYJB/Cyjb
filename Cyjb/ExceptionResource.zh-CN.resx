@@ -189,6 +189,10 @@
     <value>空对象不能转换为值类型。</value>
     <comment>空对象不能转换为值类型。</comment>
   </data>
+  <data name="ConvertInvalidValue" xml:space="preserve">
+    <value>'{0}' 不是 '{1}' 的有效值。</value>
+    <comment>转换无效。</comment>
+  </data>
   <data name="EnumFailedVersion" xml:space="preserve">
     <value>集合已修改；可能无法执行枚举操作。</value>
     <comment>无法执行枚举操作。</comment>
@@ -196,6 +200,10 @@
   <data name="EnumTypeDoesNotMatch" xml:space="preserve">
     <value>参数类型 '{0}' 与枚举类型 '{1}' 不相同。</value>
     <comment>枚举参数类型不匹配。</comment>
+  </data>
+  <data name="EnumValueNotFound" xml:space="preserve">
+    <value>在枚举 '{0}‘ 中未找到请求的值 '{1}'。</value>
+    <comment>未识别的枚举值。</comment>
   </data>
   <data name="ExtraJunkAtEnd" xml:space="preserve">
     <value>字符串的末尾有其他无法分析的字符。</value>

@@ -189,6 +189,10 @@
     <value>Null object cannot be converted to a value type.</value>
     <comment>空对象不能转换为值类型。</comment>
   </data>
+  <data name="ConvertInvalidValue" xml:space="preserve">
+    <value>'{0}' is not a valid value for '{1}'.</value>
+    <comment>转换无效。</comment>
+  </data>
   <data name="EnumFailedVersion" xml:space="preserve">
     <value>Collection was modified; enumeration operation may not execute.</value>
     <comment>无法执行枚举操作。</comment>
@@ -196,6 +200,10 @@
   <data name="EnumTypeDoesNotMatch" xml:space="preserve">
     <value>The argument type '{0}' is not the same as the enum type '{1}'.</value>
     <comment>枚举参数类型不匹配。</comment>
+  </data>
+  <data name="EnumValueNotFound" xml:space="preserve">
+    <value>Requested value '{1}' was not found in enum type '{0}'.</value>
+    <comment>未识别的枚举值。</comment>
   </data>
   <data name="ExtraJunkAtEnd" xml:space="preserve">
     <value>Additional non-parsable characters are at the end of the string.</value>

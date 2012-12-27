@@ -150,6 +150,16 @@ namespace Cyjb
 			return GetArgumentException("EnumTypeDoesNotMatch", argType, baseType);
 		}
 		/// <summary>
+		/// 返回未识别的枚举值的异常。
+		/// </summary>
+		/// <param name="enumType">枚举类型。</param>
+		/// <param name="value">未识别的枚举值。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		public static ArgumentException EnumValueNotFound(Type enumType, object value)
+		{
+			return GetArgumentException("EnumValueNotFound", enumType, value);
+		}
+		/// <summary>
 		/// 返回基无效的异常。
 		/// </summary>
 		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
@@ -278,6 +288,18 @@ namespace Cyjb
 
 		#region FormatException
 
+		/// <summary>
+		/// 返回转换无效的异常。
+		/// </summary>
+		/// <param name="value">无效的值。</param>
+		/// <param name="type">要转换到的类型。</param>
+		/// <param name="innerException">内部异常。</param>
+		/// <returns><see cref="System.FormatException"/> 对象。</returns>
+		public static FormatException ConvertInvalidValue(object value, Type type, Exception innerException)
+		{
+			string message = ExceptionResources.GetString("ConvertInvalidValue", value, type.Name);
+			return new FormatException(message, innerException);
+		}
 		/// <summary>
 		/// 返回字符串末尾有其它无法分析的字符的异常。
 		/// </summary>
