@@ -54,6 +54,7 @@
     <Compile Include="Collections\ArrayAdapter`1.cs" />
     <Compile Include="Collections\CollectionDebugView`1.cs" />
     <Compile Include="Collections\ObjectModel\IteratorBase`1.cs" />
+    <Compile Include="ComponentModel\EnumDescConverter.cs" />
     <Compile Include="Configurations\ConfigurationElementCollection`1.cs" />
     <Compile Include="Configurations\ConfigurationElementCollection`2.cs" />
     <Compile Include="ConversionCache.cs" />
@@ -95,6 +96,9 @@
     <Compile Include="TextValuePairCollection`1.cs" />
     <Compile Include="TextValuePair`1.cs" />
     <Compile Include="Tristate.cs" />
+    <Compile Include="Utility\LruCacheNoSync`2.cs" />
+    <Compile Include="Utility\SimplyCache`2.cs" />
+    <Compile Include="Utility\SimplyCacheNoSync`2.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CYJB_Code_Key.snk" />
