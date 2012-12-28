@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Cyjb.Utility;
 
 namespace Cyjb
@@ -127,19 +129,13 @@ namespace Cyjb
 		public static TextValuePairCollection GetTextValues(Type enumType, bool useDescription)
 		{
 			TextValuePairCollection enumList = new TextValuePairCollection();
-			Array array = Enum.GetValues(enumType);
-			string[] names = null;
-			if (useDescription)
+			// 这里使用自己的缓存。
+			EnumCache cache = GetEnumCache(enumType.TypeHandle);
+			ulong[] values = cache.Values;
+			string[] names = useDescription ? cache.Descriptions : cache.Names;
+			for (int i = 0; i < values.Length; i++)
 			{
-				names = GetEnumCache(enumType.TypeHandle).Descriptions;
-			}
-			else
-			{
-				names = Enum.GetNames(enumType);
-			}
-			for (int i = 0; i < array.Length; i++)
-			{
-				enumList.Add(names[i], array.GetValue(i));
+				enumList.Add(names[i], Enum.ToObject(enumType, values[i]));
 			}
 			return enumList;
 		}
@@ -168,19 +164,13 @@ namespace Cyjb
 		{
 			Type enumType = typeof(TEnum);
 			TextValuePairCollection<TEnum> enumList = new TextValuePairCollection<TEnum>();
-			Array array = Enum.GetValues(enumType);
-			string[] names = null;
-			if (useDescription)
+			// 这里使用自己的缓存。
+			EnumCache cache = GetEnumCache(enumType.TypeHandle);
+			ulong[] values = cache.Values;
+			string[] names = useDescription ? cache.Descriptions : cache.Names;
+			for (int i = 0; i < values.Length; i++)
 			{
-				names = GetEnumCache(enumType.TypeHandle).Descriptions;
-			}
-			else
-			{
-				names = Enum.GetNames(enumType);
-			}
-			for (int i = 0; i < array.Length; i++)
-			{
-				enumList.Add(names[i], (TEnum)array.GetValue(i));
+				enumList.Add(names[i], (TEnum)Enum.ToObject(enumType, values[i]));
 			}
 			return enumList;
 		}
@@ -284,6 +274,7 @@ namespace Cyjb
 			{
 				throw ExceptionHelper.MustBeEnum(enumType);
 			}
+			value = value.Trim();
 			if (value.Length == 0)
 			{
 				throw ExceptionHelper.MustContainEnumInfo();
@@ -300,9 +291,8 @@ namespace Cyjb
 			}
 			// 尝试对描述信息进行解析。
 			EnumCache cache = GetEnumCache(enumType.TypeHandle);
-			// 描述信息可能是语言相关的，这里采用当前区域文化信息比较字符串。
 			StringComparison comparison = ignoreCase ?
-				StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture;
+				StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 			ulong valueUL = 0;
 			int start = 0;
 			do
@@ -314,18 +304,31 @@ namespace Cyjb
 				int nIdx = idx - 1;
 				// 去除后面的空白。
 				while (char.IsWhiteSpace(value, nIdx)) { nIdx--; }
-				// 比较描述信息。
-				if (nIdx > start)
+				if (nIdx >= start)
 				{
 					string str = value.Substring(start, nIdx - start + 1);
 					int j = 0;
-					for (; j < cache.Descriptions.Length; j++)
+					// 比较常数值的名称和描述信息，先比较名称，后比较描述信息。
+					for (; j < cache.Names.Length; j++)
 					{
-						if (string.Equals(str, cache.Descriptions[j], comparison))
+						if (string.Equals(str, cache.Names[j], comparison))
 						{
-							// 与描述信息匹配。
+							// 与常数值匹配。
 							valueUL |= cache.Values[j];
 							break;
+						}
+					}
+					if (j == cache.Names.Length && cache.HasDescription)
+					{
+						// 比较描述信息。
+						for (j = 0; j < cache.Descriptions.Length; j++)
+						{
+							if (string.Equals(str, cache.Descriptions[j], comparison))
+							{
+								// 与描述信息匹配。
+								valueUL |= cache.Values[j];
+								break;
+							}
 						}
 					}
 					// 未识别的枚举值。
@@ -417,9 +420,23 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="value">要获取的枚举值。</param>
 		/// <returns><see cref="System.UInt64"/> 类型的枚举值。</returns>
-		private static ulong ToUInt64(Enum value)
+		private static ulong ToUInt64(object value)
 		{
-			return Convert.ToUInt64(value, CultureInfo.InvariantCulture);
+			switch (Convert.GetTypeCode(value))
+			{
+				case TypeCode.SByte:
+				case TypeCode.Int16:
+				case TypeCode.Int32:
+				case TypeCode.Int64:
+					return unchecked((ulong)Convert.ToInt64(value, CultureInfo.InvariantCulture));
+				case TypeCode.Byte:
+				case TypeCode.UInt16:
+				case TypeCode.UInt32:
+				case TypeCode.UInt64:
+					return Convert.ToUInt64(value, CultureInfo.InvariantCulture);
+			}
+			Debug.Fail("无效的枚举类型");
+			return 0;
 		}
 
 		#region 枚举缓存
@@ -439,36 +456,49 @@ namespace Cyjb
 		{
 			return EnumCaches.GetOrAdd(typeHandle, type =>
 			{
-				// 返回枚举类型的值和相应描述的列表。
+				// 返回枚举类型的值、常数名称和相应描述的列表。
+				// 直接使用反射获取数据，而不是 Enum 类的相关方法。
 				Type enumType = Type.GetTypeFromHandle(type);
-				Array array = Enum.GetValues(enumType);
-				string[] names = Enum.GetNames(enumType);
-				int len = array.Length;
+				FieldInfo[] fields = enumType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+				int len = fields.Length;
 				ulong[] values = new ulong[len];
 				for (int i = 0; i < len; i++)
 				{
-					// 获取 ulong 类型的值。
-					values[i] = ToUInt64((Enum)array.GetValue(i));
-					// 获取对应的描述。
-					FieldInfo fieldInfo = enumType.GetField(names[i]);
-					// 没有描述的直接使用枚举名称。
-					if (fieldInfo != null)
+					values[i] = ToUInt64(fields[i].GetRawConstantValue());
+				}
+				// 按照二进制大小排序。
+				Array.Sort(values, fields);
+				// 获取常数名称和相应描述。
+				string[] names = new string[len];
+				string[] descs = new string[len];
+				bool hasDesc = false;
+				for (int i = 0; i < len; i++)
+				{
+					FieldInfo fieldInfo = fields[i];
+					// 获取常数名称。
+					names[i] = descs[i] = fieldInfo.Name;
+					// 尝试获取描述。
+					DescriptionAttribute attr = Attribute.GetCustomAttribute(fieldInfo,
+						typeof(DescriptionAttribute), false) as DescriptionAttribute;
+					if (attr != null)
 					{
-						DescriptionAttribute attr = Attribute.GetCustomAttribute(fieldInfo,
-							typeof(DescriptionAttribute), false) as DescriptionAttribute;
-						if (attr != null)
-						{
-							names[i] = attr.Description;
-						}
+						descs[i] = attr.Description;
+						hasDesc = true;
 					}
 				}
+				// 如果不包含描述信息，直接将描述信息指向常数名称。
+				if (!hasDesc)
+				{
+					descs = names;
+				}
 				// 将是否包含 FlagsAttribute 一并缓存，能有效的提高性能。
-				return new EnumCache(enumType.IsDefined(typeof(FlagsAttribute), false), values, names);
+				return new EnumCache(enumType.IsDefined(typeof(FlagsAttribute), false), hasDesc, values, names, descs);
 			});
 		}
 		/// <summary>
 		/// 表示枚举缓存。
 		/// </summary>
+		[StructLayout(LayoutKind.Auto)]
 		private struct EnumCache
 		{
 			/// <summary>
@@ -480,19 +510,31 @@ namespace Cyjb
 			/// </summary>
 			public string[] Descriptions;
 			/// <summary>
+			/// 枚举名称的列表，与枚举值列表一一对应。
+			/// </summary>
+			public string[] Names;
+			/// <summary>
 			/// 枚举类是否含有 FlagsAttribute。
 			/// </summary>
 			public bool HasFlagsAttribute;
 			/// <summary>
+			/// 枚举类是否定义了 DescriptionAttribute。
+			/// </summary>
+			public bool HasDescription;
+			/// <summary>
 			/// 使用给定的值初始化 <see cref="EnumCache"/> 结构的新实例。
 			/// </summary>
 			/// <param name="hasFlags">枚举类是否含有 FlagsAttribute。</param>
+			/// <param name="hasDesc">枚举类是否定义了 DescriptionAttribute。</param>
 			/// <param name="values">枚举值的列表，从小到大排序。</param>
+			/// <param name="names">枚举名称的列表，与枚举值列表一一对应。</param>
 			/// <param name="descs">枚举描述的列表，与枚举值列表一一对应。</param>
-			public EnumCache(bool hasFlags, ulong[] values, string[] descs)
+			public EnumCache(bool hasFlags, bool hasDesc, ulong[] values, string[] names, string[] descs)
 			{
 				this.HasFlagsAttribute = hasFlags;
+				this.HasDescription = hasDesc;
 				this.Values = values;
+				this.Names = names;
 				this.Descriptions = descs;
 			}
 		}
