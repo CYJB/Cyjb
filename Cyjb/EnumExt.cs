@@ -278,54 +278,53 @@ namespace Cyjb
 		/// 基础类型的范围。</exception>
 		public static object ParseEx(Type enumType, string value, bool ignoreCase)
 		{
-			try
+			ExceptionHelper.CheckArgumentNull(enumType, "enumType");
+			ExceptionHelper.CheckArgumentNull(value, "value");
+			if (!enumType.IsEnum)
 			{
-				return Enum.Parse(enumType, value, ignoreCase);
+				throw ExceptionHelper.MustBeEnum(enumType);
 			}
-			catch (ArgumentException)
+			if (value.Length == 0)
 			{
-				if (!enumType.IsEnum || string.IsNullOrWhiteSpace(value))
+				throw ExceptionHelper.MustContainEnumInfo();
+			}
+			// 进行进一步分析，对描述信息进行解析。
+			EnumCache cache = GetEnumCache(enumType.TypeHandle);
+			string[] strValues = value.Split(',');
+			ulong valueUL = 0;
+			// 描述信息可能是语言相关的，这里采用当前区域文化信息比较字符串。
+			StringComparison comparison = ignoreCase ?
+				StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture;
+			for (int i = 0; i < strValues.Length; i++)
+			{
+				string str = strValues[i].Trim();
+				int j = 0;
+				for (; j < cache.Descriptions.Length; j++)
 				{
-					throw;
-				}
-				// 进行进一步分析，对描述信息进行解析。
-				EnumCache cache = GetEnumCache(enumType.TypeHandle);
-				string[] strValues = value.Split(',');
-				ulong valueUL = 0;
-				// 描述信息可能是语言相关的，这里采用当前区域文化信息比较字符串。
-				StringComparison comparison = ignoreCase ?
-					StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture;
-				for (int i = 0; i < strValues.Length; i++)
-				{
-					string str = strValues[i].Trim();
-					int j = 0;
-					for (; j < cache.Descriptions.Length; j++)
+					if (string.Equals(str, cache.Descriptions[j], comparison))
 					{
-						if (string.Equals(str, cache.Descriptions[j], comparison))
-						{
-							// 与描述信息匹配。
-							valueUL |= cache.Values[j];
-							break;
-						}
-					}
-					// 未识别的枚举值。
-					if (j == cache.Descriptions.Length)
-					{
-						// 尝试识别为数字。
-						long valueL;
-						if (long.TryParse(str, out valueL))
-						{
-							valueUL |= unchecked((ulong)valueL);
-						}
-						else
-						{
-							// 不能识别为数字。
-							throw ExceptionHelper.EnumValueNotFound(enumType, str);
-						}
+						// 与描述信息匹配。
+						valueUL |= cache.Values[j];
+						break;
 					}
 				}
-				return Enum.ToObject(enumType, valueUL);
+				// 未识别的枚举值。
+				if (j == cache.Descriptions.Length)
+				{
+					// 尝试识别为数字。
+					long valueL;
+					if (long.TryParse(str, out valueL))
+					{
+						valueUL |= unchecked((ulong)valueL);
+					}
+					else
+					{
+						// 不能识别为数字。
+						throw ExceptionHelper.EnumValueNotFound(enumType, str);
+					}
+				}
 			}
+			return Enum.ToObject(enumType, valueUL);
 		}
 		/// <summary>
 		/// 将一个或多个枚举常数的名称、描述或数字值的字符串表示转换成等效的枚举对象。
@@ -397,22 +396,9 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="value">要获取的枚举值。</param>
 		/// <returns><see cref="System.UInt64"/> 类型的枚举值。</returns>
-		private static ulong ToUInt64(object value)
+		private static ulong ToUInt64(Enum value)
 		{
-			switch (Convert.GetTypeCode(value))
-			{
-				case TypeCode.SByte:
-				case TypeCode.Int16:
-				case TypeCode.Int32:
-				case TypeCode.Int64:
-					return unchecked((ulong)Convert.ToInt64(value, CultureInfo.InvariantCulture));
-				case TypeCode.Byte:
-				case TypeCode.UInt16:
-				case TypeCode.UInt32:
-				case TypeCode.UInt64:
-					return Convert.ToUInt64(value, CultureInfo.InvariantCulture);
-			}
-			throw ExceptionHelper.UnknownEnumType();
+			return Convert.ToUInt64(value, CultureInfo.InvariantCulture);
 		}
 
 		#region 枚举缓存
@@ -441,7 +427,7 @@ namespace Cyjb
 				for (int i = 0; i < len; i++)
 				{
 					// 获取 ulong 类型的值。
-					values[i] = ToUInt64(array.GetValue(i));
+					values[i] = ToUInt64((Enum)array.GetValue(i));
 					// 获取对应的描述。
 					FieldInfo fieldInfo = enumType.GetField(names[i]);
 					// 没有描述的直接使用枚举名称。

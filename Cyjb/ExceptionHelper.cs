@@ -175,6 +175,23 @@ namespace Cyjb
 		{
 			return GetArgumentException("KeyDuplicate");
 		}
+		/// <summary>
+		/// 返回必须是枚举的异常。
+		/// </summary>
+		/// <param name="type">异常的类型。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		public static ArgumentException MustBeEnum(Type type)
+		{
+			return GetArgumentException("MustBeEnum", type);
+		}
+		/// <summary>
+		/// 返回必须包含枚举信息的异常。
+		/// </summary>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		public static ArgumentException MustContainEnumInfo()
+		{
+			return GetArgumentException("MustContainEnumInfo");
+		}
 
 		#region 获取异常对象
 
@@ -361,14 +378,6 @@ namespace Cyjb
 		public static InvalidOperationException EnumFailedVersion()
 		{
 			return GetInvalidOperation("EnumFailedVersion");
-		}
-		/// <summary>
-		/// 返回未知的枚举类型的异常。
-		/// </summary>
-		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
-		public static InvalidOperationException UnknownEnumType()
-		{
-			return GetInvalidOperation("UnknownEnumType");
 		}
 		/// <summary>
 		/// 返回状态无效的异常。

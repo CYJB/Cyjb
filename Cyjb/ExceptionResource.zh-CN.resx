@@ -249,6 +249,14 @@
     <value>类型必须从委托派生。</value>
     <comment>类型必须从委托派生。</comment>
   </data>
+  <data name="MustBeEnum" xml:space="preserve">
+    <value>提供的类型 '{0}' 必须是 Enum。</value>
+    <comment>必须是枚举。</comment>
+  </data>
+  <data name="MustContainEnumInfo" xml:space="preserve">
+    <value>要在此字符串中进行分析，必须指定有效信息。</value>
+    <comment>必须包含枚举信息。</comment>
+  </data>
   <data name="NoParsibleDigits" xml:space="preserve">
     <value>未能找到任何可识别的数字。</value>
     <comment>未能找到任何可识别的数字。</comment>
@@ -296,9 +304,5 @@
   <data name="UnboundGenParam" xml:space="preserve">
     <value>不能对 ContainsGenericParameters 为 True 的类型或方法执行后期绑定操作。</value>
     <comment>不能是开放式泛型类型。</comment>
-  </data>
-  <data name="UnknownEnumType" xml:space="preserve">
-    <value>未知的枚举类型。</value>
-    <comment>未知的枚举类型。</comment>
   </data>
 </root>

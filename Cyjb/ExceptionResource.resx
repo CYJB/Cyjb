@@ -249,6 +249,14 @@
     <value>Type must derive from Delegate.</value>
     <comment>类型必须从委托派生。</comment>
   </data>
+  <data name="MustBeEnum" xml:space="preserve">
+    <value>Type '{0}' must be an Enum.</value>
+    <comment>必须是枚举。</comment>
+  </data>
+  <data name="MustContainEnumInfo" xml:space="preserve">
+    <value>Must specify valid information for parsing in the string.</value>
+    <comment>必须包含枚举信息。</comment>
+  </data>
   <data name="NoParsibleDigits" xml:space="preserve">
     <value>Could not find any recognizable digits.</value>
     <comment>未能找到任何可识别的数字。</comment>
@@ -296,9 +304,5 @@
   <data name="UnboundGenParam" xml:space="preserve">
     <value>Late bound operations cannot be performed on types or methods for which ContainsGenericParameters is true.</value>
     <comment>不能是开放式泛型类型。</comment>
-  </data>
-  <data name="UnknownEnumType" xml:space="preserve">
-    <value>Unknown enum type.</value>
-    <comment>未知的枚举类型。</comment>
   </data>
 </root>
