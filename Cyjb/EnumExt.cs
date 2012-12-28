@@ -281,12 +281,12 @@ namespace Cyjb
 			}
 			// 尝试对数字进行解析，这样可避免之后的字符串比较。
 			char firstChar = value[0];
-			long valueL;
+			ulong tmpValue;
 			if (char.IsDigit(firstChar) || firstChar == '+' || firstChar == '-')
 			{
-				if (long.TryParse(value, out valueL))
+				if (ParseString(value, out tmpValue))
 				{
-					return Enum.ToObject(enumType, valueL);
+					return Enum.ToObject(enumType, tmpValue);
 				}
 			}
 			// 尝试对描述信息进行解析。
@@ -335,9 +335,9 @@ namespace Cyjb
 					if (j == cache.Descriptions.Length)
 					{
 						// 尝试识别为数字。
-						if (long.TryParse(str, out valueL))
+						if (ParseString(str, out tmpValue))
 						{
-							valueUL |= unchecked((ulong)valueL);
+							valueUL |= tmpValue;
 						}
 						else
 						{
@@ -395,6 +395,27 @@ namespace Cyjb
 		public static TEnum ParseEx<TEnum>(string value, bool ignoreCase)
 		{
 			return (TEnum)ParseEx(typeof(TEnum), value, ignoreCase);
+		}
+		/// <summary>
+		/// 解析给定的字符串，并返回对应的值。
+		/// </summary>
+		/// <param name="str">要解析的字符串。</param>
+		/// <param name="value">字符串对应的值。</param>
+		/// <returns>字符串的解析是否成功。</returns>
+		private static bool ParseString(string str, out ulong value)
+		{
+			if (str[0] == '-')
+			{
+				long valueL;
+				if (long.TryParse(str, out valueL))
+				{
+					value = unchecked((ulong)valueL);
+					return true;
+				}
+				value = 0;
+				return false;
+			}
+			return ulong.TryParse(str, out value);
 		}
 
 		#endregion // 字符串分析
