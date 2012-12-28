@@ -288,42 +288,63 @@ namespace Cyjb
 			{
 				throw ExceptionHelper.MustContainEnumInfo();
 			}
-			// 进行进一步分析，对描述信息进行解析。
+			// 尝试对数字进行解析，这样可避免之后的字符串比较。
+			char firstChar = value[0];
+			long valueL;
+			if (char.IsDigit(firstChar) || firstChar == '+' || firstChar == '-')
+			{
+				if (long.TryParse(value, out valueL))
+				{
+					return Enum.ToObject(enumType, valueL);
+				}
+			}
+			// 尝试对描述信息进行解析。
 			EnumCache cache = GetEnumCache(enumType.TypeHandle);
-			string[] strValues = value.Split(',');
-			ulong valueUL = 0;
 			// 描述信息可能是语言相关的，这里采用当前区域文化信息比较字符串。
 			StringComparison comparison = ignoreCase ?
 				StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture;
-			for (int i = 0; i < strValues.Length; i++)
+			ulong valueUL = 0;
+			int start = 0;
+			do
 			{
-				string str = strValues[i].Trim();
-				int j = 0;
-				for (; j < cache.Descriptions.Length; j++)
+				// 去除前导空白。
+				while (char.IsWhiteSpace(value, start)) { start++; }
+				int idx = value.IndexOf(',', start);
+				if (idx < 0) { idx = value.Length; }
+				int nIdx = idx - 1;
+				// 去除后面的空白。
+				while (char.IsWhiteSpace(value, nIdx)) { nIdx--; }
+				// 比较描述信息。
+				if (nIdx > start)
 				{
-					if (string.Equals(str, cache.Descriptions[j], comparison))
+					string str = value.Substring(start, nIdx - start + 1);
+					int j = 0;
+					for (; j < cache.Descriptions.Length; j++)
 					{
-						// 与描述信息匹配。
-						valueUL |= cache.Values[j];
-						break;
+						if (string.Equals(str, cache.Descriptions[j], comparison))
+						{
+							// 与描述信息匹配。
+							valueUL |= cache.Values[j];
+							break;
+						}
+					}
+					// 未识别的枚举值。
+					if (j == cache.Descriptions.Length)
+					{
+						// 尝试识别为数字。
+						if (long.TryParse(str, out valueL))
+						{
+							valueUL |= unchecked((ulong)valueL);
+						}
+						else
+						{
+							// 不能识别为数字。
+							throw ExceptionHelper.EnumValueNotFound(enumType, str);
+						}
 					}
 				}
-				// 未识别的枚举值。
-				if (j == cache.Descriptions.Length)
-				{
-					// 尝试识别为数字。
-					long valueL;
-					if (long.TryParse(str, out valueL))
-					{
-						valueUL |= unchecked((ulong)valueL);
-					}
-					else
-					{
-						// 不能识别为数字。
-						throw ExceptionHelper.EnumValueNotFound(enumType, str);
-					}
-				}
-			}
+				start = idx + 1;
+			} while (start < value.Length);
 			return Enum.ToObject(enumType, valueUL);
 		}
 		/// <summary>
