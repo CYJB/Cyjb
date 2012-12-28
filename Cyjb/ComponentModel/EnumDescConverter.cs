@@ -33,7 +33,7 @@ namespace Cyjb.ComponentModel
 			{
 				try
 				{
-					return EnumExt.ParseDesc(this.EnumType, strValue, true);
+					return EnumExt.ParseEx(this.EnumType, strValue, true);
 				}
 				catch (Exception ex)
 				{

@@ -19,6 +19,7 @@ namespace Cyjb
 		/// <summary>
 		/// 返回指定枚举值的描述（通过 
 		/// <see cref="System.ComponentModel.DescriptionAttribute"/> 指定）。
+		/// 如果没有指定描述，则返回枚举常数的名称，没有找到枚举常数则返回枚举值。
 		/// </summary>
 		/// <param name="value">要获取描述的枚举值。</param>
 		/// <returns>指定枚举值的描述。</returns>
@@ -251,9 +252,9 @@ namespace Cyjb
 		/// <exception cref="System.OverflowException">
 		/// <paramref name="value"/> 超出 <paramref name="enumType"/> 
 		/// 基础类型的范围。</exception>
-		public static object ParseDesc(Type enumType, string value)
+		public static object ParseEx(Type enumType, string value)
 		{
-			return ParseDesc(enumType, value, false);
+			return ParseEx(enumType, value, false);
 		}
 		/// <summary>
 		/// 将一个或多个枚举常数的名称、描述或数字值的字符串表示转换成等效的枚举对象。
@@ -275,7 +276,7 @@ namespace Cyjb
 		/// <exception cref="System.OverflowException">
 		/// <paramref name="value"/> 超出 <paramref name="enumType"/> 
 		/// 基础类型的范围。</exception>
-		public static object ParseDesc(Type enumType, string value, bool ignoreCase)
+		public static object ParseEx(Type enumType, string value, bool ignoreCase)
 		{
 			try
 			{
@@ -344,9 +345,9 @@ namespace Cyjb
 		/// <exception cref="System.OverflowException">
 		/// <paramref name="value"/> 超出 <typeparamref name="TEnum"/> 
 		/// 基础类型的范围。</exception>
-		public static TEnum ParseDesc<TEnum>(string value)
+		public static TEnum ParseEx<TEnum>(string value)
 		{
-			return (TEnum)ParseDesc(typeof(TEnum), value, false);
+			return (TEnum)ParseEx(typeof(TEnum), value, false);
 		}
 		/// <summary>
 		/// 将一个或多个枚举常数的名称、描述或数字值的字符串表示转换成等效的枚举对象。
@@ -368,9 +369,9 @@ namespace Cyjb
 		/// <exception cref="System.OverflowException">
 		/// <paramref name="value"/> 超出 <typeparamref name="TEnum"/> 
 		/// 基础类型的范围。</exception>
-		public static TEnum ParseDesc<TEnum>(string value, bool ignoreCase)
+		public static TEnum ParseEx<TEnum>(string value, bool ignoreCase)
 		{
-			return (TEnum)ParseDesc(typeof(TEnum), value, ignoreCase);
+			return (TEnum)ParseEx(typeof(TEnum), value, ignoreCase);
 		}
 
 		#endregion // 字符串分析
