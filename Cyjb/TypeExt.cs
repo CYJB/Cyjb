@@ -94,13 +94,13 @@ namespace Cyjb
 			}
 			// 对隐式类型转换运算符进行判断。
 			if (ConversionCache.GetTypeOperators(type.TypeHandle).Any(
-				pair => pair.Value.ConversionType.HasFlag(ConversionType.ImplicitFrom) &&
+				pair => ((pair.Value.ConversionType & ConversionType.ImplicitFrom) == ConversionType.ImplicitFrom) &&
 					IsAssignableFromEx(Type.GetTypeFromHandle(pair.Key), fromType)))
 			{
 				return true;
 			}
 			if (ConversionCache.GetTypeOperators(fromType.TypeHandle).Any(
-				pair => pair.Value.ConversionType.HasFlag(ConversionType.ImplicitTo) &&
+				pair => ((pair.Value.ConversionType & ConversionType.ImplicitTo) == ConversionType.ImplicitTo) &&
 					IsAssignableFromEx(type, Type.GetTypeFromHandle(pair.Key))))
 			{
 				return true;
@@ -175,13 +175,13 @@ namespace Cyjb
 			}
 			// 对强制类型转换运算符进行判断。
 			if (ConversionCache.GetTypeOperators(type.TypeHandle).Any(
-				pair => pair.Value.ConversionType.AnyFlag(ConversionType.From) &&
+				pair => ((pair.Value.ConversionType & ConversionType.From) != 0) &&
 					IsAssignableFromCastEx(Type.GetTypeFromHandle(pair.Key), fromType)))
 			{
 				return true;
 			}
 			if (ConversionCache.GetTypeOperators(fromType.TypeHandle).Any(
-				pair => pair.Value.ConversionType.AnyFlag(ConversionType.To) &&
+				pair => ((pair.Value.ConversionType & ConversionType.To) != 0) &&
 					IsAssignableFromCastEx(type, Type.GetTypeFromHandle(pair.Key))))
 			{
 				return true;
