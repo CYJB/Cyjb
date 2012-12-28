@@ -282,12 +282,9 @@ namespace Cyjb
 			// 尝试对数字进行解析，这样可避免之后的字符串比较。
 			char firstChar = value[0];
 			ulong tmpValue;
-			if (char.IsDigit(firstChar) || firstChar == '+' || firstChar == '-')
+			if (ParseString(value, out tmpValue))
 			{
-				if (ParseString(value, out tmpValue))
-				{
-					return Enum.ToObject(enumType, tmpValue);
-				}
+				return Enum.ToObject(enumType, tmpValue);
 			}
 			// 尝试对描述信息进行解析。
 			EnumCache cache = GetEnumCache(enumType.TypeHandle);
@@ -404,7 +401,12 @@ namespace Cyjb
 		/// <returns>字符串的解析是否成功。</returns>
 		private static bool ParseString(string str, out ulong value)
 		{
-			if (str[0] == '-')
+			char firstChar = str[0];
+			if (char.IsDigit(firstChar) || firstChar == '+')
+			{
+				return ulong.TryParse(str, out value);
+			}
+			else if (firstChar == '-')
 			{
 				long valueL;
 				if (long.TryParse(str, out valueL))
@@ -412,10 +414,9 @@ namespace Cyjb
 					value = unchecked((ulong)valueL);
 					return true;
 				}
-				value = 0;
-				return false;
 			}
-			return ulong.TryParse(str, out value);
+			value = 0;
+			return false;
 		}
 
 		#endregion // 字符串分析
