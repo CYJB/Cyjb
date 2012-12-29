@@ -77,6 +77,9 @@ namespace Cyjb
 			{
 				return false;
 			}
+			// 对引用类型的支持。
+			if (type.IsByRef) { type = type.GetElementType(); }
+			if (fromType.IsByRef) { fromType = type.GetElementType(); }
 			// 总是可以隐式类型转换为 Object。
 			if (type.TypeHandle.Equals(typeof(object).TypeHandle))
 			{
@@ -151,8 +154,12 @@ namespace Cyjb
 			{
 				return false;
 			}
+			// 对引用类型的支持。
+			if (type.IsByRef) { type = type.GetElementType(); }
+			if (fromType.IsByRef) { fromType = type.GetElementType(); }
 			// 总是可以与 Object 进行强制类型转换。
-			if (type == typeof(object) || fromType == typeof(object))
+			if (type.TypeHandle.Equals(typeof(object).TypeHandle) ||
+				fromType.TypeHandle.Equals(typeof(object).TypeHandle))
 			{
 				return true;
 			}
