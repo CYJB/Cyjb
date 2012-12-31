@@ -31,6 +31,7 @@ namespace UnitTestCyjb
 			Assert.IsTrue(typeof(decimal).IsImplicitFrom(typeof(TestClass)));
 			Assert.IsTrue(typeof(bool).IsImplicitFrom(typeof(TestClass2)));
 			Assert.IsTrue(typeof(Enum).IsImplicitFrom(typeof(Tristate)));
+			Assert.IsTrue(typeof(Enum).IsImplicitFrom(typeof(TestClass13)));
 			Assert.IsTrue(typeof(Delegate).IsImplicitFrom(typeof(Func<int>)));
 			Assert.IsTrue(typeof(int?).IsImplicitFrom(typeof(int)));
 			Assert.IsTrue(typeof(long?).IsImplicitFrom(typeof(int?)));
@@ -97,6 +98,11 @@ namespace UnitTestCyjb
 			Assert.IsTrue(typeof(decimal).IsCastableFrom(typeof(TestClass)));
 			Assert.IsTrue(typeof(bool).IsCastableFrom(typeof(TestClass2)));
 			Assert.IsTrue(typeof(Enum).IsCastableFrom(typeof(Tristate)));
+			Assert.IsTrue(typeof(Enum).IsCastableFrom(typeof(TestClass13)));
+			Assert.IsTrue(typeof(Tristate).IsCastableFrom(typeof(TestClass13)));
+			Assert.IsTrue(typeof(Tristate).IsCastableFrom(typeof(int)));
+			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(Tristate)));
+			Assert.IsTrue(typeof(Enum).IsCastableFrom(typeof(TestClass14)));
 			Assert.IsTrue(typeof(Delegate).IsCastableFrom(typeof(Func<int>)));
 			Assert.IsTrue(typeof(int?).IsCastableFrom(typeof(int)));
 			Assert.IsTrue(typeof(long?).IsCastableFrom(typeof(int?)));
@@ -132,12 +138,16 @@ namespace UnitTestCyjb
 			Assert.IsTrue(typeof(TestClass11).IsCastableFrom(typeof(TestClass9)));
 			Assert.IsTrue(typeof(TestClass9).IsCastableFrom(typeof(TestClass10)));
 			Assert.IsTrue(typeof(TestClass9).IsCastableFrom(typeof(TestClass11)));
+			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(TestClass12)));
+			Assert.IsTrue(typeof(TestClass12).IsCastableFrom(typeof(int)));
 			Assert.IsTrue(typeof(long).IsCastableFrom(typeof(TestClass6)));
 			Assert.IsTrue(typeof(TestStruct).IsCastableFrom(typeof(TestStruct2?)));
 			Assert.IsTrue(typeof(TestStruct).IsCastableFrom(typeof(TestStruct3?)));
 			// Falses
 			Assert.IsFalse(typeof(TestClass).IsImplicitFrom(typeof(TestClass3)));
 			Assert.IsFalse(typeof(string).IsCastableFrom(typeof(TestClass)));
+			Assert.IsFalse(typeof(int).IsCastableFrom(typeof(TestClass13)));
+			Assert.IsFalse(typeof(int).IsCastableFrom(typeof(TestClass14)));
 			Assert.IsFalse(typeof(TestStruct2).IsCastableFrom(typeof(TestStruct)));
 			Assert.IsFalse(typeof(TestStruct2).IsCastableFrom(typeof(TestStruct?)));
 			Assert.IsFalse(typeof(TestStruct2?).IsCastableFrom(typeof(TestStruct)));
@@ -234,6 +244,31 @@ namespace UnitTestCyjb
 		}
 		private class TestClass10 { }
 		private class TestClass11 : TestClass10 { }
+		private class TestClass12
+		{
+			public static implicit operator Nullable<int>(TestClass12 t)
+			{
+				return 12;
+			}
+			public static implicit operator TestClass12(Nullable<int> t)
+			{
+				return new TestClass12();
+			}
+		}
+		private class TestClass13
+		{
+			public static implicit operator Enum(TestClass13 t)
+			{
+				return Tristate.False;
+			}
+		}
+		private class TestClass14
+		{
+			public static implicit operator Tristate(TestClass14 t)
+			{
+				return Tristate.False;
+			}
+		}
 		private struct TestStruct
 		{
 			public static implicit operator TestStruct(TestStruct3 tc)

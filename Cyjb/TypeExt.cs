@@ -128,7 +128,7 @@ namespace Cyjb
 		/// 确定当前的 <see cref="System.Type"/> 的实例是否可以从指定 <see cref="System.Type"/> 
 		/// 的实例进行内置强制类型转换。
 		/// </summary>
-		/// <param name="type">要判断的实例。</param>
+		/// <param name="type">要判断的类型。</param>
 		/// <param name="fromType">要与当前类型进行比较的类型。</param>
 		/// <returns>如果当前 <see cref="System.Type"/> 可以从 <paramref name="fromType"/>
 		/// 的实例分配或进行内置强制类型转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
@@ -139,6 +139,28 @@ namespace Cyjb
 				return true;
 			}
 			return CastFromSet.Contains(type.TypeHandle) && CastFromSet.Contains(fromType.TypeHandle);
+		}
+		/// <summary>
+		/// 确定当前的 <see cref="System.Type"/> 是否属于合法的枚举基础类型。
+		/// </summary>
+		/// <param name="type">要判断的类型。</param>
+		/// <returns>如果当前 <see cref="System.Type"/> 是合法的枚举基础类型，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
+		private static bool IsEnumUnderlyingType(Type type)
+		{
+			switch (Type.GetTypeCode(type))
+			{
+				case TypeCode.Byte:
+				case TypeCode.SByte:
+				case TypeCode.Int16:
+				case TypeCode.UInt16:
+				case TypeCode.Int32:
+				case TypeCode.UInt32:
+				case TypeCode.Int64:
+				case TypeCode.UInt64:
+					return true;
+			}
+			return false;
 		}
 		/// <summary>
 		/// 确定当前的 <see cref="System.Type"/> 的实例是否可以从指定 <see cref="System.Type"/> 
@@ -169,16 +191,27 @@ namespace Cyjb
 			// 对枚举的支持。
 			if (type.IsEnum)
 			{
-				type = Enum.GetUnderlyingType(type);
+				if (fromType.IsEnum || IsEnumUnderlyingType(fromType))
+				{
+					return true;
+				}
 			}
-			if (fromType.IsEnum)
+			else if (fromType.IsEnum && IsEnumUnderlyingType(type))
 			{
-				fromType = Enum.GetUnderlyingType(fromType);
+				return true;
 			}
 			// 判断是否可以从实例分配，强制类型转换允许沿着继承链反向转换。
 			if (IsAssignableFromCastEx(type, fromType))
 			{
 				return true;
+			}
+			else if (fromType.IsEnum)
+			{
+				if (type.TypeHandle.Equals(typeof(Enum).TypeHandle))
+				{
+					return true;
+				}
+				fromType = Enum.GetUnderlyingType(fromType);
 			}
 			// 对强制类型转换运算符进行判断。
 			if (ConversionCache.GetTypeOperators(type.TypeHandle).Any(
