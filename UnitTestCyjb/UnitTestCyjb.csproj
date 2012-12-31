@@ -54,6 +54,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="AssertExt.cs" />
     <Compile Include="UnitTestEnumExt.cs" />
     <Compile Include="UnitTestCastBinder.cs" />
     <Compile Include="UnitTestTypeExt.cs" />

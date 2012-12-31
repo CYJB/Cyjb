@@ -24,16 +24,7 @@ namespace UnitTestCyjb
 			Assert.AreEqual(-2, ConvertExt.ToSByte("9b", 27));
 			Assert.AreEqual(-90, ConvertExt.ToSByte("4m", 36));
 			Assert.AreEqual(-128, ConvertExt.ToSByte("4c", 29));
-			bool hasException = false;
-			try
-			{
-				ConvertExt.ToSByte("38o7", 27);
-			}
-			catch (OverflowException)
-			{
-				hasException = true;
-			}
-			Assert.IsTrue(hasException, "没有正确引发 OverflowException。");
+			AssertExt.ThrowsException(() => ConvertExt.ToSByte("38o7", 27), typeof(OverflowException));
 		}
 		/// <summary>
 		/// 对 <see cref="Cyjb.ConvertExt.ToInt16"/> 方法进行测试。
@@ -49,16 +40,7 @@ namespace UnitTestCyjb
 			Assert.AreEqual(-2, ConvertExt.ToInt16("38o5", 27));
 			Assert.AreEqual(-21458, ConvertExt.ToInt16("y0e", 36));
 			Assert.AreEqual(-32768, ConvertExt.ToInt16("19rr", 29));
-			bool hasException = false;
-			try
-			{
-				ConvertExt.ToInt16("38o7", 27);
-			}
-			catch (OverflowException)
-			{
-				hasException = true;
-			}
-			Assert.IsTrue(hasException, "没有正确引发 OverflowException。");
+			AssertExt.ThrowsException(() => ConvertExt.ToInt16("38o7", 27), typeof(OverflowException));
 		}
 		/// <summary>
 		/// 对 <see cref="Cyjb.ConvertExt.ToInt32"/> 方法进行测试。
@@ -74,16 +56,7 @@ namespace UnitTestCyjb
 			Assert.AreEqual(-2, ConvertExt.ToInt32("b28jpdk", 27));
 			Assert.AreEqual(-1235678902, ConvertExt.ToInt32("1elf616", 36));
 			Assert.AreEqual(-2147483648, ConvertExt.ToInt32("3hk7988", 29));
-			bool hasException = false;
-			try
-			{
-				ConvertExt.ToInt32("b28jpdm", 27);
-			}
-			catch (OverflowException)
-			{
-				hasException = true;
-			}
-			Assert.IsTrue(hasException, "没有正确引发 OverflowException。");
+			AssertExt.ThrowsException(() => ConvertExt.ToInt32("b28jpdm", 27), typeof(OverflowException));
 		}
 		/// <summary>
 		/// 对 <see cref="Cyjb.ConvertExt.ToInt64"/> 方法进行测试。
@@ -99,16 +72,7 @@ namespace UnitTestCyjb
 			Assert.AreEqual(-2L, ConvertExt.ToInt64("4Eo8hfam6fllmn", 27));
 			Assert.AreEqual(-8071017880399937603L, ConvertExt.ToInt64("26tvjyybszf7h", 36));
 			Assert.AreEqual(-9223372036854775808L, ConvertExt.ToInt64("q1se8f0m04isc", 29));
-			bool hasException = false;
-			try
-			{
-				ConvertExt.ToInt64("4Eo8hfam6fllmp", 27);
-			}
-			catch (OverflowException)
-			{
-				hasException = true;
-			}
-			Assert.IsTrue(hasException, "没有正确引发 OverflowException。");
+			AssertExt.ThrowsException(() => ConvertExt.ToInt64("4Eo8hfam6fllmp", 27), typeof(OverflowException));
 		}
 		/// <summary>
 		/// 对 <see cref="Cyjb.ConvertExt.ToByte"/> 方法进行测试。
@@ -124,16 +88,7 @@ namespace UnitTestCyjb
 			Assert.AreEqual(166, ConvertExt.ToByte("4m", 36));
 			Assert.AreEqual(254, ConvertExt.ToByte("9b", 27));
 			Assert.AreEqual(255, ConvertExt.ToByte("9c", 27));
-			bool hasException = false;
-			try
-			{
-				ConvertExt.ToByte("38o7", 27);
-			}
-			catch (OverflowException)
-			{
-				hasException = true;
-			}
-			Assert.IsTrue(hasException, "没有正确引发 OverflowException。");
+			AssertExt.ThrowsException(() => ConvertExt.ToByte("38o7", 27), typeof(OverflowException));
 		}
 		/// <summary>
 		/// 对 <see cref="Cyjb.ConvertExt.ToUInt16"/> 方法进行测试。
@@ -149,16 +104,7 @@ namespace UnitTestCyjb
 			Assert.AreEqual(44078, ConvertExt.ToUInt16("y0e", 36));
 			Assert.AreEqual(65534, ConvertExt.ToUInt16("38o5", 27));
 			Assert.AreEqual(65535, ConvertExt.ToUInt16("38o6", 27));
-			bool hasException = false;
-			try
-			{
-				ConvertExt.ToUInt16("38o7", 27);
-			}
-			catch (OverflowException)
-			{
-				hasException = true;
-			}
-			Assert.IsTrue(hasException, "没有正确引发 OverflowException。");
+			AssertExt.ThrowsException(() => ConvertExt.ToUInt16("38o7", 27), typeof(OverflowException));
 		}
 		/// <summary>
 		/// 对 <see cref="Cyjb.ConvertExt.ToUInt32"/> 方法进行测试。
@@ -174,16 +120,7 @@ namespace UnitTestCyjb
 			Assert.AreEqual(3059288394U, ConvertExt.ToUInt32("1elf616", 36));
 			Assert.AreEqual(4294967294U, ConvertExt.ToUInt32("b28jpdk", 27));
 			Assert.AreEqual(4294967295U, ConvertExt.ToUInt32("b28jpdl", 27));
-			bool hasException = false;
-			try
-			{
-				ConvertExt.ToUInt32("b28jpdm", 27);
-			}
-			catch (OverflowException)
-			{
-				hasException = true;
-			}
-			Assert.IsTrue(hasException, "没有正确引发 OverflowException。");
+			AssertExt.ThrowsException(() => ConvertExt.ToUInt32("b28jpdm", 27), typeof(OverflowException));
 		}
 		/// <summary>
 		/// 对 <see cref="Cyjb.ConvertExt.ToUInt64"/> 方法进行测试。
@@ -199,16 +136,7 @@ namespace UnitTestCyjb
 			Assert.AreEqual(10375726193309614013UL, ConvertExt.ToUInt64("26tvjyybszf7h", 36));
 			Assert.AreEqual(18446744073709551614UL, ConvertExt.ToUInt64("4Eo8hfam6fllmn", 27));
 			Assert.AreEqual(18446744073709551615UL, ConvertExt.ToUInt64("4Eo8hfam6fllmo", 27));
-			bool hasException = false;
-			try
-			{
-				ConvertExt.ToUInt64("4Eo8hfam6fllmp", 27);
-			}
-			catch (OverflowException)
-			{
-				hasException = true;
-			}
-			Assert.IsTrue(hasException, "没有正确引发 OverflowException。");
+			AssertExt.ThrowsException(() => ConvertExt.ToUInt64("4Eo8hfam6fllmp", 27), typeof(OverflowException));
 		}
 		/// <summary>
 		/// 对 <see cref="Cyjb.ConvertExt.ToString"/> 方法进行测试。
