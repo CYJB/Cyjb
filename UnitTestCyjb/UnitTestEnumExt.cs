@@ -27,15 +27,16 @@ namespace UnitTestCyjb
 			Assert.AreEqual("B Des", TestEnum.B.GetDescription());
 			Assert.AreEqual("C Des", TestEnum.C.GetDescription());
 			Assert.AreEqual("D Des", TestEnum.D.GetDescription());
+			Assert.AreEqual("E", TestEnum.E.GetDescription());
 			Assert.AreEqual("0", ((TestEnum2)0).GetDescription());
 			Assert.AreEqual("A Des", TestEnum2.A.GetDescription());
 			Assert.AreEqual("B Des", TestEnum2.B.GetDescription());
 			Assert.AreEqual("C Des", TestEnum2.C.GetDescription());
-			Assert.AreEqual("D Des", TestEnum2.D.GetDescription());
+			Assert.AreEqual("D", TestEnum2.D.GetDescription());
 			Assert.AreEqual("AB Des", TestEnum2.AB.GetDescription());
 			Assert.AreEqual("BC Des", TestEnum2.BC.GetDescription());
 			Assert.AreEqual("A Des, BC Des", (TestEnum2.BC | TestEnum2.A).GetDescription());
-			Assert.AreEqual("BC Des, D Des", (TestEnum2.BC | TestEnum2.D).GetDescription());
+			Assert.AreEqual("BC Des, D", (TestEnum2.BC | TestEnum2.D).GetDescription());
 			Assert.AreEqual("All Des", TestEnum2.All.GetDescription());
 			Assert.AreEqual("All Des, 128", (TestEnum2.All | (TestEnum2)128).GetDescription());
 		}
@@ -64,6 +65,8 @@ namespace UnitTestCyjb
 			Assert.AreEqual(TestEnum.D, EnumExt.ParseEx<TestEnum>("D"));
 			Assert.AreEqual(TestEnum.D, EnumExt.ParseEx<TestEnum>("-4"));
 			Assert.AreEqual(TestEnum.D, EnumExt.ParseEx<TestEnum>("D Des"));
+			Assert.AreEqual(TestEnum.E, EnumExt.ParseEx<TestEnum>("-5"));
+			Assert.AreEqual(TestEnum.E, EnumExt.ParseEx<TestEnum>("E"));
 			Assert.AreEqual((TestEnum2)0, EnumExt.ParseEx<TestEnum2>("0"));
 			Assert.AreEqual(TestEnum2.A, EnumExt.ParseEx<TestEnum2>("  A "));
 			Assert.AreEqual(TestEnum2.A, EnumExt.ParseEx<TestEnum2>("  1 "));
@@ -76,7 +79,7 @@ namespace UnitTestCyjb
 			Assert.AreEqual(TestEnum2.C, EnumExt.ParseEx<TestEnum2>("C Des"));
 			Assert.AreEqual(TestEnum2.D, EnumExt.ParseEx<TestEnum2>("D "));
 			Assert.AreEqual(TestEnum2.D, EnumExt.ParseEx<TestEnum2>("0008"));
-			Assert.AreEqual(TestEnum2.D, EnumExt.ParseEx<TestEnum2>("D Des"));
+			Assert.AreEqual(TestEnum2.D, EnumExt.ParseEx<TestEnum2>("D"));
 			Assert.AreEqual(TestEnum2.AB, EnumExt.ParseEx<TestEnum2>("AB Des"));
 			Assert.AreEqual(TestEnum2.AB, EnumExt.ParseEx<TestEnum2>("A,B Des"));
 			Assert.AreEqual(TestEnum2.AB, EnumExt.ParseEx<TestEnum2>("1,2"));
@@ -90,16 +93,16 @@ namespace UnitTestCyjb
 			Assert.AreEqual(TestEnum2.A | TestEnum2.BC, EnumExt.ParseEx<TestEnum2>("7"));
 			Assert.AreEqual(TestEnum2.A | TestEnum2.BC, EnumExt.ParseEx<TestEnum2>("BC Des    ,   , A Des"));
 			Assert.AreEqual(TestEnum2.A | TestEnum2.BC, EnumExt.ParseEx<TestEnum2>("AB Des    ,    C Des"));
-			Assert.AreEqual(TestEnum2.D | TestEnum2.BC, EnumExt.ParseEx<TestEnum2>("BC Des    ,    D Des"));
-			Assert.AreEqual(TestEnum2.All, EnumExt.ParseEx<TestEnum2>("BC Des,A Des,D Des"));
+			Assert.AreEqual(TestEnum2.D | TestEnum2.BC, EnumExt.ParseEx<TestEnum2>("BC Des    ,    D"));
+			Assert.AreEqual(TestEnum2.All, EnumExt.ParseEx<TestEnum2>("BC Des,A Des,D"));
 			Assert.AreEqual(TestEnum2.All, EnumExt.ParseEx<TestEnum2>("15"));
 			Assert.AreEqual(TestEnum2.All, EnumExt.ParseEx<TestEnum2>("+1,+2,  , 4, 8, "));
 			Assert.AreEqual(TestEnum2.All, EnumExt.ParseEx<TestEnum2>("All Des"));
-			Assert.AreEqual(TestEnum2.All, EnumExt.ParseEx<TestEnum2>("BC Des,AB Des,D Des"));
-			Assert.AreEqual(TestEnum2.All | (TestEnum2)128, EnumExt.ParseEx<TestEnum2>("BC Des,AB Des,D Des, 128"));
+			Assert.AreEqual(TestEnum2.All, EnumExt.ParseEx<TestEnum2>("BC Des,AB Des,D"));
+			Assert.AreEqual(TestEnum2.All | (TestEnum2)128, EnumExt.ParseEx<TestEnum2>("BC Des,AB Des,D, 128"));
 			Assert.AreEqual(TestEnum2.All | (TestEnum2)128, EnumExt.ParseEx<TestEnum2>("15, 128"));
 			Assert.AreEqual(TestEnum2.All | (TestEnum2)128, EnumExt.ParseEx<TestEnum2>("143"));
-			Assert.AreEqual(TestEnum2.All | (TestEnum2)128, EnumExt.ParseEx<TestEnum2>("BC Des,AB Des,D Des,+128"));
+			Assert.AreEqual(TestEnum2.All | (TestEnum2)128, EnumExt.ParseEx<TestEnum2>("BC Des,AB Des,D,+128"));
 		}
 		private enum TestEnum
 		{
@@ -110,7 +113,8 @@ namespace UnitTestCyjb
 			[System.ComponentModel.Description("C Des")]
 			C = -3,
 			[System.ComponentModel.Description("D Des")]
-			D = -4
+			D = -4,
+			E = -5
 		}
 		[Flags]
 		private enum TestEnum2
@@ -121,7 +125,6 @@ namespace UnitTestCyjb
 			B = 2,
 			[System.ComponentModel.Description("C Des")]
 			C = 4,
-			[System.ComponentModel.Description("D Des")]
 			D = 8,
 			[System.ComponentModel.Description("AB Des")]
 			AB = A | B,
