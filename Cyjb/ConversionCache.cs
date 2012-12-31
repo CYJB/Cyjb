@@ -45,7 +45,7 @@ namespace Cyjb
 					{
 						ConversionType cType = ConversionType.ExplicitTo;
 						RuntimeTypeHandle opType;
-						if (m.ReturnType == type)
+						if (m.ReturnType.TypeHandle.Equals(type))
 						{
 							// 转换自其它类型。
 							opType = m.GetParameters()[0].ParameterType.TypeHandle;
