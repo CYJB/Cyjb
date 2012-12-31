@@ -18,55 +18,61 @@ namespace UnitTestCyjb
 		[TestMethod]
 		public void TestIsImplicitFrom()
 		{
-			// Trues
+			// object 可以从任何类型隐式类型转换。
 			Assert.IsTrue(typeof(object).IsImplicitFrom(typeof(object)));
 			Assert.IsTrue(typeof(object).IsImplicitFrom(typeof(string)));
 			Assert.IsTrue(typeof(object).IsImplicitFrom(typeof(uint)));
 			Assert.IsTrue(typeof(object).IsImplicitFrom(typeof(TestClass)));
+			// 子类隐式类型转换为父类。
 			Assert.IsTrue(typeof(TestClass).IsImplicitFrom(typeof(TestClass2)));
-			Assert.IsTrue(typeof(int).IsImplicitFrom(typeof(short)));
-			Assert.IsTrue(typeof(uint).IsImplicitFrom(typeof(ushort)));
-			Assert.IsTrue(typeof(int).IsImplicitFrom(typeof(TestClass)));
-			Assert.IsTrue(typeof(long).IsImplicitFrom(typeof(TestClass)));
-			Assert.IsTrue(typeof(decimal).IsImplicitFrom(typeof(TestClass)));
-			Assert.IsTrue(typeof(bool).IsImplicitFrom(typeof(TestClass2)));
 			Assert.IsTrue(typeof(Enum).IsImplicitFrom(typeof(Tristate)));
-			Assert.IsTrue(typeof(Enum).IsImplicitFrom(typeof(TestClass13)));
 			Assert.IsTrue(typeof(Delegate).IsImplicitFrom(typeof(Func<int>)));
-			Assert.IsTrue(typeof(int?).IsImplicitFrom(typeof(int)));
-			Assert.IsTrue(typeof(long?).IsImplicitFrom(typeof(int?)));
 			Assert.IsTrue(typeof(Array).IsImplicitFrom(typeof(int[])));
 			Assert.IsTrue(typeof(Array).IsImplicitFrom(typeof(object[])));
 			Assert.IsTrue(typeof(IList<int>).IsImplicitFrom(typeof(List<int>)));
 			Assert.IsTrue(typeof(IList).IsImplicitFrom(typeof(List<int>)));
-			// Nullable<T>
+			// 用户自定义隐式类型转换运算符。
+			Assert.IsTrue(typeof(int).IsImplicitFrom(typeof(TestClass)));
+			Assert.IsTrue(typeof(bool).IsImplicitFrom(typeof(TestClass2)));
+			Assert.IsTrue(typeof(Enum).IsImplicitFrom(typeof(TestClass13)));
+			Assert.IsTrue(typeof(TestClass6).IsImplicitFrom(typeof(TestClass8)));
+			Assert.IsTrue(typeof(TestClass7).IsImplicitFrom(typeof(TestClass6)));
+			Assert.IsTrue(typeof(TestClass6).IsImplicitFrom(typeof(int)));
+			// CLS 基本类型间的隐式类型转换。
+			Assert.IsTrue(typeof(int).IsImplicitFrom(typeof(short)));
+			Assert.IsTrue(typeof(uint).IsImplicitFrom(typeof(ushort)));
+			// 用户自定义隐式类型转换运算符 + 基本类型隐式类型转换。
+			Assert.IsTrue(typeof(long).IsImplicitFrom(typeof(TestClass)));
+			Assert.IsTrue(typeof(decimal).IsImplicitFrom(typeof(TestClass)));
+			Assert.IsTrue(typeof(TestClass6).IsImplicitFrom(typeof(short)));
+			Assert.IsTrue(typeof(long).IsImplicitFrom(typeof(TestClass6)));
+			// Nullable<T> 的隐式类型转换。
+			Assert.IsTrue(typeof(int?).IsImplicitFrom(typeof(int)));
+			Assert.IsTrue(typeof(long?).IsImplicitFrom(typeof(int?)));
 			Assert.IsTrue(typeof(TestStruct).IsImplicitFrom(typeof(TestStruct2)));
 			Assert.IsTrue(typeof(TestStruct?).IsImplicitFrom(typeof(TestStruct2?)));
 			Assert.IsTrue(typeof(TestStruct?).IsImplicitFrom(typeof(TestStruct2)));
 			Assert.IsTrue(typeof(TestStruct).IsImplicitFrom(typeof(TestStruct3)));
 			Assert.IsTrue(typeof(TestStruct?).IsImplicitFrom(typeof(TestStruct3?)));
-			Assert.IsTrue(typeof(TestClass6).IsImplicitFrom(typeof(short)));
-			Assert.IsTrue(typeof(TestClass6).IsImplicitFrom(typeof(int)));
-			Assert.IsTrue(typeof(TestClass6).IsImplicitFrom(typeof(TestClass8)));
-			Assert.IsTrue(typeof(TestClass7).IsImplicitFrom(typeof(TestClass6)));
-			Assert.IsTrue(typeof(long).IsImplicitFrom(typeof(TestClass6)));
-			// Falses
-			Assert.IsFalse(typeof(int?).IsImplicitFrom(typeof(long?)));
+			// 不允许从 object 隐式类型转换。
 			Assert.IsFalse(typeof(TestClass).IsImplicitFrom(typeof(object)));
+			// 不允许从父类隐式类型转换为子类。
 			Assert.IsFalse(typeof(TestClass2).IsImplicitFrom(typeof(TestClass)));
-			Assert.IsFalse(typeof(TestClass).IsImplicitFrom(typeof(TestClass3)));
-			Assert.IsFalse(typeof(int).IsImplicitFrom(typeof(long)));
-			Assert.IsFalse(typeof(uint).IsImplicitFrom(typeof(short)));
-			Assert.IsFalse(typeof(short).IsImplicitFrom(typeof(TestClass)));
-			Assert.IsFalse(typeof(string).IsImplicitFrom(typeof(TestClass)));
-			Assert.IsFalse(typeof(int).IsImplicitFrom(typeof(TestClass3)));
-			Assert.IsFalse(typeof(Tristate).IsImplicitFrom(typeof(Enum)));
-			Assert.IsFalse(typeof(Func<int>).IsImplicitFrom(typeof(Delegate)));
-			Assert.IsFalse(typeof(int).IsImplicitFrom(typeof(int?)));
 			Assert.IsFalse(typeof(int[]).IsImplicitFrom(typeof(Array)));
 			Assert.IsFalse(typeof(List<int>).IsImplicitFrom(typeof(IList<int>)));
 			Assert.IsFalse(typeof(List<int>).IsImplicitFrom(typeof(IList)));
-			// Nullable<T>
+			Assert.IsFalse(typeof(Tristate).IsImplicitFrom(typeof(Enum)));
+			Assert.IsFalse(typeof(Func<int>).IsImplicitFrom(typeof(Delegate)));
+			// 不允许用户未定义的类型转换或显示类型转换。
+			Assert.IsFalse(typeof(string).IsImplicitFrom(typeof(TestClass)));
+			Assert.IsFalse(typeof(int).IsImplicitFrom(typeof(TestClass3)));
+			// 不允许从窄类型隐式类型转换到宽类型。
+			Assert.IsFalse(typeof(int).IsImplicitFrom(typeof(long)));
+			Assert.IsFalse(typeof(uint).IsImplicitFrom(typeof(short)));
+			Assert.IsFalse(typeof(short).IsImplicitFrom(typeof(TestClass)));
+			// 不允许的 Nullable<T> 隐式类型转换。
+			Assert.IsFalse(typeof(int).IsImplicitFrom(typeof(int?)));
+			Assert.IsFalse(typeof(int?).IsImplicitFrom(typeof(long?)));
 			Assert.IsFalse(typeof(TestStruct2).IsImplicitFrom(typeof(TestStruct)));
 			Assert.IsFalse(typeof(TestStruct2).IsImplicitFrom(typeof(TestStruct?)));
 			Assert.IsFalse(typeof(TestStruct2?).IsImplicitFrom(typeof(TestStruct)));
@@ -78,6 +84,8 @@ namespace UnitTestCyjb
 			Assert.IsFalse(typeof(TestStruct3?).IsImplicitFrom(typeof(TestStruct)));
 			Assert.IsFalse(typeof(TestStruct3?).IsImplicitFrom(typeof(TestStruct?)));
 			Assert.IsFalse(typeof(TestStruct).IsImplicitFrom(typeof(TestStruct3?)));
+			// 不允许两次隐式类型转换。
+			Assert.IsFalse(typeof(TestClass).IsImplicitFrom(typeof(TestClass3)));
 		}
 		/// <summary>
 		/// 对 <see cref="Cyjb.TypeExt.IsCastableFrom"/> 方法进行测试。
@@ -85,36 +93,18 @@ namespace UnitTestCyjb
 		[TestMethod]
 		public void TestIsCastableFrom()
 		{
-			// Trues
+			// object 可以与任何类型相互显示类型转换。
 			Assert.IsTrue(typeof(object).IsCastableFrom(typeof(object)));
 			Assert.IsTrue(typeof(object).IsCastableFrom(typeof(string)));
 			Assert.IsTrue(typeof(object).IsCastableFrom(typeof(uint)));
 			Assert.IsTrue(typeof(object).IsCastableFrom(typeof(TestClass)));
-			Assert.IsTrue(typeof(TestClass).IsCastableFrom(typeof(TestClass2)));
-			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(short)));
-			Assert.IsTrue(typeof(uint).IsCastableFrom(typeof(ushort)));
-			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(TestClass)));
-			Assert.IsTrue(typeof(long).IsCastableFrom(typeof(TestClass)));
-			Assert.IsTrue(typeof(decimal).IsCastableFrom(typeof(TestClass)));
-			Assert.IsTrue(typeof(bool).IsCastableFrom(typeof(TestClass2)));
-			Assert.IsTrue(typeof(Enum).IsCastableFrom(typeof(Tristate)));
-			Assert.IsTrue(typeof(Enum).IsCastableFrom(typeof(TestClass13)));
-			Assert.IsTrue(typeof(Tristate).IsCastableFrom(typeof(TestClass13)));
-			Assert.IsTrue(typeof(Tristate).IsCastableFrom(typeof(int)));
-			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(Tristate)));
-			Assert.IsTrue(typeof(Enum).IsCastableFrom(typeof(TestClass14)));
-			Assert.IsTrue(typeof(Delegate).IsCastableFrom(typeof(Func<int>)));
-			Assert.IsTrue(typeof(int?).IsCastableFrom(typeof(int)));
-			Assert.IsTrue(typeof(long?).IsCastableFrom(typeof(int?)));
-			Assert.IsTrue(typeof(int?).IsCastableFrom(typeof(long?)));
 			Assert.IsTrue(typeof(TestClass).IsCastableFrom(typeof(object)));
-			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(long)));
-			Assert.IsTrue(typeof(uint).IsCastableFrom(typeof(short)));
-			Assert.IsTrue(typeof(short).IsCastableFrom(typeof(TestClass)));
-			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(TestClass3)));
+			// 可以沿着继承链任意显示类型转换。
+			Assert.IsTrue(typeof(TestClass).IsCastableFrom(typeof(TestClass2)));
+			Assert.IsTrue(typeof(Enum).IsCastableFrom(typeof(Tristate)));
+			Assert.IsTrue(typeof(Delegate).IsCastableFrom(typeof(Func<int>)));
 			Assert.IsTrue(typeof(Tristate).IsCastableFrom(typeof(Enum)));
 			Assert.IsTrue(typeof(Func<int>).IsCastableFrom(typeof(Delegate)));
-			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(int?)));
 			Assert.IsTrue(typeof(TestClass2).IsCastableFrom(typeof(TestClass)));
 			Assert.IsTrue(typeof(Array).IsCastableFrom(typeof(int[])));
 			Assert.IsTrue(typeof(Array).IsCastableFrom(typeof(object[])));
@@ -124,7 +114,31 @@ namespace UnitTestCyjb
 			Assert.IsTrue(typeof(object[]).IsCastableFrom(typeof(Array)));
 			Assert.IsTrue(typeof(List<int>).IsCastableFrom(typeof(IList<int>)));
 			Assert.IsTrue(typeof(List<int>).IsCastableFrom(typeof(IList)));
-			// Nullable<T>
+			// 用户自定义显式类型转换运算符
+			Assert.IsTrue(typeof(Enum).IsCastableFrom(typeof(TestClass13)));
+			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(TestClass)));
+			Assert.IsTrue(typeof(bool).IsCastableFrom(typeof(TestClass2)));
+			// CLS 基本类型间的显式类型转换。
+			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(short)));
+			Assert.IsTrue(typeof(uint).IsCastableFrom(typeof(ushort)));
+			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(long)));
+			Assert.IsTrue(typeof(uint).IsCastableFrom(typeof(short)));
+			// 用户自定义显式类型转换运算符 + 类型显式类型转换。
+			Assert.IsTrue(typeof(long).IsCastableFrom(typeof(TestClass)));
+			Assert.IsTrue(typeof(decimal).IsCastableFrom(typeof(TestClass)));
+			Assert.IsTrue(typeof(short).IsCastableFrom(typeof(TestClass)));
+			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(TestClass3)));
+			Assert.IsTrue(typeof(Tristate).IsCastableFrom(typeof(TestClass13)));
+			Assert.IsTrue(typeof(Enum).IsCastableFrom(typeof(TestClass14)));
+			// 枚举的显示类型转换。
+			Assert.IsTrue(typeof(Tristate).IsCastableFrom(typeof(int)));
+			Assert.IsTrue(typeof(Tristate).IsCastableFrom(typeof(TypeCode)));
+			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(Tristate)));
+			// Nullable<T> 的显式类型转换。
+			Assert.IsTrue(typeof(int?).IsCastableFrom(typeof(int)));
+			Assert.IsTrue(typeof(long?).IsCastableFrom(typeof(int?)));
+			Assert.IsTrue(typeof(int?).IsCastableFrom(typeof(long?)));
+			Assert.IsTrue(typeof(int).IsCastableFrom(typeof(int?)));
 			Assert.IsTrue(typeof(TestStruct).IsCastableFrom(typeof(TestStruct2)));
 			Assert.IsTrue(typeof(TestStruct?).IsCastableFrom(typeof(TestStruct2?)));
 			Assert.IsTrue(typeof(TestStruct?).IsCastableFrom(typeof(TestStruct2)));
@@ -143,11 +157,14 @@ namespace UnitTestCyjb
 			Assert.IsTrue(typeof(long).IsCastableFrom(typeof(TestClass6)));
 			Assert.IsTrue(typeof(TestStruct).IsCastableFrom(typeof(TestStruct2?)));
 			Assert.IsTrue(typeof(TestStruct).IsCastableFrom(typeof(TestStruct3?)));
-			// Falses
-			Assert.IsFalse(typeof(TestClass).IsImplicitFrom(typeof(TestClass3)));
+			// 不允许两次隐式类型转换。
+			Assert.IsFalse(typeof(TestClass).IsCastableFrom(typeof(TestClass3)));
+			// 不允许用户未定义的类型转换。
 			Assert.IsFalse(typeof(string).IsCastableFrom(typeof(TestClass)));
+			// 不允许枚举的两次类型转换。
 			Assert.IsFalse(typeof(int).IsCastableFrom(typeof(TestClass13)));
 			Assert.IsFalse(typeof(int).IsCastableFrom(typeof(TestClass14)));
+			// 不允许的 Nullable<T> 类型转换。
 			Assert.IsFalse(typeof(TestStruct2).IsCastableFrom(typeof(TestStruct)));
 			Assert.IsFalse(typeof(TestStruct2).IsCastableFrom(typeof(TestStruct?)));
 			Assert.IsFalse(typeof(TestStruct2?).IsCastableFrom(typeof(TestStruct)));
