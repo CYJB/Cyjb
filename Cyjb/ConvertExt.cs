@@ -97,7 +97,7 @@ namespace Cyjb
 			if (ConversionCache.GetTypeOperators(conversionHandle).TryGetValue(typeHandle, out method) &&
 				method.ConversionType.AnyFlag(ConversionType.From))
 			{
-				return MethodInfo.GetMethodFromHandle(method.ToMethod).Invoke(null, new object[] { value });
+				return MethodInfo.GetMethodFromHandle(method.FromMethod).Invoke(null, new object[] { value });
 			}
 			return Convert.ChangeType(value, conversionType, provider);
 		}
