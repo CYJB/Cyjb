@@ -57,14 +57,14 @@ namespace Cyjb
 		public static object ChangeType(object value, Type conversionType, IFormatProvider provider)
 		{
 			ExceptionHelper.CheckArgumentNull(conversionType, "conversionType");
-			if (conversionType.TypeHandle.Equals(typeof(object).TypeHandle))
-			{
-				return value;
-			}
-			Type type = value.GetType();
 			if (conversionType.IsByRef)
 			{
 				conversionType = conversionType.GetElementType();
+			}
+			// 总是可以转换为 Object。
+			if (conversionType.TypeHandle.Equals(typeof(object).TypeHandle))
+			{
+				return value;
 			}
 			// 对 Nullable<T> 的支持。
 			bool nullalbe = TypeExt.NullableAssignableFrom(ref conversionType);
@@ -76,26 +76,27 @@ namespace Cyjb
 				}
 				return null;
 			}
+			Type type = value.GetType();
 			// 对枚举的支持。
 			if (conversionType.IsEnum)
 			{
-				conversionType = Enum.GetUnderlyingType(conversionType);
+				return Enum.ToObject(conversionType, value);
 			}
-			RuntimeTypeHandle conversionHandle = conversionType.TypeHandle;
-			if (conversionType.IsInstanceOfType(type) || conversionHandle.Equals(typeof(object).TypeHandle))
+			if (conversionType.IsInstanceOfType(value))
 			{
 				return value;
 			}
-			RuntimeTypeHandle typeHandle = type.TypeHandle;
 			// 检测用户定义类型转换。
+			RuntimeTypeHandle conversionHandle = conversionType.TypeHandle;
+			RuntimeTypeHandle typeHandle = type.TypeHandle;
 			ConversionMethod method;
 			if (ConversionCache.GetTypeOperators(typeHandle).TryGetValue(conversionHandle, out method) &&
-				method.ConversionType.AnyFlag(ConversionType.To))
+				(method.ConversionType & ConversionType.To) != 0)
 			{
 				return MethodInfo.GetMethodFromHandle(method.ToMethod).Invoke(null, new object[] { value });
 			}
 			if (ConversionCache.GetTypeOperators(conversionHandle).TryGetValue(typeHandle, out method) &&
-				method.ConversionType.AnyFlag(ConversionType.From))
+				(method.ConversionType & ConversionType.From) != 0)
 			{
 				return MethodInfo.GetMethodFromHandle(method.FromMethod).Invoke(null, new object[] { value });
 			}
@@ -636,7 +637,7 @@ namespace Cyjb
 		{
 			if (toBase < 2 || toBase > 36)
 			{
-				throw ExceptionHelper.InvalidBase();
+				throw ExceptionHelper.InvalidBase("toBase");
 			}
 			// 从后向前转换，不必反转字符串。
 			ulong ulBase = (ulong)toBase;
@@ -659,9 +660,9 @@ namespace Cyjb
 		/// 使用不区分大小写的字母表示大于 <c>10</c> 的数。</param>
 		/// <param name="fromBase"><paramref name="value"/> 中数字的基数，
 		/// 它必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="System.ArgumentOutOfRangeException">
 		/// <paramref name="fromBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="System.FormatException">
 		/// <paramref name="value"/> 表示一个非 <c>10</c> 为基的有符号数，
 		/// 但前面带一个负号。</exception>
 		private static void CheckBaseConvert(string value, int fromBase)
@@ -669,7 +670,7 @@ namespace Cyjb
 			// 基数检查。
 			if (fromBase < 3 || fromBase > 36)
 			{
-				throw ExceptionHelper.InvalidBase();
+				throw ExceptionHelper.InvalidBase("toBase");
 			}
 			if (value.Length == 0)
 			{
