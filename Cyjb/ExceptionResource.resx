@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AmbiguousMatchField" xml:space="preserve">
+    <value>More than one field is found with the specified name and matching the specified binding constraints.</value>
+    <comment>找到多个有指定名称且与指定绑定约束匹配的字段。</comment>
+  </data>
   <data name="AmbiguousMatchMethod" xml:space="preserve">
     <value>More than one method is found with the specified name and matching the specified binding constraints.</value>
     <comment>找到多个有指定名称且与指定绑定约束匹配的方法。</comment>
@@ -130,19 +134,19 @@
     <comment>必须至少有一个对象实现 IComparable。</comment>
   </data>
   <data name="ArgumentMustBePositive" xml:space="preserve">
-    <value>The parameter '{0}' must be greater than zero.</value>
+    <value>Parameter values must be greater than zero.</value>
     <comment>参数小于等于零。</comment>
   </data>
   <data name="ArgumentNegative" xml:space="preserve">
-    <value>The parameter '{0}' can not be negative.</value>
+    <value>Parameter values can not be negative.</value>
     <comment>参数小于零。</comment>
   </data>
   <data name="ArgumentOutOfRange" xml:space="preserve">
-    <value>The parameter '{0}' was out of range.</value>
+    <value>Parameter values was out of range.</value>
     <comment>参数超出范围。</comment>
   </data>
   <data name="ArgumentOutOfRangeBetween" xml:space="preserve">
-    <value>The parameter '{0}' must be between {1} and {2}.</value>
+    <value>Parameter values must be between {1} and {2}.</value>
     <comment>参数超出范围。</comment>
   </data>
   <data name="ArgumentWrongType" xml:space="preserve">
@@ -214,7 +218,7 @@
     <comment>集合是固定大小的。</comment>
   </data>
   <data name="InvalidBase" xml:space="preserve">
-    <value>Invalid Base.</value>
+    <value>Base is not between 2 and 36.</value>
     <comment>无效的基。</comment>
   </data>
   <data name="InvalidCacheOption" xml:space="preserve">
@@ -244,6 +248,10 @@
   <data name="KeyDuplicate" xml:space="preserve">
     <value>An item with the same key has already been added.</value>
     <comment>键重复。</comment>
+  </data>
+  <data name="KeyNotFound" xml:space="preserve">
+    <value>Key '{0}' is not exists.</value>
+    <comment>指定的键不存在。</comment>
   </data>
   <data name="MustBeDelegate" xml:space="preserve">
     <value>Type must derive from Delegate.</value>
@@ -300,6 +308,10 @@
   <data name="ReadOnlyCollection" xml:space="preserve">
     <value>Collection is read-only.</value>
     <comment>集合是只读的。</comment>
+  </data>
+  <data name="SameParameterName" xml:space="preserve">
+    <value>Two parameters can not have same name.</value>
+    <comment>参数名相同。</comment>
   </data>
   <data name="UnboundGenParam" xml:space="preserve">
     <value>Late bound operations cannot be performed on types or methods for which ContainsGenericParameters is true.</value>

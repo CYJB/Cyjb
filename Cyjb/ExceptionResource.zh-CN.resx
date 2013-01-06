@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AmbiguousMatchField" xml:space="preserve">
+    <value>找到多个有指定名称且与指定绑定约束匹配的字段。</value>
+    <comment>找到多个有指定名称且与指定绑定约束匹配的字段。</comment>
+  </data>
   <data name="AmbiguousMatchMethod" xml:space="preserve">
     <value>找到多个有指定名称且与指定绑定约束匹配的方法。</value>
     <comment>找到多个有指定名称且与指定绑定约束匹配的方法。</comment>
@@ -130,19 +134,19 @@
     <comment>必须至少有一个对象实现 IComparable。</comment>
   </data>
   <data name="ArgumentMustBePositive" xml:space="preserve">
-    <value>参数 '{0}' 必须大于 0。</value>
+    <value>参数值必须大于 0。</value>
     <comment>参数小于等于零。</comment>
   </data>
   <data name="ArgumentNegative" xml:space="preserve">
-    <value>参数 '{0}' 不能为负值。</value>
+    <value>参数值不能为负。</value>
     <comment>参数小于零。</comment>
   </data>
   <data name="ArgumentOutOfRange" xml:space="preserve">
-    <value>参数 '{0}' 超出了有效范围。</value>
+    <value>参数值超出了有效范围。</value>
     <comment>参数超出范围。</comment>
   </data>
   <data name="ArgumentOutOfRangeBetween" xml:space="preserve">
-    <value>参数 '{0}' 必须位于 {1} 和 {2} 之间。</value>
+    <value>参数值必须位于 {1} 和 {2} 之间。</value>
     <comment>参数超出范围。</comment>
   </data>
   <data name="ArgumentWrongType" xml:space="preserve">
@@ -214,7 +218,7 @@
     <comment>集合是固定大小的。</comment>
   </data>
   <data name="InvalidBase" xml:space="preserve">
-    <value>无效的基。</value>
+    <value>基不在 2 至 36 之间。</value>
     <comment>无效的基。</comment>
   </data>
   <data name="InvalidCacheOption" xml:space="preserve">
@@ -244,6 +248,10 @@
   <data name="KeyDuplicate" xml:space="preserve">
     <value>已添加了具有相同键的项。</value>
     <comment>键重复。</comment>
+  </data>
+  <data name="KeyNotFound" xml:space="preserve">
+    <value>指定的键 '{0}' 不存在。</value>
+    <comment>指定的键不存在。</comment>
   </data>
   <data name="MustBeDelegate" xml:space="preserve">
     <value>类型必须从委托派生。</value>
@@ -300,6 +308,10 @@
   <data name="ReadOnlyCollection" xml:space="preserve">
     <value>集合是只读的。</value>
     <comment>集合是只读的。</comment>
+  </data>
+  <data name="SameParameterName" xml:space="preserve">
+    <value>两个参数的名称不能是相同的。</value>
+    <comment>参数名相同。</comment>
   </data>
   <data name="UnboundGenParam" xml:space="preserve">
     <value>不能对 ContainsGenericParameters 为 True 的类型或方法执行后期绑定操作。</value>
