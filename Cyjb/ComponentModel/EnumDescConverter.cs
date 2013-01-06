@@ -31,14 +31,7 @@ namespace Cyjb.ComponentModel
 			string strValue = value as string;
 			if (strValue != null)
 			{
-				try
-				{
-					return EnumExt.ParseEx(this.EnumType, strValue, true);
-				}
-				catch (Exception ex)
-				{
-					throw ExceptionHelper.ConvertInvalidValue(value, this.EnumType, ex);
-				}
+				return EnumExt.ParseEx(this.EnumType, strValue, true);
 			}
 			return base.ConvertFrom(context, culture, value);
 		}

@@ -111,7 +111,7 @@ namespace Cyjb.Configurations
 				}
 				else
 				{
-					throw ExceptionHelper.ArgumentWrongType(value, typeof(TElement));
+					throw ExceptionHelper.ArgumentWrongType("value", value, typeof(TElement));
 				}
 			}
 		}
@@ -127,7 +127,7 @@ namespace Cyjb.Configurations
 			TElement item = value as TElement;
 			if (item == null)
 			{
-				throw ExceptionHelper.ArgumentWrongType(value, typeof(TElement));
+				throw ExceptionHelper.ArgumentWrongType("value", value, typeof(TElement));
 			}
 			else
 			{
@@ -148,7 +148,8 @@ namespace Cyjb.Configurations
 		/// 确定 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 是否包含特定值。
 		/// </summary>
 		/// <param name="value">要在 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中定位的对象。</param>
-		/// <returns>如果在 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中找到 <paramref name="value"/>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <returns>如果在 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 
+		/// 中找到 <paramref name="value"/>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		bool IList.Contains(object value)
 		{
 			TElement item = value as TElement;
@@ -163,7 +164,8 @@ namespace Cyjb.Configurations
 		/// 确定 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中特定项的索引。
 		/// </summary>
 		/// <param name="value">要在 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中定位的对象。</param>
-		/// <returns>如果在 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中找到 <paramref name="value"/>，则为该项的索引；否则为 <c>-1</c>。</returns>
+		/// <returns>如果在 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 
+		/// 中找到 <paramref name="value"/>，则为该项的索引；否则为 <c>-1</c>。</returns>
 		int IList.IndexOf(object value)
 		{
 			TElement item = value as TElement;
@@ -179,13 +181,14 @@ namespace Cyjb.Configurations
 		/// </summary>
 		/// <param name="index">应插入 <paramref name="value"/> 的位置的零始索引。</param>
 		/// <param name="value">要插入 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中的对象。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="index"/> 不是 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中的有效索引。</exception>
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="index"/> 
+		/// 不是 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中的有效索引。</exception>
 		void IList.Insert(int index, object value)
 		{
 			TElement item = value as TElement;
 			if (item == null)
 			{
-				throw ExceptionHelper.ArgumentWrongType(value, typeof(TElement));
+				throw ExceptionHelper.ArgumentWrongType("value", value, typeof(TElement));
 			}
 			else
 			{
@@ -210,7 +213,8 @@ namespace Cyjb.Configurations
 		/// 移除指定索引处的 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 项。
 		/// </summary>
 		/// <param name="index">要移除的项的从零开始的索引。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="index"/> 不是 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中的有效索引。</exception>
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="index"/> 
+		/// 不是 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中的有效索引。</exception>
 		void IList.RemoveAt(int index)
 		{
 			this.RemoveAt(index);
@@ -223,7 +227,8 @@ namespace Cyjb.Configurations
 		/// <summary>
 		/// 获取一个值，该值指示 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 是否为只读。
 		/// </summary>
-		/// <value>如果 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 为只读，则为 <c>true</c>；否则为 <c>false</c>。</value>
+		/// <value>如果 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 为只读，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</value>
 		bool ICollection<TElement>.IsReadOnly
 		{
 			get { return base.IsReadOnly(); }
@@ -279,7 +284,10 @@ namespace Cyjb.Configurations
 		/// 从 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中移除特定对象的第一个匹配项。
 		/// </summary>
 		/// <param name="item">要从 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中移除的对象。</param>
-		/// <returns>如果已从 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中成功移除 <paramref name="item"/>，则为 <c>true</c>；否则为 <c>false</c>。如果在原始 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中没有找到 <paramref name="item"/>，该方法也会返回 <c>false</c>。</returns>
+		/// <returns>如果已从 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中成功移除
+		/// <paramref name="item"/>，则为 <c>true</c>；否则为 <c>false</c>。
+		/// 如果在原始 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中没有找到
+		/// <paramref name="item"/>，该方法也会返回 <c>false</c>。</returns>
 		public bool Remove(TElement item)
 		{
 			int idx = base.BaseIndexOf(item);

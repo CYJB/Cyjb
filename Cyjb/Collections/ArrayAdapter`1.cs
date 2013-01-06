@@ -174,7 +174,7 @@ namespace Cyjb.Collections
 				}
 				else
 				{
-					throw ExceptionHelper.ArgumentWrongType(value, typeof(T));
+					throw ExceptionHelper.ArgumentWrongType("value", value, typeof(T));
 				}
 			}
 		}
@@ -338,20 +338,7 @@ namespace Cyjb.Collections
 		/// <paramref name="array"/> 的类型。</exception>
 		public void CopyTo(T[] array, int arrayIndex)
 		{
-			ExceptionHelper.CheckArgumentNull(array, "array");
-			ExceptionHelper.CheckFlatArray(array);
-			if (arrayIndex < 0)
-			{
-				throw ExceptionHelper.ArgumentOutOfRange("arrayIndex");
-			}
-			if (array.Length - arrayIndex < this.Count)
-			{
-				throw ExceptionHelper.ArrayTooSmall();
-			}
-			for (int i = offset; i < offset + count; i++)
-			{
-				array.SetValue(this.items[i], arrayIndex++);
-			}
+			Array.Copy(this.items, offset, array, arrayIndex, count);
 		}
 
 		/// <summary>
@@ -424,35 +411,7 @@ namespace Cyjb.Collections
 		/// <paramref name="array"/> 的类型。</exception>
 		void ICollection.CopyTo(Array array, int index)
 		{
-			ExceptionHelper.CheckArgumentNull(array, "array");
-			ExceptionHelper.CheckFlatArray(array);
-			if (index < 0)
-			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
-			}
-			if (array.Length - index < this.Count)
-			{
-				throw ExceptionHelper.ArrayTooSmall();
-			}
-			T[] arr = array as T[];
-			if (arr != null)
-			{
-				this.CopyTo(arr, index);
-			}
-			else
-			{
-				try
-				{
-					for (int i = offset; i < offset + count; i++)
-					{
-						array.SetValue(this.items[i], index++);
-					}
-				}
-				catch (ArrayTypeMismatchException ex)
-				{
-					throw ExceptionHelper.ArrayTypeInvalid(ex);
-				}
-			}
+			Array.Copy(this.items, offset, array, index, count);
 		}
 
 		#endregion // ICollection 成员

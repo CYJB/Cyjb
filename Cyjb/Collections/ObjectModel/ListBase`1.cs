@@ -246,7 +246,7 @@ namespace Cyjb.Collections.ObjectModel
 				}
 				else
 				{
-					throw ExceptionHelper.ArgumentWrongType(value, typeof(T));
+					throw ExceptionHelper.ArgumentWrongType("value", value, typeof(T));
 				}
 			}
 		}
@@ -271,7 +271,7 @@ namespace Cyjb.Collections.ObjectModel
 			}
 			else
 			{
-				throw ExceptionHelper.ArgumentWrongType(value, typeof(T));
+				throw ExceptionHelper.ArgumentWrongType("value", value, typeof(T));
 			}
 			return idx;
 		}
@@ -341,7 +341,7 @@ namespace Cyjb.Collections.ObjectModel
 			}
 			else
 			{
-				throw ExceptionHelper.ArgumentWrongType(value, typeof(T));
+				throw ExceptionHelper.ArgumentWrongType("value", value, typeof(T));
 			}
 		}
 
@@ -468,18 +468,19 @@ namespace Cyjb.Collections.ObjectModel
 		public void CopyTo(T[] array, int arrayIndex)
 		{
 			ExceptionHelper.CheckArgumentNull(array, "array");
-			ExceptionHelper.CheckFlatArray(array);
+			ExceptionHelper.CheckFlatArray(array, "array");
 			if (arrayIndex < 0)
 			{
 				throw ExceptionHelper.ArgumentOutOfRange("arrayIndex");
 			}
 			if (array.Length - arrayIndex < this.Count)
 			{
-				throw ExceptionHelper.ArrayTooSmall();
+				throw ExceptionHelper.ArrayTooSmall("array");
 			}
-			foreach (T obj in this)
+			int cnt = this.Count;
+			for (int i = 0; i < cnt; i++)
 			{
-				array.SetValue(obj, arrayIndex++);
+				array[arrayIndex++] = this[i];
 			}
 		}
 
@@ -573,14 +574,14 @@ namespace Cyjb.Collections.ObjectModel
 		void ICollection.CopyTo(Array array, int index)
 		{
 			ExceptionHelper.CheckArgumentNull(array, "array");
-			ExceptionHelper.CheckFlatArray(array);
+			ExceptionHelper.CheckFlatArray(array, "array");
 			if (index < 0)
 			{
 				throw ExceptionHelper.ArgumentOutOfRange("index");
 			}
 			if (array.Length - index < this.Count)
 			{
-				throw ExceptionHelper.ArrayTooSmall();
+				throw ExceptionHelper.ArrayTooSmall("array");
 			}
 			T[] arr = array as T[];
 			if (arr != null)
@@ -596,7 +597,7 @@ namespace Cyjb.Collections.ObjectModel
 						array.SetValue(obj, index++);
 					}
 				}
-				catch (ArrayTypeMismatchException ex)
+				catch (InvalidCastException ex)
 				{
 					throw ExceptionHelper.ArrayTypeInvalid(ex);
 				}

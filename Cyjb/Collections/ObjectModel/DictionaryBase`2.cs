@@ -206,7 +206,7 @@ namespace Cyjb.Collections.ObjectModel
 				TValue value;
 				if (!this.TryGetValue(key, out value))
 				{
-					throw ExceptionHelper.KeyNotFound();
+					throw ExceptionHelper.KeyNotFound("key");
 				}
 				return value;
 			}
@@ -365,14 +365,14 @@ namespace Cyjb.Collections.ObjectModel
 		public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
 		{
 			ExceptionHelper.CheckArgumentNull(array, "array");
-			ExceptionHelper.CheckFlatArray(array);
+			ExceptionHelper.CheckFlatArray(array, "array");
 			if (arrayIndex < 0)
 			{
 				throw ExceptionHelper.ArgumentOutOfRange("arrayIndex");
 			}
 			if (array.Length - arrayIndex < this.Count)
 			{
-				throw ExceptionHelper.ArrayTooSmall();
+				throw ExceptionHelper.ArrayTooSmall("array");
 			}
 			foreach (KeyValuePair<TKey, TValue> obj in this)
 			{
@@ -498,11 +498,11 @@ namespace Cyjb.Collections.ObjectModel
 				}
 				if (!(key is TKey))
 				{
-					throw ExceptionHelper.ArgumentWrongType(key, typeof(TKey));
+					throw ExceptionHelper.ArgumentWrongType("key", key, typeof(TKey));
 				}
 				if (!(value is TValue))
 				{
-					throw ExceptionHelper.ArgumentWrongType(value, typeof(TValue));
+					throw ExceptionHelper.ArgumentWrongType("value", value, typeof(TValue));
 				}
 				this.SetItem((TKey)key, (TValue)value);
 			}
@@ -525,11 +525,11 @@ namespace Cyjb.Collections.ObjectModel
 			}
 			if (!(key is TKey))
 			{
-				throw ExceptionHelper.ArgumentWrongType(key, typeof(TKey));
+				throw ExceptionHelper.ArgumentWrongType("key", key, typeof(TKey));
 			}
 			if (!(value is TValue))
 			{
-				throw ExceptionHelper.ArgumentWrongType(value, typeof(TValue));
+				throw ExceptionHelper.ArgumentWrongType("value", value, typeof(TValue));
 			}
 			this.AddItem((TKey)key, (TValue)value);
 		}
@@ -655,14 +655,14 @@ namespace Cyjb.Collections.ObjectModel
 		void ICollection.CopyTo(Array array, int index)
 		{
 			ExceptionHelper.CheckArgumentNull(array, "array");
-			ExceptionHelper.CheckFlatArray(array);
+			ExceptionHelper.CheckFlatArray(array, "array");
 			if (index < 0)
 			{
 				throw ExceptionHelper.ArgumentOutOfRange("index");
 			}
 			if (array.Length - index < this.Count)
 			{
-				throw ExceptionHelper.ArrayTooSmall();
+				throw ExceptionHelper.ArrayTooSmall("array");
 			}
 			KeyValuePair<TKey, TValue>[] arr = array as KeyValuePair<TKey, TValue>[];
 			if (arr != null)
@@ -688,7 +688,7 @@ namespace Cyjb.Collections.ObjectModel
 							array.SetValue(obj, index++);
 						}
 					}
-					catch (ArrayTypeMismatchException ex)
+					catch (InvalidCastException ex)
 					{
 						throw ExceptionHelper.ArrayTypeInvalid(ex);
 					}

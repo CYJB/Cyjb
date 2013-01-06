@@ -272,15 +272,14 @@ namespace Cyjb
 			ExceptionHelper.CheckArgumentNull(value, "value");
 			if (!enumType.IsEnum)
 			{
-				throw ExceptionHelper.MustBeEnum(enumType);
+				throw ExceptionHelper.MustBeEnum("enumType", enumType);
 			}
 			value = value.Trim();
 			if (value.Length == 0)
 			{
-				throw ExceptionHelper.MustContainEnumInfo();
+				throw ExceptionHelper.MustContainEnumInfo("value");
 			}
 			// 尝试对数字进行解析，这样可避免之后的字符串比较。
-			char firstChar = value[0];
 			ulong tmpValue;
 			if (ParseString(value, out tmpValue))
 			{
@@ -433,7 +432,7 @@ namespace Cyjb
 		{
 			if (!Type.GetTypeHandle(baseEnum).Equals(Type.GetTypeHandle(value)))
 			{
-				throw ExceptionHelper.EnumTypeDoesNotMatch(value.GetType(), baseEnum.GetType());
+				throw ExceptionHelper.EnumTypeDoesNotMatch("value", value.GetType(), baseEnum.GetType());
 			}
 			return ((ToUInt64(baseEnum) & ToUInt64(value)) != 0);
 		}

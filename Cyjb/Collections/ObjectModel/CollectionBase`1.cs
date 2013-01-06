@@ -178,18 +178,18 @@ namespace Cyjb.Collections.ObjectModel
 		public void CopyTo(T[] array, int arrayIndex)
 		{
 			ExceptionHelper.CheckArgumentNull(array, "array");
-			ExceptionHelper.CheckFlatArray(array);
+			ExceptionHelper.CheckFlatArray(array, "array");
 			if (arrayIndex < 0)
 			{
 				throw ExceptionHelper.ArgumentOutOfRange("arrayIndex");
 			}
 			if (array.Length - arrayIndex < this.Count)
 			{
-				throw ExceptionHelper.ArrayTooSmall();
+				throw ExceptionHelper.ArrayTooSmall("array");
 			}
 			foreach (T obj in this)
 			{
-				array.SetValue(obj, arrayIndex++);
+				array[arrayIndex++] = obj;
 			}
 		}
 
@@ -277,14 +277,14 @@ namespace Cyjb.Collections.ObjectModel
 		void ICollection.CopyTo(Array array, int index)
 		{
 			ExceptionHelper.CheckArgumentNull(array, "array");
-			ExceptionHelper.CheckFlatArray(array);
+			ExceptionHelper.CheckFlatArray(array, "array");
 			if (index < 0)
 			{
 				throw ExceptionHelper.ArgumentOutOfRange("index");
 			}
 			if (array.Length - index < this.Count)
 			{
-				throw ExceptionHelper.ArrayTooSmall();
+				throw ExceptionHelper.ArrayTooSmall("array");
 			}
 			T[] arr = array as T[];
 			if (arr != null)
@@ -300,7 +300,7 @@ namespace Cyjb.Collections.ObjectModel
 						array.SetValue(obj, index++);
 					}
 				}
-				catch (ArrayTypeMismatchException ex)
+				catch (InvalidCastException ex)
 				{
 					throw ExceptionHelper.ArrayTypeInvalid(ex);
 				}
