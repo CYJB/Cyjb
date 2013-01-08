@@ -255,6 +255,7 @@ namespace Cyjb.Configurations
 		/// 确定 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 是否包含特定值。
 		/// </summary>
 		/// <param name="item">要在 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中定位的对象。</param>
+		/// <returns>如果包含特定值，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public bool Contains(TElement item)
 		{
 			return base.BaseIndexOf(item) >= 0;

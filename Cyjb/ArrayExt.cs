@@ -661,6 +661,7 @@ namespace Cyjb
 		/// <summary>
 		/// 从当前数组的左端截取一部分。
 		/// </summary>
+		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">从该数组返回最左端截取一部分。</param>
 		/// <param name="length">指示要截取的元素数的数值表达式。
 		/// 如果为 <c>0</c>，则返回空数组。如果大于或等于 <paramref name="array"/> 的长度，
@@ -687,6 +688,7 @@ namespace Cyjb
 		/// <summary>
 		/// 从当前数组的右端截取一部分。
 		/// </summary>
+		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">从该数组返回最右端截取一部分。</param>
 		/// <param name="length">指示要截取的元素数的数值表达式。
 		/// 如果为 <c>0</c>，则返回空数组。如果大于或等于 <paramref name="array"/> 的长度，
@@ -773,6 +775,7 @@ namespace Cyjb
 		/// 从当前数组的指定索引开始截取一部分。
 		/// 如果 <paramref name="startIndex"/> 小于 <c>0</c>，那么表示从数组末尾向前计算的位置。
 		/// </summary>
+		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要截取的数组。</param>
 		/// <param name="startIndex">要截取的起始索引。</param>
 		/// <returns>截取得到的数组。如果 <paramref name="startIndex"/> 等于数组的长度，则为空数组。</returns>
@@ -799,6 +802,7 @@ namespace Cyjb
 		/// 如果 <paramref name="startIndex"/> 或 <paramref name="endIndex"/>
 		/// 小于 <c>0</c>，那么表示从数组末尾向前计算的位置。
 		/// </summary>
+		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要截取的数组。</param>
 		/// <param name="startIndex">要截取的起始索引。</param>
 		/// <param name="endIndex">要截取的结束索引，但不包括该位置的元素。</param>

@@ -336,6 +336,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// 确定 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 是否包含特定值。
 		/// </summary>
 		/// <param name="item">要在 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 中定位的对象。</param>
+		/// <returns>如果包含特定值，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public bool Contains(KeyValuePair<TKey, TValue> item)
 		{
 			TValue value;
