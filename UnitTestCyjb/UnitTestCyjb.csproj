@@ -55,10 +55,10 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="AssertExt.cs" />
+    <Compile Include="UnitTestTextValuePair`1.cs" />
     <Compile Include="UnitTestEnumExt.cs" />
-    <Compile Include="UnitTestCastBinder.cs" />
+    <Compile Include="UnitTestPowerBinder.cs" />
     <Compile Include="UnitTestTypeExt.cs" />
-    <Compile Include="UnitTestDelegateBuilder.cs" />
     <Compile Include="UnitTestCharExt.cs" />
     <Compile Include="UnitTestConvertExt.cs" />
     <Compile Include="UnitTestStringExt.cs" />

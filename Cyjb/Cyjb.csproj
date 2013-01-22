@@ -47,11 +47,8 @@
   <ItemGroup>
     <Compile Include="ArrayExt.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="CastBinder.cs" />
-    <Compile Include="CharComparer.cs" />
-    <Compile Include="CharComparison.cs" />
+    <Compile Include="PowerBinder.cs" />
     <Compile Include="CharExt.cs" />
-    <Compile Include="CharIgnoreCaseComparer.cs" />
     <Compile Include="Collections\ArrayAdapter`1.cs" />
     <Compile Include="Collections\CollectionDebugView`1.cs" />
     <Compile Include="Collections\ObjectModel\IteratorBase`1.cs" />
@@ -62,7 +59,6 @@
     <Compile Include="ConversionMethod.cs" />
     <Compile Include="ConversionType.cs" />
     <Compile Include="ConvertExt.cs" />
-    <Compile Include="DelegateBuilder.cs" />
     <Compile Include="EnumerableExt.cs" />
     <Compile Include="EnumExt.cs" />
     <Compile Include="IntegerExt.cs" />
