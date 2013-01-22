@@ -347,7 +347,12 @@ namespace Cyjb
 					infos[idx++] = info;
 				}
 			}
-			return SelectMethod(bindingAttr, infos, idx, types).Method;
+			info = SelectMethod(bindingAttr, infos, idx, types);
+			if (info == null)
+			{
+				return null;
+			}
+			return info.Method;
 		}
 		/// <summary>
 		/// 基于指定的判据，从给定的属性集中选择一个属性。
