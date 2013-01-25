@@ -209,7 +209,7 @@ namespace Cyjb
 					int len = info.Parameters.Length > args.Length ? info.Parameters.Length : args.Length;
 					if (names == null)
 					{
-						info.ParamOrder = GetParamOrder(len);
+						info.ParamOrder = info.ParamOrderRev = GetParamOrder(len);
 					}
 					else
 					{
@@ -343,7 +343,7 @@ namespace Cyjb
 				{
 					info = new MatchInfo(match[i]);
 					int len = info.Parameters.Length > types.Length ? info.Parameters.Length : types.Length;
-					info.ParamOrder = GetParamOrder(len);
+					info.ParamOrder = info.ParamOrderRev = GetParamOrder(len);
 					infos[idx++] = info;
 				}
 			}
@@ -454,6 +454,10 @@ namespace Cyjb
 			/// </summary>
 			public int[] ParamOrder;
 			/// <summary>
+			/// 逆序的参数顺序，不要依赖与该顺序的长度。
+			/// </summary>
+			public int[] ParamOrderRev;
+			/// <summary>
 			/// 方法的 params 参数类型。
 			/// </summary>
 			public Type ParamArrayType;
@@ -461,6 +465,10 @@ namespace Cyjb
 			/// 方法是否是开放泛型方法。
 			/// </summary>
 			public bool IsGeneric;
+			/// <summary>
+			/// 方法的参数是否是对应于开放的泛型类型。
+			/// </summary>
+			public bool[] IsGenericParam;
 			/// <summary>
 			/// 使用指定的方法信息初始化 <see cref="PowerBinder.MatchInfo"/> 结构的新实例。
 			/// </summary>
@@ -479,7 +487,7 @@ namespace Cyjb
 			public MatchInfo(ParameterInfo[] parameters, int[] paramOrder)
 			{
 				this.Parameters = parameters;
-				this.ParamOrder = paramOrder;
+				this.ParamOrder = this.ParamOrderRev = paramOrder;
 			}
 		}
 
@@ -504,9 +512,20 @@ namespace Cyjb
 			int idx = 0;
 			for (int i = 0; i < len; i++)
 			{
-				if (MakeGenericMethod(infos[i], types) && CheckMethodParameters(infos[i], types, optionalParamBinding))
+				MatchInfo info = infos[i];
+				// 记录参数是否是泛型类型。
+				if (info.IsGeneric)
 				{
-					infos[idx++] = infos[i];
+					bool[] genericParams = new bool[info.Parameters.Length];
+					for (int j = 0; j < genericParams.Length; j++)
+					{
+						genericParams[j] = info.Parameters[j].ParameterType.IsGenericParameter;
+					}
+					info.IsGenericParam = genericParams;
+				}
+				if (MakeGenericMethod(info, types) && CheckMethodParameters(info, types, optionalParamBinding))
+				{
+					infos[idx++] = info;
 				}
 			}
 			if (idx == 0)
@@ -610,6 +629,22 @@ namespace Cyjb
 			}
 			return true;
 		}
+		/// <summary>
+		/// 更新匹配信息的逆序的参数顺序。
+		/// </summary>
+		/// <param name="info">要更新的匹配信息。</param>
+		private static void UpdateParamOrderRev(MatchInfo info)
+		{
+			if (info.ParamOrderRev == null)
+			{
+				int[] paramOrderRev = new int[info.ParamOrder.Length];
+				for (int i = 0; i < paramOrderRev.Length; i++)
+				{
+					paramOrderRev[info.ParamOrder[i]] = i;
+				}
+				info.ParamOrderRev = paramOrderRev;
+			}
+		}
 
 		#endregion // 参数顺序
 
@@ -625,7 +660,7 @@ namespace Cyjb
 		private static bool MakeGenericMethod(MatchInfo match, Type[] types)
 		{
 			MethodInfo method = match.Method as MethodInfo;
-			if (method == null || !method.IsGenericMethodDefinition)
+			if (method == null || !match.IsGeneric)
 			{
 				return true;
 			}
@@ -706,6 +741,27 @@ namespace Cyjb
 			match.Method = method;
 			match.Parameters = method.GetParameters();
 			return true;
+		}
+		/// <summary>
+		/// 使用类型数组的元素替代泛型方法定义的类型参数，并返回封闭的泛型方法及其参数。
+		/// </summary>
+		/// <param name="method">泛型方法的信息。</param>
+		/// <param name="methodParams">泛型方法的参数信息。</param>
+		/// <param name="types">要替换泛型方法定义的类型参数的类型数组。</param>
+		/// <returns>如果构造封闭的泛型方法，或者不是泛型方法则为 <c>true</c>；
+		/// 如果没能成功构造封闭的泛型方法，则为 <c>false</c>。</returns>
+		internal static bool MakeGenericMethod(ref MethodInfo method, ref ParameterInfo[] methodParams, Type[] types)
+		{
+			MatchInfo info = new MatchInfo(methodParams, GetParamOrder(methodParams.Length));
+			info.IsGeneric = true;
+			info.Method = method;
+			if (MakeGenericMethod(info, types))
+			{
+				method = info.Method as MethodInfo;
+				methodParams = info.Parameters;
+				return true;
+			}
+			return false;
 		}
 
 		#endregion // 构造封闭的泛型方法
@@ -860,7 +916,16 @@ namespace Cyjb
 			// 如果两个方法具有完全相同的签名，先判断是否是封闭的泛型方法。
 			if (method1.IsGeneric)
 			{
-				if (!method2.IsGeneric)
+				if (method2.IsGeneric)
+				{
+					// 比较泛型类型的参数。
+					res = FindLessGenericType(method1, method2, types.Length);
+					if (res != 0)
+					{
+						return res;
+					}
+				}
+				else
 				{
 					return 2;
 				}
@@ -999,6 +1064,57 @@ namespace Cyjb
 			return allowCast ? type.IsCastableFrom(fromType) : type.IsImplicitFrom(fromType);
 		}
 		/// <summary>
+		/// 寻找泛型参数较少的泛型方法。
+		/// </summary>
+		/// <param name="match1">要比较匹配的第一组参数。</param>
+		/// <param name="match2">要比较匹配的第二组参数。</param>
+		/// <param name="len">要比较的参数个数。</param>
+		/// <returns>如果第一组参数匹配的更好，则为 <c>1</c>；如果第二组参数匹配的更好，则为 <c>2</c>；
+		/// 如果不能区分，则为 <c>0</c>。</returns>
+		private int FindLessGenericType(MatchInfo match1, MatchInfo match2, int len)
+		{
+			bool p1Better = false;
+			bool p2Better = false;
+			int p1Len = match1.Parameters.Length - 1;
+			int p2Len = match2.Parameters.Length - 1;
+			for (int i = 0; i < len; i++)
+			{
+				bool isGeneric1, isGeneric2;
+				// 得到第 i 个参数实际对应的参数是否是泛型参数。
+				int idx = match1.ParamOrderRev[i];
+				if (idx > p1Len)
+				{
+					idx = p1Len;
+				}
+				isGeneric1 = match1.IsGenericParam[idx];
+				idx = match2.ParamOrderRev[i];
+				if (idx > p2Len)
+				{
+					idx = p2Len;
+				}
+				isGeneric2 = match2.IsGenericParam[idx];
+				if (isGeneric1)
+				{
+					if (!isGeneric2)
+					{
+						p2Better = true;
+					}
+				}
+				else if (isGeneric2)
+				{
+					p1Better = true;
+				}
+			}
+			if (p1Better == p2Better)
+			{
+				return 0;
+			}
+			else
+			{
+				return p1Better ? 1 : 2;
+			}
+		}
+		/// <summary>
 		/// 寻找匹配的最好的参数类型。
 		/// </summary>
 		/// <param name="match1">要比较匹配的第一组参数。</param>
@@ -1017,11 +1133,35 @@ namespace Cyjb
 			{
 				return 1;
 			}
+			UpdateParamOrderRev(match1);
+			UpdateParamOrderRev(match2);
 			bool p1Better = false;
 			bool p2Better = false;
+			int p1Len = match1.Parameters.Length - 1;
+			int p2Len = match2.Parameters.Length - 1;
 			for (int i = 0; i < types.Length; i++)
 			{
-				switch (FindMostSpecificType(match1.Parameters[i].ParameterType, match2.Parameters[i].ParameterType, types[i]))
+				Type type1, type2;
+				// 得到 types[i] 实际对应的方法参数。
+				int idx = match1.ParamOrderRev[i];
+				if (match1.ParamArrayType != null && idx >= p1Len)
+				{
+					type1 = match1.ParamArrayType;
+				}
+				else
+				{
+					type1 = match1.Parameters[idx].ParameterType;
+				}
+				idx = match2.ParamOrderRev[i];
+				if (match2.ParamArrayType != null && idx >= p2Len)
+				{
+					type2 = match2.ParamArrayType;
+				}
+				else
+				{
+					type2 = match2.Parameters[idx].ParameterType;
+				}
+				switch (FindMostSpecificType(type1, type2, types[i]))
 				{
 					case 1:
 						p1Better = true;
@@ -1033,6 +1173,17 @@ namespace Cyjb
 			}
 			if (p1Better == p2Better)
 			{
+				if (!p1Better)
+				{
+					if (p1Len < p2Len)
+					{
+						return 1;
+					}
+					else if (p1Len > p2Len)
+					{
+						return 2;
+					}
+				}
 				return 0;
 			}
 			else

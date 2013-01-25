@@ -306,6 +306,24 @@ namespace UnitTestCyjb
 			Assert.AreEqual("<System.Int32, System.Int32>(10, 20, 30)",
 				type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 10, 20, 30 }));
+			Assert.AreEqual("<System.Int32>(10, 20, string str)",
+				type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
+				new object[] { 10, 20, "str" }));
+			//Assert.AreEqual("<System.Int32, System.String, System.Int32>(10, str, 20,30)",
+			//	type.InvokeMember("TestMethod5", bindingOptFlags, PowerBinder.DefaultBinder, null,
+			//	new object[] { 10, "str", 20, 30 }));
+			//Assert.AreEqual("<System.Int32, System.String, System.Int64>(10, str, 20,30)",
+			//	type.InvokeMember("TestMethod5", bindingOptFlags, PowerBinder.DefaultBinder, null,
+			//	new object[] { 10, "str", 20L, 30 }));
+			//Assert.AreEqual("<System.Int32, System.Object, System.Int32>(10, , 20,30)",
+			//	type.InvokeMember("TestMethod5", bindingOptFlags, PowerBinder.DefaultBinder, null,
+			//	new object[] { 10, new int[] { 20, 30 } }, null, null, new string[] { "value1", "value3" }));
+			//Assert.AreEqual("<System.Int32, System.String, System.Object>(10, str, 20,30)",
+			//	type.InvokeMember("TestMethod5", bindingOptFlags, PowerBinder.DefaultBinder, null,
+			//	new object[] { 10, "str" }));
+			//Assert.AreEqual("<System.Int32, System.Object, System.Object>(10, , 20,30)",
+			//	type.InvokeMember("TestMethod5", bindingOptFlags, PowerBinder.DefaultBinder, null,
+			//	new object[] { 10 }));
 			// 测试选择方法。
 			BindingFlags bindingInsFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod;
 			BindingFlags bindingInsOptFlags = bindingInsFlags | BindingFlags.OptionalParamBinding;
@@ -319,8 +337,9 @@ namespace UnitTestCyjb
 			Assert.AreEqual("(int 10, string str)",
 				type.InvokeMember("TestMethod4", bindingInsFlags, PowerBinder.CastBinder, subClass,
 				new object[] { 10, "str" }));
-			AssertExt.ThrowsException(() => type.InvokeMember("TestMethod4", bindingInsOptFlags, PowerBinder.CastBinder, subClass,
-				new object[] { 10, "str" }), typeof(AmbiguousMatchException));
+			Assert.AreEqual("(int 10, string str)",
+				type.InvokeMember("TestMethod4", bindingInsOptFlags, PowerBinder.CastBinder, subClass,
+				new object[] { 10, "str" }));
 			Assert.AreEqual("(int 10, string str, bool False)",
 				type.InvokeMember("TestMethod4", bindingInsFlags, PowerBinder.CastBinder, subClass,
 				new object[] { 10, "str", false }));
@@ -336,7 +355,22 @@ namespace UnitTestCyjb
 			Assert.AreEqual("<System.Boolean>(True, True)",
 				type.InvokeMember("TestMethod4", bindingInsFlags, PowerBinder.DefaultBinder, subClass,
 				new object[] { true, true }));
+			Assert.AreEqual("(string str, int 30)",
+				type.InvokeMember("TestMethod6", bindingOptFlags, PowerBinder.DefaultBinder, null,
+				new object[] { 30, "str" }, null, null,
+				new string[] { "value2", "value1" }));
+			Assert.AreEqual("(string str, short 30)",
+				type.InvokeMember("TestMethod6", bindingOptFlags, PowerBinder.DefaultBinder, null,
+				new object[] { (short)30, "str" }, null, null,
+				new string[] { "value2", "value1" }));
+			Assert.AreEqual("(int 30, string str, string str2)",
+				type.InvokeMember("TestMethod6", bindingOptFlags, PowerBinder.DefaultBinder, null,
+				new object[] { 30, "str", "str2" }, null, null,
+				new string[] { "value2", "value1" }));
 		}
+		/// <summary>
+		/// 测试辅助类。
+		/// </summary>
 		private class TestClass
 		{
 			public string TestField = "TestClass";
@@ -403,6 +437,10 @@ namespace UnitTestCyjb
 			{
 				return string.Concat("<", typeof(T1), ", ", typeof(T2), ">(", value1, ", ", value2, ", ", value3, ")");
 			}
+			public static object TestMethod3<T1>(T1 value1, T1 value2, string value3)
+			{
+				return string.Concat("<", typeof(T1), ">(", value1, ", ", value2, ", string ", value3, ")");
+			}
 			public new object TestMethod4(int value1, int value2)
 			{
 				return string.Concat("sub(int ", value1, ", int ", value2, ")");
@@ -422,6 +460,24 @@ namespace UnitTestCyjb
 			public object TestMethod4<T>(T value1, T value2)
 			{
 				return string.Concat("<", typeof(T), ">(", value1, ", ", value2, ")");
+			}
+			public static string TestMethod5<T, T2, T3>(T value1, T2 value2 = null, params T3[] value3)
+				where T2 : class
+			{
+				return string.Concat("<", typeof(T), ", ", typeof(T2), ", ", typeof(T3), ">(",
+					value1, ", ", value2, ", ", string.Join(",", value3), ")");
+			}
+			public static string TestMethod6(string value1, short value2)
+			{
+				return string.Concat("(string ", value1, ", short ", value2, ")");
+			}
+			public static string TestMethod6(string value1, int value2)
+			{
+				return string.Concat("(string ", value1, ", int ", value2, ")");
+			}
+			public static string TestMethod6(int value2, string value1, string value3 = "text")
+			{
+				return string.Concat("(int ", value2, ", string ", value1, ", string ", value3, ")");
 			}
 		}
 	}
