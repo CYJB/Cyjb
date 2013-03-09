@@ -10,12 +10,8 @@ namespace Cyjb.Utility
 	/// <typeparam name="TKey">缓冲对象的键的类型。</typeparam>
 	/// <typeparam name="TValue">缓冲对象的类型。</typeparam>
 	[DebuggerDisplay("Count = {Count}")]
-	public sealed class LruCacheNoSync<TKey, TValue> : ICache<TKey, TValue>, IDisposable
+	public sealed class LruCacheNoSync<TKey, TValue> : ICache<TKey, TValue>
 	{
-		/// <summary>
-		/// <typeparamref name="TValue"/> 表示的类型是否可以被释放。
-		/// </summary>
-		private static readonly bool IsDisposable = typeof(TValue).GetInterface("IDisposable") != null;
 		/// <summary>
 		/// 缓冲池中可以保存的最大对象数目。
 		/// </summary>
@@ -33,7 +29,7 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 缓存对象的字典。
 		/// </summary>
-		private Dictionary<TKey, LruNode<TKey, TValue>> cacheDict = new Dictionary<TKey, LruNode<TKey, TValue>>();
+		private IDictionary<TKey, LruNode<TKey, TValue>> cacheDict = new Dictionary<TKey, LruNode<TKey, TValue>>();
 		/// <summary>
 		/// 链表的头节点，也是热端的头。
 		/// </summary>
@@ -42,10 +38,6 @@ namespace Cyjb.Utility
 		/// 链表冷端的头节点。
 		/// </summary>
 		private LruNode<TKey, TValue> codeHead;
-		/// <summary>
-		/// 当前对象是否已释放资源。
-		/// </summary>
-		private bool isDisposed = false;
 		/// <summary>
 		/// 使用指定的最大对象数目初始化 <see cref="LruCacheNoSync&lt;TKey,TValue&gt;"/> 类的新实例。
 		/// </summary>
@@ -81,23 +73,6 @@ namespace Cyjb.Utility
 		/// </summary>
 		public int MaxSize { get { return maxSize; } }
 
-		#region IDisposable 成员
-
-		/// <summary>
-		/// 执行与释放或重置非托管资源相关的应用程序定义的任务。
-		/// </summary>
-		public void Dispose()
-		{
-			if (!this.isDisposed)
-			{
-				this.isDisposed = true;
-				this.ClearInternal();
-				GC.SuppressFinalize(this);
-			}
-		}
-
-		#endregion // IDisposable 成员
-
 		#region ICache<TKey, TValue> 成员
 
 		/// <summary>
@@ -108,7 +83,6 @@ namespace Cyjb.Utility
 		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		public void Add(TKey key, TValue value)
 		{
-			this.CheckDisposed();
 			ExceptionHelper.CheckArgumentNull(key, "key");
 			this.AddInternal(key, value);
 		}
@@ -117,8 +91,9 @@ namespace Cyjb.Utility
 		/// </summary>
 		public void Clear()
 		{
-			CheckDisposed();
-			ClearInternal();
+			cacheDict.Clear();
+			head = codeHead = null;
+			count = 0;
 		}
 		/// <summary>
 		/// 确定缓存中是否包含指定的键。
@@ -128,7 +103,6 @@ namespace Cyjb.Utility
 		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		public bool Contains(TKey key)
 		{
-			this.CheckDisposed();
 			ExceptionHelper.CheckArgumentNull(key, "key");
 			return cacheDict.ContainsKey(key);
 		}
@@ -159,7 +133,6 @@ namespace Cyjb.Utility
 		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		public void Remove(TKey key)
 		{
-			this.CheckDisposed();
 			ExceptionHelper.CheckArgumentNull(key, "key");
 			LruNode<TKey, TValue> node;
 			if (cacheDict.TryGetValue(key, out node))
@@ -167,14 +140,6 @@ namespace Cyjb.Utility
 				cacheDict.Remove(key);
 				Remove(node);
 				count--;
-			}
-			if (IsDisposable)
-			{
-				IDisposable disposable = node.Value as IDisposable;
-				if (disposable != null)
-				{
-					disposable.Dispose();
-				}
 			}
 		}
 		/// <summary>
@@ -187,7 +152,6 @@ namespace Cyjb.Utility
 		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		public bool TryGet(TKey key, out TValue value)
 		{
-			this.CheckDisposed();
 			ExceptionHelper.CheckArgumentNull(key, "key");
 			LruNode<TKey, TValue> node;
 			if (cacheDict.TryGetValue(key, out node))
@@ -263,30 +227,6 @@ namespace Cyjb.Utility
 		#endregion // 链表操作
 
 		/// <summary>
-		/// 清空缓存中的所有对象。
-		/// </summary>
-		private void ClearInternal()
-		{
-			LruNode<TKey, TValue> oldHead = head;
-			cacheDict.Clear();
-			head = codeHead = null;
-			count = 0;
-			if (IsDisposable)
-			{
-				// 释放对象资源。
-				LruNode<TKey, TValue> node = oldHead;
-				do
-				{
-					IDisposable disposable = node.Value as IDisposable;
-					if (disposable != null)
-					{
-						disposable.Dispose();
-					}
-					node = node.Next;
-				} while (node != oldHead);
-			}
-		}
-		/// <summary>
 		/// 将指定的键和对象添加到缓存中，并返回添加的节点。
 		/// </summary>
 		/// <param name="key">要添加的对象的键。</param>
@@ -294,7 +234,6 @@ namespace Cyjb.Utility
 		private void AddInternal(TKey key, TValue value)
 		{
 			LruNode<TKey, TValue> node;
-			IDisposable disposable = null;
 			if (cacheDict.TryGetValue(key, out node))
 			{
 				// 更新节点。
@@ -330,7 +269,6 @@ namespace Cyjb.Utility
 					}
 					// 将 node 移除，并添加到冷端的头。
 					node = head.Prev;
-					disposable = node.Value as IDisposable;
 					this.cacheDict.Remove(node.Key);
 					this.Remove(node);
 					// 这里直接重用旧节点。
@@ -340,20 +278,6 @@ namespace Cyjb.Utility
 					this.AddCodeFirst(node);
 					cacheDict.Add(key, node);
 				}
-			}
-			if (disposable != null)
-			{
-				disposable.Dispose();
-			}
-		}
-		/// <summary>
-		/// 检查当前对象是否已释放资源。
-		/// </summary>
-		private void CheckDisposed()
-		{
-			if (this.isDisposed)
-			{
-				throw ExceptionHelper.ObjectDisposed();
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 
 namespace Cyjb.Utility
 {
@@ -11,52 +11,20 @@ namespace Cyjb.Utility
 	/// <typeparam name="TKey">缓冲对象的键的类型。</typeparam>
 	/// <typeparam name="TValue">缓冲对象的类型。</typeparam>
 	[DebuggerDisplay("Count = {Count}")]
-	public sealed class SimplyCache<TKey, TValue> : ICache<TKey, TValue>, IDisposable
+	public sealed class SimplyCache<TKey, TValue> : ICache<TKey, TValue>
 	{
-		/// <summary>
-		/// <typeparamref name="TValue"/> 表示的类型是否可以被释放。
-		/// </summary>
-		private static readonly bool IsDisposable = typeof(TValue).GetInterface("IDisposable") != null;
-		/// <summary>
-		/// 用于多线程同步的锁。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private ReaderWriterLockSlim cacheLock = new ReaderWriterLockSlim();
 		/// <summary>
 		/// 缓存对象的字典。
 		/// </summary>
-		private Dictionary<TKey, TValue> cacheDict = new Dictionary<TKey, TValue>();
-		/// <summary>
-		/// 当前对象是否已释放资源。
-		/// </summary>
-		private bool isDisposed = false;
+		private IDictionary<TKey, TValue> cacheDict = new ConcurrentDictionary<TKey, TValue>();
 		/// <summary>
 		/// 初始化 <see cref="SimplyCache&lt;TKey,TValue&gt;"/> 类的新实例。
 		/// </summary>
-		public SimplyCache()
-		{ }
+		public SimplyCache() { }
 		/// <summary>
 		/// 获取实际包含在缓存中的对象数目。
 		/// </summary>
 		public int Count { get { return cacheDict.Count; } }
-
-		#region IDisposable 成员
-
-		/// <summary>
-		/// 执行与释放或重置非托管资源相关的应用程序定义的任务。
-		/// </summary>
-		public void Dispose()
-		{
-			if (!this.isDisposed)
-			{
-				this.isDisposed = true;
-				this.ClearInternal();
-				cacheLock.Dispose();
-				GC.SuppressFinalize(this);
-			}
-		}
-
-		#endregion // IDisposable 成员
 
 		#region ICache<TKey, TValue> 成员
 
@@ -68,17 +36,15 @@ namespace Cyjb.Utility
 		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		public void Add(TKey key, TValue value)
 		{
-			this.CheckDisposed();
 			ExceptionHelper.CheckArgumentNull(key, "key");
-			this.AddInternal(key, value);
+			this.cacheDict[key] = value;
 		}
 		/// <summary>
 		/// 清空缓存中的所有对象。
 		/// </summary>
 		public void Clear()
 		{
-			CheckDisposed();
-			ClearInternal();
+			this.cacheDict.Clear();
 		}
 		/// <summary>
 		/// 确定缓存中是否包含指定的键。
@@ -88,17 +54,8 @@ namespace Cyjb.Utility
 		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		public bool Contains(TKey key)
 		{
-			this.CheckDisposed();
 			ExceptionHelper.CheckArgumentNull(key, "key");
-			cacheLock.EnterReadLock();
-			try
-			{
-				return cacheDict.ContainsKey(key);
-			}
-			finally
-			{
-				cacheLock.ExitReadLock();
-			}
+			return cacheDict.ContainsKey(key);
 		}
 		/// <summary>
 		/// 从缓存中获取与指定的键关联的对象，如果不存在则将对象添加到缓存中。
@@ -117,7 +74,7 @@ namespace Cyjb.Utility
 				return value;
 			}
 			value = valueFactory(key);
-			this.AddInternal(key, value);
+			this.cacheDict[key] = value;
 			return value;
 		}
 		/// <summary>
@@ -127,37 +84,8 @@ namespace Cyjb.Utility
 		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		public void Remove(TKey key)
 		{
-			this.CheckDisposed();
 			ExceptionHelper.CheckArgumentNull(key, "key");
-			TValue value;
-			cacheLock.EnterUpgradeableReadLock();
-			try
-			{
-				if (cacheDict.TryGetValue(key, out value))
-				{
-					cacheLock.EnterWriteLock();
-					try
-					{
-						cacheDict.Remove(key);
-					}
-					finally
-					{
-						cacheLock.ExitWriteLock();
-					}
-				}
-			}
-			finally
-			{
-				cacheLock.ExitUpgradeableReadLock();
-			}
-			if (IsDisposable)
-			{
-				IDisposable disposable = value as IDisposable;
-				if (disposable != null)
-				{
-					disposable.Dispose();
-				}
-			}
+			cacheDict.Remove(key);
 		}
 		/// <summary>
 		/// 尝试从缓存中获取与指定的键关联的对象。
@@ -169,19 +97,10 @@ namespace Cyjb.Utility
 		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		public bool TryGet(TKey key, out TValue value)
 		{
-			this.CheckDisposed();
 			ExceptionHelper.CheckArgumentNull(key, "key");
-			cacheLock.EnterReadLock();
-			try
+			if (cacheDict.TryGetValue(key, out value))
 			{
-				if (cacheDict.TryGetValue(key, out value))
-				{
-					return true;
-				}
-			}
-			finally
-			{
-				cacheLock.ExitReadLock();
+				return true;
 			}
 			value = default(TValue);
 			return false;
@@ -189,65 +108,5 @@ namespace Cyjb.Utility
 
 		#endregion // ICache<TKey, TValue> 成员
 
-		/// <summary>
-		/// 清空缓存中的所有对象。
-		/// </summary>
-		private void ClearInternal()
-		{
-			Dictionary<TKey, TValue> oldDict = null;
-			cacheLock.EnterWriteLock();
-			try
-			{
-				if (IsDisposable)
-				{
-					oldDict = cacheDict;
-				}
-				cacheDict = new Dictionary<TKey, TValue>();
-			}
-			finally
-			{
-				cacheLock.ExitWriteLock();
-			}
-			if (IsDisposable)
-			{
-				// 释放对象资源。
-				foreach (TValue value in oldDict.Values)
-				{
-					IDisposable disposable = value as IDisposable;
-					if (disposable != null)
-					{
-						disposable.Dispose();
-					}
-				}
-			}
-		}
-		/// <summary>
-		/// 将指定的键和对象添加到缓存中，并返回添加的节点。
-		/// </summary>
-		/// <param name="key">要添加的对象的键。</param>
-		/// <param name="value">要添加的对象。</param>
-		private void AddInternal(TKey key, TValue value)
-		{
-			cacheLock.EnterWriteLock();
-			try
-			{
-				// 更新节点。
-				cacheDict[key] = value;
-			}
-			finally
-			{
-				cacheLock.ExitWriteLock();
-			}
-		}
-		/// <summary>
-		/// 检查当前对象是否已释放资源。
-		/// </summary>
-		private void CheckDisposed()
-		{
-			if (this.isDisposed)
-			{
-				throw ExceptionHelper.ObjectDisposed();
-			}
-		}
 	}
 }

@@ -14,10 +14,6 @@ namespace Cyjb.Utility
 	public sealed class LruCache<TKey, TValue> : ICache<TKey, TValue>, IDisposable
 	{
 		/// <summary>
-		/// <typeparamref name="TValue"/> 表示的类型是否可以被释放。
-		/// </summary>
-		private static readonly bool IsDisposable = typeof(TValue).GetInterface("IDisposable") != null;
-		/// <summary>
 		/// 用于多线程同步的锁。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -176,10 +172,10 @@ namespace Cyjb.Utility
 		{
 			this.CheckDisposed();
 			ExceptionHelper.CheckArgumentNull(key, "key");
-			LruNode<TKey, TValue> node;
 			cacheLock.EnterUpgradeableReadLock();
 			try
 			{
+				LruNode<TKey, TValue> node;
 				if (cacheDict.TryGetValue(key, out node))
 				{
 					cacheLock.EnterWriteLock();
@@ -199,14 +195,6 @@ namespace Cyjb.Utility
 			finally
 			{
 				cacheLock.ExitUpgradeableReadLock();
-			}
-			if (IsDisposable)
-			{
-				IDisposable disposable = node.Value as IDisposable;
-				if (disposable != null)
-				{
-					disposable.Dispose();
-				}
 			}
 		}
 		/// <summary>
@@ -307,32 +295,16 @@ namespace Cyjb.Utility
 		/// </summary>
 		private void ClearInternal()
 		{
-			LruNode<TKey, TValue> oldHead;
 			cacheLock.EnterWriteLock();
 			try
 			{
 				cacheDict.Clear();
-				oldHead = head;
 				head = codeHead = null;
 				count = 0;
 			}
 			finally
 			{
 				cacheLock.ExitWriteLock();
-			}
-			if (IsDisposable)
-			{
-				// 释放对象资源。
-				LruNode<TKey, TValue> node = oldHead;
-				do
-				{
-					IDisposable disposable = node.Value as IDisposable;
-					if (disposable != null)
-					{
-						disposable.Dispose();
-					}
-					node = node.Next;
-				} while (node != oldHead);
 			}
 		}
 		/// <summary>
@@ -342,11 +314,10 @@ namespace Cyjb.Utility
 		/// <param name="value">要添加的对象。</param>
 		private void AddInternal(TKey key, TValue value)
 		{
-			LruNode<TKey, TValue> node;
-			IDisposable disposable = null;
 			cacheLock.EnterWriteLock();
 			try
 			{
+				LruNode<TKey, TValue> node;
 				if (cacheDict.TryGetValue(key, out node))
 				{
 					// 更新节点。
@@ -384,7 +355,6 @@ namespace Cyjb.Utility
 						}
 						// 将 node 移除，并添加到冷端的头。
 						node = head.Prev;
-						disposable = node.Value as IDisposable;
 						this.cacheDict.Remove(node.Key);
 						this.Remove(node);
 						// 这里直接重用旧节点。
@@ -399,10 +369,6 @@ namespace Cyjb.Utility
 			finally
 			{
 				cacheLock.ExitWriteLock();
-			}
-			if (disposable != null)
-			{
-				disposable.Dispose();
 			}
 		}
 		/// <summary>
