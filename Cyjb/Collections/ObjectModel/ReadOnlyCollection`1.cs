@@ -55,7 +55,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="array"/> 为 <c>null</c>。</exception>
 		public ReadOnlyCollection(T[] array)
-			: base(new ArrayAdapter<T>(array), true)
+			: base((ICollection<T>)array, true)
 		{ }
 		/// <summary>
 		/// 将 <see cref="ReadOnlyCollection&lt;T&gt;"/> 类的新实例初始化为指定迭代器中数据的包装。
@@ -64,7 +64,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="enumerable"/> 为 <c>null</c>。</exception>
 		public ReadOnlyCollection(IEnumerable<T> enumerable)
-			: base(new ArrayAdapter<T>(enumerable.ToArray()), true)
+			: base((ICollection<T>)enumerable.ToArray(), true)
 		{ }
 	}
 }
