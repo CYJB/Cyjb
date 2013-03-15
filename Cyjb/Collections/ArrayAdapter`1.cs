@@ -39,7 +39,7 @@ namespace Cyjb.Collections
 		/// 使用给定的数组初始化 <see cref="Cyjb.Collections.ArrayAdapter&lt;T&gt;"/> 类的新实例。
 		/// </summary>
 		/// <param name="array">初始化使用的数组。</param>
-		public ArrayAdapter(T[] array)
+		public ArrayAdapter(params T[] array)
 		{
 			ExceptionHelper.CheckArgumentNull(array, "array");
 			this.items = array;

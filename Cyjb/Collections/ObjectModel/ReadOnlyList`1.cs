@@ -54,7 +54,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <param name="array">由新的列表包装的数组。</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="array"/> 为 <c>null</c>。</exception>
-		public ReadOnlyList(T[] array)
+		public ReadOnlyList(params T[] array)
 			: base((IList<T>)array, true)
 		{ }
 		/// <summary>
