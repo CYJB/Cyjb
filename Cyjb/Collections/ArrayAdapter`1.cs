@@ -6,7 +6,8 @@ using System.Diagnostics;
 namespace Cyjb.Collections
 {
 	/// <summary>
-	/// 表示数组到 <see cref="System.Collections.Generic.IList&lt;T&gt;"/> 接口的适配器。
+	/// 表示数组的一部分的列表。
+	/// 与 ArraySegment&lt;T&gt; 的区别就是其访问方式与普通的列表相同。
 	/// </summary>
 	/// <typeparam name="T">元素的类型。</typeparam>
 	[Serializable, DebuggerDisplay("Count = {Count}")]
