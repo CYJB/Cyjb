@@ -262,45 +262,10 @@ namespace Cyjb
 			{
 				return ConvertExt.ChangeType(value, type, culture);
 			}
-			// 隐式类型转换。
-			if (type.IsByRef)
+			else
 			{
-				type = type.GetElementType();
+				return ConvertExt.ImplicitChangeType(value, type, culture);
 			}
-			// 总是可以转换为 Object。
-			if (type.TypeHandle.Equals(typeof(object).TypeHandle))
-			{
-				return value;
-			}
-			// 对 Nullable<T> 的支持。
-			bool nullalbe = TypeExt.NullableAssignableFrom(ref type);
-			if (value == null)
-			{
-				if (!nullalbe && type.IsValueType)
-				{
-					throw ExceptionHelper.CannotCastNullToValueType();
-				}
-				return null;
-			}
-			if (type.IsInstanceOfType(value))
-			{
-				return value;
-			}
-			// 检测用户定义类型转换。
-			RuntimeTypeHandle conversionHandle = type.TypeHandle;
-			RuntimeTypeHandle valueTypeHandle = value.GetType().TypeHandle;
-			ConversionMethod method;
-			if (ConversionCache.GetTypeOperators(valueTypeHandle).TryGetValue(conversionHandle, out method) &&
-				(method.ConversionType & ConversionType.ImplicitTo) == ConversionType.ImplicitTo)
-			{
-				return MethodInfo.GetMethodFromHandle(method.ToMethod).Invoke(null, new object[] { value });
-			}
-			if (ConversionCache.GetTypeOperators(conversionHandle).TryGetValue(valueTypeHandle, out method) &&
-				(method.ConversionType & ConversionType.ImplicitFrom) == ConversionType.ImplicitFrom)
-			{
-				return MethodInfo.GetMethodFromHandle(method.FromMethod).Invoke(null, new object[] { value });
-			}
-			return value;
 		}
 		/// <summary>
 		/// 从 <see cref="BindToMethod"/> 返回后，将 <paramref name="args"/> 参数还原为从 
@@ -1047,7 +1012,7 @@ namespace Cyjb
 			{
 				return type.IsClass;
 			}
-			return allowCast ? type.IsCastableFrom(types[index]) : type.IsImplicitFrom(types[index]);
+			return allowCast ? type.IsExplicitFrom(types[index]) : type.IsImplicitFrom(types[index]);
 		}
 		/// <summary>
 		/// 判断的类型是否可以从指定的类型转换而来。
@@ -1061,7 +1026,7 @@ namespace Cyjb
 			{
 				return type.IsClass;
 			}
-			return allowCast ? type.IsCastableFrom(fromType) : type.IsImplicitFrom(fromType);
+			return allowCast ? type.IsExplicitFrom(fromType) : type.IsImplicitFrom(fromType);
 		}
 		/// <summary>
 		/// 寻找泛型参数较少的泛型方法。
@@ -1071,7 +1036,7 @@ namespace Cyjb
 		/// <param name="len">要比较的参数个数。</param>
 		/// <returns>如果第一组参数匹配的更好，则为 <c>1</c>；如果第二组参数匹配的更好，则为 <c>2</c>；
 		/// 如果不能区分，则为 <c>0</c>。</returns>
-		private int FindLessGenericType(MatchInfo match1, MatchInfo match2, int len)
+		private static int FindLessGenericType(MatchInfo match1, MatchInfo match2, int len)
 		{
 			bool p1Better = false;
 			bool p2Better = false;

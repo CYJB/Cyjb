@@ -1,14 +1,146 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 
 namespace Cyjb
 {
 	/// <summary>
-	/// 将一个基本数据类型转换为另一个基本数据类型的方法。
+	/// 将一个数据类型转换为另一个数据类型的方法。
 	/// </summary>
 	public static class ConvertExt
 	{
+
+		#region 隐式类型转换
+
+		/// <summary>
+		/// 返回指定类型的对象，其值等效于指定对象。参数提供区域性特定的格式设置信息。
+		/// 只对允许进行隐式类型转换。
+		/// </summary>
+		/// <param name="value">要转换的对象。</param>
+		/// <param name="conversionType">要返回的对象的类型。</param>
+		/// <param name="provider">一个提供区域性特定的格式设置信息的对象。</param>
+		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，并且其值等效于 <paramref name="value"/>。</returns>
+		internal static object ImplicitChangeType(object value, Type conversionType, IFormatProvider provider)
+		{
+			ExceptionHelper.CheckArgumentNull(conversionType, "conversionType");
+			if (conversionType.IsByRef)
+			{
+				conversionType = conversionType.GetElementType();
+			}
+			// 总是可以转换为 Object。
+			if (conversionType == typeof(object)) { return value; }
+			// value 为 null 的情况。
+			Type nonNullableType;
+			bool nullableCType = TypeExt.IsNullableType(conversionType, out nonNullableType);
+			if (value == null)
+			{
+				if (conversionType.IsValueType && !nullableCType)
+				{
+					throw ExceptionHelper.CannotCastNullToValueType();
+				}
+				return null;
+			}
+			Type type = value.GetType();
+			// 尝试标准隐式类型转换。
+			bool success;
+			object result = StandardImplicitChangeType(value, type, nonNullableType, provider, out success);
+			if (success)
+			{
+				return result;
+			}
+			// 对隐式类型转换运算符进行判断。
+			ConversionMethod method = ConversionCache.GetImplicitConversion(type, conversionType);
+			if (method != null)
+			{
+				value = MethodInfo.GetMethodFromHandle(method.Method).Invoke(null, new object[] { value });
+				if (value != null)
+				{
+					type = value.GetType();
+					if (type != nonNullableType)
+					{
+						// 处理用户定义隐式类型转换之后的标准隐式类型转换。
+						value = StandardImplicitChangeType(value, type, nonNullableType, provider, out success);
+					}
+				}
+				return value;
+			}
+			throw ExceptionHelper.ConvertInvalidValue(value, conversionType);
+		}
+		/// <summary>
+		/// 返回指定类型的对象，其值等效于指定对象。参数提供区域性特定的格式设置信息。
+		/// 只对允许进行标准隐式类型转换。
+		/// </summary>
+		/// <remarks>在运行时，value.GetType() 永远不可能为 Nullalbe&lt;T&gt;，因此某些情况可以不考虑。</remarks>
+		/// <param name="value">要转换的对象。</param>
+		/// <param name="type">要转换的对象的类型。</param>
+		/// <param name="conversionType">要返回的对象的类型。</param>
+		/// <param name="provider">一个提供区域性特定的格式设置信息的对象。</param>
+		/// <param name="success">如果标准隐式类型转换成功，则为 <c>true</c>；否则为 <c>false</c>。</param>
+		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，并且其值等效于 <paramref name="value"/>。</returns>
+		private static object StandardImplicitChangeType(object value, Type type, Type conversionType,
+			IFormatProvider provider, out bool success)
+		{
+			success = true;
+			// 判断隐式数值转换。
+			HashSet<TypeCode> typeSet;
+			TypeCode cTypeCode = Type.GetTypeCode(conversionType);
+			if (!conversionType.IsEnum && TypeExt.ImplicitNumericConversions.TryGetValue(cTypeCode, out typeSet))
+			{
+				TypeCode typeCode = Type.GetTypeCode(type);
+				if (!type.IsEnum && typeSet.Contains(typeCode))
+				{
+					// char 类型的变量需要额外判断，
+					// 因为 Convert 类并不支持到 Single，Double 和 Decimal 类型的转换。
+					if (typeCode == TypeCode.Char)
+					{
+						switch (cTypeCode)
+						{
+							case TypeCode.Single: return ConvertCharToSingle(value);
+							case TypeCode.Double: return ConvertCharToDouble(value);
+							case TypeCode.Decimal: return ConvertCharToDecimal(value);
+						}
+					}
+					return Convert.ChangeType(value, conversionType, provider);
+				}
+			}
+			// 判断隐式引用转换和装箱转换。
+			if (conversionType.IsAssignableFrom(type))
+			{
+				return value;
+			}
+			success = false;
+			return null;
+		}
+		/// <summary>
+		/// 将 <see cref="System.Char"/> 类型的值转换为 <see cref="System.Single"/> 类型的值。
+		/// </summary>
+		/// <param name="value">要转换的 <see cref="System.Char"/> 类型的值。</param>
+		/// <returns>转换得到的 <see cref="Single"/> 类型的值。</returns>
+		private static object ConvertCharToSingle(object value)
+		{
+			return (float)(char)value;
+		}
+		/// <summary>
+		/// 将 <see cref="System.Char"/> 类型的值转换为 <see cref="System.Double"/> 类型的值。
+		/// </summary>
+		/// <param name="value">要转换的 <see cref="System.Char"/> 类型的值。</param>
+		/// <returns>转换得到的 <see cref="Double"/> 类型的值。</returns>
+		private static object ConvertCharToDouble(object value)
+		{
+			return (double)(char)value;
+		}
+		/// <summary>
+		/// 将 <see cref="System.Char"/> 类型的值转换为 <see cref="System.Decimal"/> 类型的值。
+		/// </summary>
+		/// <param name="value">要转换的 <see cref="System.Char"/> 类型的值。</param>
+		/// <returns>转换得到的 <see cref="Decimal"/> 类型的值。</returns>
+		private static object ConvertCharToDecimal(object value)
+		{
+			return (decimal)(char)value;
+		}
+
+		#endregion // 隐式类型转换
 
 		#region 类型转换
 
@@ -18,7 +150,8 @@ namespace Cyjb
 		/// </summary>
 		/// <typeparam name="T">要转换到的类型。</typeparam>
 		/// <param name="value">要转换的对象。</param>
-		/// <returns>一个对象，其类型为 <typeparamref name="T"/>，并且其值等效于 <paramref name="value"/>。</returns>
+		/// <returns>一个对象，其类型为 <typeparamref name="T"/>，
+		/// 并且其值等效于 <paramref name="value"/>。</returns>
 		public static T ChangeType<T>(object value)
 		{
 			return (T)ChangeType(value, typeof(T), CultureInfo.CurrentCulture);
@@ -30,7 +163,8 @@ namespace Cyjb
 		/// <typeparam name="T">要转换到的类型。</typeparam>
 		/// <param name="value">要转换的对象。</param>
 		/// <param name="provider">一个提供区域性特定的格式设置信息的对象。</param>
-		/// <returns>一个对象，其类型为 <typeparamref name="T"/>，并且其值等效于 <paramref name="value"/>。</returns>
+		/// <returns>一个对象，其类型为 <typeparamref name="T"/>，
+		/// 并且其值等效于 <paramref name="value"/>。</returns>
 		public static T ChangeType<T>(object value, IFormatProvider provider)
 		{
 			return (T)ChangeType(value, typeof(T), provider);
@@ -41,7 +175,8 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="value">要转换的对象。</param>
 		/// <param name="conversionType">要返回的对象的类型。</param>
-		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，并且其值等效于 <paramref name="value"/>。</returns>
+		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，
+		/// 并且其值等效于 <paramref name="value"/>。</returns>
 		public static object ChangeType(object value, Type conversionType)
 		{
 			return ChangeType(value, conversionType, CultureInfo.CurrentCulture);
@@ -53,7 +188,8 @@ namespace Cyjb
 		/// <param name="value">要转换的对象。</param>
 		/// <param name="conversionType">要返回的对象的类型。</param>
 		/// <param name="provider">一个提供区域性特定的格式设置信息的对象。</param>
-		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，并且其值等效于 <paramref name="value"/>。</returns>
+		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，
+		/// 并且其值等效于 <paramref name="value"/>。</returns>
 		public static object ChangeType(object value, Type conversionType, IFormatProvider provider)
 		{
 			ExceptionHelper.CheckArgumentNull(conversionType, "conversionType");
@@ -62,45 +198,151 @@ namespace Cyjb
 				conversionType = conversionType.GetElementType();
 			}
 			// 总是可以转换为 Object。
-			if (conversionType.TypeHandle.Equals(typeof(object).TypeHandle))
-			{
-				return value;
-			}
-			// 对 Nullable<T> 的支持。
-			bool nullalbe = TypeExt.NullableAssignableFrom(ref conversionType);
+			if (conversionType == typeof(object)) { return value; }
+			// value 为 null 的情况。
+			Type nonNullableType;
+			bool nullableCType = TypeExt.IsNullableType(conversionType, out nonNullableType);
 			if (value == null)
 			{
-				if (!nullalbe && conversionType.IsValueType)
+				if (conversionType.IsValueType && !nullableCType)
 				{
 					throw ExceptionHelper.CannotCastNullToValueType();
 				}
 				return null;
 			}
 			Type type = value.GetType();
-			// 对枚举的支持。
-			if (conversionType.IsEnum)
+			// 尝试显示枚举转换。
+			if (conversionType.IsEnumExplicitFrom(type))
 			{
-				return Enum.ToObject(conversionType, value);
+				if (conversionType.IsEnum)
+				{
+					// Enum.ToObject 不支持 char, float, double 和 decimal。
+					switch (Type.GetTypeCode(type))
+					{
+						case TypeCode.Char:
+							value = (ushort)(char)value;
+							break;
+						case TypeCode.Single:
+							value = (long)(float)value;
+							break;
+						case TypeCode.Double:
+							value = (long)(double)value;
+							break;
+						case TypeCode.Decimal:
+							value = (long)(decimal)value;
+							break;
+					}
+					return Enum.ToObject(conversionType, value);
+				}
+				else
+				{
+					return Convert.ChangeType(value, conversionType, provider);
+				}
 			}
-			if (conversionType.IsInstanceOfType(value))
+			// 尝试标准显式类型转换。
+			bool success;
+			object result = StandardExplicitChangeType(value, type, nonNullableType, provider, out success);
+			if (success)
+			{
+				return result;
+			}
+			// 对显式类型转换运算符进行判断。
+			ConversionMethod method = ConversionCache.GetExplicitConversion(type, conversionType);
+			if (method != null)
+			{
+				value = MethodInfo.GetMethodFromHandle(method.Method).Invoke(null, new object[] { value });
+				if (value != null)
+				{
+					type = value.GetType();
+					if (type != nonNullableType)
+					{
+						// 处理用户定义显式类型转换之后的标准显式类型转换。
+						value = StandardExplicitChangeType(value, type, nonNullableType, provider, out success);
+					}
+				}
+				return value;
+			}
+			// 尝试其他支持的转换。
+			return Convert.ChangeType(value, conversionType, provider);
+		}
+		/// <summary>
+		/// 返回指定类型的对象，其值等效于指定对象。参数提供区域性特定的格式设置信息。
+		/// 只对允许进行标准显式类型转换。
+		/// </summary>
+		/// <remarks>在运行时，value.GetType() 永远不可能为 Nullalbe&lt;T&gt;，因此某些情况可以不考虑。</remarks>
+		/// <param name="value">要转换的对象。</param>
+		/// <param name="type">要转换的对象的类型。</param>
+		/// <param name="conversionType">要返回的对象的类型。</param>
+		/// <param name="provider">一个提供区域性特定的格式设置信息的对象。</param>
+		/// <param name="success">如果标准显式类型转换成功，则为 <c>true</c>；否则为 <c>false</c>。</param>
+		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，并且其值等效于 <paramref name="value"/>。</returns>
+		private static object StandardExplicitChangeType(object value, Type type, Type conversionType,
+			IFormatProvider provider, out bool success)
+		{
+			success = true;
+			// 判断显式数值转换。
+			TypeCode cTypeCode = Type.GetTypeCode(conversionType);
+			TypeCode typeCode = Type.GetTypeCode(type);
+			if (!conversionType.IsEnum && TypeExt.ExplicitNumericConversions.Contains(cTypeCode) &&
+				!type.IsEnum && TypeExt.ExplicitNumericConversions.Contains(typeCode))
+			{
+				// char 类型的变量需要额外判断，
+				// 因为 Convert 类并不支持与 Single，Double 和 Decimal 类型之间的转换。
+				if (typeCode == TypeCode.Char)
+				{
+					switch (cTypeCode)
+					{
+						case TypeCode.Single: return ConvertCharToSingle(value);
+						case TypeCode.Double: return ConvertCharToDouble(value);
+						case TypeCode.Decimal: return ConvertCharToDecimal(value);
+					}
+				}
+				else if (cTypeCode == TypeCode.Char)
+				{
+					switch (typeCode)
+					{
+						case TypeCode.Single: return ConvertSingleToChar(value);
+						case TypeCode.Double: return ConvertDoubleToChar(value);
+						case TypeCode.Decimal: return ConvertDecimalToChar(value);
+					}
+				}
+				return Convert.ChangeType(value, conversionType, provider);
+			}
+			// 要想显式转换成功，value 必须为 null 或者可以进行隐式转换。
+			// 判断隐式引用转换和装箱转换。
+			if (conversionType.IsAssignableFrom(type))
 			{
 				return value;
 			}
-			// 检测用户定义类型转换。
-			RuntimeTypeHandle conversionHandle = conversionType.TypeHandle;
-			RuntimeTypeHandle typeHandle = type.TypeHandle;
-			ConversionMethod method;
-			if (ConversionCache.GetTypeOperators(typeHandle).TryGetValue(conversionHandle, out method) &&
-				(method.ConversionType & ConversionType.To) != 0)
-			{
-				return MethodInfo.GetMethodFromHandle(method.ToMethod).Invoke(null, new object[] { value });
-			}
-			if (ConversionCache.GetTypeOperators(conversionHandle).TryGetValue(typeHandle, out method) &&
-				(method.ConversionType & ConversionType.From) != 0)
-			{
-				return MethodInfo.GetMethodFromHandle(method.FromMethod).Invoke(null, new object[] { value });
-			}
-			return Convert.ChangeType(value, conversionType, provider);
+			success = false;
+			return null;
+		}
+		/// <summary>
+		/// 将 <see cref="System.Single"/> 类型的值转换为 <see cref="System.Char"/> 类型的值。
+		/// </summary>
+		/// <param name="value">要转换的 <see cref="System.Single"/> 类型的值。</param>
+		/// <returns>转换得到的 <see cref="Char"/> 类型的值。</returns>
+		private static object ConvertSingleToChar(object value)
+		{
+			return (char)(float)value;
+		}
+		/// <summary>
+		/// 将 <see cref="System.Double"/> 类型的值转换为 <see cref="System.Char"/> 类型的值。
+		/// </summary>
+		/// <param name="value">要转换的 <see cref="System.Double"/> 类型的值。</param>
+		/// <returns>转换得到的 <see cref="Char"/> 类型的值。</returns>
+		private static object ConvertDoubleToChar(object value)
+		{
+			return (char)(double)value;
+		}
+		/// <summary>
+		/// 将 <see cref="System.Decimal"/> 类型的值转换为 <see cref="System.Char"/> 类型的值。
+		/// </summary>
+		/// <param name="value">要转换的 <see cref="System.Decimal"/> 类型的值。</param>
+		/// <returns>转换得到的 <see cref="Char"/> 类型的值。</returns>
+		private static object ConvertDecimalToChar(object value)
+		{
+			return (char)(decimal)value;
 		}
 
 		#endregion // 类型转换
