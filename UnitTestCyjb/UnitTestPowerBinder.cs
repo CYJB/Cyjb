@@ -23,41 +23,41 @@ namespace UnitTestCyjb
 			TestClass target = targetSub;
 			// 测试父类。
 			// DefaultBinder
-			Assert.AreEqual("TestClass", type.InvokeMember("TestField", BindingFlags.GetField, PowerBinder.DefaultBinder,
+			Assert.AreEqual(target.TestField, type.InvokeMember("TestField", BindingFlags.GetField, PowerBinder.DefaultBinder,
 				target, new object[0]));
-			Assert.AreEqual((short)10, type.InvokeMember("TestField2", BindingFlags.GetField, PowerBinder.DefaultBinder,
+			Assert.AreEqual(target.TestField2, type.InvokeMember("TestField2", BindingFlags.GetField, PowerBinder.DefaultBinder,
 				target, new object[0]));
-			Assert.AreEqual(100L, type.InvokeMember("TestField3", BindingFlags.GetField, PowerBinder.DefaultBinder,
+			Assert.AreEqual(target.TestField3, type.InvokeMember("TestField3", BindingFlags.GetField, PowerBinder.DefaultBinder,
 				target, new object[0]));
-			Assert.AreEqual("TestClass4", type.InvokeMember("TestField4", BindingFlags.GetField, PowerBinder.DefaultBinder,
+			Assert.AreEqual(target.TestField4, type.InvokeMember("TestField4", BindingFlags.GetField, PowerBinder.DefaultBinder,
 				target, new object[0]));
 			// CastBinder
-			Assert.AreEqual("TestClass", type.InvokeMember("TestField", BindingFlags.GetField, PowerBinder.CastBinder,
+			Assert.AreEqual(target.TestField, type.InvokeMember("TestField", BindingFlags.GetField, PowerBinder.CastBinder,
 				target, new object[0]));
-			Assert.AreEqual((short)10, type.InvokeMember("TestField2", BindingFlags.GetField, PowerBinder.CastBinder,
+			Assert.AreEqual(target.TestField2, type.InvokeMember("TestField2", BindingFlags.GetField, PowerBinder.CastBinder,
 				target, new object[0]));
-			Assert.AreEqual(100L, type.InvokeMember("TestField3", BindingFlags.GetField, PowerBinder.CastBinder,
+			Assert.AreEqual(target.TestField3, type.InvokeMember("TestField3", BindingFlags.GetField, PowerBinder.CastBinder,
 				target, new object[0]));
-			Assert.AreEqual("TestClass4", type.InvokeMember("TestField4", BindingFlags.GetField, PowerBinder.CastBinder,
+			Assert.AreEqual(target.TestField4, type.InvokeMember("TestField4", BindingFlags.GetField, PowerBinder.CastBinder,
 				target, new object[0]));
 			// 测试子类。
 			// DefaultBinder
-			Assert.AreEqual("TestSubClass", subType.InvokeMember("TestField", BindingFlags.GetField, PowerBinder.DefaultBinder,
+			Assert.AreEqual(targetSub.TestField, subType.InvokeMember("TestField", BindingFlags.GetField, PowerBinder.DefaultBinder,
 				target, new object[0]));
-			Assert.AreEqual(11, subType.InvokeMember("TestField2", BindingFlags.GetField, PowerBinder.DefaultBinder,
+			Assert.AreEqual(targetSub.TestField2, subType.InvokeMember("TestField2", BindingFlags.GetField, PowerBinder.DefaultBinder,
 				target, new object[0]));
-			Assert.AreEqual(101, subType.InvokeMember("TestField3", BindingFlags.GetField, PowerBinder.DefaultBinder,
+			Assert.AreEqual(targetSub.TestField3, subType.InvokeMember("TestField3", BindingFlags.GetField, PowerBinder.DefaultBinder,
 				target, new object[0]));
-			Assert.AreEqual(102, subType.InvokeMember("TestField4", BindingFlags.GetField, PowerBinder.DefaultBinder,
+			Assert.AreEqual(targetSub.TestField4, subType.InvokeMember("TestField4", BindingFlags.GetField, PowerBinder.DefaultBinder,
 				target, new object[0]));
 			// CastBinder
-			Assert.AreEqual("TestSubClass", subType.InvokeMember("TestField", BindingFlags.GetField, PowerBinder.CastBinder,
+			Assert.AreEqual(targetSub.TestField, subType.InvokeMember("TestField", BindingFlags.GetField, PowerBinder.CastBinder,
 				target, new object[0]));
-			Assert.AreEqual(11, subType.InvokeMember("TestField2", BindingFlags.GetField, PowerBinder.CastBinder,
+			Assert.AreEqual(targetSub.TestField2, subType.InvokeMember("TestField2", BindingFlags.GetField, PowerBinder.CastBinder,
 				target, new object[0]));
-			Assert.AreEqual(101, subType.InvokeMember("TestField3", BindingFlags.GetField, PowerBinder.CastBinder,
+			Assert.AreEqual(targetSub.TestField3, subType.InvokeMember("TestField3", BindingFlags.GetField, PowerBinder.CastBinder,
 				target, new object[0]));
-			Assert.AreEqual(102, subType.InvokeMember("TestField4", BindingFlags.GetField, PowerBinder.CastBinder,
+			Assert.AreEqual(targetSub.TestField4, subType.InvokeMember("TestField4", BindingFlags.GetField, PowerBinder.CastBinder,
 				target, new object[0]));
 			// 测试设置父类字段。
 			// DefaultBinder
@@ -174,139 +174,151 @@ namespace UnitTestCyjb
 			BindingFlags bindingFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod;
 			BindingFlags bindingOptFlags = bindingFlags | BindingFlags.OptionalParamBinding;
 			// 测试完整的调用。
-			Assert.AreEqual("()", type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
+			Assert.AreEqual(TestSubClass.TestMethod(),
+				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[0]));
-			Assert.AreEqual("(int 10)", type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
+			Assert.AreEqual(TestSubClass.TestMethod(10),
+				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 10 }));
-			Assert.AreEqual("(int 10)", type.InvokeMember("TestMethod", bindingFlags, PowerBinder.CastBinder, null,
+			Assert.AreEqual(TestSubClass.TestMethod(10),
+				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.CastBinder, null,
 				new object[] { 10 }));
-			Assert.AreEqual("(int 10, int 20)", type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
+			Assert.AreEqual(TestSubClass.TestMethod(10, 20),
+				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 10, 20 }));
-			Assert.AreEqual("(int 10, int 20)", type.InvokeMember("TestMethod", bindingFlags, PowerBinder.CastBinder, null,
+			Assert.AreEqual(TestSubClass.TestMethod(10, 20),
+				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.CastBinder, null,
 				new object[] { 10, 20 }));
-			Assert.AreEqual("(int 30, string , bool True)",
+			Assert.AreEqual(TestSubClass.TestMethod(30, null, true),
 				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 30, null, true }));
 			// 测试完整的调用与类型转换。
 			Type[] invalidCastExceptions = new Type[] { 
 				typeof(ArgumentException), typeof(InvalidCastException), typeof(MissingMethodException) };
-			Assert.AreEqual("(int 10)", type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
+			Assert.AreEqual(TestSubClass.TestMethod((short)10),
+				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { (short)10 }));
-			Assert.AreEqual("(int 10)", type.InvokeMember("TestMethod", bindingFlags, PowerBinder.CastBinder, null,
+			Assert.AreEqual(TestSubClass.TestMethod((short)10),
+				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.CastBinder, null,
 				new object[] { (short)10 }));
 			AssertExt.ThrowsException(() => type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 10L }), invalidCastExceptions);
-			Assert.AreEqual("(int 10)", type.InvokeMember("TestMethod", bindingFlags, PowerBinder.CastBinder, null,
+			Assert.AreEqual(TestSubClass.TestMethod(10),
+				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.CastBinder, null,
 				new object[] { 10L }));
-			Assert.AreEqual("(int 10, int 20)", type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
+			Assert.AreEqual(TestSubClass.TestMethod((short)10, (byte)20),
+				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { (short)10, (byte)20 }));
 			AssertExt.ThrowsException(() => type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 10UL, 20L }), invalidCastExceptions);
 			AssertExt.ThrowsException(() => type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 10, 20L }), invalidCastExceptions);
-			Assert.AreEqual("(int 10, int 20)", type.InvokeMember("TestMethod", bindingFlags, PowerBinder.CastBinder, null,
+			Assert.AreEqual(TestSubClass.TestMethod(10, 20),
+				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.CastBinder, null,
 				new object[] { 10UL, 20L }));
 			// 测试命名参数。
-			Assert.AreEqual("(int 30, string str, bool True)",
+			Assert.AreEqual(TestSubClass.TestMethod(30, "str", true),
 				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 30, "str", true }));
-			Assert.AreEqual("(int 30, string str, bool True)",
+			Assert.AreEqual(TestSubClass.TestMethod(value2: "str", value1: 30, value3: true),
 				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { "str", 30, true }, null, null, new string[] { "value2", "value1", "value3" }));
-			Assert.AreEqual("(int 30, string str, bool True)",
+			Assert.AreEqual(TestSubClass.TestMethod(30, "str", true),
 				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { "str", 30, true }, null, null, new string[] { "value2" }));
-			Assert.AreEqual("(int 30, string str, bool True)",
+			Assert.AreEqual(TestSubClass.TestMethod(value3: true, value2: "str", value1: 30),
 				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { true, "str", 30 }, null, null, new string[] { "value3", "value2", "value1" }));
-			Assert.AreEqual("(int 30, string str, bool True)",
+			Assert.AreEqual(TestSubClass.TestMethod(30, "str", true),
 				type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { true, "str", 30 }, null, null, new string[] { "value3", "value2" }));
 			AssertExt.ThrowsException(() => type.InvokeMember("TestMethod", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 10 }, null, null, new string[] { "values" }), typeof(MissingMethodException));
 			// 测试默认参数和 params 参数。
-			Assert.AreEqual("(int 30, string str, bool True, int[] 1,2,3)",
+			Assert.AreEqual(TestSubClass.TestMethod2(30, "str", true, 1, 2, 3),
 				type.InvokeMember("TestMethod2", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 30, "str", true, 1, 2, 3 }));
-			Assert.AreEqual("(int 30, string str, bool True, int[] )",
+			Assert.AreEqual(TestSubClass.TestMethod2(30, "str", true),
 				type.InvokeMember("TestMethod2", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 30, "str", true }));
-			Assert.AreEqual("(int 30, string str, bool False, int[] )",
+			Assert.AreEqual(TestSubClass.TestMethod2(30, "str"),
 				type.InvokeMember("TestMethod2", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 30, "str" }));
-			Assert.AreEqual("(int 30, string text, bool False, int[] )",
+			Assert.AreEqual(TestSubClass.TestMethod2(30),
 				type.InvokeMember("TestMethod2", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 30 }));
 			AssertExt.ThrowsException(() => type.InvokeMember("TestMethod2", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[0]), typeof(MissingMethodException));
 			// 测试命名参数、默认参数和 params 参数。
-			Assert.AreEqual("(int 30, string str, bool True, int[] 1,2,3)",
+			Assert.AreEqual(TestSubClass.TestMethod2(value1: 30, value2: "str", value3: true, value4: new int[] { 1, 2, 3 }),
 				type.InvokeMember("TestMethod2", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 30, "str", true, 1, 2, 3 }, null, null,
 				new string[] { "value1", "value2", "value3", "value4" }));
-			Assert.AreEqual("(int 30, string str, bool True, int[] 1,2,3)",
+			Assert.AreEqual(TestSubClass.TestMethod2(30, "str", true, 1, 2, 3),
 				type.InvokeMember("TestMethod2", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 30, "str", true, 1, 2, 3 }, null, null,
 				new string[] { "value1", "value2", "value3" }));
-			Assert.AreEqual("(int 30, string str, bool True, int[] )",
+			Assert.AreEqual(TestSubClass.TestMethod2(value1: 30, value2: "str", value3: true),
 				type.InvokeMember("TestMethod2", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 30, "str", true }, null, null,
 				new string[] { "value1", "value2", "value3" }));
-			Assert.AreEqual("(int 30, string str, bool True, int[] 1,2,3)",
+			Assert.AreEqual(TestSubClass.TestMethod2(30, "str", true, 1, 2, 3),
 				type.InvokeMember("TestMethod2", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 30, "str", 1, true, 2, 3 }, null, null,
 				new string[] { "value1", "value2", "value4" }));
-			Assert.AreEqual("(int 30, string str, bool False, int[] 1)",
+			Assert.AreEqual(TestSubClass.TestMethod2(value1: 30, value2: "str", value4: new int[] { 1 }),
 				type.InvokeMember("TestMethod2", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 30, "str", new int[] { 1 } }, null, null,
 				new string[] { "value1", "value2", "value4" }));
-			Assert.AreEqual("(int 30, string text, bool True, int[] 1)",
+			Assert.AreEqual(TestSubClass.TestMethod2(value4: new int[] { 1 }, value3: true, value1: 30),
 				type.InvokeMember("TestMethod2", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { new int[] { 1 }, true, 30 }, null, null,
 				new string[] { "value4", "value3", "value1" }));
-			Assert.AreEqual("(int 30, string text, bool False, int[] 1)",
+			Assert.AreEqual(TestSubClass.TestMethod2(value4: new int[] { 1 }, value1: 30),
 				type.InvokeMember("TestMethod2", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { new int[] { 1 }, 30 }, null, null,
 				new string[] { "value4", "value1" }));
-			Assert.AreEqual("(int 30, string text, bool True, int[] )",
+			Assert.AreEqual(TestSubClass.TestMethod2(value3: true, value1: 30),
 				type.InvokeMember("TestMethod2", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { true, 30 }, null, null,
 				new string[] { "value3", "value1" }));
-			Assert.AreEqual("(int 30, string text, bool False, int[] )",
+			Assert.AreEqual(TestSubClass.TestMethod2(value1: 30),
 				type.InvokeMember("TestMethod2", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 30 }, null, null,
 				new string[] { "value1" }));
 			// 测试泛型方法。
-			Assert.AreEqual("(int 10, int 20)", type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
+			Assert.AreEqual(TestSubClass.TestMethod3(10, 20),
+				type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 10, 20 }));
-			Assert.AreEqual("(int 10, int 20)", type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
+			Assert.AreEqual(TestSubClass.TestMethod3((short)10, 20),
+				type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { (short)10, 20 }));
-			Assert.AreEqual("<System.Int16>(10, 20)",
+			Assert.AreEqual(TestSubClass.TestMethod3((short)10, (short)20),
 				type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { (short)10, (short)20 }));
-			Assert.AreEqual("<System.Int64>(10, 20)",
+			Assert.AreEqual(TestSubClass.TestMethod3((short)10, (long)20),
 				type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { (short)10, (long)20 }));
-			Assert.AreEqual("(int 10, string str)",
+			Assert.AreEqual(TestSubClass.TestMethod3(10, "str"),
 				type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 10, "str" }));
-			Assert.AreEqual("(int 10, string str)",
+			Assert.AreEqual(TestSubClass.TestMethod3((short)10, "str"),
 				type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { (short)10, "str" }));
 			AssertExt.ThrowsException(() => type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { (long)10, "str" }), typeof(MissingMethodException));
-			Assert.AreEqual("<System.String>(text, str)",
+			Assert.AreEqual(TestSubClass.TestMethod3("text", "str"),
 				type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { "text", "str" }));
 			AssertExt.ThrowsException(() => type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { "str", 10 }), typeof(MissingMethodException));
-			Assert.AreEqual("<System.String, System.Int32>(text, str, 10)",
+			Assert.AreEqual(TestSubClass.TestMethod3("text", "str", 10),
 				type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { "text", "str", 10 }));
-			Assert.AreEqual("<System.Int32, System.Int32>(10, 20, 30)",
+			Assert.AreEqual(TestSubClass.TestMethod3(10, 20, 30),
 				type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 10, 20, 30 }));
-			Assert.AreEqual("<System.Int32>(10, 20, string str)",
+			Assert.AreEqual(TestSubClass.TestMethod3(10, 20, "str"),
 				type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 10, 20, "str" }));
 			//Assert.AreEqual("<System.Int32, System.String, System.Int32>(10, str, 20,30)",
@@ -328,42 +340,42 @@ namespace UnitTestCyjb
 			BindingFlags bindingInsFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod;
 			BindingFlags bindingInsOptFlags = bindingInsFlags | BindingFlags.OptionalParamBinding;
 			TestSubClass subClass = new TestSubClass();
-			Assert.AreEqual("sub(int 10, int 20)",
+			Assert.AreEqual(subClass.TestMethod4(10, 20),
 				type.InvokeMember("TestMethod4", bindingInsFlags, PowerBinder.CastBinder, subClass,
 				new object[] { 10, 20 }));
-			Assert.AreEqual("(bool True, string str)",
+			Assert.AreEqual(subClass.TestMethod4(true, "str"),
 				type.InvokeMember("TestMethod4", bindingInsFlags, PowerBinder.CastBinder, subClass,
 				new object[] { true, "str" }));
-			Assert.AreEqual("(int 10, string str)",
+			Assert.AreEqual(subClass.TestMethod4(10, "str"),
 				type.InvokeMember("TestMethod4", bindingInsFlags, PowerBinder.CastBinder, subClass,
 				new object[] { 10, "str" }));
-			Assert.AreEqual("(int 10, string str)",
+			Assert.AreEqual(subClass.TestMethod4(10, "str"),
 				type.InvokeMember("TestMethod4", bindingInsOptFlags, PowerBinder.CastBinder, subClass,
 				new object[] { 10, "str" }));
-			Assert.AreEqual("(int 10, string str, bool False)",
+			Assert.AreEqual(subClass.TestMethod4(10, "str", false),
 				type.InvokeMember("TestMethod4", bindingInsFlags, PowerBinder.CastBinder, subClass,
 				new object[] { 10, "str", false }));
-			Assert.AreEqual("(int 10, string str, int[] 1)",
+			Assert.AreEqual(subClass.TestMethod4(10, "str", 1),
 				type.InvokeMember("TestMethod4", bindingInsFlags, PowerBinder.CastBinder, subClass,
 				new object[] { 10, "str", 1 }));
-			Assert.AreEqual("(int 10, string str, int[] 1)",
+			Assert.AreEqual(subClass.TestMethod4(10, "str", new int[] { 1 }),
 				type.InvokeMember("TestMethod4", bindingInsFlags, PowerBinder.CastBinder, subClass,
 				new object[] { 10, "str", new int[] { 1 } }));
-			Assert.AreEqual("(int 10, string str, int[] 1,2)",
+			Assert.AreEqual(subClass.TestMethod4(10, "str", 1, 2),
 				type.InvokeMember("TestMethod4", bindingInsFlags, PowerBinder.CastBinder, subClass,
 				new object[] { 10, "str", 1, 2 }));
-			Assert.AreEqual("<System.Boolean>(True, True)",
+			Assert.AreEqual(subClass.TestMethod4(true, true),
 				type.InvokeMember("TestMethod4", bindingInsFlags, PowerBinder.DefaultBinder, subClass,
 				new object[] { true, true }));
-			Assert.AreEqual("(string str, int 30)",
+			Assert.AreEqual(TestSubClass.TestMethod6(value2: 30, value1: "str"),
 				type.InvokeMember("TestMethod6", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 30, "str" }, null, null,
 				new string[] { "value2", "value1" }));
-			Assert.AreEqual("(string str, short 30)",
+			Assert.AreEqual(TestSubClass.TestMethod6(value2: (short)30, value1: "str"),
 				type.InvokeMember("TestMethod6", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { (short)30, "str" }, null, null,
 				new string[] { "value2", "value1" }));
-			Assert.AreEqual("(int 30, string str, string str2)",
+			Assert.AreEqual(TestSubClass.TestMethod6(value2: 30, value1: "str", value3: "str2"),
 				type.InvokeMember("TestMethod6", bindingOptFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 30, "str", "str2" }, null, null,
 				new string[] { "value2", "value1" }));

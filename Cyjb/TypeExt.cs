@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Cyjb
 {
@@ -15,53 +14,49 @@ namespace Cyjb
 		/// <summary>
 		/// 可以进行隐式类型转换的类型字典。
 		/// </summary>
-		private static readonly Dictionary<RuntimeTypeHandle, HashSet<RuntimeTypeHandle>> ConvertFromDict =
-			new Dictionary<RuntimeTypeHandle, HashSet<RuntimeTypeHandle>>() { 
-				{ typeof(short).TypeHandle, new HashSet<RuntimeTypeHandle>(){ typeof(sbyte).TypeHandle, typeof(byte).TypeHandle } },
-				{ typeof(ushort).TypeHandle, new HashSet<RuntimeTypeHandle>(){ typeof(char).TypeHandle, typeof(byte).TypeHandle } },
-				{ typeof(int).TypeHandle, new HashSet<RuntimeTypeHandle>(){ 
-					typeof(char).TypeHandle, typeof(sbyte).TypeHandle, typeof(byte).TypeHandle, 
-					typeof(short).TypeHandle, typeof(ushort).TypeHandle } },
-				{ typeof(uint).TypeHandle, new HashSet<RuntimeTypeHandle>(){ 
-					typeof(char).TypeHandle, typeof(byte).TypeHandle, typeof(ushort).TypeHandle } },
-				{ typeof(long).TypeHandle, new HashSet<RuntimeTypeHandle>(){ 
-					typeof(char).TypeHandle, typeof(sbyte).TypeHandle, typeof(byte).TypeHandle, 
-					typeof(short).TypeHandle, typeof(ushort).TypeHandle, typeof(int).TypeHandle, typeof(uint).TypeHandle } },
-				{ typeof(ulong).TypeHandle, new HashSet<RuntimeTypeHandle>(){ 
-					typeof(char).TypeHandle, typeof(byte).TypeHandle, typeof(ushort).TypeHandle, typeof(uint).TypeHandle } },
-				{ typeof(float).TypeHandle, new HashSet<RuntimeTypeHandle>(){ 
-					typeof(char).TypeHandle, typeof(sbyte).TypeHandle, typeof(byte).TypeHandle, typeof(short).TypeHandle, 
-					typeof(ushort).TypeHandle, typeof(int).TypeHandle, typeof(uint).TypeHandle, 
-					typeof(long).TypeHandle, typeof(ulong).TypeHandle } },
-				{ typeof(double).TypeHandle, new HashSet<RuntimeTypeHandle>(){ 
-					typeof(char).TypeHandle, typeof(sbyte).TypeHandle, typeof(byte).TypeHandle, typeof(short).TypeHandle, 
-					typeof(ushort).TypeHandle, typeof(int).TypeHandle, typeof(uint).TypeHandle, typeof(long).TypeHandle, 
-					typeof(ulong).TypeHandle, typeof(float).TypeHandle } },
-				{ typeof(decimal).TypeHandle, new HashSet<RuntimeTypeHandle>(){ 
-					typeof(char).TypeHandle, typeof(sbyte).TypeHandle, typeof(byte).TypeHandle, typeof(short).TypeHandle, 
-					typeof(ushort).TypeHandle, typeof(int).TypeHandle, typeof(uint).TypeHandle, 
-					typeof(long).TypeHandle, typeof(ulong).TypeHandle } },
+		internal static readonly Dictionary<TypeCode, HashSet<TypeCode>> ImplicitNumericConversions =
+			new Dictionary<TypeCode, HashSet<TypeCode>>() { 
+				{ TypeCode.Int16, new HashSet<TypeCode>(){ TypeCode.SByte, TypeCode.Byte } },
+				{ TypeCode.UInt16, new HashSet<TypeCode>(){ TypeCode.Char, TypeCode.Byte } },
+				{ TypeCode.Int32, new HashSet<TypeCode>(){ TypeCode.Char, TypeCode.SByte, TypeCode.Byte,
+					TypeCode.Int16, TypeCode.UInt16 } },
+				{ TypeCode.UInt32, new HashSet<TypeCode>(){ TypeCode.Char, TypeCode.Byte, TypeCode.UInt16 } },
+				{ TypeCode.Int64, new HashSet<TypeCode>(){ TypeCode.Char, TypeCode.SByte, TypeCode.Byte, 
+					TypeCode.Int16, TypeCode.UInt16, TypeCode.Int32, TypeCode.UInt32 } },
+				{ TypeCode.UInt64, new HashSet<TypeCode>(){ TypeCode.Char, TypeCode.Byte, TypeCode.UInt16, TypeCode.UInt32 } },
+				{ TypeCode.Single, new HashSet<TypeCode>(){ TypeCode.Char, TypeCode.SByte, TypeCode.Byte, 
+					TypeCode.Int16, TypeCode.UInt16, TypeCode.Int32, TypeCode.UInt32, TypeCode.Int64, TypeCode.UInt64 } },
+				{ TypeCode.Double, new HashSet<TypeCode>(){ TypeCode.Char, TypeCode.SByte, TypeCode.Byte, TypeCode.Int16,
+					TypeCode.UInt16, TypeCode.Int32, TypeCode.UInt32, TypeCode.Int64, TypeCode.UInt64, TypeCode.Single } },
+				{ TypeCode.Decimal, new HashSet<TypeCode>(){ TypeCode.Char, TypeCode.SByte, TypeCode.Byte,
+					TypeCode.Int16, TypeCode.UInt16, TypeCode.Int32, TypeCode.UInt32, TypeCode.Int64, TypeCode.UInt64 } },
 		};
 		/// <summary>
 		/// 确定当前的 <see cref="System.Type"/> 的实例是否可以从指定 <see cref="System.Type"/> 
-		/// 的实例进行内置隐式类型转换。
+		/// 的实例进行标准隐式类型转换。
 		/// </summary>
 		/// <param name="type">要判断的实例。</param>
 		/// <param name="fromType">要与当前类型进行比较的类型。</param>
 		/// <returns>如果当前 <see cref="System.Type"/> 可以从 <paramref name="fromType"/>
-		/// 的实例分配或进行内置隐式类型转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private static bool IsAssignableFromEx(Type type, Type fromType)
+		/// 的实例进行标准隐式类型转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		internal static bool IsStandardImplicitFrom(this Type type, Type fromType)
 		{
-			if (type.IsAssignableFrom(fromType))
+			// 对 Nullable<T> 的支持。
+			if (!type.IsValueType || IsNullableType(ref type))
 			{
-				return true;
+				fromType = GetNonNullableType(fromType);
 			}
-			HashSet<RuntimeTypeHandle> typeSet;
-			if (ConvertFromDict.TryGetValue(type.TypeHandle, out typeSet))
+			// 判断隐式数值转换。
+			HashSet<TypeCode> typeSet;
+			if (!type.IsEnum && ImplicitNumericConversions.TryGetValue(Type.GetTypeCode(type), out typeSet))
 			{
-				return typeSet.Contains(fromType.TypeHandle);
+				if (!fromType.IsEnum && typeSet.Contains(Type.GetTypeCode(fromType)))
+				{
+					return true;
+				}
 			}
-			return false;
+			// 判断隐式引用转换和装箱转换。
+			return type.IsAssignableFrom(fromType);
 		}
 		/// <summary>
 		/// 确定当前的 <see cref="System.Type"/> 的实例是否可以从指定 <see cref="System.Type"/> 
@@ -81,84 +76,76 @@ namespace Cyjb
 			if (type.IsByRef) { type = type.GetElementType(); }
 			if (fromType.IsByRef) { fromType = type.GetElementType(); }
 			// 总是可以隐式类型转换为 Object。
-			if (type.TypeHandle.Equals(typeof(object).TypeHandle))
+			if (type.Equals(typeof(object)))
 			{
 				return true;
 			}
-			// 对 Nullable<T> 的支持。
-			if (NullableAssignableFrom(ref type))
-			{
-				NullableAssignableFrom(ref fromType);
-			}
-			// 判断是否可以从实例分配。
-			if (IsAssignableFromEx(type, fromType))
+			// 判断是否可以进行标准隐式转换。
+			if (IsStandardImplicitFrom(type, fromType))
 			{
 				return true;
 			}
 			// 对隐式类型转换运算符进行判断。
-			if (ConversionCache.GetTypeOperators(type.TypeHandle).Any(
-				pair => ((pair.Value.ConversionType & ConversionType.ImplicitFrom) == ConversionType.ImplicitFrom) &&
-					IsAssignableFromEx(Type.GetTypeFromHandle(pair.Key), fromType)))
+			// 处理提升转换运算符。
+			Type nonNullalbeType, nonNullableFromType;
+			if (IsNullableType(type, out nonNullalbeType) &&
+				IsNullableType(fromType, out nonNullableFromType))
 			{
-				return true;
+				type = nonNullalbeType;
+				fromType = nonNullableFromType;
 			}
-			if (ConversionCache.GetTypeOperators(fromType.TypeHandle).Any(
-				pair => ((pair.Value.ConversionType & ConversionType.ImplicitTo) == ConversionType.ImplicitTo) &&
-					IsAssignableFromEx(type, Type.GetTypeFromHandle(pair.Key))))
-			{
-				return true;
-			}
-			return false;
+			return ConversionCache.GetImplicitConversion(fromType, type) != null;
 		}
 
 		#endregion // 是否可以进行隐式类型转换
 
-		#region 是否可以进行强制类型转换
+		#region 是否可以进行显式类型转换
 
 		/// <summary>
-		/// 可以进行强制类型转换的类型集合。
+		/// 可以进行显式数值转换或枚举转换的类型集合。
 		/// </summary>
-		/// <remarks>内置的强制类型转换是 Char, SByte, Byte, Int16, UInt16, Int32, UInt32, 
-		/// Int64, UInt64, Single, Double 和 Decimal 之间的相互转换，没必要也是用字典来表示，用集合同样可以。</remarks>
-		private static readonly HashSet<RuntimeTypeHandle> CastFromSet = new HashSet<RuntimeTypeHandle>(){ 
-			typeof(char).TypeHandle, typeof(sbyte).TypeHandle, typeof(byte).TypeHandle, typeof(short).TypeHandle, 
-			typeof(ushort).TypeHandle, typeof(int).TypeHandle, typeof(uint).TypeHandle, typeof(long).TypeHandle, 
-			typeof(ulong).TypeHandle, typeof(float).TypeHandle, typeof(double).TypeHandle, typeof(decimal).TypeHandle };
+		internal static readonly HashSet<TypeCode> ExplicitNumericConversions = new HashSet<TypeCode>(){ 
+				TypeCode.Char, TypeCode.SByte, TypeCode.Byte, TypeCode.Int16, TypeCode.UInt16, TypeCode.Int32,
+				TypeCode.UInt32, TypeCode.Int64, TypeCode.UInt64, TypeCode.Single, TypeCode.Double, TypeCode.Decimal };
 		/// <summary>
 		/// 确定当前的 <see cref="System.Type"/> 的实例是否可以从指定 <see cref="System.Type"/> 
-		/// 的实例进行内置强制类型转换。
+		/// 的实例进行标准显式类型转换。
 		/// </summary>
-		/// <param name="type">要判断的类型。</param>
+		/// <param name="type">要判断的实例。</param>
 		/// <param name="fromType">要与当前类型进行比较的类型。</param>
 		/// <returns>如果当前 <see cref="System.Type"/> 可以从 <paramref name="fromType"/>
-		/// 的实例分配或进行内置强制类型转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private static bool IsAssignableFromCastEx(Type type, Type fromType)
+		/// 的实例进行标准显式类型转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		internal static bool IsStandardExplicitFrom(this Type type, Type fromType)
 		{
-			if (type.IsAssignableFrom(fromType) || fromType.IsAssignableFrom(type))
+			// 判断显式数值转换。
+			if (!type.IsEnum && ExplicitNumericConversions.Contains(Type.GetTypeCode(type)) &&
+				!fromType.IsEnum && ExplicitNumericConversions.Contains(Type.GetTypeCode(fromType)))
 			{
 				return true;
 			}
-			return CastFromSet.Contains(type.TypeHandle) && CastFromSet.Contains(fromType.TypeHandle);
+			// 判断正向和反向的隐式引用转换和装箱转换。
+			return (type.IsAssignableFrom(fromType) || fromType.IsAssignableFrom(type));
 		}
 		/// <summary>
-		/// 确定当前的 <see cref="System.Type"/> 是否属于合法的枚举基础类型。
+		/// 确定当前的 <see cref="System.Type"/> 的实例是否可以从指定 <see cref="System.Type"/> 
+		/// 的实例进行显式枚举转换。
 		/// </summary>
-		/// <param name="type">要判断的类型。</param>
-		/// <returns>如果当前 <see cref="System.Type"/> 是合法的枚举基础类型，则为 <c>true</c>；
-		/// 否则为 <c>false</c>。</returns>
-		private static bool IsEnumUnderlyingType(Type type)
+		/// <param name="type">要判断的实例。</param>
+		/// <param name="fromType">要与当前类型进行比较的类型。</param>
+		/// <returns>如果当前 <see cref="System.Type"/> 可以从 <paramref name="fromType"/>
+		/// 的实例进行显式枚举转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		internal static bool IsEnumExplicitFrom(this Type type, Type fromType)
 		{
-			switch (Type.GetTypeCode(type))
+			if (type.IsEnum)
 			{
-				case TypeCode.Byte:
-				case TypeCode.SByte:
-				case TypeCode.Int16:
-				case TypeCode.UInt16:
-				case TypeCode.Int32:
-				case TypeCode.UInt32:
-				case TypeCode.Int64:
-				case TypeCode.UInt64:
+				if (fromType.IsEnum || ExplicitNumericConversions.Contains(Type.GetTypeCode(fromType)))
+				{
 					return true;
+				}
+			}
+			else if (fromType.IsEnum && ExplicitNumericConversions.Contains(Type.GetTypeCode(type)))
+			{
+				return true;
 			}
 			return false;
 		}
@@ -170,7 +157,7 @@ namespace Cyjb
 		/// <param name="fromType">要与当前类型进行比较的类型。</param>
 		/// <returns>如果当前 <see cref="System.Type"/> 可以从 <paramref name="fromType"/>
 		/// 的实例分配或进行强制类型转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		public static bool IsCastableFrom(this Type type, Type fromType)
+		public static bool IsExplicitFrom(this Type type, Type fromType)
 		{
 			if (type == null || fromType == null)
 			{
@@ -179,57 +166,29 @@ namespace Cyjb
 			// 对引用类型的支持。
 			if (type.IsByRef) { type = type.GetElementType(); }
 			if (fromType.IsByRef) { fromType = type.GetElementType(); }
-			// 总是可以与 Object 进行强制类型转换。
-			if (type.TypeHandle.Equals(typeof(object).TypeHandle) ||
-				fromType.TypeHandle.Equals(typeof(object).TypeHandle))
+			// 总是可以与 Object 进行显示类型转换。
+			if (type.Equals(typeof(object)) || fromType.Equals(typeof(object)))
 			{
 				return true;
 			}
 			// 对 Nullable<T> 的支持。
-			NullableAssignableFrom(ref type);
-			NullableAssignableFrom(ref fromType);
-			// 对枚举的支持。
-			if (type.IsEnum)
-			{
-				if (fromType.IsEnum || IsEnumUnderlyingType(fromType))
-				{
-					return true;
-				}
-			}
-			else if (fromType.IsEnum && IsEnumUnderlyingType(type))
+			IsNullableType(ref type);
+			IsNullableType(ref fromType);
+			// 显式枚举转换。
+			if (type.IsEnumExplicitFrom(fromType))
 			{
 				return true;
 			}
-			// 判断是否可以从实例分配，强制类型转换允许沿着继承链反向转换。
-			if (IsAssignableFromCastEx(type, fromType))
+			// 判断是否可以进行标准显式转换。
+			if (IsStandardExplicitFrom(type, fromType))
 			{
 				return true;
 			}
-			else if (fromType.IsEnum)
-			{
-				if (type.TypeHandle.Equals(typeof(Enum).TypeHandle))
-				{
-					return true;
-				}
-				fromType = Enum.GetUnderlyingType(fromType);
-			}
-			// 对强制类型转换运算符进行判断。
-			if (ConversionCache.GetTypeOperators(type.TypeHandle).Any(
-				pair => ((pair.Value.ConversionType & ConversionType.From) != 0) &&
-					IsAssignableFromCastEx(Type.GetTypeFromHandle(pair.Key), fromType)))
-			{
-				return true;
-			}
-			if (ConversionCache.GetTypeOperators(fromType.TypeHandle).Any(
-				pair => ((pair.Value.ConversionType & ConversionType.To) != 0) &&
-					IsAssignableFromCastEx(type, Type.GetTypeFromHandle(pair.Key))))
-			{
-				return true;
-			}
-			return false;
+			// 对显式类型转换运算符进行判断。
+			return ConversionCache.GetExplicitConversion(fromType, type) != null;
 		}
 
-		#endregion // 是否可以进行强制类型转换
+		#endregion // 是否可以进行显式类型转换
 
 		#region 是否可分配到开放泛型类型
 
@@ -255,11 +214,11 @@ namespace Cyjb
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public static bool OpenGenericIsAssignableFrom(this Type type, Type fromType, out Type[] genericArguments)
 		{
-			if (type != null && fromType != null && type.IsGenericType)
+			if (type != null && fromType != null && type.IsGenericTypeDefinition)
 			{
 				if (type.IsInterface == fromType.IsInterface)
 				{
-					if (InInheritanceChain(type, fromType, out genericArguments))
+					if (type.InInheritanceChain(fromType, out genericArguments))
 					{
 						return true;
 					}
@@ -270,7 +229,7 @@ namespace Cyjb
 					Type[] interfaces = fromType.GetInterfaces();
 					for (int i = 0; i < interfaces.Length; i++)
 					{
-						if (InInheritanceChain(type, interfaces[i], out genericArguments))
+						if (type.InInheritanceChain(interfaces[i], out genericArguments))
 						{
 							return true;
 						}
@@ -281,13 +240,42 @@ namespace Cyjb
 			return false;
 		}
 		/// <summary>
+		/// 确定指定 <see cref="System.Type"/> 是否是 Nullable&lt;&gt; 泛型。
+		/// </summary>
+		/// <param name="type">要判断是否可空类型的类型。</param>
+		/// <returns>如果 <paramref name="type"/> 是可空类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		internal static bool IsNullableType(this Type type)
+		{
+			return (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
+		}
+		/// <summary>
+		/// 确定指定 <see cref="System.Type"/> 是否是 Nullable&lt;&gt; 泛型，如果是则返回泛型的参数。
+		/// </summary>
+		/// <param name="type">要判断是否可空类型的类型。</param>
+		/// <param name="nonNullalbeType">如果 <paramref name="type"/> 是可空类型，则返回泛型类型参数。
+		/// 否则为 <paramref name="type"/>。</param>
+		/// <returns>如果 <paramref name="type"/> 是可空类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		internal static bool IsNullableType(this Type type, out Type nonNullalbeType)
+		{
+			if (IsNullableType(type))
+			{
+				nonNullalbeType = type.GetGenericArguments()[0];
+				return true;
+			}
+			else
+			{
+				nonNullalbeType = type;
+				return false;
+			}
+		}
+		/// <summary>
 		/// 确定指定 <see cref="System.Type"/> 是否是 Nullable&lt;&gt; 泛型，如果是则返回泛型的参数。
 		/// </summary>
 		/// <param name="type">要判断是否可空类型的类型。如果是可空类型，则返回泛型类型参数；否则不变。</param>
 		/// <returns>如果 <paramref name="type"/> 是可空类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		internal static bool NullableAssignableFrom(ref Type type)
+		internal static bool IsNullableType(ref Type type)
 		{
-			if (type.IsGenericType && type.GetGenericTypeDefinition().TypeHandle.Equals(typeof(Nullable<>).TypeHandle))
+			if (IsNullableType(type))
 			{
 				type = type.GetGenericArguments()[0];
 				return true;
@@ -298,6 +286,19 @@ namespace Cyjb
 			}
 		}
 		/// <summary>
+		/// 确定指定 <see cref="System.Type"/> 是否是 Nullable&lt;&gt; 泛型，如果是则返回泛型的参数。
+		/// </summary>
+		/// <param name="type">要判断是否可空类型的类型。</param>
+		/// <returns>如果 <paramref name="type"/> 是可空类型，则为泛型的参数；否则为原类型。</returns>
+		internal static Type GetNonNullableType(this Type type)
+		{
+			if (IsNullableType(type))
+			{
+				return type.GetGenericArguments()[0];
+			}
+			return type;
+		}
+		/// <summary>
 		/// 确定当前的开放泛型类型是否在指定 <see cref="System.Type"/> 类型的继承链中，并返回泛型的参数。
 		/// </summary>
 		/// <param name="type">要判断的开放泛型类型。</param>
@@ -305,7 +306,7 @@ namespace Cyjb
 		/// <param name="genericArguments">如果在继承链中，则返回泛型类型参数；否则返回 <c>null</c>。</param>
 		/// <returns>如果当前的开放泛型类型在 <paramref name="fromType"/> 的继承链中，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private static bool InInheritanceChain(Type type, Type fromType, out Type[] genericArguments)
+		private static bool InInheritanceChain(this Type type, Type fromType, out Type[] genericArguments)
 		{
 			// 沿着 fromType 的继承链向上查找。
 			while (fromType != null)
