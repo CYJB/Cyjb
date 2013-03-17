@@ -29,7 +29,7 @@ namespace Cyjb
 		{
 			Type enumType = value.GetType();
 			// 寻找枚举值的组合。
-			EnumCache cache = GetEnumCache(enumType.TypeHandle);
+			EnumCache cache = GetEnumCache(enumType);
 			ulong valueUL = ToUInt64(value);
 			int idx = Array.BinarySearch(cache.Values, valueUL);
 			if (idx >= 0)
@@ -130,7 +130,7 @@ namespace Cyjb
 		{
 			TextValuePairCollection enumList = new TextValuePairCollection();
 			// 这里使用自己的缓存。
-			EnumCache cache = GetEnumCache(enumType.TypeHandle);
+			EnumCache cache = GetEnumCache(enumType);
 			ulong[] values = cache.Values;
 			string[] names = useDescription ? cache.Descriptions : cache.Names;
 			for (int i = 0; i < values.Length; i++)
@@ -165,7 +165,7 @@ namespace Cyjb
 			Type enumType = typeof(TEnum);
 			TextValuePairCollection<TEnum> enumList = new TextValuePairCollection<TEnum>();
 			// 这里使用自己的缓存。
-			EnumCache cache = GetEnumCache(enumType.TypeHandle);
+			EnumCache cache = GetEnumCache(enumType);
 			ulong[] values = cache.Values;
 			string[] names = useDescription ? cache.Descriptions : cache.Names;
 			for (int i = 0; i < values.Length; i++)
@@ -286,7 +286,7 @@ namespace Cyjb
 				return Enum.ToObject(enumType, tmpValue);
 			}
 			// 尝试对描述信息进行解析。
-			EnumCache cache = GetEnumCache(enumType.TypeHandle);
+			EnumCache cache = GetEnumCache(enumType);
 			StringComparison comparison = ignoreCase ?
 				StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 			ulong valueUL = 0;
@@ -465,22 +465,21 @@ namespace Cyjb
 		/// <summary>
 		/// 枚举类型的缓存。
 		/// </summary>
-		private static readonly ICache<RuntimeTypeHandle, EnumCache> EnumCaches =
-			CacheFactory.CreateCache<RuntimeTypeHandle, EnumCache>("Cyjb.EnumDescriptionCache") ??
-			new LruCache<RuntimeTypeHandle, EnumCache>(100);
+		private static readonly ICache<Type, EnumCache> EnumCaches =
+			CacheFactory.CreateCache<Type, EnumCache>("Cyjb.EnumDescriptionCache") ??
+			new LruCache<Type, EnumCache>(100);
 		/// <summary>
 		/// 返回枚举的缓存。
 		/// </summary>
-		/// <param name="typeHandle">要获取缓存的枚举类型。</param>
+		/// <param name="enumType">要获取缓存的枚举类型。</param>
 		/// <value>枚举的缓存。</value>
-		private static EnumCache GetEnumCache(RuntimeTypeHandle typeHandle)
+		private static EnumCache GetEnumCache(Type enumType)
 		{
-			return EnumCaches.GetOrAdd(typeHandle, type =>
+			return EnumCaches.GetOrAdd(enumType, type =>
 			{
 				// 返回枚举类型的值、常数名称和相应描述的列表。
 				// 直接使用反射获取数据，而不是 Enum 类的相关方法。
-				Type enumType = Type.GetTypeFromHandle(type);
-				FieldInfo[] fields = enumType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+				FieldInfo[] fields = type.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
 				int len = fields.Length;
 				ulong[] values = new ulong[len];
 				for (int i = 0; i < len; i++)
@@ -513,7 +512,7 @@ namespace Cyjb
 					descs = names;
 				}
 				// 将是否包含 FlagsAttribute 一并缓存，能有效的提高性能。
-				return new EnumCache(enumType.IsDefined(typeof(FlagsAttribute), false), hasDesc, values, names, descs);
+				return new EnumCache(type.IsDefined(typeof(FlagsAttribute), false), hasDesc, values, names, descs);
 			});
 		}
 		/// <summary>
