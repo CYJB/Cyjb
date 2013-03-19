@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 
@@ -21,7 +22,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// 获取空的只读泛型列表。
 		/// </summary>
 		/// <value>空的只读泛型列表。</value>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
+		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
 		public static IList<T> Empty
 		{
 			get

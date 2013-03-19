@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Cyjb.Collections
 {
@@ -15,6 +16,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 返回一个默认的相等比较器。。
 		/// </summary>
+		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
 		public new static ListEqualityComparer<T> Default
 		{
 			get
