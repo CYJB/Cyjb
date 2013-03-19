@@ -22,7 +22,7 @@ namespace UnitTestCyjb
 			{
 				if (actual != null)
 				{
-					Assert.Fail("实际的数组不为 null");
+					Assert.Fail("实际的数组 {{{0}}} 不为 null", string.Join(", ", actual));
 				}
 			}
 			else
@@ -41,7 +41,7 @@ namespace UnitTestCyjb
 					{
 						if (!EqualityComparer<T>.Default.Equals(expected[i], actual[i]))
 						{
-							Assert.Fail("期望得到 [{0}]，而实际得到的是 [{1}]",
+							Assert.Fail("期望得到 {{{0}}}，而实际得到的是 {{{1}}}",
 								string.Join(", ", expected), string.Join(", ", actual));
 						}
 					}

@@ -65,6 +65,12 @@ namespace UnitTestCyjb
 				method.GenericArgumentsInferences(typeof(string), typeof(string), typeof(object), typeof(object)));
 			AssertExt.AreEqual(new Type[] { typeof(string) },
 				method.GenericArgumentsInferences(typeof(string), typeof(string[])));
+			AssertExt.AreEqual(new Type[] { typeof(string[]) },
+				method.GenericArgumentsInferences(typeof(string[]), typeof(string[])));
+			AssertExt.AreEqual(new Type[] { typeof(string[][]) },
+				method.GenericArgumentsInferences(typeof(string[][]), typeof(string[][])));
+			AssertExt.AreEqual(new Type[] { typeof(string[]) },
+				method.GenericArgumentsInferences(typeof(string[]), typeof(string[][])));
 			AssertExt.AreEqual(new Type[] { typeof(string) },
 				method.GenericArgumentsInferences(typeof(string), typeof(string)));
 			AssertExt.AreEqual(new Type[] { typeof(string) }, method.GenericArgumentsInferences(typeof(string)));

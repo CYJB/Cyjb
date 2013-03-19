@@ -424,19 +424,33 @@ namespace Cyjb
 				boundSets.Add(genericArgs[i], new BoundSet());
 			}
 			int len = paramTypes.Length;
+			// params T 数组参数。
+			Type paramElementType = null;
 			if (paramArrayType != null)
 			{
 				// 最后一个参数需要对 params 参数进行特殊处理。
 				len--;
 				if (paramTypes[len].ContainsGenericParameters && paramOrder[len] < types.Length)
 				{
-					// params 参数需要从数组元素类型到多个实参做类型推断。
-					for (int i = len; i < types.Length; i++)
+					if (len + 1 == types.Length)
 					{
-						if (!TypeInferences(paramArrayType, types[paramOrder[len]], boundSets))
+						// 如果实参形参数量相等，需要对 params T 数组进行特殊判断。
+						paramArrayType.GetArrayDepth(out paramElementType);
+						if (!paramElementType.IsGenericParameter)
 						{
-							// 类型推断失败。
-							return null;
+							paramElementType = null;
+						}
+					}
+					if (paramElementType == null)
+					{
+						// params 参数需要从数组元素类型到多个实参做类型推断。
+						for (int i = len; i < types.Length; i++)
+						{
+							if (!TypeInferences(paramArrayType, types[paramOrder[len]], boundSets))
+							{
+								// 类型推断失败。
+								return null;
+							}
 						}
 					}
 				}
@@ -452,7 +466,35 @@ namespace Cyjb
 					}
 				}
 			}
-			return FixTypeArguments(genericArgs, boundSets);
+			len = paramTypes.Length - 1;
+			Dictionary<Type, BoundSet> boundSetsClone = null;
+			if (paramElementType != null)
+			{
+				// 需要复制界限集。
+				boundSetsClone = new Dictionary<Type, BoundSet>();
+				foreach (KeyValuePair<Type, BoundSet> pair in boundSets)
+				{
+					boundSetsClone.Add(pair.Key, pair.Value.Clone());
+				}
+				// 首先尝试对 paramArrayType 进行推断。
+				if (!TypeInferences(paramArrayType, types[paramOrder[len]], boundSets))
+				{
+					// 类型推断失败。
+					return null;
+				}
+			}
+			Type[] args = FixTypeArguments(genericArgs, boundSets);
+			if (args == null && paramElementType != null)
+			{
+				// 再次尝试对 paramArrayType[] 进行推断。
+				if (!TypeInferences(paramTypes[len], types[paramOrder[len]], boundSetsClone))
+				{
+					// 类型推断失败。
+					return null;
+				}
+				args = FixTypeArguments(genericArgs, boundSetsClone);
+			}
+			return args;
 		}
 		/// <summary>
 		/// 根据给定的界限集固定类型参数。
@@ -464,91 +506,15 @@ namespace Cyjb
 		private static Type[] FixTypeArguments(Type[] genericArgs, IDictionary<Type, BoundSet> boundSets)
 		{
 			Type[] result = new Type[genericArgs.Length];
-			List<Type> tempList = new List<Type>();
 			for (int i = 0; i < genericArgs.Length; i++)
 			{
-				BoundSet boundSet = boundSets[genericArgs[i]];
-				if (boundSet.ExactBound != null)
+				result[i] = boundSets[genericArgs[i]].Inference();
+				if (result[i] == null)
 				{
-					// 检测精确界限是否满足上限和下限的要求。
-					if (CanFixed(boundSet, boundSet.ExactBound))
-					{
-						result[i] = boundSet.ExactBound;
-					}
-					else
-					{
-						return null;
-					}
-				}
-				else
-				{
-					tempList.Clear();
-					tempList.AddRange(new HashSet<Type>(boundSet.LowerBounds.Concat(boundSet.UpperBounds))
-						.Where(type => CanFixed(boundSet, type)));
-					if (tempList.Count == 0)
-					{
-						// 没有找到合适的推断结果。
-						return null;
-					}
-					else if (tempList.Count == 1)
-					{
-						// 找到唯一的推断结果。
-						result[i] = tempList[0];
-					}
-					else
-					{
-						// 进一步进行推断。
-						UniqueValue<Type> uType = new UniqueValue<Type>();
-						int cnt = tempList.Count;
-						for (int j = 0; j < cnt; j++)
-						{
-							int k = 0;
-							for (; k < cnt; k++)
-							{
-								if (k == j) { continue; }
-								if (!tempList[j].IsImplicitFrom(tempList[k]))
-								{
-									break;
-								}
-							}
-							if (k == cnt) { uType.Value = tempList[j]; }
-						}
-						if (uType.IsUnique)
-						{
-							result[i] = uType.Value;
-						}
-						else
-						{
-							// 推断失败。
-							return null;
-						}
-					}
-				}
-				if (boundSet.ReferenceType && result[i].IsValueType)
-				{
-					// 判断引用类型约束。
 					return null;
 				}
 			}
 			return result;
-		}
-		/// <summary>
-		/// 获取指定的类型能否根据给定的上限集和下限集中被固定。
-		/// </summary>
-		/// <param name="boundSet">界限集。</param>
-		/// <param name="testType">要判断能否固定的类型。</param>
-		/// <returns>如果给定的类型可以固定，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private static bool CanFixed(BoundSet boundSet, Type testType)
-		{
-			foreach (Type type in boundSet.LowerBounds)
-			{
-				if (!testType.IsImplicitFrom(type)) { return false; }
-			}
-			foreach (Type type in boundSet.UpperBounds)
-			{
-				if (!type.IsImplicitFrom(testType)) { return false; }
-			}
-			return true;
 		}
 		/// <summary>
 		/// 对类型进行推断。
@@ -592,15 +558,7 @@ namespace Cyjb
 			Type tempParamType;
 			if (paramType.IsGenericParameter)
 			{
-				BoundSet boundSet = boundSets[paramType];
-				if (boundSet.ExactBound == null)
-				{
-					boundSet.ExactBound = type;
-				}
-				else if (boundSet.ExactBound != type)
-				{
-					return false;
-				}
+				return boundSets[paramType].AddExactBound(type);
 			}
 			else if (paramType.IsNullableType(out tempParamType))
 			{
@@ -643,7 +601,7 @@ namespace Cyjb
 			Type tempParamType = null, tempType = null;
 			if (paramType.IsGenericParameter)
 			{
-				boundSets[paramType].LowerBounds.Add(type);
+				return boundSets[paramType].AddLowerBound(type);
 			}
 			else if (paramType.IsNullableType(out tempParamType))
 			{
@@ -717,7 +675,7 @@ namespace Cyjb
 			Type tempParamType = null, tempType = null;
 			if (paramType.IsGenericParameter)
 			{
-				boundSets[paramType].UpperBounds.Add(type);
+				return boundSets[paramType].AddUpperBound(type);
 			}
 			else if (paramType.IsNullableType(out tempParamType))
 			{
@@ -787,19 +745,177 @@ namespace Cyjb
 			/// <summary>
 			/// 类型推断的下限界限集。
 			/// </summary>
-			public HashSet<Type> LowerBounds = new HashSet<Type>();
-			/// <summary>
-			/// 类型推断的精确界限（这个需要是唯一的）。
-			/// </summary>
-			public Type ExactBound = null;
+			private HashSet<Type> lowerBounds = new HashSet<Type>();
 			/// <summary>
 			/// 类型推断的上限界限集。
 			/// </summary>
-			public HashSet<Type> UpperBounds = new HashSet<Type>();
+			private HashSet<Type> upperBounds = new HashSet<Type>();
+			/// <summary>
+			/// 类型推断的精确界限（这个需要是唯一的）。
+			/// </summary>
+			private Type exactBound = null;
 			/// <summary>
 			/// 是否要求类型形参必须是泛型类型。
 			/// </summary>
 			public bool ReferenceType = false;
+			/// <summary>
+			/// 向类型推断的精确界限集中添加指定的类型。
+			/// </summary>
+			/// <param name="type">要添加的类型。</param>
+			/// <returns>如果添加成功，则为 <c>true</c>；如果产生了冲突，则为 <c>false</c>。</returns>
+			public bool AddExactBound(Type type)
+			{
+				if (exactBound == null)
+				{
+					if (!CanFixed(type))
+					{
+						// 与现有的界限冲突。
+						return false;
+					}
+					lowerBounds.Clear();
+					upperBounds.Clear();
+					exactBound = type;
+				}
+				else if (exactBound != type)
+				{
+					return false;
+				}
+				return true;
+			}
+			/// <summary>
+			/// 向类型推断的下限界限集中添加指定的类型。
+			/// </summary>
+			/// <param name="type">要添加的类型。</param>
+			/// <returns>如果添加成功，则为 <c>true</c>；如果产生了冲突，则为 <c>false</c>。</returns>
+			public bool AddLowerBound(Type type)
+			{
+				if (exactBound == null)
+				{
+					lowerBounds.Add(type);
+				}
+				else if (!exactBound.IsImplicitFrom(type))
+				{
+					// 与精确界限冲突。
+					return false;
+				}
+				return true;
+			}
+			/// <summary>
+			/// 向类型推断的上限界限集中添加指定的类型。
+			/// </summary>
+			/// <param name="type">要添加的类型。</param>
+			/// <returns>如果添加成功，则为 <c>true</c>；如果产生了冲突，则为 <c>false</c>。</returns>
+			public bool AddUpperBound(Type type)
+			{
+				if (exactBound == null)
+				{
+					upperBounds.Add(type);
+				}
+				else if (!type.IsImplicitFrom(exactBound))
+				{
+					// 与精确界限冲突。
+					return false;
+				}
+				return true;
+			}
+			/// <summary>
+			/// 返回当前类型的复制。
+			/// </summary>
+			/// <returns>当前类型的复制。</returns>
+			public BoundSet Clone()
+			{
+				BoundSet newSet = new BoundSet();
+				if (this.exactBound == null)
+				{
+					newSet.lowerBounds.UnionWith(this.lowerBounds);
+					newSet.upperBounds.UnionWith(this.upperBounds);
+				}
+				else
+				{
+					newSet.exactBound = this.exactBound;
+				}
+				newSet.ReferenceType = this.ReferenceType;
+				return newSet;
+			}
+			/// <summary>
+			/// 推断当前界限集所限定的类型参数。
+			/// </summary>
+			/// <returns>如果成功推断当前界限集的的类型参数，则为类型参数；
+			/// 如果推断失败，则为 <c>null</c>。</returns>
+			public Type Inference()
+			{
+				Type result = null;
+				if (exactBound == null)
+				{
+					List<Type> list = new List<Type>(new HashSet<Type>(lowerBounds.Concat(upperBounds))
+						.Where(type => this.CanFixed(type)));
+					if (list.Count == 0)
+					{
+						// 没有找到合适的推断结果。
+						return null;
+					}
+					else if (list.Count == 1)
+					{
+						// 找到唯一的推断结果。
+						result = list[0];
+					}
+					else
+					{
+						// 进一步进行推断。
+						UniqueValue<Type> uType = new UniqueValue<Type>();
+						int cnt = list.Count;
+						for (int j = 0; j < cnt; j++)
+						{
+							int k = 0;
+							for (; k < cnt; k++)
+							{
+								if (k == j) { continue; }
+								if (!list[j].IsImplicitFrom(list[k]))
+								{
+									break;
+								}
+							}
+							if (k == cnt) { uType.Value = list[j]; }
+						}
+						if (uType.IsUnique)
+						{
+							result = uType.Value;
+						}
+						else
+						{
+							// 推断失败。
+							return null;
+						}
+					}
+				}
+				else
+				{
+					result = exactBound;
+				}
+				// 判断引用类型约束。
+				if (ReferenceType && result.IsValueType)
+				{
+					return null;
+				}
+				return result;
+			}
+			/// <summary>
+			/// 判断指定的类型能否根据给定的上限集和下限集中被固定。
+			/// </summary>
+			/// <param name="testType">要判断能否固定的类型。</param>
+			/// <returns>如果给定的类型可以固定，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+			private bool CanFixed(Type testType)
+			{
+				foreach (Type type in lowerBounds)
+				{
+					if (!testType.IsImplicitFrom(type)) { return false; }
+				}
+				foreach (Type type in upperBounds)
+				{
+					if (!type.IsImplicitFrom(testType)) { return false; }
+				}
+				return true;
+			}
 		}
 
 		#endregion // 泛型参数推断
@@ -817,6 +933,23 @@ namespace Cyjb
 				depth++;
 				type = type.GetElementType();
 			}
+			return depth;
+		}
+		/// <summary>
+		/// 返回获取类型的数组深度和数组元素类型。
+		/// </summary>
+		/// <param name="type">要获取数组深度的类型。</param>
+		/// <param name="elementType">数组元素的类型。</param>
+		/// <returns>如果给定类型是数组，则为数组的深度；否则为 <c>0</c>。</returns>
+		internal static int GetArrayDepth(this Type type, out Type elementType)
+		{
+			int depth = 0;
+			while (type.IsArray)
+			{
+				depth++;
+				type = type.GetElementType();
+			}
+			elementType = type;
 			return depth;
 		}
 		/// <summary>

@@ -47,6 +47,9 @@
   <ItemGroup>
     <Compile Include="ArrayExt.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Collections\ListEqualityComparer`1.cs" />
+    <Compile Include="ConversionMethod.cs" />
+    <Compile Include="MethodExt.cs" />
     <Compile Include="PowerBinder.cs" />
     <Compile Include="CharExt.cs" />
     <Compile Include="Collections\ArrayAdapter`1.cs" />
@@ -56,14 +59,13 @@
     <Compile Include="Configurations\ConfigurationElementCollection`1.cs" />
     <Compile Include="Configurations\ConfigurationElementCollection`2.cs" />
     <Compile Include="ConversionCache.cs" />
-    <Compile Include="ConversionMethod.cs" />
-    <Compile Include="ConversionType.cs" />
     <Compile Include="ConvertExt.cs" />
     <Compile Include="EnumerableExt.cs" />
     <Compile Include="EnumExt.cs" />
     <Compile Include="IntegerExt.cs" />
     <Compile Include="RandomExt.cs" />
     <Compile Include="TypeExt.cs" />
+    <Compile Include="UniqueValue`1.cs" />
     <Compile Include="Utility\CacheCreateExceptionEventArgs.cs" />
     <Compile Include="Utility\CacheElement.cs" />
     <Compile Include="Utility\CacheElementCollection.cs" />

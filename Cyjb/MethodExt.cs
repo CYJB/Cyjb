@@ -211,17 +211,30 @@ namespace Cyjb
 				if ((paramArrayType = GetParamArrayType(parameters[len])) != null)
 				{
 					// 判断是否需要展开 params 参数。
-					int paramDepth = paramArrayType.GetArrayDepth();
+					Type paramElementType;
+					int paramDepth = paramArrayType.GetArrayDepth(out paramElementType);
 					int typeDepth = types[paramOrder[len]].GetArrayDepth();
-					if (paramDepth + 1 == typeDepth)
+					if (paramElementType.IsGenericParameter)
 					{
-						// 数组深度相差 1，不需要展开 params 参数。
-						paramArrayType = null;
+						// 如果是 params T 数组，那么不能判定 T 本身的数组层数。
+						if (typeDepth < paramDepth)
+						{
+							// 如果实参数组层数少，那么肯定无法正确匹配。
+							return false;
+						}
 					}
-					else if (paramDepth != typeDepth)
+					else
 					{
-						// 数组深度不等。
-						return false;
+						if (paramDepth + 1 == typeDepth)
+						{
+							// 数组深度相差 1，不需要展开 params 参数。
+							paramArrayType = null;
+						}
+						else if (paramDepth != typeDepth)
+						{
+							// 数组深度不等。
+							return false;
+						}
 					}
 				}
 				return true;
