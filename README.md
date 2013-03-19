@@ -11,6 +11,7 @@ My personal C# library.
 	- ArrayExt 类：提供数组的扩展方法。
 	- CharExt 类：提供 Char 类的扩展方法。
 	- ConvertExt 类：将一个数据类型转换为另一个数据类型的方法。
+	- DelegateBuilder 类：提供动态构造方法、属性或字段委托的方法。
 	- EnumerableExt 类：提供 IEnumerable&lt;T&gt; 接口的扩展方法。
 	- EnumExt 类：提供 Enum 类的扩展方法。
 	- IntegerExt 类：提供对整数的扩展方法。

@@ -49,6 +49,9 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Collections\ListEqualityComparer`1.cs" />
     <Compile Include="ConversionMethod.cs" />
+    <Compile Include="DelegateBuilder.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MethodExt.cs" />
     <Compile Include="PowerBinder.cs" />
     <Compile Include="CharExt.cs" />
