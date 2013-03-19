@@ -14,6 +14,7 @@ My personal C# library.
 	- EnumerableExt 类：提供 IEnumerable&lt;T&gt; 接口的扩展方法。
 	- EnumExt 类：提供 Enum 类的扩展方法。
 	- IntegerExt 类：提供对整数的扩展方法。
+	- MethodExt 类：提供对 MethodBase 及其子类的扩展方法。
 	- PowerBinder 类：扩展的参数类型绑定器。
 	- RandomExt 类：表示一个全局的伪随机数生成器。
 	- StringExt 类：提供 String 类的扩展方法。
@@ -26,6 +27,7 @@ My personal C# library.
 	- UniqueValue&lt;TValue&gt; 类：用于需要获取唯一值的情况。
 * Cyjb.Collections 命名空间：包含与集合有关的类。
 	- ArrayAdapter&lt;T&gt; 类：表示数组的一部分的列表。
+	- ListEqualityComparer&lt;T&gt; 类：可以根据内容比较 IList&gt;T&gt; 列表的比较器。
 * Cyjb.Collections.ObjectModel 命名空间：包含通用的集合基类和只读的集合类。
 * Cyjb.ComponentModel 命名空间：包含与组件模型有关的类。
 	- EnumDescConverter 类：支持枚举值的描述信息的转换器。
