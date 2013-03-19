@@ -150,7 +150,7 @@ namespace Cyjb
 					paramTypes[i] = parameters[i].ParameterType;
 				}
 				return TypeExt.GenericArgumentsInferences(method.GetGenericArguments(), paramTypes,
-					paramArrayType, types, paramOrder);
+					ref paramArrayType, types, paramOrder);
 			}
 			return null;
 		}

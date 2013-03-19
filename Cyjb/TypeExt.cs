@@ -411,7 +411,7 @@ namespace Cyjb
 		/// <returns>如果成功推断泛型参数组的类型参数，则为类型参数数组；
 		/// 如果推断失败，则为 <c>null</c>。</returns>
 		internal static Type[] GenericArgumentsInferences(Type[] genericArgs, Type[] paramTypes,
-			Type paramArrayType, Type[] types, int[] paramOrder)
+			ref Type paramArrayType, Type[] types, int[] paramOrder)
 		{
 			Debug.Assert(genericArgs.Length > 0);
 			Debug.Assert(paramTypes.Length > 0);
@@ -481,15 +481,23 @@ namespace Cyjb
 					boundSetsClone.Add(pair.Key, pair.Value.Clone());
 				}
 				len = paramTypes.Length - 1;
-				// 首先尝试对 paramArrayType 进行推断。
-				if (TypeInferences(paramArrayType, types[paramOrder[len]], boundSets))
+				// 首先尝试对 paramArrayType[] 进行推断。
+				if (TypeInferences(paramTypes[len], types[paramOrder[len]], boundSets))
 				{
 					args = FixTypeArguments(genericArgs, boundSets);
 				}
-				// 失败的话则尝试对 paramArrayType[] 进行推断。
-				if (args == null && TypeInferences(paramTypes[len], types[paramOrder[len]], boundSetsClone))
+				if (args != null)
 				{
-					args = FixTypeArguments(genericArgs, boundSetsClone);
+					// 推断成功的话，则需要将 paramArrayType 置为 null 以表示无需展开 params 参数。
+					paramArrayType = null;
+				}
+				else
+				{
+					// 失败的话则尝试对 paramArrayType 进行推断。
+					if (TypeInferences(paramArrayType, types[paramOrder[len]], boundSetsClone))
+					{
+						args = FixTypeArguments(genericArgs, boundSetsClone);
+					}
 				}
 			}
 			return args;

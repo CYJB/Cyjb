@@ -600,8 +600,10 @@ namespace Cyjb
 			{
 				paramTypes[i] = match.Parameters[i].ParameterType;
 			}
+			Type paramArrayType = match.ParamArrayType;
 			Type[] args = TypeExt.GenericArgumentsInferences(method.GetGenericArguments(),
-				paramTypes, match.ParamArrayType, types, match.ParamOrder);
+				paramTypes, ref paramArrayType, types, match.ParamOrder);
+			match.ParamArrayType = paramArrayType;
 			try
 			{
 				method = method.MakeGenericMethod(args);
