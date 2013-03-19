@@ -178,20 +178,32 @@
     <comment>如果基不为 10，则此字符串不能包含减号。</comment>
   </data>
   <data name="BindTargetField" xml:space="preserve">
-    <value>Error binding to target field.</value>
+    <value>Cannot bind to the target field because its type or security transparency is not compatible with that of the delegate type.</value>
     <comment>绑定到目标字段时出错。</comment>
   </data>
   <data name="BindTargetMethod" xml:space="preserve">
-    <value>Error binding to target method.</value>
+    <value>Cannot bind to the target method because its signature or security transparency is not compatible with that of the delegate type.</value>
     <comment>绑定到目标方法时出错。</comment>
   </data>
   <data name="BindTargetProperty" xml:space="preserve">
-    <value>Error binding to target property.</value>
+    <value>Cannot bind to the target property because its signature or security transparency is not compatible with that of the delegate type.</value>
+    <comment>绑定到目标属性时出错。</comment>
+  </data>
+  <data name="BindTargetPropertyNoGet" xml:space="preserve">
+    <value>Cannot bind to the target property because no get accessor exists.</value>
+    <comment>绑定到目标属性时出错。</comment>
+  </data>
+  <data name="BindTargetPropertyNoSet" xml:space="preserve">
+    <value>Cannot bind to the target property because no set accessor exists.</value>
     <comment>绑定到目标属性时出错。</comment>
   </data>
   <data name="CannotCastNullToValueType" xml:space="preserve">
     <value>Null object cannot be converted to a value type.</value>
     <comment>空对象不能转换为值类型。</comment>
+  </data>
+  <data name="CannotInferGenericArguments" xml:space="preserve">
+    <value>Can not infer type argument of {0} from parameters.</value>
+    <comment>无效的泛型参数推断。</comment>
   </data>
   <data name="ConvertInvalidValue" xml:space="preserve">
     <value>'{0}' is not a valid value for '{1}'.</value>
@@ -268,6 +280,10 @@
   <data name="NoParsibleDigits" xml:space="preserve">
     <value>Could not find any recognizable digits.</value>
     <comment>未能找到任何可识别的数字。</comment>
+  </data>
+  <data name="NotGenericMethodDefinition" xml:space="preserve">
+    <value>{0} is not a GenericMethodDefinition. {1} may only be called on a method for which MethodBase.IsGenericMethodDefinition is true.</value>
+    <comment>不表示泛型方法定义。</comment>
   </data>
   <data name="ObjectDisposed" xml:space="preserve">
     <value>The object has been disposed.</value>

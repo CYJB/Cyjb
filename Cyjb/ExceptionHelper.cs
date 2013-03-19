@@ -49,7 +49,6 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="array">要检查的数组。</param>
 		/// <param name="paramName">产生异常的参数名称。</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="array"/>是多维的。</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="array"/>的下限不为 <c>0</c>。</exception>
 		public static void CheckFlatArray(Array array, string paramName)
@@ -93,6 +92,16 @@ namespace Cyjb
 		public static ArgumentException ArgumentWrongType(string paramName, object value, Type targetType)
 		{
 			return GetArgumentException(paramName, "ArgumentWrongType", value, targetType);
+		}
+		/// <summary>
+		/// 返回未能推导类型参数的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <param name="method">未能推导参数的方法。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		public static ArgumentException CannotInferGenericArguments(string paramName, MethodBase method)
+		{
+			return GetArgumentException(paramName, "CannotInferGenericArguments", method);
 		}
 		/// <summary>
 		/// 返回枚举参数类型不匹配的异常。
@@ -369,6 +378,16 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="value">无效的值。</param>
 		/// <param name="type">要转换到的类型。</param>
+		/// <returns><see cref="System.InvalidCastException"/> 对象。</returns>
+		public static InvalidCastException ConvertInvalidValue(object value, Type type)
+		{
+			return GetInvalidCast("ConvertInvalidValue", value, type);
+		}
+		/// <summary>
+		/// 返回转换无效的异常。
+		/// </summary>
+		/// <param name="value">无效的值。</param>
+		/// <param name="type">要转换到的类型。</param>
 		/// <param name="innerException">内部异常。</param>
 		/// <returns><see cref="System.InvalidCastException"/> 对象。</returns>
 		public static InvalidCastException ConvertInvalidValue(object value, Type type, Exception innerException)
@@ -385,6 +404,16 @@ namespace Cyjb
 		{
 			return new InvalidCastException(ExceptionResources.GetString(resName));
 		}
+		/// <summary>
+		/// 返回转换无效的异常。
+		/// </summary>
+		/// <param name="resName">异常信息的资源名称。</param>
+		/// <param name="args">异常信息的格式化值。</param>
+		/// <returns><see cref="System.InvalidCastException"/> 对象。</returns>
+		private static InvalidCastException GetInvalidCast(string resName, params object[] args)
+		{
+			return new InvalidCastException(ExceptionResources.GetString(resName, args));
+		}
 
 		#endregion // InvalidCastException
 
@@ -399,6 +428,16 @@ namespace Cyjb
 			return GetInvalidOperation("EnumFailedVersion");
 		}
 		/// <summary>
+		/// 返回不表示泛型方法定义的异常。
+		/// </summary>
+		/// <param name="method">不是泛型方法的方法。</param>
+		/// <param name="operatorName">产生异常的操作名。</param>
+		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
+		public static InvalidOperationException NotGenericMethodDefinition(MethodBase method, string operatorName)
+		{
+			return GetInvalidOperation("NotGenericMethodDefinition", method, operatorName);
+		}
+		/// <summary>
 		/// 返回状态无效的异常。
 		/// </summary>
 		/// <param name="resName">异常信息的资源名称。</param>
@@ -406,6 +445,16 @@ namespace Cyjb
 		private static InvalidOperationException GetInvalidOperation(string resName)
 		{
 			return new InvalidOperationException(ExceptionResources.GetString(resName));
+		}
+		/// <summary>
+		/// 返回状态无效的异常。
+		/// </summary>
+		/// <param name="resName">异常信息的资源名称。</param>
+		/// <param name="args">异常信息的格式化值。</param>
+		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
+		private static InvalidOperationException GetInvalidOperation(string resName, params object[] args)
+		{
+			return new InvalidOperationException(ExceptionResources.GetString(resName, args));
 		}
 
 		#endregion
@@ -677,46 +726,69 @@ namespace Cyjb
 
 		#region DelegateBuilder 异常
 
-		///// <summary>
-		///// 返回绑定到目标方法出错的异常。
-		///// </summary>
-		///// <returns><see cref="System.ArgumentException"/> 对象。</returns>
-		//internal static ArgumentException BindTargetMethod()
-		//{
-		//	throw GetArgumentException("BindTargetMethod");
-		//}
-		///// <summary>
-		///// 返回绑定到目标属性出错的异常。
-		///// </summary>
-		///// <returns><see cref="System.ArgumentException"/> 对象。</returns>
-		//internal static ArgumentException BindTargetProperty()
-		//{
-		//	throw GetArgumentException("BindTargetProperty");
-		//}
-		///// <summary>
-		///// 返回绑定到目标字段出错的异常。
-		///// </summary>
-		///// <returns><see cref="System.ArgumentException"/> 对象。</returns>
-		//internal static ArgumentException BindTargetField()
-		//{
-		//	throw GetArgumentException("BindTargetField");
-		//}
-		///// <summary>
-		///// 返回类型必须从委托派生的异常。
-		///// </summary>
-		///// <returns><see cref="System.ArgumentException"/> 对象。</returns>
-		//internal static ArgumentException MustBeDelegate()
-		//{
-		//	throw GetArgumentException("MustBeDelegate");
-		//}
-		///// <summary>
-		///// 返回不能是开放泛型类型的异常。
-		///// </summary>
-		///// <returns><see cref="System.ArgumentException"/> 对象。</returns>
-		//internal static ArgumentException UnboundGenParam()
-		//{
-		//	throw GetArgumentException("UnboundGenParam");
-		//}
+		/// <summary>
+		/// 返回绑定到目标方法出错的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException BindTargetMethod(string paramName)
+		{
+			throw GetArgumentException(paramName, "BindTargetMethod");
+		}
+		/// <summary>
+		/// 返回绑定到目标属性出错的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException BindTargetProperty(string paramName)
+		{
+			throw GetArgumentException(paramName, "BindTargetProperty");
+		}
+		/// <summary>
+		/// 返回绑定到目标属性出错，不存在 set 访问器的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException BindTargetPropertyNoSet(string paramName)
+		{
+			throw GetArgumentException(paramName, "BindTargetPropertyNoSet");
+		}
+		/// <summary>
+		/// 返回绑定到目标属性出错，不存在 get 访问器的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException BindTargetPropertyNoGet(string paramName)
+		{
+			throw GetArgumentException(paramName, "BindTargetPropertyNoGet");
+		}
+		/// <summary>
+		/// 返回绑定到目标字段出错的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException BindTargetField(string paramName)
+		{
+			throw GetArgumentException(paramName, "BindTargetField");
+		}
+		/// <summary>
+		/// 返回类型必须从委托派生的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException MustBeDelegate(string paramName)
+		{
+			throw GetArgumentException(paramName, "MustBeDelegate");
+		}
+		/// <summary>
+		/// 返回不能是开放泛型类型的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException UnboundGenParam(string paramName)
+		{
+			throw GetArgumentException(paramName, "UnboundGenParam");
+		}
 
 		#endregion // DelegateBuilder 异常
 

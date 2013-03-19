@@ -321,21 +321,16 @@ namespace UnitTestCyjb
 			Assert.AreEqual(TestSubClass.TestMethod3(10, 20, "str"),
 				type.InvokeMember("TestMethod3", bindingFlags, PowerBinder.DefaultBinder, null,
 				new object[] { 10, 20, "str" }));
-			//Assert.AreEqual("<System.Int32, System.String, System.Int32>(10, str, 20,30)",
-			//	type.InvokeMember("TestMethod5", bindingOptFlags, PowerBinder.DefaultBinder, null,
-			//	new object[] { 10, "str", 20, 30 }));
-			//Assert.AreEqual("<System.Int32, System.String, System.Int64>(10, str, 20,30)",
-			//	type.InvokeMember("TestMethod5", bindingOptFlags, PowerBinder.DefaultBinder, null,
-			//	new object[] { 10, "str", 20L, 30 }));
-			//Assert.AreEqual("<System.Int32, System.Object, System.Int32>(10, , 20,30)",
-			//	type.InvokeMember("TestMethod5", bindingOptFlags, PowerBinder.DefaultBinder, null,
-			//	new object[] { 10, new int[] { 20, 30 } }, null, null, new string[] { "value1", "value3" }));
-			//Assert.AreEqual("<System.Int32, System.String, System.Object>(10, str, 20,30)",
-			//	type.InvokeMember("TestMethod5", bindingOptFlags, PowerBinder.DefaultBinder, null,
-			//	new object[] { 10, "str" }));
-			//Assert.AreEqual("<System.Int32, System.Object, System.Object>(10, , 20,30)",
-			//	type.InvokeMember("TestMethod5", bindingOptFlags, PowerBinder.DefaultBinder, null,
-			//	new object[] { 10 }));
+			Assert.AreEqual("<System.Int32, System.String, System.Int32>(10, str, 20,30)",
+				type.InvokeMember("TestMethod5", bindingOptFlags, PowerBinder.DefaultBinder, null,
+				new object[] { 10, "str", 20, 30 }));
+			Assert.AreEqual("<System.Int32, System.String, System.Int64>(10, str, 20,30)",
+				type.InvokeMember("TestMethod5", bindingOptFlags, PowerBinder.DefaultBinder, null,
+				new object[] { 10, "str", 20L, 30 }));
+			Assert.AreEqual("<System.Int32, System.String, System.Int32>(10, test, 20,30)",
+				type.InvokeMember("TestMethod5", bindingOptFlags, PowerBinder.DefaultBinder, null,
+				new object[] { 10, new int[] { 20, 30 }, "test" }, null, null,
+				new string[] { "value1", "value3", "value2" }));
 			// 测试选择方法。
 			BindingFlags bindingInsFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod;
 			BindingFlags bindingInsOptFlags = bindingInsFlags | BindingFlags.OptionalParamBinding;

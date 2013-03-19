@@ -826,37 +826,31 @@ namespace UnitTestCyjb
 		[TestMethod]
 		public void TestOpenGenericIsAssignableFrom()
 		{
-			Type[] genericArguments;
-			Assert.IsFalse(typeof(IEnumerable<int>).OpenGenericIsAssignableFrom(typeof(IEnumerable<>), out genericArguments));
-			Assert.IsFalse(typeof(object).OpenGenericIsAssignableFrom(typeof(IEnumerable<>), out genericArguments));
-			Assert.IsFalse(typeof(IEnumerable<int>).OpenGenericIsAssignableFrom(typeof(IEnumerable<int>), out genericArguments));
+			Type closedType;
+			Assert.IsFalse(typeof(IEnumerable<int>).OpenGenericIsAssignableFrom(typeof(IEnumerable<>), out closedType));
+			Assert.IsFalse(typeof(object).OpenGenericIsAssignableFrom(typeof(IEnumerable<>), out closedType));
+			Assert.IsFalse(typeof(IEnumerable<int>).OpenGenericIsAssignableFrom(typeof(IEnumerable<int>), out closedType));
 
-			Assert.IsTrue(typeof(IEnumerable<>).OpenGenericIsAssignableFrom(typeof(IEnumerable<>), out genericArguments));
-			Assert.AreEqual(1, genericArguments.Length);
-			Assert.IsTrue(genericArguments[0].IsGenericParameter);
+			Assert.IsTrue(typeof(IEnumerable<>).OpenGenericIsAssignableFrom(typeof(IEnumerable<>), out closedType));
+			Assert.AreEqual(typeof(IEnumerable<>), closedType);
 
-			Assert.IsTrue(typeof(IEnumerable<>).OpenGenericIsAssignableFrom(typeof(IEnumerable<int>), out genericArguments));
-			Assert.AreEqual(1, genericArguments.Length);
-			Assert.AreEqual(typeof(int), genericArguments[0]);
+			Assert.IsTrue(typeof(IEnumerable<>).OpenGenericIsAssignableFrom(typeof(IEnumerable<int>), out closedType));
+			Assert.AreEqual(typeof(IEnumerable<int>), closedType);
 
-			Assert.IsTrue(typeof(IEnumerable<>).OpenGenericIsAssignableFrom(typeof(Dictionary<int, string>), out genericArguments));
-			Assert.AreEqual(1, genericArguments.Length);
-			Assert.AreEqual(typeof(KeyValuePair<int, string>), genericArguments[0]);
+			Assert.IsTrue(typeof(IEnumerable<>).OpenGenericIsAssignableFrom(typeof(Dictionary<int, string>), out closedType));
+			Assert.AreEqual(typeof(IEnumerable<KeyValuePair<int, string>>), closedType);
 
-			Assert.IsTrue(typeof(IDictionary<,>).OpenGenericIsAssignableFrom(typeof(Dictionary<int, string>), out genericArguments));
-			Assert.AreEqual(2, genericArguments.Length);
-			Assert.AreEqual(typeof(int), genericArguments[0]);
-			Assert.AreEqual(typeof(string), genericArguments[1]);
+			Assert.IsTrue(typeof(IDictionary<,>).OpenGenericIsAssignableFrom(typeof(Dictionary<int, string>), out closedType));
+			Assert.AreEqual(typeof(IDictionary<int, string>), closedType);
 
-			Assert.IsTrue(typeof(TestClass4<,>).OpenGenericIsAssignableFrom(typeof(TestClass5<>), out genericArguments));
-			Assert.AreEqual(2, genericArguments.Length);
-			Assert.AreEqual(typeof(int), genericArguments[0]);
-			Assert.IsTrue(genericArguments[1].IsGenericParameter);
+			Assert.IsTrue(typeof(TestClass4<,>).OpenGenericIsAssignableFrom(typeof(TestClass5<>), out closedType));
+			Type[] genericArgs = closedType.GetGenericArguments();
+			Assert.AreEqual(2, genericArgs.Length);
+			Assert.AreEqual(typeof(int), genericArgs[0]);
+			Assert.IsTrue(genericArgs[1].IsGenericParameter);
 
-			Assert.IsTrue(typeof(TestClass4<,>).OpenGenericIsAssignableFrom(typeof(TestClass5<string>), out genericArguments));
-			Assert.AreEqual(2, genericArguments.Length);
-			Assert.AreEqual(typeof(int), genericArguments[0]);
-			Assert.AreEqual(typeof(string), genericArguments[1]);
+			Assert.IsTrue(typeof(TestClass4<,>).OpenGenericIsAssignableFrom(typeof(TestClass5<string>), out closedType));
+			Assert.AreEqual(typeof(TestClass4<int, string>), closedType);
 		}
 
 		#region 测试辅助类
