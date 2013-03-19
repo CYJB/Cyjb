@@ -466,33 +466,31 @@ namespace Cyjb
 					}
 				}
 			}
-			len = paramTypes.Length - 1;
-			Dictionary<Type, BoundSet> boundSetsClone = null;
-			if (paramElementType != null)
+			Type[] args = null;
+			if (paramElementType == null)
+			{
+				// 没有 params T 数组参数，直接进行固定。
+				args = FixTypeArguments(genericArgs, boundSets);
+			}
+			else
 			{
 				// 需要复制界限集。
-				boundSetsClone = new Dictionary<Type, BoundSet>();
+				Dictionary<Type, BoundSet> boundSetsClone = new Dictionary<Type, BoundSet>();
 				foreach (KeyValuePair<Type, BoundSet> pair in boundSets)
 				{
 					boundSetsClone.Add(pair.Key, pair.Value.Clone());
 				}
+				len = paramTypes.Length - 1;
 				// 首先尝试对 paramArrayType 进行推断。
-				if (!TypeInferences(paramArrayType, types[paramOrder[len]], boundSets))
+				if (TypeInferences(paramArrayType, types[paramOrder[len]], boundSets))
 				{
-					// 类型推断失败。
-					return null;
+					args = FixTypeArguments(genericArgs, boundSets);
 				}
-			}
-			Type[] args = FixTypeArguments(genericArgs, boundSets);
-			if (args == null && paramElementType != null)
-			{
-				// 再次尝试对 paramArrayType[] 进行推断。
-				if (!TypeInferences(paramTypes[len], types[paramOrder[len]], boundSetsClone))
+				// 失败的话则尝试对 paramArrayType[] 进行推断。
+				if (args == null && TypeInferences(paramTypes[len], types[paramOrder[len]], boundSetsClone))
 				{
-					// 类型推断失败。
-					return null;
+					args = FixTypeArguments(genericArgs, boundSetsClone);
 				}
-				args = FixTypeArguments(genericArgs, boundSetsClone);
 			}
 			return args;
 		}
@@ -508,7 +506,7 @@ namespace Cyjb
 			Type[] result = new Type[genericArgs.Length];
 			for (int i = 0; i < genericArgs.Length; i++)
 			{
-				result[i] = boundSets[genericArgs[i]].Inference();
+				result[i] = boundSets[genericArgs[i]].FixTypeArg();
 				if (result[i] == null)
 				{
 					return null;
@@ -838,11 +836,11 @@ namespace Cyjb
 				return newSet;
 			}
 			/// <summary>
-			/// 推断当前界限集所限定的类型参数。
+			/// 固定当前界限集所限定的类型参数。
 			/// </summary>
-			/// <returns>如果成功推断当前界限集的的类型参数，则为类型参数；
-			/// 如果推断失败，则为 <c>null</c>。</returns>
-			public Type Inference()
+			/// <returns>如果成功固定当前界限集的的类型参数，则为类型参数；
+			/// 如果固定失败，则为 <c>null</c>。</returns>
+			public Type FixTypeArg()
 			{
 				Type result = null;
 				if (exactBound == null)
