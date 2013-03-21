@@ -1505,16 +1505,16 @@ namespace Cyjb
 			{
 				bindingAttr |= BinderMemberMask;
 			}
+			BindingFlags instancecBindingAttr = bindingAttr & ~BindingFlags.Static;
+			Delegate dlg = null;
 			if (memberName.Equals(ConstructorName, StringComparison.OrdinalIgnoreCase))
 			{
-				// 查找构造函数成员。
-				if ((bindingAttr & BindingFlags.CreateInstance) == BindingFlags.CreateInstance)
+				// 查找构造函数成员，此时注意只搜索实例方法。
+				ConstructorInfo ctor = target.GetConstructor(instancecBindingAttr | BindingFlags.Instance,
+					PowerBinder.CastBinder, types, null);
+				if (ctor != null)
 				{
-					ConstructorInfo ctor = target.GetConstructor(bindingAttr, PowerBinder.CastBinder, types, null);
-					if (ctor != null)
-					{
-						return CreateDelegate(type, ctor, throwOnBindFailure);
-					}
+					dlg = CreateDelegate(type, ctor, false);
 				}
 			}
 			else
@@ -1543,60 +1543,134 @@ namespace Cyjb
 					}
 				}
 				BindingFlags staticBindingAttr = bindingAttr & ~BindingFlags.Instance;
-				BindingFlags instancecBindingAttr = bindingAttr & ~BindingFlags.Static;
-				// 查找方法成员。
 				if ((bindingAttr & BindingFlags.InvokeMethod) == BindingFlags.InvokeMethod)
 				{
-					MethodInfo method = null;
 					// 查找静态方法成员。
 					if (containsStaticMember)
 					{
-						method = target.GetMethod(memberName, staticBindingAttr, PowerBinder.CastBinder, types, null);
+						dlg = CreateMethodDelegate(type, target, memberName, null, staticBindingAttr, types);
 					}
 					// 查找实例方法成员。
-					if (method == null && containsInstnceMember)
+					if (dlg == null && containsInstnceMember)
 					{
-						method = target.GetMethod(memberName, instancecBindingAttr, PowerBinder.CastBinder, instanceTypes, null);
-					}
-					if (method != null)
-					{
-						return CreateDelegate(type, method, throwOnBindFailure);
+						dlg = CreateMethodDelegate(type, target, memberName, null, instancecBindingAttr, instanceTypes);
 					}
 				}
-				// 查找属性成员。
 				if ((bindingAttr & BinderGetSetProperty) != BindingFlags.Default)
 				{
-					PropertyInfo property = null;
 					// 查找静态属性成员。
-					if (containsStaticMember)
+					if (dlg == null && containsStaticMember)
 					{
-						property = target.GetProperty(memberName, staticBindingAttr, PowerBinder.CastBinder,
-							invoke.ReturnType, types, null);
+						dlg = CreatePropertyDelegate(type, target, memberName, null, staticBindingAttr,
+							invoke.ReturnType, types);
 					}
 					// 查找实例属性成员。
-					if (property == null && containsInstnceMember)
+					if (dlg == null && containsInstnceMember)
 					{
-						property = target.GetProperty(memberName, instancecBindingAttr, PowerBinder.CastBinder,
-							invoke.ReturnType, instanceTypes, null);
-					}
-					if (property != null)
-					{
-						return CreateDelegate(type, property, throwOnBindFailure);
+						dlg = CreatePropertyDelegate(type, target, memberName, null, instancecBindingAttr,
+							invoke.ReturnType, instanceTypes);
 					}
 				}
 				// 查找字段成员。
-				if ((bindingAttr & BinderGetSetField) != BindingFlags.Default)
+				if (dlg == null && (bindingAttr & BinderGetSetField) != BindingFlags.Default)
 				{
 					FieldInfo field = target.GetField(memberName, bindingAttr);
 					if (field != null)
 					{
-						return CreateDelegate(type, field, throwOnBindFailure);
+						dlg = CreateDelegate(type, field, false);
 					}
 				}
+			}
+			if (dlg != null)
+			{
+				return dlg;
 			}
 			if (throwOnBindFailure)
 			{
 				throw ExceptionHelper.BindTargetMethod("memberName");
+			}
+			return null;
+		}
+		/// <summary>
+		/// 使用指定的搜索方式创建用于表示静态或实例方法的指定类型的委托。
+		/// </summary>
+		/// <param name="type">要创建的委托的类型。</param>
+		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
+		/// <param name="methodName">方法的名称。</param>
+		/// <param name="firstArgument">委托要绑定到的对象。</param>
+		/// <param name="bindingAttr">一个位屏蔽，由一个或多个指定搜索执行方式的 
+		/// <see cref="System.Reflection.BindingFlags"/> 组成。</param>
+		/// <param name="types">方法的签名。</param>
+		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
+		private static Delegate CreateMethodDelegate(Type type, Type target, string methodName, object firstArgument,
+			BindingFlags bindingAttr, Type[] types)
+		{
+			MethodInfo method = target.GetMethod(methodName, bindingAttr, PowerBinder.CastBinder, types, null);
+			if (method != null)
+			{
+				if (firstArgument == null)
+				{
+					return CreateDelegate(type, method, false);
+				}
+				else
+				{
+					return CreateDelegate(type, method, firstArgument, false);
+				}
+			}
+			return null;
+		}
+		/// <summary>
+		/// 使用指定的搜索方式创建用于表示静态或实例属性的指定类型的委托。
+		/// </summary>
+		/// <param name="type">要创建的委托的类型。</param>
+		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
+		/// <param name="propertyName">方法的名称。</param>
+		/// <param name="firstArgument">委托要绑定到的对象。</param>
+		/// <param name="bindingAttr">一个位屏蔽，由一个或多个指定搜索执行方式的 
+		/// <see cref="System.Reflection.BindingFlags"/> 组成。</param>
+		/// <param name="propType">属性的类型。</param>
+		/// <param name="types">方法的签名。</param>
+		/// <returns>指定类型的委托，表示指定的静态或属性方法。</returns>
+		private static Delegate CreatePropertyDelegate(Type type, Type target, string propertyName,
+			object firstArgument, BindingFlags bindingAttr, Type propType, Type[] types)
+		{
+			PropertyInfo property = null;
+			if (propType == typeof(void))
+			{
+				// 是设置属性，将第一个参数作为属性类型。
+				propType = types[0];
+				if (types.Length == 1)
+				{
+					types = Type.EmptyTypes;
+				}
+				else
+				{
+					Type[] newTypes = new Type[types.Length - 1];
+					for (int i = 0; i < newTypes.Length; i++)
+					{
+						newTypes[i] = types[i + 1];
+					}
+					types = newTypes;
+				}
+				property = target.GetProperty(propertyName, bindingAttr, PowerBinder.CastBinder,
+					propType, types, null);
+			}
+			else
+			{
+				// 是获取属性。
+				property = target.GetProperty(propertyName, bindingAttr, PowerBinder.CastBinder,
+					propType, types, null);
+			}
+			if (property != null)
+			{
+				if (firstArgument == null)
+				{
+					return CreateDelegate(type, property, false);
+				}
+				else
+				{
+					return CreateDelegate(type, property, firstArgument, false);
+				}
 			}
 			return null;
 		}
@@ -1827,16 +1901,15 @@ namespace Cyjb
 			{
 				bindingAttr |= BinderMemberMask;
 			}
+			BindingFlags instancecBindingAttr = (bindingAttr & ~BindingFlags.Static) | BindingFlags.Instance;
+			Delegate dlg = null;
 			if (memberName.Equals(ConstructorName, StringComparison.OrdinalIgnoreCase))
 			{
-				// 查找构造函数成员。
-				if ((bindingAttr & BindingFlags.CreateInstance) == BindingFlags.CreateInstance)
+				// 查找构造函数成员，此时注意只搜索实例方法。
+				ConstructorInfo ctor = target.GetConstructor(instancecBindingAttr, PowerBinder.CastBinder, types, null);
+				if (ctor != null)
 				{
-					ConstructorInfo ctor = target.GetConstructor(bindingAttr, PowerBinder.CastBinder, types, null);
-					if (ctor != null)
-					{
-						return CreateDelegate(type, ctor, throwOnBindFailure);
-					}
+					dlg = CreateDelegate(type, ctor, false);
 				}
 			}
 			else
@@ -1844,42 +1917,42 @@ namespace Cyjb
 				// 查找其它成员。
 				if (firstArgument == null)
 				{
-					bindingAttr &= ~BindingFlags.Instance;
-					bindingAttr |= BindingFlags.Static;
+					bindingAttr = (bindingAttr & ~BindingFlags.Instance) | BindingFlags.Static;
 				}
 				else
 				{
-					bindingAttr &= ~BindingFlags.Static;
-					bindingAttr |= BindingFlags.Instance;
+					bindingAttr = instancecBindingAttr;
 				}
 				// 查找方法成员。
 				if ((bindingAttr & BindingFlags.InvokeMethod) == BindingFlags.InvokeMethod)
 				{
-					MethodInfo method = target.GetMethod(memberName, bindingAttr, PowerBinder.CastBinder, types, null);
-					if (method != null)
-					{
-						return CreateDelegate(type, method, firstArgument, throwOnBindFailure);
-					}
+					dlg = CreateMethodDelegate(type, target, memberName, firstArgument, bindingAttr, types);
 				}
 				// 查找属性成员。
-				if ((bindingAttr & BinderGetSetProperty) != BindingFlags.Default)
+				if (dlg == null && (bindingAttr & BinderGetSetProperty) != BindingFlags.Default)
 				{
-					PropertyInfo property = target.GetProperty(memberName, bindingAttr, PowerBinder.CastBinder,
-							invoke.ReturnType, types, null);
-					if (property != null)
-					{
-						return CreateDelegate(type, property, firstArgument, throwOnBindFailure);
-					}
+					dlg = CreatePropertyDelegate(type, target, memberName, firstArgument, bindingAttr, invoke.ReturnType, types);
 				}
 				// 查找字段成员。
-				if ((bindingAttr & BinderGetSetField) != BindingFlags.Default)
+				if (dlg == null && (bindingAttr & BinderGetSetField) != BindingFlags.Default)
 				{
 					FieldInfo field = target.GetField(memberName, bindingAttr);
 					if (field != null)
 					{
-						return CreateDelegate(type, field, firstArgument, throwOnBindFailure);
+						if (firstArgument == null)
+						{
+							dlg = CreateDelegate(type, field, throwOnBindFailure);
+						}
+						else
+						{
+							dlg = CreateDelegate(type, field, firstArgument, throwOnBindFailure);
+						}
 					}
 				}
+			}
+			if (dlg != null)
+			{
+				return dlg;
 			}
 			if (throwOnBindFailure)
 			{
