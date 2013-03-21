@@ -1308,7 +1308,7 @@ namespace Cyjb
 		/// 所有成员有效值掩码。
 		/// </summary>
 		private const BindingFlags BinderMemberMask = BinderGetSetField | BinderGetSetProperty |
-			BindingFlags.InvokeMethod | BindingFlags.CreateInstance;
+			BindingFlags.InvokeMethod | BindingFlags.CreateInstance | BindingFlags.CreateInstance;
 		/// <summary>
 		/// 绑定设置值的有效值掩码。
 		/// </summary>
@@ -1346,7 +1346,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1378,7 +1377,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1439,7 +1437,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1470,7 +1467,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1530,7 +1526,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1561,7 +1556,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1594,10 +1588,16 @@ namespace Cyjb
 			MethodInfo invoke = type.GetMethod("Invoke");
 			ParameterInfo[] paramInfos = invoke.GetParameters();
 			Type[] types = GetParameterTypes(paramInfos, 0, 0, 0);
-			// 未设置 MemberMask 的情况下，查找所有成员。
-			if ((bindingAttr & BinderMemberMask) == BindingFlags.Default)
+			BindingFlags memberFlags = bindingAttr & BinderMemberMask;
+			if (memberFlags == BindingFlags.Default)
 			{
-				bindingAttr |= BinderMemberMask;
+				// 未设置 MemberMask 的情况下，查找所有成员。
+				memberFlags = BinderMemberMask;
+			}
+			else
+			{
+				// 清除 bindingAttr 中的成员设置。
+				bindingAttr &= ~BinderMemberMask;
 			}
 			BindingFlags instancecBindingAttr = bindingAttr & ~BindingFlags.Static;
 			Delegate dlg = null;
@@ -1621,7 +1621,7 @@ namespace Cyjb
 				{
 					// 构造查找实例方法用的参数列表。
 					if (types.Length - 1 < 0 ||
-						(bindingAttr & BinderMethodOrProperty) == BindingFlags.Default)
+						(memberFlags & BinderMethodOrProperty) == BindingFlags.Default)
 					{
 						// 参数个数为 0，不能是实例成员。
 						// 没有方法或属性调用，也不用区分实例成员。
@@ -1637,7 +1637,7 @@ namespace Cyjb
 					}
 				}
 				BindingFlags staticBindingAttr = bindingAttr & ~BindingFlags.Instance;
-				if ((bindingAttr & BindingFlags.InvokeMethod) == BindingFlags.InvokeMethod)
+				if ((memberFlags & BindingFlags.InvokeMethod) == BindingFlags.InvokeMethod)
 				{
 					// 查找静态方法成员。
 					if (containsStaticMember)
@@ -1650,10 +1650,10 @@ namespace Cyjb
 						dlg = CreateMethodDelegate(type, target, memberName, null, instancecBindingAttr, instanceTypes);
 					}
 				}
-				if ((bindingAttr & BinderGetSetProperty) != BindingFlags.Default)
+				if (dlg == null && (memberFlags & BinderGetSetProperty) != BindingFlags.Default)
 				{
 					// 查找静态属性成员。
-					if (dlg == null && containsStaticMember)
+					if (containsStaticMember)
 					{
 						dlg = CreatePropertyDelegate(type, target, memberName, null, staticBindingAttr,
 							invoke.ReturnType, types);
@@ -1666,7 +1666,7 @@ namespace Cyjb
 					}
 				}
 				// 查找字段成员。
-				if (dlg == null && (bindingAttr & BinderGetSetField) != BindingFlags.Default)
+				if (dlg == null && (memberFlags & BinderGetSetField) != BindingFlags.Default)
 				{
 					FieldInfo field = target.GetField(memberName, bindingAttr);
 					if (field != null)
@@ -1780,7 +1780,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1813,7 +1812,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1849,7 +1847,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1888,7 +1885,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1921,7 +1917,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1957,7 +1952,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1996,7 +1990,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2028,7 +2021,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2063,7 +2055,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2098,10 +2089,16 @@ namespace Cyjb
 			MethodInfo invoke = type.GetMethod("Invoke");
 			ParameterInfo[] paramInfos = invoke.GetParameters();
 			Type[] types = GetParameterTypes(paramInfos, 0, 0, 0);
-			// 未设置 MemberMask 的情况下，查找所有成员。
-			if ((bindingAttr & BinderMemberMask) == BindingFlags.Default)
+			BindingFlags memberFlags = bindingAttr & BinderMemberMask;
+			if (memberFlags == BindingFlags.Default)
 			{
-				bindingAttr |= BinderMemberMask;
+				// 未设置 MemberMask 的情况下，查找所有成员。
+				memberFlags = BinderMemberMask;
+			}
+			else
+			{
+				// 清除 bindingAttr 中的成员设置。
+				bindingAttr &= ~BinderMemberMask;
 			}
 			BindingFlags instancecBindingAttr = (bindingAttr & ~BindingFlags.Static) | BindingFlags.Instance;
 			Delegate dlg = null;
@@ -2126,17 +2123,17 @@ namespace Cyjb
 					bindingAttr = instancecBindingAttr;
 				}
 				// 查找方法成员。
-				if ((bindingAttr & BindingFlags.InvokeMethod) == BindingFlags.InvokeMethod)
+				if ((memberFlags & BindingFlags.InvokeMethod) == BindingFlags.InvokeMethod)
 				{
 					dlg = CreateMethodDelegate(type, target, memberName, firstArgument, bindingAttr, types);
 				}
 				// 查找属性成员。
-				if (dlg == null && (bindingAttr & BinderGetSetProperty) != BindingFlags.Default)
+				if (dlg == null && (memberFlags & BinderGetSetProperty) != BindingFlags.Default)
 				{
 					dlg = CreatePropertyDelegate(type, target, memberName, firstArgument, bindingAttr, invoke.ReturnType, types);
 				}
 				// 查找字段成员。
-				if (dlg == null && (bindingAttr & BinderGetSetField) != BindingFlags.Default)
+				if (dlg == null && (memberFlags & BinderGetSetField) != BindingFlags.Default)
 				{
 					FieldInfo field = target.GetField(memberName, bindingAttr);
 					if (field != null)
@@ -2172,7 +2169,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2201,7 +2197,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2232,7 +2227,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2267,7 +2261,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2295,7 +2288,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2325,7 +2317,6 @@ namespace Cyjb
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
-		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
