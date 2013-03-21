@@ -1334,6 +1334,100 @@ namespace Cyjb
 		/// <exception cref="System.MissingMethodException">未找到 <typeparamref name="TDelegate"/>
 		/// 的 <c>Invoke</c> 方法。</exception>
 		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
+		public static Lazy<TDelegate> CreateDelegateLazy<TDelegate>(this Type target, string memberName)
+			where TDelegate : class
+		{
+			return new Lazy<TDelegate>(() =>
+				CreateDelegate(typeof(TDelegate), target, memberName, BinderDefault, true) as TDelegate);
+		}
+		/// <summary>
+		/// 使用指定的名称和搜索方式，创建用于表示静态或实例成员的指定类型的委托。
+		/// 如果是实例成员，需要将实例对象作为委托的第一个参数。
+		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
+		/// 按照方法、属性、字段的顺序查找匹配的成员。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
+		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
+		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
+		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
+		/// </summary>
+		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
+		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
+		/// <param name="memberName">委托要表示的成员的名称。</param> 
+		/// <param name="bindingAttr">一个位屏蔽，由一个或多个指定搜索执行方式的 
+		/// <see cref="System.Reflection.BindingFlags"/> 组成。</param>
+		/// <returns>指定类型的委托，表示指定的静态或实例成员。</returns>
+		/// <exception cref="System.ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="memberName"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentException"><typeparamref name="TDelegate"/> 不继承
+		/// <see cref="System.MulticastDelegate"/>。</exception>
+		/// <exception cref="System.ArgumentException"><paramref name="target"/> 是一个开放式泛型类型。</exception>
+		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="memberName"/>。</exception>
+		/// <exception cref="System.MissingMethodException">未找到 <typeparamref name="TDelegate"/>
+		/// 的 <c>Invoke</c> 方法。</exception>
+		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
+		public static Lazy<TDelegate> CreateDelegateLazy<TDelegate>(this Type target, string memberName, BindingFlags bindingAttr)
+			where TDelegate : class
+		{
+			return new Lazy<TDelegate>(() =>
+				CreateDelegate(typeof(TDelegate), target, memberName, bindingAttr, true) as TDelegate);
+		}
+		/// <summary>
+		/// 使用指定的名称、搜索方式和针对绑定失败的指定行为，创建用于表示静态或实例成员的指定类型的委托。
+		/// 如果是实例成员，需要将实例对象作为委托的第一个参数。
+		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
+		/// 按照方法、属性、字段的顺序查找匹配的成员。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
+		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
+		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
+		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
+		/// </summary>
+		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
+		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
+		/// <param name="memberName">委托要表示的成员的名称。</param> 
+		/// <param name="bindingAttr">一个位屏蔽，由一个或多个指定搜索执行方式的 
+		/// <see cref="System.Reflection.BindingFlags"/> 组成。</param>
+		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="memberName"/> 
+		/// 时引发异常；否则为 <c>false</c>。</param>
+		/// <returns>指定类型的委托，表示指定的静态或实例成员。</returns>
+		/// <exception cref="System.ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="memberName"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentException"><typeparamref name="TDelegate"/> 不继承
+		/// <see cref="System.MulticastDelegate"/>。</exception>
+		/// <exception cref="System.ArgumentException"><paramref name="target"/> 是一个开放式泛型类型。</exception>
+		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="memberName"/>
+		/// 且 <paramref name="throwOnBindFailure"/> 为 <c>true</c>。</exception>
+		/// <exception cref="System.MissingMethodException">未找到 <typeparamref name="TDelegate"/>
+		/// 的 <c>Invoke</c> 方法。</exception>
+		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
+		public static Lazy<TDelegate> CreateDelegateLazy<TDelegate>(this Type target, string memberName, BindingFlags bindingAttr,
+			bool throwOnBindFailure)
+			where TDelegate : class
+		{
+			return new Lazy<TDelegate>(() =>
+				CreateDelegate(typeof(TDelegate), target, memberName, bindingAttr, throwOnBindFailure) as TDelegate);
+		}
+		/// <summary>
+		/// 使用指定的名称创建用于表示静态或实例成员的指定类型的委托。
+		/// 如果是实例成员，需要将实例对象作为委托的第一个参数。
+		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
+		/// 按照方法、属性、字段的顺序查找匹配的成员。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// </summary>
+		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
+		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
+		/// <param name="memberName">委托要表示的成员的名称。</param> 
+		/// <returns>指定类型的委托，表示指定的静态或实例成员。</returns>
+		/// <exception cref="System.ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="memberName"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentException"><typeparamref name="TDelegate"/> 不继承
+		/// <see cref="System.MulticastDelegate"/>。</exception>
+		/// <exception cref="System.ArgumentException"><paramref name="target"/> 是一个开放式泛型类型。</exception>
+		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="memberName"/>。</exception>
+		/// <exception cref="System.MissingMethodException">未找到 <typeparamref name="TDelegate"/>
+		/// 的 <c>Invoke</c> 方法。</exception>
+		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
 		public static TDelegate CreateDelegate<TDelegate>(this Type target, string memberName)
 			where TDelegate : class
 		{
@@ -1679,6 +1773,114 @@ namespace Cyjb
 
 		#region 从 Type 构造带有第一个参数的成员委托
 
+		/// <summary>
+		/// 使用指定的名称和第一个参数，创建用于表示静态或实例成员的指定类型的委托。
+		/// 如果 <paramref name="firstArgument"/> 不为 <c>null</c>，则搜索实例成员，
+		/// 并将 <paramref name="firstArgument"/> 作为实例。如果为 <c>null</c>，则搜索静态成员。
+		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
+		/// 按照方法、属性、字段的顺序查找匹配的成员。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
+		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
+		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
+		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
+		/// </summary>
+		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
+		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
+		/// <param name="memberName">委托要表示的成员的名称。</param> 
+		/// <param name="firstArgument">委托要绑定到的对象，或为 <c>null</c>，
+		/// 后者表示将 <paramref name="memberName"/> 视为 <c>static</c>。</param>
+		/// <returns>指定类型的委托，表示指定的静态或实例成员。</returns>
+		/// <exception cref="System.ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="memberName"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentException"><typeparamref name="TDelegate"/> 不继承
+		/// <see cref="System.MulticastDelegate"/>。</exception>
+		/// <exception cref="System.ArgumentException"><paramref name="target"/> 是一个开放式泛型类型。</exception>
+		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="memberName"/>。</exception>
+		/// <exception cref="System.MissingMethodException">未找到 <typeparamref name="TDelegate"/>
+		/// 的 <c>Invoke</c> 方法。</exception>
+		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
+		public static Lazy<TDelegate> CreateDelegateLazy<TDelegate>(this Type target, string memberName, object firstArgument)
+			where TDelegate : class
+		{
+			return new Lazy<TDelegate>(() =>
+				CreateDelegate(typeof(TDelegate), target, memberName, firstArgument, BinderDefault, true) as TDelegate);
+		}
+		/// <summary>
+		/// 使用指定的名称、第一个参数和搜索方式，创建用于表示静态或实例成员的指定类型的委托。
+		/// 如果 <paramref name="firstArgument"/> 不为 <c>null</c>，则搜索实例成员，
+		/// 并将 <paramref name="firstArgument"/> 作为实例。如果为 <c>null</c>，则搜索静态成员。
+		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
+		/// 按照方法、属性、字段的顺序查找匹配的成员。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
+		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
+		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
+		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
+		/// </summary>
+		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
+		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
+		/// <param name="memberName">委托要表示的成员的名称。</param> 
+		/// <param name="firstArgument">委托要绑定到的对象，或为 <c>null</c>，
+		/// 后者表示将 <paramref name="memberName"/> 视为 <c>static</c>。</param>
+		/// <param name="bindingAttr">一个位屏蔽，由一个或多个指定搜索执行方式的 
+		/// <see cref="System.Reflection.BindingFlags"/> 组成。</param>
+		/// <returns>指定类型的委托，表示指定的静态或实例成员。</returns>
+		/// <exception cref="System.ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="memberName"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentException"><typeparamref name="TDelegate"/> 不继承
+		/// <see cref="System.MulticastDelegate"/>。</exception>
+		/// <exception cref="System.ArgumentException"><paramref name="target"/> 是一个开放式泛型类型。</exception>
+		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="memberName"/>。</exception>
+		/// <exception cref="System.MissingMethodException">未找到 <typeparamref name="TDelegate"/>
+		/// 的 <c>Invoke</c> 方法。</exception>
+		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
+		public static Lazy<TDelegate> CreateDelegateLazy<TDelegate>(this Type target, string memberName,
+			object firstArgument, BindingFlags bindingAttr)
+			where TDelegate : class
+		{
+			return new Lazy<TDelegate>(() =>
+				CreateDelegate(typeof(TDelegate), target, memberName, firstArgument, bindingAttr, true) as TDelegate);
+		}
+		/// <summary>
+		/// 使用指定的名称、第一个参数、搜索方式和针对绑定失败的指定行为，创建用于表示静态或实例成员的指定类型的委托。
+		/// 如果 <paramref name="firstArgument"/> 不为 <c>null</c>，则搜索实例成员，
+		/// 并将 <paramref name="firstArgument"/> 作为实例。如果为 <c>null</c>，则搜索静态成员。
+		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
+		/// 按照方法、属性、字段的顺序查找匹配的成员。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 可以通过指定 <see cref="BindingFlags.OptionalParamBinding"/> 允许绑定到方法的默认参数和带变量参数。
+		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
+		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
+		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
+		/// </summary>
+		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
+		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
+		/// <param name="memberName">委托要表示的成员的名称。</param> 
+		/// <param name="firstArgument">委托要绑定到的对象，或为 <c>null</c>，
+		/// 后者表示将 <paramref name="memberName"/> 视为 <c>static</c>。</param>
+		/// <param name="bindingAttr">一个位屏蔽，由一个或多个指定搜索执行方式的 
+		/// <see cref="System.Reflection.BindingFlags"/> 组成。</param>
+		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="memberName"/> 
+		/// 时引发异常；否则为 <c>false</c>。</param>
+		/// <returns>指定类型的委托，表示指定的静态或实例成员。</returns>
+		/// <exception cref="System.ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="memberName"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentException"><typeparamref name="TDelegate"/> 不继承
+		/// <see cref="System.MulticastDelegate"/>。</exception>
+		/// <exception cref="System.ArgumentException"><paramref name="target"/> 是一个开放式泛型类型。</exception>
+		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="memberName"/>
+		/// 且 <paramref name="throwOnBindFailure"/> 为 <c>true</c>。</exception>
+		/// <exception cref="System.MissingMethodException">未找到 <typeparamref name="TDelegate"/>
+		/// 的 <c>Invoke</c> 方法。</exception>
+		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
+		public static Lazy<TDelegate> CreateDelegateLazy<TDelegate>(this Type target, string memberName,
+			object firstArgument, BindingFlags bindingAttr, bool throwOnBindFailure)
+			where TDelegate : class
+		{
+			return new Lazy<TDelegate>(() =>
+				CreateDelegate(typeof(TDelegate), target, memberName, firstArgument, bindingAttr, throwOnBindFailure) as TDelegate);
+		}
 		/// <summary>
 		/// 使用指定的名称和第一个参数，创建用于表示静态或实例成员的指定类型的委托。
 		/// 如果 <paramref name="firstArgument"/> 不为 <c>null</c>，则搜索实例成员，
