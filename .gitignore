@@ -2,6 +2,7 @@
 bin
 obj
 Properties
+*.pdb
 
 # mstest test results
 TestResults
