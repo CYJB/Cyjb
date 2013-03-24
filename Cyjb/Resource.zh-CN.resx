@@ -117,6 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AtText" xml:space="preserve">
+    <value>在 {0}</value>
+    <comment>所在位置的文本。</comment>
+  </data>
+  <data name="DefaultAggregateExceptionMessage" xml:space="preserve">
+    <value>发生一个或多个错误。</value>
+    <comment>集合异常的默认消息。</comment>
+  </data>
+  <data name="ErrorText" xml:space="preserve">
+    <value>[错误] </value>
+    <comment>错误的文本。</comment>
+  </data>
+  <data name="FromToText" xml:space="preserve">
+    <value>从 {0} 到 {1}</value>
+    <comment>所在位置的文本。</comment>
+  </data>
   <data name="Tristate.False" xml:space="preserve">
     <value>否</value>
     <comment>Tristate 枚举 False 项的说明。</comment>
@@ -128,5 +144,9 @@
   <data name="Tristate.True" xml:space="preserve">
     <value>是</value>
     <comment>Tristate 枚举 True 项的说明。</comment>
+  </data>
+  <data name="WarningText" xml:space="preserve">
+    <value>[警告] </value>
+    <comment>警告的文本。</comment>
   </data>
 </root>

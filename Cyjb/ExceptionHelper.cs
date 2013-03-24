@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Cyjb.Utility;
 
 namespace Cyjb
@@ -115,6 +116,15 @@ namespace Cyjb
 			return GetArgumentException(paramName, "EnumTypeDoesNotMatch", argType, baseType);
 		}
 		/// <summary>
+		/// 返回存在为 <c>null</c> 的内部异常的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		public static ArgumentException InnerExceptionNull(string paramName)
+		{
+			return GetArgumentException(paramName, "InnerExceptionNull");
+		}
+		/// <summary>
 		/// 返回键重复的异常。
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
@@ -141,6 +151,16 @@ namespace Cyjb
 		public static ArgumentException MustContainEnumInfo(string paramName)
 		{
 			return GetArgumentException(paramName, "MustContainEnumInfo");
+		}
+		/// <summary>
+		/// 返回参数顺序颠倒的异常。
+		/// </summary>
+		/// <param name="paramName1">第一个异常参数的名称。</param>
+		/// <param name="paramName2">第二个异常参数的名称。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		public static ArgumentException ReversedArgument(string paramName1, string paramName2)
+		{
+			throw GetArgumentException(paramName1, "ReversedArgument", paramName1, paramName2);
 		}
 
 		#region 获取异常对象
@@ -506,6 +526,14 @@ namespace Cyjb
 		#region ObjectDisposedException
 
 		/// <summary>
+		/// 返回 SourceReader 已关闭的异常。
+		/// </summary>
+		/// <returns><see cref="System.ObjectDisposedException"/> 对象。</returns>
+		internal static ObjectDisposedException SourceReaderClosed()
+		{
+			return new ObjectDisposedException(ExceptionResources.GetString("SourceReaderClosed"));
+		}
+		/// <summary>
 		/// 返回对象已释放资源的异常。
 		/// </summary>
 		/// <returns><see cref="System.ObjectDisposedException"/> 对象。</returns>
@@ -608,6 +636,20 @@ namespace Cyjb
 		}
 
 		#endregion // RankException
+
+		#region SerializationException
+
+		/// <summary>
+		/// 返回异常集合反序列化失败的异常。
+		/// </summary>
+		/// <returns><see cref="System.Runtime.Serialization.SerializationException"/> 对象。</returns>
+		public static SerializationException AggregateExceptionDeserializationFailure()
+		{
+			return new SerializationException(
+				ExceptionResources.GetString("AggregateExceptionDeserializationFailure"));
+		}
+
+		#endregion // SerializationException
 
 		#region 缓冲池工厂异常
 

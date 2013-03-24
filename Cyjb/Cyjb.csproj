@@ -23,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\bin\Cyjb.XML</DocumentationFile>
     <CodeAnalysisRuleSet>..\CyjbRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -52,6 +53,11 @@
     <Compile Include="DelegateBuilder.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IO\AggregateSourceException.cs" />
+    <Compile Include="IO\SourceException.cs" />
+    <Compile Include="IO\SourceLocation.cs" />
+    <Compile Include="IO\SourceLocator.cs" />
+    <Compile Include="IO\SourceReader.cs" />
     <Compile Include="MethodExt.cs" />
     <Compile Include="PowerBinder.cs" />
     <Compile Include="CharExt.cs" />
@@ -67,6 +73,7 @@
     <Compile Include="EnumExt.cs" />
     <Compile Include="IntegerExt.cs" />
     <Compile Include="RandomExt.cs" />
+    <Compile Include="Text\Token.cs" />
     <Compile Include="TypeExt.cs" />
     <Compile Include="UniqueValue`1.cs" />
     <Compile Include="Utility\CacheCreateExceptionEventArgs.cs" />

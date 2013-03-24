@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AggregateExceptionDeserializationFailure" xml:space="preserve">
+    <value>序列化流不包含内部异常。</value>
+    <comment>异常集合反序列化异常。</comment>
+  </data>
   <data name="AmbiguousMatchField" xml:space="preserve">
     <value>找到多个有指定名称且与指定绑定约束匹配的字段。</value>
     <comment>找到多个有指定名称且与指定绑定约束匹配的字段。</comment>
@@ -229,6 +233,10 @@
     <value>集合是固定大小的。</value>
     <comment>集合是固定大小的。</comment>
   </data>
+  <data name="InnerExceptionNull" xml:space="preserve">
+    <value>innerExceptions 的一个元素为 null。</value>
+    <comment>内部异常之一为 null。</comment>
+  </data>
   <data name="InvalidBase" xml:space="preserve">
     <value>基不在 2 至 36 之间。</value>
     <comment>无效的基。</comment>
@@ -325,9 +333,17 @@
     <value>集合是只读的。</value>
     <comment>集合是只读的。</comment>
   </data>
+  <data name="ReversedArgument" xml:space="preserve">
+    <value>参数 '{0}' 和 '{1}' 的顺序颠倒。</value>
+    <comment>参数顺序颠倒。</comment>
+  </data>
   <data name="SameParameterName" xml:space="preserve">
     <value>两个参数的名称不能是相同的。</value>
     <comment>参数名相同。</comment>
+  </data>
+  <data name="SourceReaderClosed" xml:space="preserve">
+    <value>无法从已关闭的 SourceReader 中读取。</value>
+    <comment>不能从关闭的 SourceReader 中读取。</comment>
   </data>
   <data name="UnboundGenParam" xml:space="preserve">
     <value>不能对 ContainsGenericParameters 为 True 的类型或方法执行后期绑定操作。</value>

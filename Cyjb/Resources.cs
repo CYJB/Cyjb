@@ -86,6 +86,21 @@ namespace Cyjb
 		{
 			return ResManager.GetString(name, Culture);
 		}
+		/// <summary>
+		/// 使用指定的 <see cref="System.String"/> 资源的值格式化参数序列。
+		/// </summary>
+		/// <param name="name">要使用的资源名。</param>
+		/// <param name="args">要格式化的参数序列。</param>
+		/// <returns>格式化的参数序列。如果不可能有最佳匹配，则返回 <c>null</c>。</returns>
+		public static string GetString(string name, params object[] args)
+		{
+			string format = GetString(name);
+			if (string.IsNullOrEmpty(format) || args == null || args.Length <= 0)
+			{
+				return format;
+			}
+			return string.Format(Culture, format, args);
+		}
 
 		#endregion
 

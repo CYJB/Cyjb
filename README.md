@@ -35,6 +35,14 @@ My personal C# library.
 * Cyjb.Configurations 命名空间：包含与组件模型有关的类。
 	- ConfigurationElementCollection&lt;TElement&gt; 类：强类型的包含一个子元素集合的配置元素。
 	- ConfigurationElementCollection&lt;TKey, TElement&gt; 类：强类型的包含一个子元素集合的配置元素。
+* Cyjb.IO 命名空间：包含与输入输出有关的类。
+	- AggregateSourceException 类：表示源文件的异常的集合。
+	- SourceException 类：表示源文件中出现异常。
+	- SourceLocation 结构：表示源文件中的位置信息。
+	- SourceLocator 类：提供可以用于在源文件中定位的方法。
+	- SourceReader 类：支持行列计数的源文件读取器。
+* Cyjb.Text 命名空间：包含文本相关的类。
+	- Token 结构：表示一个词法单元。
 * Cyjb.Utility 命名空间：包含一些辅助类。
 	- ICache&lt;TKey, TValue&gt; 类：表示缓冲池的接口。
 	- CacheFactory 类：允许根据配置文件使用不同的缓冲池配置的工厂类。
