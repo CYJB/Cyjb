@@ -48,6 +48,10 @@ namespace Cyjb.IO
 		/// </summary>
 		private List<int> idxList;
 		/// <summary>
+		/// 计算字节数使用的编码器。
+		/// </summary>
+		private Encoder encoder = Encoding.Default.GetEncoder();
+		/// <summary>
 		/// 使用默认的 Tab 宽度初始化 <see cref="SourceLocator"/> 类的新实例。
 		/// </summary>
 		public SourceLocator() : this(DefaultTabSize) { }
@@ -113,7 +117,7 @@ namespace Cyjb.IO
 			else
 			{
 				charArr[0] = ch;
-				nextCol += Encoding.Default.GetByteCount(charArr);
+				nextCol += encoder.GetByteCount(charArr, 0, 1, false);
 			}
 		}
 		/// <summary>
@@ -249,18 +253,31 @@ namespace Cyjb.IO
 			}
 			// 余下最后一个字符单独考虑。
 			count--;
-			int i = idx + count - 1;
+			int end = idx + count;
+			int i = end - 1;
 			for (; i >= idx; i--)
 			{
 				if (chars[i] == '\t')
 				{
-					idxList.Add(i);
+					if (end > i)
+					{
+						idxList.Add(encoder.GetByteCount(chars, i + 1, end - i - 1, false));
+					}
+					else
+					{
+						idxList.Add(0);
+					}
+					end = i;
 				}
 				else if (chars[i] == '\n')
 				{
 					// 统计之前的行数。
 					nextCol = 1;
 					nextLine++;
+					if (end > i)
+					{
+						idxList.Add(encoder.GetByteCount(chars, i + 1, end - i - 1, false));
+					}
 					for (int j = i - 1; j >= idx; j--)
 					{
 						if (chars[j] == '\n') { nextLine++; }
@@ -268,24 +285,13 @@ namespace Cyjb.IO
 					break;
 				}
 			}
-			// 从 i 之后开始统计列数。
-			i++;
-			int len;
-			for (int j = idxList.Count - 1; j >= 0; j--)
+			// 统计列数。
+			for (int j = idxList.Count - 1; j > 0; j--)
 			{
-				len = idxList[j] - i;
-				if (len > 0)
-				{
-					nextCol += Encoding.Default.GetByteCount(chars, i, len);
-				}
-				i = idxList[j] + 1;
+				nextCol += idxList[j];
 				ForwardTab();
 			}
-			len = idx + count - i;
-			if (len > 0)
-			{
-				nextCol += Encoding.Default.GetByteCount(chars, i, len);
-			}
+			nextCol += idxList[0];
 			curIndex += count;
 			Forward(chars[idx + count]);
 		}
@@ -320,7 +326,11 @@ namespace Cyjb.IO
 						{
 							if (end > i)
 							{
-								idxList.Add(Encoding.Default.GetByteCount(i + 1, (int)(end - i) - 1));
+								idxList.Add(encoder.GetByteCount(i + 1, (int)(end - i) - 1, false));
+							}
+							else
+							{
+								idxList.Add(0);
 							}
 							end = i;
 						}
@@ -331,7 +341,7 @@ namespace Cyjb.IO
 							nextLine++;
 							if (end > i)
 							{
-								idxList.Add(Encoding.Default.GetByteCount(i + 1, (int)(end - i) - 1));
+								idxList.Add(encoder.GetByteCount(i + 1, (int)(end - i) - 1, false));
 							}
 							for (char* j = i - 1; j >= start; j--)
 							{
