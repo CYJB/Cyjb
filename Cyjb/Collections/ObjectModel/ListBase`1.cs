@@ -579,7 +579,8 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				throw ExceptionHelper.ArgumentOutOfRange("index");
 			}
-			if (array.Length - index < this.Count)
+			int cnt = this.Count;
+			if (array.Length - index < cnt)
 			{
 				throw ExceptionHelper.ArrayTooSmall("array");
 			}
@@ -592,9 +593,9 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				try
 				{
-					foreach (T obj in this)
+					for (int i = 0; i < cnt; i++)
 					{
-						array.SetValue(obj, index++);
+						array.SetValue(this[i], index++);
 					}
 				}
 				catch (InvalidCastException ex)
