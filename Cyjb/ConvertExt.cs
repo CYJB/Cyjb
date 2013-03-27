@@ -23,23 +23,10 @@ namespace Cyjb
 		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，并且其值等效于 <paramref name="value"/>。</returns>
 		internal static object ImplicitChangeType(object value, Type conversionType, IFormatProvider provider)
 		{
-			ExceptionHelper.CheckArgumentNull(conversionType, "conversionType");
-			if (conversionType.IsByRef)
-			{
-				conversionType = conversionType.GetElementType();
-			}
-			// 总是可以转换为 Object。
-			if (conversionType == typeof(object)) { return value; }
-			// value 为 null 的情况。
 			Type nonNullableType;
-			bool nullableCType = TypeExt.IsNullableType(conversionType, out nonNullableType);
-			if (value == null)
+			if (BasicChangeType(ref value, conversionType, out nonNullableType))
 			{
-				if (conversionType.IsValueType && !nullableCType)
-				{
-					throw ExceptionHelper.CannotCastNullToValueType();
-				}
-				return null;
+				return value;
 			}
 			Type type = value.GetType();
 			// 尝试标准隐式类型转换。
@@ -66,6 +53,39 @@ namespace Cyjb
 				return value;
 			}
 			throw ExceptionHelper.ConvertInvalidValue(value, conversionType);
+		}
+		/// <summary>
+		/// 对指定类型执行基本的类型转换判断，包括转换为 object 和 null 转换。
+		/// 基本类型转换失败时，保证 value != null，nonNullableType != null。
+		/// </summary>
+		/// <param name="value">要转换的对象。</param>
+		/// <param name="conversionType">要返回的对象的类型。</param>
+		/// <param name="nonNullableType"><paramref name="value"/> 对应的 non-nullable-type。</param>
+		/// <returns>如果基本类型转换成功，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		private static bool BasicChangeType(ref object value, Type conversionType, out Type nonNullableType)
+		{
+			ExceptionHelper.CheckArgumentNull(conversionType, "conversionType");
+			if (conversionType.IsByRef)
+			{
+				conversionType = conversionType.GetElementType();
+			}
+			// 总是可以转换为 Object。
+			if (conversionType == typeof(object))
+			{
+				nonNullableType = null;
+				return true;
+			}
+			// value 为 null 的情况。
+			bool nullableCType = TypeExt.IsNullableType(conversionType, out nonNullableType);
+			if (value == null)
+			{
+				if (conversionType.IsValueType && !nullableCType)
+				{
+					throw ExceptionHelper.CannotCastNullToValueType();
+				}
+				return true;
+			}
+			return false;
 		}
 		/// <summary>
 		/// 返回指定类型的对象，其值等效于指定对象。参数提供区域性特定的格式设置信息。
@@ -192,23 +212,10 @@ namespace Cyjb
 		/// 并且其值等效于 <paramref name="value"/>。</returns>
 		public static object ChangeType(object value, Type conversionType, IFormatProvider provider)
 		{
-			ExceptionHelper.CheckArgumentNull(conversionType, "conversionType");
-			if (conversionType.IsByRef)
-			{
-				conversionType = conversionType.GetElementType();
-			}
-			// 总是可以转换为 Object。
-			if (conversionType == typeof(object)) { return value; }
-			// value 为 null 的情况。
 			Type nonNullableType;
-			bool nullableCType = TypeExt.IsNullableType(conversionType, out nonNullableType);
-			if (value == null)
+			if (BasicChangeType(ref value, conversionType, out nonNullableType))
 			{
-				if (conversionType.IsValueType && !nullableCType)
-				{
-					throw ExceptionHelper.CannotCastNullToValueType();
-				}
-				return null;
+				return value;
 			}
 			Type type = value.GetType();
 			// 尝试显示枚举转换。
