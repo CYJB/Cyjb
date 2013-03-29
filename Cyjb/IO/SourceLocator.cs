@@ -262,12 +262,12 @@ namespace Cyjb.IO
 					if (end > i)
 					{
 						idxList.Add(encoder.GetByteCount(chars, i + 1, end - i - 1, false));
+						end = i;
 					}
 					else
 					{
 						idxList.Add(0);
 					}
-					end = i;
 				}
 				else if (chars[i] == '\n')
 				{
@@ -277,6 +277,7 @@ namespace Cyjb.IO
 					if (end > i)
 					{
 						idxList.Add(encoder.GetByteCount(chars, i + 1, end - i - 1, false));
+						end = i;
 					}
 					for (int j = i - 1; j >= idx; j--)
 					{
@@ -284,6 +285,10 @@ namespace Cyjb.IO
 					}
 					break;
 				}
+			}
+			if (end > i)
+			{
+				idxList.Add(encoder.GetByteCount(chars, i + 1, end - i - 1, false));
 			}
 			// 统计列数。
 			for (int j = idxList.Count - 1; j > 0; j--)
@@ -327,12 +332,12 @@ namespace Cyjb.IO
 							if (end > i)
 							{
 								idxList.Add(encoder.GetByteCount(i + 1, (int)(end - i) - 1, false));
+								end = i;
 							}
 							else
 							{
 								idxList.Add(0);
 							}
-							end = i;
 						}
 						else if (*i == '\n')
 						{
@@ -342,6 +347,7 @@ namespace Cyjb.IO
 							if (end > i)
 							{
 								idxList.Add(encoder.GetByteCount(i + 1, (int)(end - i) - 1, false));
+								end = i;
 							}
 							for (char* j = i - 1; j >= start; j--)
 							{
@@ -349,6 +355,10 @@ namespace Cyjb.IO
 							}
 							break;
 						}
+					}
+					if (end > i)
+					{
+						idxList.Add(encoder.GetByteCount(i + 1, (int)(end - i) - 1, false));
 					}
 				}
 			}
