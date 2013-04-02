@@ -103,6 +103,15 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			this.items[index] = item;
 		}
+		/// <summary>
+		/// 返回指定索引处的元素。
+		/// </summary>
+		/// <param name="index">要返回元素的从零开始的索引。</param>
+		/// <returns>位于指定索引处的元素。</returns>
+		protected virtual T GetItem(int index)
+		{
+			return this.items[index];
+		}
 
 		#region IList<T> 成员
 
@@ -115,12 +124,9 @@ namespace Cyjb.Collections.ObjectModel
 		/// 而且 <see cref="ListBase&lt;T&gt;"/> 为只读。</exception>
 		/// <exception cref="System.NotSupportedException">
 		/// <see cref="ListBase&lt;T&gt;"/> 是只读的。</exception>
-		public virtual T this[int index]
+		public T this[int index]
 		{
-			get
-			{
-				return this.items[index];
-			}
+			get { return GetItem(index); }
 			set
 			{
 				if (this.isReadOnly)
@@ -226,10 +232,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// 而且 <see cref="ListBase&lt;T&gt;"/> 为只读。</exception>
 		object IList.this[int index]
 		{
-			get
-			{
-				return this[index];
-			}
+			get { return this.GetItem(index); }
 			set
 			{
 				if (this.isReadOnly)
@@ -465,23 +468,9 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentException">源 <see cref="CollectionBase&lt;T&gt;"/> 
 		/// 中的元素数目大于从 <paramref name="arrayIndex"/> 到目标 <paramref name="array"/> 
 		/// 末尾之间的可用空间。</exception>
-		public void CopyTo(T[] array, int arrayIndex)
+		public virtual void CopyTo(T[] array, int arrayIndex)
 		{
-			ExceptionHelper.CheckArgumentNull(array, "array");
-			ExceptionHelper.CheckFlatArray(array, "array");
-			if (arrayIndex < 0)
-			{
-				throw ExceptionHelper.ArgumentOutOfRange("arrayIndex");
-			}
-			if (array.Length - arrayIndex < this.Count)
-			{
-				throw ExceptionHelper.ArrayTooSmall("array");
-			}
-			int cnt = this.Count;
-			for (int i = 0; i < cnt; i++)
-			{
-				array[arrayIndex++] = this[i];
-			}
+			this.items.CopyTo(array, arrayIndex);
 		}
 
 		/// <summary>
@@ -595,7 +584,7 @@ namespace Cyjb.Collections.ObjectModel
 				{
 					for (int i = 0; i < cnt; i++)
 					{
-						array.SetValue(this[i], index++);
+						array.SetValue(this.GetItem(i), index++);
 					}
 				}
 				catch (InvalidCastException ex)
@@ -634,5 +623,4 @@ namespace Cyjb.Collections.ObjectModel
 		#endregion // IEnumerable 成员
 
 	}
-
 }

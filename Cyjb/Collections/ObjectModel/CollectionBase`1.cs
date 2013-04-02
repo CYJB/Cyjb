@@ -175,22 +175,9 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentException">源 <see cref="CollectionBase&lt;T&gt;"/> 
 		/// 中的元素数目大于从 <paramref name="arrayIndex"/> 到目标 <paramref name="array"/> 
 		/// 末尾之间的可用空间。</exception>
-		public void CopyTo(T[] array, int arrayIndex)
+		public virtual void CopyTo(T[] array, int arrayIndex)
 		{
-			ExceptionHelper.CheckArgumentNull(array, "array");
-			ExceptionHelper.CheckFlatArray(array, "array");
-			if (arrayIndex < 0)
-			{
-				throw ExceptionHelper.ArgumentOutOfRange("arrayIndex");
-			}
-			if (array.Length - arrayIndex < this.Count)
-			{
-				throw ExceptionHelper.ArrayTooSmall("array");
-			}
-			foreach (T obj in this)
-			{
-				array[arrayIndex++] = obj;
-			}
+			this.items.CopyTo(array, arrayIndex);
 		}
 
 		/// <summary>
@@ -276,35 +263,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// 的类型无法自动转换为目标 <paramref name="array"/> 的类型。</exception>
 		void ICollection.CopyTo(Array array, int index)
 		{
-			ExceptionHelper.CheckArgumentNull(array, "array");
-			ExceptionHelper.CheckFlatArray(array, "array");
-			if (index < 0)
-			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
-			}
-			if (array.Length - index < this.Count)
-			{
-				throw ExceptionHelper.ArrayTooSmall("array");
-			}
-			T[] arr = array as T[];
-			if (arr != null)
-			{
-				this.CopyTo(arr, index);
-			}
-			else
-			{
-				try
-				{
-					foreach (T obj in this)
-					{
-						array.SetValue(obj, index++);
-					}
-				}
-				catch (InvalidCastException ex)
-				{
-					throw ExceptionHelper.ArrayTypeInvalid(ex);
-				}
-			}
+			CollectionHelper.CopyTo(this, array, index);
 		}
 
 		#endregion // ICollection 成员

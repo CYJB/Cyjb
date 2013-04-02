@@ -40,6 +40,41 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			return this.dict.ContainsKey(item);
 		}
+		/// <summary>
+		/// 从特定的 <see cref="System.Array"/> 索引处开始，
+		/// 将 <see cref="DictionaryKeyCollection&lt;TKey, TValue&gt;"/> 
+		/// 的元素复制到一个 <see cref="System.Array"/> 中。
+		/// </summary>
+		/// <param name="array">作为从 <see cref="DictionaryKeyCollection&lt;TKey, TValue&gt;"/> 
+		/// 复制的元素的目标位置的一维 <see cref="System.Array"/>。
+		/// <see cref="System.Array"/> 必须具有从零开始的索引。</param>
+		/// <param name="arrayIndex"><paramref name="array"/> 中从零开始的索引，在此处开始复制。</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="array"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <paramref name="arrayIndex"/> 小于零。</exception>
+		/// <exception cref="System.ArgumentException">
+		/// <paramref name="array"/> 是多维的。</exception>
+		/// <exception cref="System.ArgumentException">源 <see cref="DictionaryKeyCollection&lt;TKey, TValue&gt;"/> 
+		/// 中的元素数目大于从 <paramref name="arrayIndex"/> 到目标 <paramref name="array"/> 
+		/// 末尾之间的可用空间。</exception>
+		public override void CopyTo(TKey[] array, int arrayIndex)
+		{
+			ExceptionHelper.CheckArgumentNull(array, "array");
+			ExceptionHelper.CheckFlatArray(array, "array");
+			if (arrayIndex < 0)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("arrayIndex");
+			}
+			if (array.Length - arrayIndex < this.Count)
+			{
+				throw ExceptionHelper.ArrayTooSmall("array");
+			}
+			foreach (KeyValuePair<TKey, TValue> pair in this.dict)
+			{
+				array[arrayIndex++] = pair.Key;
+			}
+		}
 
 		#endregion // ICollection<TKey> 成员
 

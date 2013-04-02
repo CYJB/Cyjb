@@ -363,24 +363,10 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentException">源 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 
 		/// 中的元素数目大于从 <paramref name="arrayIndex"/> 到目标 <paramref name="array"/> 
 		/// 末尾之间的可用空间。</exception>
-		public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+		public virtual void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
 		{
-			ExceptionHelper.CheckArgumentNull(array, "array");
-			ExceptionHelper.CheckFlatArray(array, "array");
-			if (arrayIndex < 0)
-			{
-				throw ExceptionHelper.ArgumentOutOfRange("arrayIndex");
-			}
-			if (array.Length - arrayIndex < this.Count)
-			{
-				throw ExceptionHelper.ArrayTooSmall("array");
-			}
-			foreach (KeyValuePair<TKey, TValue> obj in this)
-			{
-				array[arrayIndex++] = obj;
-			}
+			this.items.CopyTo(array, arrayIndex);
 		}
-
 		/// <summary>
 		/// 从 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 中移除特定对象的第一个匹配项。
 		/// </summary>

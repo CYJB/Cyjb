@@ -14,14 +14,14 @@ namespace Cyjb.Collections.ObjectModel
 	public class ReadOnlyDictionary<TKey, TValue> : DictionaryBase<TKey, TValue>
 	{
 		/// <summary>
-		/// 空的只读泛型集合。
+		/// 空的只读泛型字典。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private static IDictionary<TKey, TValue> empty;
 		/// <summary>
-		/// 获取空的只读泛型集合。
+		/// 获取空的只读泛型字典。
 		/// </summary>
-		/// <value>空的只读泛型集合。</value>
+		/// <value>空的只读泛型字典。</value>
 		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
 		public static IDictionary<TKey, TValue> Empty
 		{
@@ -41,13 +41,13 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 将 <see cref="ReadOnlyDictionary&lt;TKey,TValue&gt;"/> 类的新实例初始化为指定字典的包装。
 		/// </summary>
-		/// <param name="dict">由新的列表包装的字典。</param>
+		/// <param name="dict">由新的字典包装的字典。</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="dict"/> 为 <c>null</c>。</exception>
 		public ReadOnlyDictionary(IDictionary<TKey, TValue> dict)
 			: base(dict, true)
 		{
-			ExceptionHelper.CheckArgumentNull(dict, "collection");
+			ExceptionHelper.CheckArgumentNull(dict, "dict");
 		}
 		/// <summary>
 		/// 将 <see cref="ReadOnlyDictionary&lt;TKey,TValue&gt;"/> 类的新实例初始化为指定数组的包装。
