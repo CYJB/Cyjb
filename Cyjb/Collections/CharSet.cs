@@ -23,35 +23,23 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 顶层数组的长度。
 		/// </summary>
-		private const int TopLen = 16;
-		/// <summary>
-		/// 中间层数组的长度。
-		/// </summary>
-		private const int MidLen = 16;
+		private const int TopLen = 64;
 		/// <summary>
 		/// 底层数组的长度。
 		/// </summary>
-		private const int BtmLen = 8;
+		private const int BtmLen = 32;
 		/// <summary>
 		/// 顶层数组索引的位移。
 		/// </summary>
-		private const int TopShift = 12;
-		/// <summary>
-		/// 中间层数组索引的位移。
-		/// </summary>
-		private const int MidShift = 8;
+		private const int TopShift = 10;
 		/// <summary>
 		/// 底层数组索引的位移。
 		/// </summary>
 		private const int BtmShift = 5;
 		/// <summary>
-		/// 中间层数组索引的掩码。
-		/// </summary>
-		private const int MidMask = 0xF;
-		/// <summary>
 		/// 底间层数组索引的掩码。
 		/// </summary>
-		private const int BtmMask = 7;
+		private const int BtmMask = 0x1F;
 		/// <summary>
 		/// Int32 索引的掩码。
 		/// </summary>
@@ -60,13 +48,9 @@ namespace Cyjb.Collections
 		#endregion // 常量定义
 
 		/// <summary>
-		/// EASCII 码的数据，0x00 ~ 0xFF。
-		/// </summary>
-		private uint[] eascii;
-		/// <summary>
 		/// 0x0000 ~ 0xFFFF 的数据。
 		/// </summary>
-		private uint[][][] data = null;
+		private uint[][] data = null;
 		/// <summary>
 		/// 集合中元素的个数。
 		/// </summary>
@@ -114,6 +98,7 @@ namespace Cyjb.Collections
 			: base(null)
 		{
 			this.ignoreCase = ignoreCase;
+			this.data = new uint[TopLen][];
 			if (this.ignoreCase)
 			{
 				if (culture == null)
@@ -132,9 +117,6 @@ namespace Cyjb.Collections
 				this.getIndex = GetIndex;
 				this.btmFullLen = BtmLen;
 			}
-			this.data = new uint[TopLen][][];
-			this.data[0] = new uint[MidLen][];
-			this.eascii = this.data[0][0] = new uint[btmFullLen];
 		}
 		/// <summary>
 		/// 初始化 <see cref="Cyjb.Collections.CharSet"/> 类的新实例，
@@ -184,8 +166,7 @@ namespace Cyjb.Collections
 			: base(null)
 		{
 			ExceptionHelper.CheckArgumentNull(info, "info");
-			this.data = (uint[][][])info.GetValue("Data", typeof(uint[][][]));
-			this.eascii = data[0][0];
+			this.data = (uint[][])info.GetValue("Data", typeof(uint[][]));
 			this.count = info.GetInt32("Count");
 			this.ignoreCase = info.GetBoolean("IgnoreCase");
 			if (this.ignoreCase)
@@ -218,23 +199,6 @@ namespace Cyjb.Collections
 		#region 数据操作
 
 		/// <summary>
-		/// 返回指定的中层存储单元是否都是 0 或 <c>null</c>。
-		/// </summary>
-		/// <param name="array">要判断的中层存储单元。</param>
-		/// <returns>如果单元中的元素都是 0 或 <c>null</c>，则为 <c>true</c>；
-		/// 否则为 <c>false</c>。</returns>
-		private static bool IsEmpty(uint[][] array)
-		{
-			for (int i = 0; i < array.Length; i++)
-			{
-				if (array[i] != null && !IsEmpty(array[i]))
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-		/// <summary>
 		/// 返回指定的底层存储单元是否都是 0。
 		/// </summary>
 		/// <param name="array">要判断的底层存储单元。</param>
@@ -249,23 +213,6 @@ namespace Cyjb.Collections
 				}
 			}
 			return true;
-		}
-		/// <summary>
-		/// 计算指定的中层存储单元中包含的字符个数
-		/// </summary>
-		/// <param name="array">要计算字符个数的中层存储单元。</param>
-		/// <returns>指定的中层存储单元中包含的字符个数。</returns>
-		private static int CountChar(uint[][] array)
-		{
-			int cnt = 0;
-			for (int i = 0; i < array.Length; i++)
-			{
-				if (array[i] != null)
-				{
-					cnt += CountChar(array[i]);
-				}
-			}
-			return cnt;
 		}
 		/// <summary>
 		/// 计算指定的底层存储单元中包含的字符个数。
@@ -283,31 +230,6 @@ namespace Cyjb.Collections
 				}
 			}
 			return cnt;
-		}
-		/// <summary>
-		/// 复制指定的中层存储单元
-		/// </summary>
-		/// <param name="array">要复制中层存储单元。</param>
-		/// <param name="count">实际被复制的字符个数。</param>
-		/// <returns>复制得到的中层存储单元。。</returns>
-		private static uint[][] CopyChar(uint[][] array, out int count)
-		{
-			uint[][] newArr = new uint[array.Length][];
-			count = 0;
-			int cnt = 0;
-			for (int i = 0; i < array.Length; i++)
-			{
-				if (array[i] == null)
-				{
-					newArr[i] = null;
-				}
-				else
-				{
-					newArr[i] = CopyChar(array[i], out cnt);
-					count += cnt;
-				}
-			}
-			return newArr;
 		}
 		/// <summary>
 		/// 复制指定的底层存储单元
@@ -356,29 +278,17 @@ namespace Cyjb.Collections
 		/// <returns>数据数组。</returns>
 		private uint[] FindMask(int ch, out int idx, out uint binIdx)
 		{
-			uint[] arr = null;
-			if (ch <= 0xFF)
+			idx = ch >> TopShift;
+			uint[] arr = this.data[idx];
+			if (arr == null)
 			{
-				arr = eascii;
+				binIdx = 0;
 			}
 			else
 			{
-				idx = ch >> TopShift;
-				binIdx = 0;
-				uint[][] arrMid = this.data[idx];
-				if (arrMid == null)
-				{
-					return null;
-				}
-				idx = (ch >> MidShift) & MidMask;
-				arr = arrMid[idx];
-				if (arr == null)
-				{
-					return null;
-				}
+				idx = (ch >> BtmShift) & BtmMask;
+				binIdx = 1u << (ch & IndexMask);
 			}
-			idx = (ch >> BtmShift) & BtmMask;
-			binIdx = 1u << (ch & IndexMask);
 			return arr;
 		}
 		/// <summary>
@@ -390,27 +300,12 @@ namespace Cyjb.Collections
 		/// <returns>数据数组。</returns>
 		private uint[] FindAndCreateMask(int ch, out int idx, out uint binIdx)
 		{
-			uint[] arr = null;
-			if (ch <= 0xFF)
+			idx = ch >> TopShift;
+			uint[] arr = this.data[idx];
+			if (arr == null)
 			{
-				arr = eascii;
-			}
-			else
-			{
-				idx = ch >> TopShift;
-				uint[][] arrMid = this.data[idx];
-				if (arrMid == null)
-				{
-					arrMid = new uint[MidLen][];
-					this.data[idx] = arrMid;
-				}
-				idx = (ch >> MidShift) & MidMask;
-				arr = arrMid[idx];
-				if (arr == null)
-				{
-					arr = new uint[btmFullLen];
-					arrMid[idx] = arr;
-				}
+				arr = new uint[btmFullLen];
+				this.data[idx] = arr;
 			}
 			idx = (ch >> BtmShift) & BtmMask;
 			binIdx = 1u << (ch & IndexMask);
@@ -458,43 +353,26 @@ namespace Cyjb.Collections
 		{
 			for (int i = 0; i < TopLen; i++)
 			{
-				uint[][] otherArrMid = other.data[i];
-				if (otherArrMid == null)
+				uint[] otherArr = other.data[i];
+				if (otherArr == null)
 				{
 					continue;
 				}
-				uint[][] arrMid = data[i];
-				if (arrMid == null)
+				uint[] arr = data[i];
+				if (arr == null)
 				{
 					// 判断 otherArrMid 是否为空。
-					if (!IsEmpty(otherArrMid))
+					if (!IsEmpty(otherArr))
 					{
 						return false;
 					}
 					continue;
 				}
-				for (int j = 0; j < MidLen; j++)
+				for (int j = 0; j < BtmLen; j++)
 				{
-					uint[] otherArrBottom = otherArrMid[j];
-					if (otherArrBottom == null)
+					if ((arr[j] | otherArr[j]) != arr[j])
 					{
-						continue;
-					}
-					uint[] arrBottom = arrMid[j];
-					if (arrBottom == null)
-					{
-						if (!IsEmpty(otherArrBottom))
-						{
-							return false;
-						}
-						continue;
-					}
-					for (int k = 0; k < BtmLen; k++)
-					{
-						if ((arrBottom[k] | otherArrBottom[k]) != arrBottom[k])
-						{
-							return false;
-						}
+						return false;
 					}
 				}
 			}
@@ -509,40 +387,9 @@ namespace Cyjb.Collections
 		/// </summary>
 		public void TrimExcess()
 		{
-			// data[0][0] 由于对应于 EASCII，不能被移除。
-			uint[][] arrMid = data[0];
-			for (int j = 1; j < MidLen; j++)
+			for (int i = 0; i < TopLen; i++)
 			{
-				// 移除为空的底层单元。
-				if (arrMid[j] != null && IsEmpty(arrMid[j]))
-				{
-					arrMid[j] = null;
-				}
-			}
-			for (int i = 1; i < TopLen; i++)
-			{
-				arrMid = data[i];
-				if (arrMid == null)
-				{
-					continue;
-				}
-				bool allEmpty = true;
-				for (int j = 0; j < MidLen; j++)
-				{
-					// 移除为空的底层单元。
-					if (arrMid[j] != null)
-					{
-						if (IsEmpty(arrMid[j]))
-						{
-							arrMid[j] = null;
-						}
-						else
-						{
-							allEmpty = false;
-						}
-					}
-				}
-				if (allEmpty)
+				if (data[i] != null && IsEmpty(data[i]))
 				{
 					data[i] = null;
 				}
@@ -557,15 +404,7 @@ namespace Cyjb.Collections
 		protected override void ClearItems()
 		{
 			this.count = 0;
-			for (int i = 0; i < btmFullLen; i++)
-			{
-				eascii[i] = 0;
-			}
-			for (int i = 1; i < MidLen; i++)
-			{
-				data[0][i] = null;
-			}
-			for (int i = 1; i < TopLen; i++)
+			for (int i = 0; i < TopLen; i++)
 			{
 				data[i] = null;
 			}
@@ -670,39 +509,26 @@ namespace Cyjb.Collections
 		{
 			for (int i = 0; i < TopLen; i++)
 			{
-				uint[][] arrMid = data[i];
-				if (arrMid == null)
+				uint[] arr = data[i];
+				if (arr == null)
 				{
 					continue;
 				}
-				uint[][] otherArrMid = other.data[i];
-				if (otherArrMid == null)
+				uint[] otherArr = other.data[i];
+				if (otherArr == null)
 				{
 					continue;
 				}
-				for (int j = 0; j < MidLen; j++)
+				for (int j = 0; j < BtmLen; j++)
 				{
-					uint[] arrBottom = arrMid[j];
-					if (arrBottom == null)
+					uint removed = arr[j] & otherArr[j];
+					if (removed > 0)
 					{
-						continue;
-					}
-					uint[] otherArrBottom = otherArrMid[j];
-					if (otherArrBottom == null)
-					{
-						continue;
-					}
-					for (int k = 0; k < BtmLen; k++)
-					{
-						uint removed = arrBottom[k] & otherArrBottom[k];
-						if (removed > 0)
+						this.count -= removed.BinOneCnt();
+						arr[j] &= ~removed;
+						if (ignoreCase)
 						{
-							this.count -= removed.BinOneCnt();
-							arrBottom[k] &= ~removed;
-							if (ignoreCase)
-							{
-								arrBottom[k + BtmLen] &= ~removed;
-							}
+							arr[j + BtmLen] &= ~removed;
 						}
 					}
 				}
@@ -733,7 +559,6 @@ namespace Cyjb.Collections
 						}
 					}
 					// 替换当前集合。
-					this.eascii = otherSet.eascii;
 					this.data = otherSet.data;
 					this.count = otherSet.count;
 				}
@@ -753,45 +578,29 @@ namespace Cyjb.Collections
 			// 针对 CharSet 的操作更快。
 			for (int i = 0; i < TopLen; i++)
 			{
-				uint[][] arrMid = data[i];
-				if (arrMid == null)
+				uint[] arr = data[i];
+				if (arr == null)
 				{
 					continue;
 				}
-				uint[][] otherArrMid = other.data[i];
-				if (otherArrMid == null)
+				uint[] otherArr = other.data[i];
+				if (otherArr == null)
 				{
 					data[i] = null;
 					// 计算被移除的元素数量。
-					this.count -= CountChar(arrMid);
+					this.count -= CountChar(arr);
 					continue;
 				}
-				for (int j = 0; j < MidLen; j++)
+				for (int j = 0; j < BtmLen; j++)
 				{
-					uint[] arrBottom = arrMid[j];
-					if (arrBottom == null)
+					uint removed = arr[j] & ~otherArr[j];
+					if (removed > 0)
 					{
-						continue;
-					}
-					uint[] otherArrBottom = otherArrMid[j];
-					if (otherArrBottom == null)
-					{
-						arrMid[j] = null;
-						// 计算被移除的元素数量。
-						this.count -= CountChar(arrBottom);
-						continue;
-					}
-					for (int k = 0; k < BtmLen; k++)
-					{
-						uint removed = arrBottom[k] & ~otherArrBottom[k];
-						if (removed > 0)
+						this.count -= removed.BinOneCnt();
+						arr[j] &= otherArr[j];
+						if (ignoreCase)
 						{
-							this.count -= removed.BinOneCnt();
-							arrBottom[k] &= otherArrBottom[k];
-							if (ignoreCase)
-							{
-								arrBottom[k + BtmLen] &= otherArrBottom[k];
-							}
+							arr[j + BtmLen] &= otherArr[j];
 						}
 					}
 				}
@@ -984,34 +793,21 @@ namespace Cyjb.Collections
 		{
 			for (int i = 0; i < TopLen; i++)
 			{
-				uint[][] arrMid = data[i];
-				if (arrMid == null)
+				uint[] arr = data[i];
+				if (arr == null)
 				{
 					continue;
 				}
-				uint[][] otherArrMid = other.data[i];
-				if (otherArrMid == null)
+				uint[] otherArr = other.data[i];
+				if (otherArr == null)
 				{
 					continue;
 				}
-				for (int j = 0; j < MidLen; j++)
+				for (int j = 0; j < BtmLen; j++)
 				{
-					uint[] arrBottom = arrMid[j];
-					if (arrBottom == null)
+					if ((arr[j] & otherArr[j]) > 0)
 					{
-						continue;
-					}
-					uint[] otherArrBottom = otherArrMid[j];
-					if (otherArrBottom == null)
-					{
-						continue;
-					}
-					for (int k = 0; k < BtmLen; k++)
-					{
-						if ((arrBottom[k] & otherArrBottom[k]) > 0)
-						{
-							return true;
-						}
+						return true;
 					}
 				}
 			}
@@ -1093,56 +889,39 @@ namespace Cyjb.Collections
 		{
 			for (int i = 0; i < TopLen; i++)
 			{
-				uint[][] otherArrMid = other.data[i];
-				if (otherArrMid == null)
+				uint[] otherArr = other.data[i];
+				if (otherArr == null)
 				{
 					continue;
 				}
-				uint[][] arrMid = data[i];
-				if (arrMid == null)
+				uint[] arr = data[i];
+				if (arr == null)
 				{
 					// 复制数据。
 					int cnt;
-					data[i] = CopyChar(otherArrMid, out cnt);
+					data[i] = CopyChar(otherArr, out cnt);
 					this.count += cnt;
 					continue;
 				}
-				for (int j = 0; j < MidLen; j++)
+				for (int j = 0; j < BtmLen; j++)
 				{
-					uint[] arrBottom = arrMid[j];
-					if (arrBottom == null)
+					int oldCnt = 0;
+					if (arr[j] > 0)
 					{
-						continue;
+						oldCnt = arr[j].BinOneCnt();
 					}
-					uint[] otherArrBottom = otherArrMid[j];
-					if (otherArrBottom == null)
+					if (ignoreCase)
 					{
-						// 复制数据。
-						int cnt;
-						arrMid[j] = CopyChar(otherArrBottom, out cnt);
-						this.count += cnt;
-						continue;
+						arr[j + BtmLen] &= ~otherArr[j];
+						arr[j + BtmLen] |= otherArr[j + BtmLen] & ~arr[j];
 					}
-					for (int k = 0; k < BtmLen; k++)
+					arr[j] ^= otherArr[j];
+					int newCnt = 0;
+					if (arr[j] > 0)
 					{
-						int oldCnt = 0;
-						if (arrBottom[k] > 0)
-						{
-							oldCnt = arrBottom[k].BinOneCnt();
-						}
-						if (ignoreCase)
-						{
-							arrBottom[k + BtmLen] &= ~otherArrBottom[k];
-							arrBottom[k + BtmLen] |= otherArrBottom[k + BtmLen] & ~arrBottom[k];
-						}
-						arrBottom[k] ^= otherArrBottom[k];
-						int newCnt = 0;
-						if (arrBottom[k] > 0)
-						{
-							newCnt = arrBottom[k].BinOneCnt();
-						}
-						this.count += newCnt - oldCnt;
+						newCnt = arr[j].BinOneCnt();
 					}
+					this.count += newCnt - oldCnt;
 				}
 			}
 		}
@@ -1182,51 +961,31 @@ namespace Cyjb.Collections
 		{
 			for (int i = 0; i < TopLen; i++)
 			{
-				uint[][] otherArrMid = other.data[i];
-				if (otherArrMid == null)
+				uint[] otherArr = other.data[i];
+				if (otherArr == null)
 				{
 					continue;
 				}
-				uint[][] arrMid = data[i];
-				if (arrMid == null)
+				uint[] arr = data[i];
+				if (arr == null)
 				{
 					// 复制数据。
 					int cnt;
-					data[i] = CopyChar(otherArrMid, out cnt);
+					data[i] = CopyChar(otherArr, out cnt);
 					this.count += cnt;
 					continue;
 				}
-				for (int j = 0; j < MidLen; j++)
+				for (int j = 0; j < BtmLen; j++)
 				{
-					uint[] otherArrBottom = otherArrMid[j];
-					if (otherArrBottom == null)
+					// 后来添加的字符数。
+					uint added = (~arr[j]) & otherArr[j];
+					if (added > 0)
 					{
-						continue;
-					}
-					uint[] arrBottom = arrMid[j];
-					if (arrBottom == null)
-					{
-						// 复制数据。
-						int cnt;
-						arrMid[j] = CopyChar(otherArrBottom, out cnt);
-						this.count += cnt;
-						continue;
-					}
-					else
-					{
-						for (int k = 0; k < BtmLen; k++)
+						this.count += added.BinOneCnt();
+						arr[j] |= added;
+						if (ignoreCase)
 						{
-							// 后来添加的字符数。
-							uint added = (~arrBottom[k]) & otherArrBottom[k];
-							if (added > 0)
-							{
-								this.count += added.BinOneCnt();
-								arrBottom[k] |= added;
-								if (ignoreCase)
-								{
-									arrBottom[k + BtmLen] |= otherArrBottom[k + BtmLen] & added;
-								}
-							}
+							arr[j + BtmLen] |= otherArr[j + BtmLen] & added;
 						}
 					}
 				}
@@ -1307,45 +1066,36 @@ namespace Cyjb.Collections
 		{
 			for (int i = 0; i < TopLen; i++)
 			{
-				uint[][] arr1 = data[i];
-				if (arr1 == null)
+				uint[] arr = this.data[i];
+				if (arr == null)
 				{
 					continue;
 				}
 				int c1 = i << TopShift;
-				for (int j = 0; j < MidLen; j++)
+				for (int k = 0; k < BtmLen; k++)
 				{
-					uint[] arr2 = arr1[j];
-					if (arr2 == null)
+					int c2 = c1 | (k << BtmShift);
+					uint value = arr[k];
+					uint valueIg = ignoreCase ? arr[k + BtmLen] : 0;
+					for (int n = -1; value > 0; )
 					{
-						continue;
-					}
-					int c2 = c1 | (j << MidShift);
-					for (int k = 0; k < BtmLen; k++)
-					{
-						int c3 = c2 | (k << BtmShift);
-						uint value = arr2[k];
-						uint valueIg = ignoreCase ? arr2[k + BtmLen] : 0;
-						for (int n = -1; value > 0; )
+						int oneIdx = (value & 1) == 1 ? 1 : value.BinTrailingZeroCount() + 1;
+						if (oneIdx == 32)
 						{
-							int oneIdx = (value & 1) == 1 ? 1 : value.BinTrailingZeroCount() + 1;
-							if (oneIdx == 32)
-							{
-								// C# 中 uint 右移 32 位会不变。
-								value = 0;
-							}
-							else
-							{
-								value = value >> oneIdx;
-							}
-							n += oneIdx;
-							char c4 = (char)(c3 | n);
-							if ((valueIg & (1 << n)) > 0)
-							{
-								c4 = char.ToLower(c4, culture);
-							}
-							yield return c4;
+							// C# 中 uint 右移 32 位会不变。
+							value = 0;
 						}
+						else
+						{
+							value = value >> oneIdx;
+						}
+						n += oneIdx;
+						char c3 = (char)(c2 | n);
+						if ((valueIg & (1 << n)) > 0)
+						{
+							c3 = char.ToLower(c3, culture);
+						}
+						yield return c3;
 					}
 				}
 			}
