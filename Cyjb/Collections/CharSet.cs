@@ -292,7 +292,7 @@ namespace Cyjb.Collections
 		/// <returns>复制得到的中层存储单元。。</returns>
 		private static uint[][] CopyChar(uint[][] array, out int count)
 		{
-			uint[][] newArr = new uint[MidLen][];
+			uint[][] newArr = new uint[array.Length][];
 			count = 0;
 			int cnt = 0;
 			for (int i = 0; i < array.Length; i++)
@@ -317,7 +317,7 @@ namespace Cyjb.Collections
 		/// <returns>复制得到的底层存储单元。。</returns>
 		private static uint[] CopyChar(uint[] array, out int count)
 		{
-			uint[] newArr = new uint[BtmLen];
+			uint[] newArr = new uint[array.Length];
 			count = 0;
 			for (int i = 0; i < array.Length; i++)
 			{
