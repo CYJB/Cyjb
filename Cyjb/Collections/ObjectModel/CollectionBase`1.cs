@@ -53,7 +53,10 @@ namespace Cyjb.Collections.ObjectModel
 		protected CollectionBase(ICollection<T> collection)
 		{
 			this.items = collection;
-			this.isReadOnly = items.IsReadOnly;
+			if (this.items != null)
+			{
+				this.isReadOnly = items.IsReadOnly;
+			}
 		}
 		/// <summary>
 		/// 将 <see cref="CollectionBase&lt;T&gt;"/> 类的新实例初始化为指定集合的包装。

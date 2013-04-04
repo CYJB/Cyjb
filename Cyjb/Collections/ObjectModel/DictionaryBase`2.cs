@@ -65,6 +65,10 @@ namespace Cyjb.Collections.ObjectModel
 		protected DictionaryBase(IDictionary<TKey, TValue> dict)
 		{
 			this.items = dict;
+			if (this.items != null)
+			{
+				this.isReadOnly = this.items.IsReadOnly;
+			}
 		}
 		/// <summary>
 		/// 将 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 类的新实例初始化为指定字典的包装。

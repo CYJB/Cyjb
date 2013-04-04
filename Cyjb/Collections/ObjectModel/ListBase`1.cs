@@ -43,7 +43,6 @@ namespace Cyjb.Collections.ObjectModel
 		protected ListBase(bool isReadOnly)
 		{
 			this.items = new List<T>();
-			this.isReadOnly = isReadOnly;
 		}
 		/// <summary>
 		/// 将 <see cref="ListBase&lt;T&gt;"/> 类的新实例初始化为指定集合的包装。
@@ -52,6 +51,10 @@ namespace Cyjb.Collections.ObjectModel
 		protected ListBase(IList<T> list)
 		{
 			this.items = list;
+			if (this.items != null)
+			{
+				this.isReadOnly = this.items.IsReadOnly;
+			}
 		}
 		/// <summary>
 		/// 将 <see cref="ListBase&lt;T&gt;"/> 类的新实例初始化为指定集合的包装。

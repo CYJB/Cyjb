@@ -53,7 +53,10 @@ namespace Cyjb.Collections.ObjectModel
 		protected SetBase(ISet<T> set)
 		{
 			this.items = set;
-			this.isReadOnly = items.IsReadOnly;
+			if (this.items != null)
+			{
+				this.isReadOnly = this.items.IsReadOnly;
+			}
 		}
 		/// <summary>
 		/// 将 <see cref="SetBase&lt;T&gt;"/> 类的新实例初始化为指定集的包装。
