@@ -153,6 +153,35 @@ namespace Cyjb
 				}
 			}
 		}
+		/// <summary>
+		/// 用于计算末尾连续零的个数的数组。
+		/// </summary>
+		private static readonly int[] MultiplyDeBruijnBitPosition32 = new int[] {
+			  0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 
+			  31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9 };
+		/// <summary>
+		/// 计算当前值的二进制表示中末尾连续零的个数。
+		/// </summary>
+		/// <param name="value">要计算二进制表示中末尾连续零的值。</param>
+		/// <returns>当前值的二进制表示中末尾连续零的个数。</returns>
+		public static int BinTrailingZeroCount(this int value)
+		{
+			return MultiplyDeBruijnBitPosition32[((uint)((value & -value) * 0x077CB531U)) >> 27];
+		}
+		/// <summary>
+		/// 计算当前值的二进制表示中 1 的个数。
+		/// </summary>
+		/// <param name="value">要计算的值。</param>
+		/// <returns>当前值的二进制表示中 1 的个数。</returns>
+		public static int BinOneCnt(this int value)
+		{
+			value = (value & 0x55555555) + ((value >> 1) & 0x55555555);
+			value = (value & 0x33333333) + ((value >> 2) & 0x33333333);
+			value = (value & 0x0F0F0F0F) + ((value >> 4) & 0x0F0F0F0F);
+			value = (value & 0x00FF00FF) + ((value >> 8) & 0x00FF00FF);
+			value = (value & 0x0000FFFF) + ((value >> 16) & 0x0000FFFF);
+			return value;
+		}
 
 		#endregion // Int32 操作
 
@@ -455,6 +484,31 @@ namespace Cyjb
 				}
 				func(source);
 			}
+		}
+		/// <summary>
+		/// 计算当前值的二进制表示中末尾连续零的个数。
+		/// </summary>
+		/// <param name="value">要计算二进制表示中末尾连续零的值。</param>
+		/// <returns>当前值的二进制表示中末尾连续零的个数。</returns>
+		[CLSCompliant(false)]
+		public static int BinTrailingZeroCount(this uint value)
+		{
+			return MultiplyDeBruijnBitPosition32[(uint)((value & -value) * 0x077CB531U) >> 27];
+		}
+		/// <summary>
+		/// 计算当前值的二进制表示中 1 的个数。
+		/// </summary>
+		/// <param name="value">要计算的值。</param>
+		/// <returns>当前值的二进制表示中 1 的个数。</returns>
+		[CLSCompliant(false)]
+		public static int BinOneCnt(this uint value)
+		{
+			value = (value & 0x55555555) + ((value >> 1) & 0x55555555);
+			value = (value & 0x33333333) + ((value >> 2) & 0x33333333);
+			value = (value & 0x0F0F0F0F) + ((value >> 4) & 0x0F0F0F0F);
+			value = (value & 0x00FF00FF) + ((value >> 8) & 0x00FF00FF);
+			value = (value & 0x0000FFFF) + ((value >> 16) & 0x0000FFFF);
+			return (int)value;
 		}
 
 		#endregion // UInt32 操作
