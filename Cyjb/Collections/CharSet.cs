@@ -41,7 +41,7 @@ namespace Cyjb.Collections
 		/// </summary>
 		private const int BtmMask = 0x1F;
 		/// <summary>
-		/// Int32 索引的掩码。
+		/// UInt32 索引的掩码。
 		/// </summary>
 		private const int IndexMask = 0x1F;
 
