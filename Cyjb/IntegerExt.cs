@@ -169,6 +169,15 @@ namespace Cyjb
 			return MultiplyDeBruijnBitPosition32[((uint)((value & -value) * 0x077CB531U)) >> 27];
 		}
 		/// <summary>
+		/// 计算当前值的二进制表示中末尾连续一的个数。
+		/// </summary>
+		/// <param name="value">要计算二进制表示中末尾连续一的值。</param>
+		/// <returns>当前值的二进制表示中末尾连续一的个数。</returns>
+		public static int BinTrailingOneCount(this int value)
+		{
+			return ((value ^ (value + 1)) >> 1).BinOneCnt();
+		}
+		/// <summary>
 		/// 计算当前值的二进制表示中 1 的个数。
 		/// </summary>
 		/// <param name="value">要计算的值。</param>
@@ -494,6 +503,16 @@ namespace Cyjb
 		public static int BinTrailingZeroCount(this uint value)
 		{
 			return MultiplyDeBruijnBitPosition32[(uint)((value & -value) * 0x077CB531U) >> 27];
+		}
+		/// <summary>
+		/// 计算当前值的二进制表示中末尾连续一的个数。
+		/// </summary>
+		/// <param name="value">要计算二进制表示中末尾连续一的值。</param>
+		/// <returns>当前值的二进制表示中末尾连续一的个数。</returns>
+		[CLSCompliant(false)]
+		public static int BinTrailingOneCount(this uint value)
+		{
+			return ((value ^ (value + 1U)) >> 1).BinOneCnt();
 		}
 		/// <summary>
 		/// 计算当前值的二进制表示中 1 的个数。
