@@ -25,13 +25,11 @@ namespace Cyjb
 		{
 			ExceptionHelper.CheckArgumentNull(source, "source");
 			ExceptionHelper.CheckArgumentNull(action, "action");
-			TSource[] list = source.ToArray();
-			int len = list.Length;
-			for (int i = 0; i < len; i++)
+			foreach (TSource obj in source)
 			{
-				action(list[i]);
+				action(obj);
 			}
-			return list;
+			return source;
 		}
 		/// <summary>
 		/// 对序列中的所有元素依次执行操作，并可以随时停止。
@@ -50,16 +48,14 @@ namespace Cyjb
 		{
 			ExceptionHelper.CheckArgumentNull(source, "source");
 			ExceptionHelper.CheckArgumentNull(func, "func");
-			TSource[] list = source.ToArray();
-			int len = list.Length;
-			for (int i = 0; i < len; i++)
+			foreach (TSource obj in source)
 			{
-				if (!func(list[i]))
+				if (!func(obj))
 				{
 					break;
 				}
 			}
-			return list;
+			return source;
 		}
 		/// <summary>
 		/// 随机打乱转序列中元素的顺序。
