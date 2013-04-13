@@ -99,8 +99,11 @@ namespace Cyjb.Collections
 		/// </summary>
 		/// <param name="obj">将为其返回哈希代码。</param>
 		/// <returns>指定对象的哈希代码。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="obj"/> 为 <c>null</c>。</exception>
 		public override int GetHashCode(IList<T> obj)
 		{
+			ExceptionHelper.CheckArgumentNull(obj, "obj");
 			// 算法来自 boost::hash_range。
 			int cnt = obj.Count;
 			int hashCode = cnt;
