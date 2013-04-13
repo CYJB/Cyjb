@@ -161,6 +161,10 @@
     <value>数组不得为空。</value>
     <comment>数组为空。</comment>
   </data>
+  <data name="ArrayLengthsDiffer" xml:space="preserve">
+    <value>数组长度必须相同。</value>
+    <comment>数组长度必须相同。</comment>
+  </data>
   <data name="ArrayNonZeroLowerBound" xml:space="preserve">
     <value>目标数组的下限必须为 0。</value>
     <comment>数组的下限必须为 0。</comment>

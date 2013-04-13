@@ -28,6 +28,9 @@ My personal C# library.
 	- UniqueValue&lt;TValue&gt; 类：用于需要获取唯一值的情况。
 * Cyjb.Collections 命名空间：包含与集合有关的类。
 	- ArrayAdapter&lt;T&gt; 类：表示数组的一部分的列表。
+	- BitList 类：管理位值的压缩列表。
+	- BitListEqualityComparer 类：可以根据内容比较 BitList 的比较器。
+	- CharSet 类：表示特定于字符的集合。
 	- ListEqualityComparer&lt;T&gt; 类：可以根据内容比较 IList&gt;T&gt; 列表的比较器。
 * Cyjb.Collections.ObjectModel 命名空间：包含通用的集合基类和只读的集合类。
 * Cyjb.ComponentModel 命名空间：包含与组件模型有关的类。

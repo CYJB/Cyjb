@@ -161,6 +161,10 @@
     <value>Array may not be empty.</value>
     <comment>数组为空。</comment>
   </data>
+  <data name="ArrayLengthsDiffer" xml:space="preserve">
+    <value>Array lengths must be the same.</value>
+    <comment>数组长度必须相同。</comment>
+  </data>
   <data name="ArrayNonZeroLowerBound" xml:space="preserve">
     <value>The lower bound of target array must be zero.</value>
     <comment>数组的下限必须为 0。</comment>

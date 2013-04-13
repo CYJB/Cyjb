@@ -71,6 +71,15 @@ namespace Cyjb
 		{
 			return new ArgumentException(ExceptionResources.GetString("InvalidOffsetLength"));
 		}
+		/// <summary>
+		/// 返回数组长度不同的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		public static ArgumentException ArrayLengthsDiffer(string paramName)
+		{
+			return GetArgumentException(paramName, "ArrayLengthsDiffer");
+		}
 
 		#endregion // 数组异常
 

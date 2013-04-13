@@ -48,11 +48,13 @@
   <ItemGroup>
     <Compile Include="ArrayExt.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Collections\BitList.cs" />
     <Compile Include="Collections\CharSet.cs" />
     <Compile Include="Collections\ListEqualityComparer`1.cs" />
     <Compile Include="Collections\ObjectModel\CollectionHelper.cs" />
     <Compile Include="Collections\ObjectModel\ReadOnlySet`1.cs" />
     <Compile Include="Collections\ObjectModel\SetBase`1.cs" />
+    <Compile Include="Collections\BitListEqualityComparer.cs" />
     <Compile Include="ConversionMethod.cs" />
     <Compile Include="DelegateBuilder.cs">
       <SubType>Code</SubType>
