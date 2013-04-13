@@ -569,7 +569,7 @@ namespace Cyjb.Collections.ObjectModel
 			ExceptionHelper.CheckFlatArray(array, "array");
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
+				throw ExceptionHelper.ArgumentNegative("index");
 			}
 			int cnt = this.Count;
 			if (array.Length - index < cnt)

@@ -33,7 +33,7 @@ namespace Cyjb.Collections.ObjectModel
 			ExceptionHelper.CheckFlatArray(array, "array");
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
+				throw ExceptionHelper.ArgumentNegative("index");
 			}
 			if (array.Length - index < source.Count)
 			{
