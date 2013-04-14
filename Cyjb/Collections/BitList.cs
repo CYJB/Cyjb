@@ -584,16 +584,16 @@ namespace Cyjb.Collections
 			}
 			uint uv = value ? uint.MaxValue : 0u;
 			int idx = index >> IndexShift;
-			int lowSize = index & IndexMask;
-			if (lowSize > 0)
+			int tailSize = index & IndexMask;
+			if (tailSize > 0)
 			{
-				uint mask = GetMask(lowSize);
+				uint mask = GetMask(tailSize);
 				if (length < UInt32Size)
 				{
-					mask |= ~GetMask(length) << lowSize;
+					mask |= ~GetMask(length) << tailSize;
 				}
 				this.items[idx] = (this.items[idx] & mask) | (uv & ~mask);
-				length -= UInt32Size - lowSize;
+				length -= UInt32Size - tailSize;
 				idx++;
 			}
 			while (length > 0)
