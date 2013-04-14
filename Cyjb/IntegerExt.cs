@@ -191,6 +191,15 @@ namespace Cyjb
 			value = (value & 0x0000FFFF) + ((value >> 16) & 0x0000FFFF);
 			return value;
 		}
+		/// <summary>
+		/// 计算当前值以 2 为底的对数值，得到的结果是大于等于当前值的最小对数值。
+		/// </summary>
+		/// <param name="value">要计算对数的值。</param>
+		/// <returns>当前值以 2 为底的对数值。</returns>
+		public static int LogBase2(this int value)
+		{
+			return LogBase2((uint)value);
+		}
 
 		#endregion // Int32 操作
 
@@ -528,6 +537,27 @@ namespace Cyjb
 			value = (value & 0x00FF00FF) + ((value >> 8) & 0x00FF00FF);
 			value = (value & 0x0000FFFF) + ((value >> 16) & 0x0000FFFF);
 			return (int)value;
+		}
+		/// <summary>
+		/// 用于计算以 2 为底的对数值的数组。
+		/// </summary>
+		private static readonly int[] LogBase2_32 = new int[] { 
+			0, 9, 1, 10, 13, 21, 2, 29, 11, 14, 16, 18, 22, 25, 3, 30, 
+			8, 12, 20, 28, 15, 17, 24, 7, 19, 27, 23, 6, 26, 5, 4, 31 };
+		/// <summary>
+		/// 计算当前值以 2 为底的对数值，得到的结果是大于等于当前值的最小对数值。
+		/// </summary>
+		/// <param name="value">要计算对数的值。</param>
+		/// <returns>当前值以 2 为底的对数值。</returns>
+		[CLSCompliant(false)]
+		public static int LogBase2(this uint value)
+		{
+			value |= value >> 1;
+			value |= value >> 2;
+			value |= value >> 4;
+			value |= value >> 8;
+			value |= value >> 16;
+			return LogBase2_32[(value * 0x07C4ACDDU) >> 27];
 		}
 
 		#endregion // UInt32 操作

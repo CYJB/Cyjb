@@ -34,6 +34,9 @@ namespace Cyjb.Collections
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private int count;
+
+		#region 构造函数
+
 		/// <summary>
 		/// 初始化 <see cref="Cyjb.Collections.BitList "/> 类的新实例。
 		/// </summary>
@@ -112,6 +115,9 @@ namespace Cyjb.Collections
 				this.Fill(0, length, true);
 			}
 		}
+
+		#endregion // 构造函数
+
 		/// <summary>
 		/// 获取或设置 <see cref="Cyjb.Collections.BitList"/> 
 		/// 在不调整大小的情况下能够容纳的元素总数。
@@ -207,7 +213,7 @@ namespace Cyjb.Collections
 			int cnt = this.count;
 			this.count += length;
 			EnsureCapacity(this.count + UInt32Size);
-			this.Fill(cnt, length, value);
+			this.FillInternal(cnt, length, value);
 		}
 
 		#endregion // AddRange 操作
@@ -409,8 +415,8 @@ namespace Cyjb.Collections
 			{
 				this.LeftShift(index, length);
 			}
+			this.FillInternal(index, length, value);
 			this.count = cnt;
-			this.Fill(index, length, value);
 		}
 		/// <summary>
 		/// 将指定集合中的元素插入 <see cref="Cyjb.Collections.BitList"/> 的指定索引处。
@@ -562,6 +568,16 @@ namespace Cyjb.Collections
 			{
 				throw ExceptionHelper.ArgumentOutOfRange("length");
 			}
+			this.FillInternal(index, length, value);
+		}
+		/// <summary>
+		/// 填充指定范围中的元素。
+		/// </summary>
+		/// <param name="index">要填充的范围的从零开始的起始索引。</param>
+		/// <param name="length">要填充的范围内的元素数。</param>
+		/// <param name="value">要填充的值。</param>
+		public void FillInternal(int index, int length, bool value)
+		{
 			if (length == 0)
 			{
 				return;
@@ -785,6 +801,42 @@ namespace Cyjb.Collections
 			for (int i = 0; i <= cnt; i++)
 			{
 				this.items[i] = ~this.items[i];
+			}
+			return this;
+		}
+		/// <summary>
+		/// 将当前 <see cref="Cyjb.Collections.BitList"/> 中的所有位值左移
+		/// <paramref name="offset"/> 位。这里的左移是向着索引增大的方向移动。
+		/// </summary>
+		/// <param name="offset">要左移的位数，
+		/// 实际的移位数会对 <see cref="BitList.Count"/> 取模。</param>
+		public BitList LeftShift(int offset)
+		{
+			if (this.count > 0)
+			{
+				int b = this.count.LogBase2();
+				offset &= (1 << (b + 1)) - 1;
+				this.LeftShift(0, offset);
+				this.Fill(0, offset, false);
+			}
+			return this;
+		}
+		/// <summary>
+		/// 将当前 <see cref="Cyjb.Collections.BitList"/> 中的所有位值右移
+		/// <paramref name="offset"/> 位。这里的右移是向着索引减小的方向移动。
+		/// </summary>
+		/// <param name="offset">要左移的位数，
+		/// 实际的移位数会对 <see cref="BitList.Count"/> 取模。</param>
+		public BitList RightShift(int offset)
+		{
+			if (this.count > 0)
+			{
+				int b = this.count.LogBase2();
+				offset &= (1 << (b + 1)) - 1;
+				int cnt = this.count;
+				this.RemoveRange(0, offset);
+				this.FillInternal(this.count, cnt - this.count, false);
+				this.count = cnt;
 			}
 			return this;
 		}
@@ -1089,7 +1141,6 @@ namespace Cyjb.Collections
 		}
 
 		#endregion // ICollection 成员
-
 
 		#region IEnumerable<T> 成员
 
