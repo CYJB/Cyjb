@@ -32,6 +32,7 @@ My personal C# library.
 	- BitListEqualityComparer 类：可以根据内容比较 BitList 的比较器。
 	- CharSet 类：表示特定于字符的集合。
 	- ListEqualityComparer&lt;T&gt; 类：可以根据内容比较 IList&gt;T&gt; 列表的比较器。
+	- SetEqualityComparer&lt;T&gt; 类：可以根据内容比较 ISet&gt;T&gt; 集合的比较器。
 * Cyjb.Collections.ObjectModel 命名空间：包含通用的集合基类和只读的集合类。
 * Cyjb.ComponentModel 命名空间：包含与组件模型有关的类。
 	- EnumDescConverter 类：支持枚举值的描述信息的转换器。
