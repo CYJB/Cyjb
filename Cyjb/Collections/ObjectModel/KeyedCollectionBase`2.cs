@@ -243,10 +243,10 @@ namespace Cyjb.Collections.ObjectModel
 		/// 移除 <see cref="KeyedCollectionBase&lt;TKey,TItem&gt;"/> 的指定元素。
 		/// </summary>
 		/// <param name="item">要移除的元素。</param>
-		protected override void RemoveItem(TItem item)
+		protected override bool RemoveItem(TItem item)
 		{
 			this.RemoveKey(this.GetKeyForItem(item));
-			base.RemoveItem(item);
+			return base.RemoveItem(item);
 		}
 
 		#endregion // CollectionBase<TItem> 成员

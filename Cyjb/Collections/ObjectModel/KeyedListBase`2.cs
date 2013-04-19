@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Cyjb.Collections.ObjectModel
 {
@@ -95,6 +96,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		/// <param name="key">要获取的元素的键。</param>
 		/// <returns>带有指定键的元素。如果未找到具有指定键的元素，则引发异常。</returns>
+		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods")]
 		public TItem this[TKey key]
 		{
 			get

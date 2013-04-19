@@ -449,7 +449,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <param name="item">要在 <see cref="CollectionBase&lt;T&gt;"/> 中定位的对象。</param>
 		/// <returns>如果在 <see cref="CollectionBase&lt;T&gt;"/> 中找到 <paramref name="item"/>，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		public bool Contains(T item)
+		public virtual bool Contains(T item)
 		{
 			return this.IndexOf(item) >= 0;
 		}
