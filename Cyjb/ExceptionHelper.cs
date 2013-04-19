@@ -134,6 +134,15 @@ namespace Cyjb
 			return GetArgumentException(paramName, "InnerExceptionNull");
 		}
 		/// <summary>
+		/// 返回指定的项不存在的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		public static ArgumentException ItemNotExist(string paramName)
+		{
+			return GetArgumentException(paramName, "ItemNotExist");
+		}
+		/// <summary>
 		/// 返回键重复的异常。
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
@@ -293,6 +302,15 @@ namespace Cyjb
 		internal static ArgumentOutOfRangeException InvalidBase(string paramName)
 		{
 			return GetArgumentOutOfRangeException(paramName, "InvalidBase");
+		}
+		/// <summary>
+		/// 返回用于创建字典的阈值超出范围的异常。
+		/// </summary>
+		/// <param name="paramName">超出范围的参数名称</param>
+		/// <returns><see cref="System.ArgumentOutOfRangeException"/> 对象。</returns>
+		internal static ArgumentOutOfRangeException InvalidDictionaryThreshold(string paramName)
+		{
+			return GetArgumentOutOfRangeException(paramName, "InvalidDictionaryThreshold");
 		}
 		/// <summary>
 		/// 返回参数超出范围的异常。

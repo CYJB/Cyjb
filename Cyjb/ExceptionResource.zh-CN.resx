@@ -265,9 +265,17 @@
     <value>无效的缓冲池类型 '{0}'，没有实现 ICache&lt;TKey, TValue&gt; 接口。</value>
     <comment>缓冲池类型无效-未实现 ICache 接口。</comment>
   </data>
+  <data name="InvalidDictionaryThreshold" xml:space="preserve">
+    <value>指定的用于创建字典的阈值超出范围。</value>
+    <comment>用于创建字典的阈值超出范围。</comment>
+  </data>
   <data name="InvalidOffsetLength" xml:space="preserve">
     <value>偏移量和长度超出数组的界限，或者计数大于从索引到源集合结尾处的元素数量。</value>
     <comment>偏移量和长度超出界限。</comment>
+  </data>
+  <data name="ItemNotExist" xml:space="preserve">
+    <value>指定的项不存在。</value>
+    <comment>指定的项不存在。</comment>
   </data>
   <data name="KeyDuplicate" xml:space="preserve">
     <value>已添加了具有相同键的项。</value>

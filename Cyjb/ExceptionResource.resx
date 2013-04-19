@@ -265,9 +265,17 @@
     <value>Invalid cache type '{0}', did not implement ICache&lt;TKey, TValue&gt;.</value>
     <comment>缓冲池类型无效-未实现 ICache 接口。</comment>
   </data>
+  <data name="InvalidDictionaryThreshold" xml:space="preserve">
+    <value>The specified threshold for creating dictionary is out of range.</value>
+    <comment>用于创建字典的阈值超出范围。</comment>
+  </data>
   <data name="InvalidOffsetLength" xml:space="preserve">
     <value>Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection.</value>
     <comment>偏移量和长度超出界限。</comment>
+  </data>
+  <data name="ItemNotExist" xml:space="preserve">
+    <value>The specified item does not exist.</value>
+    <comment>指定的项不存在。</comment>
   </data>
   <data name="KeyDuplicate" xml:space="preserve">
     <value>An item with the same key has already been added.</value>
