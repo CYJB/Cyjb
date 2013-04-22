@@ -33,7 +33,14 @@ namespace Cyjb.Collections.ObjectModel
 		/// 初始化使用默认相等比较器的 <see cref="KeyedCollectionBase&lt;TKey, TItem&gt;"/> 类的新实例。
 		/// </summary>
 		protected KeyedCollectionBase()
-			: this(null, 0)
+			: this(null, 0, false)
+		{ }
+		/// <summary>
+		/// 初始化使用默认相等比较器的 <see cref="KeyedCollectionBase&lt;TKey, TItem&gt;"/> 类的新实例。
+		/// </summary>
+		/// <param name="isReadOnly">集合是否是只读的。</param>
+		protected KeyedCollectionBase(bool isReadOnly)
+			: this(null, 0, isReadOnly)
 		{ }
 		/// <summary>
 		/// 初始化使用指定相等比较器的 <see cref="KeyedCollectionBase&lt;TKey, TItem&gt;"/> 类的新实例。
@@ -44,7 +51,19 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="System.Collections.Generic.EqualityComparer&lt;T&gt;.Default"/> 
 		/// 获取的该类型的键的默认相等比较器。</param>
 		protected KeyedCollectionBase(IEqualityComparer<TKey> comparer)
-			: this(comparer, 0)
+			: this(comparer, 0, false)
+		{ }
+		/// <summary>
+		/// 初始化使用指定相等比较器的 <see cref="KeyedCollectionBase&lt;TKey, TItem&gt;"/> 类的新实例。
+		/// </summary>
+		/// <param name="comparer">比较键时要使用的 
+		/// <see cref="System.Collections.Generic.IEqualityComparer&lt;T&gt;"/> 泛型接口的实现，
+		/// 如果为 <c>null</c>，则使用从 
+		/// <see cref="System.Collections.Generic.EqualityComparer&lt;T&gt;.Default"/> 
+		/// 获取的该类型的键的默认相等比较器。</param>
+		/// <param name="isReadOnly">集合是否是只读的。</param>
+		protected KeyedCollectionBase(IEqualityComparer<TKey> comparer, bool isReadOnly)
+			: this(comparer, 0, isReadOnly)
 		{ }
 		/// <summary>
 		/// 初始化 <see cref="KeyedCollectionBase&lt;TKey, TItem&gt;"/> 类的新实例，
@@ -60,6 +79,25 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentOutOfRangeException">
 		/// <paramref name="dictionaryCreationThreshold"/> 小于 <c>-1</c>。</exception>
 		protected KeyedCollectionBase(IEqualityComparer<TKey> comparer, int dictionaryCreationThreshold)
+			: this(comparer, dictionaryCreationThreshold, false)
+		{ }
+		/// <summary>
+		/// 初始化 <see cref="KeyedCollectionBase&lt;TKey, TItem&gt;"/> 类的新实例，
+		/// 该新实例使用指定的相等比较器并在超过指定阈值时创建一个查找字典。
+		/// </summary>
+		/// <param name="comparer">比较键时要使用的 
+		/// <see cref="System.Collections.Generic.IEqualityComparer&lt;T&gt;"/> 泛型接口的实现，
+		/// 如果为 <c>null</c>，则使用从 
+		/// <see cref="System.Collections.Generic.EqualityComparer&lt;T&gt;.Default"/> 
+		/// 获取的该类型的键的默认相等比较器。</param>
+		/// <param name="dictionaryCreationThreshold">在不创建查找字典的情况下集合可容纳的元素的数目
+		/// （<c>0</c> 表示添加第一项时创建查找字典）；或者为 <c>-1</c>，表示指定永远不会创建查找字典。</param>
+		/// <param name="isReadOnly">集合是否是只读的。</param>
+		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <paramref name="dictionaryCreationThreshold"/> 小于 <c>-1</c>。</exception>
+		protected KeyedCollectionBase(IEqualityComparer<TKey> comparer, int dictionaryCreationThreshold,
+			bool isReadOnly)
+			: base(isReadOnly)
 		{
 			if (comparer == null)
 			{
