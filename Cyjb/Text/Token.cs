@@ -9,13 +9,17 @@ namespace Cyjb.Text
 	public struct Token : IEquatable<Token>
 	{
 		/// <summary>
+		/// 表示文件结束的符号索引。
+		/// </summary>
+		public const int EndOfFileIndex = -1;
+		/// <summary>
 		/// 返回表示文件结束的词法单元。
 		/// </summary>
 		/// <param name="loc">文件结束的位置。</param>
 		/// <returns>表示文件结束的词法单元。</returns>
 		public static Token GetEndOfFile(SourceLocation loc)
 		{
-			return new Token(-1, string.Empty, loc);
+			return new Token(EndOfFileIndex, string.Empty, loc);
 		}
 		/// <summary>
 		/// 返回表示文件结束的词法单元。
@@ -25,7 +29,7 @@ namespace Cyjb.Text
 		/// <returns>表示文件结束的词法单元。</returns>
 		public static Token GetEndOfFile(SourceLocation loc, object value)
 		{
-			return new Token(-1, string.Empty, loc, SourceLocation.Invalid, value);
+			return new Token(EndOfFileIndex, string.Empty, loc, SourceLocation.Invalid, value);
 		}
 		/// <summary>
 		/// 词法单元的符号索引。
