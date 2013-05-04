@@ -95,6 +95,13 @@ namespace Cyjb.IO
 			get { return globalIndex; }
 		}
 		/// <summary>
+		/// 起始索引之前的源代码位置（不包括被丢弃的字符）。
+		/// </summary>
+		public SourceLocation BeforeStartLocation
+		{
+			get { return locator.Location; }
+		}
+		/// <summary>
 		/// 起始索引的源代码位置（不包括被丢弃的字符）。
 		/// </summary>
 		public SourceLocation StartLocation
@@ -205,7 +212,7 @@ namespace Cyjb.IO
 			return current.Buffer[index++];
 		}
 		/// <summary>
-		/// 读取文本读取器中之后的 <paramref name="idx"/> 索引的字符并使该字符的位置提升。
+		/// 读取文本读取器中之后的 <paramref name="idx"/> 索引的字符，并使该字符的位置提升。
 		/// Read(0) 就相当于 Read()，但效率不如 Read()。
 		/// </summary>
 		/// <returns>文本读取器中之后的 <paramref name="idx"/> 索引的字符，
