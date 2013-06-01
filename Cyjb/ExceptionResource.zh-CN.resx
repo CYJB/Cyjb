@@ -285,6 +285,10 @@
     <value>指定的键 '{0}' 不存在。</value>
     <comment>指定的键不存在。</comment>
   </data>
+  <data name="MethodNotSupported" xml:space="preserve">
+    <value>不支持所指定的方法。</value>
+    <comment>方法不支持。</comment>
+  </data>
   <data name="MustBeDelegate" xml:space="preserve">
     <value>类型必须从委托派生。</value>
     <comment>类型必须从委托派生。</comment>

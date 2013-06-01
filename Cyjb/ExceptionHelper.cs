@@ -523,20 +523,28 @@ namespace Cyjb
 		#region NotSupportedException
 
 		/// <summary>
-		/// 返回只读集合的异常。
-		/// </summary>
-		/// <returns><see cref="System.NotSupportedException"/> 对象。</returns>
-		public static NotSupportedException ReadOnlyCollection()
-		{
-			return GetNotSupported("ReadOnlyCollection");
-		}
-		/// <summary>
 		/// 返回固定大小集合的异常。
 		/// </summary>
 		/// <returns><see cref="System.NotSupportedException"/> 对象。</returns>
 		public static NotSupportedException FixedSizeCollection()
 		{
 			return GetNotSupported("FixedSizeCollection");
+		}
+		/// <summary>
+		/// 返回方法不支持的异常。
+		/// </summary>
+		/// <returns><see cref="System.NotSupportedException"/> 对象。</returns>
+		public static NotSupportedException MethodNotSupported()
+		{
+			return GetNotSupported("MethodNotSupported");
+		}
+		/// <summary>
+		/// 返回只读集合的异常。
+		/// </summary>
+		/// <returns><see cref="System.NotSupportedException"/> 对象。</returns>
+		public static NotSupportedException ReadOnlyCollection()
+		{
+			return GetNotSupported("ReadOnlyCollection");
 		}
 		/// <summary>
 		/// 返回不支持的异常。
