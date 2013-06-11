@@ -475,6 +475,15 @@ namespace Cyjb
 			return GetInvalidOperation("EnumFailedVersion");
 		}
 		/// <summary>
+		/// 返回无法比较数组元素的异常。
+		/// </summary>
+		/// <param name="innerException">导致当前异常的异常。</param>
+		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
+		public static InvalidOperationException IComparerFailed(Exception innerException)
+		{
+			return GetInvalidOperation("IComparerFailed", innerException);
+		}
+		/// <summary>
 		/// 返回不表示泛型方法定义的异常。
 		/// </summary>
 		/// <param name="method">不是泛型方法的方法。</param>
@@ -485,7 +494,7 @@ namespace Cyjb
 			return GetInvalidOperation("NotGenericMethodDefinition", method, operatorName);
 		}
 		/// <summary>
-		/// 返回状态无效的异常。
+		/// 返回操作无效的异常。
 		/// </summary>
 		/// <param name="resName">异常信息的资源名称。</param>
 		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
@@ -494,7 +503,17 @@ namespace Cyjb
 			return new InvalidOperationException(ExceptionResources.GetString(resName));
 		}
 		/// <summary>
-		/// 返回状态无效的异常。
+		/// 返回操作无效的异常。
+		/// </summary>
+		/// <param name="resName">异常信息的资源名称。</param>
+		/// <param name="innerException">导致当前异常的异常。</param>
+		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
+		private static InvalidOperationException GetInvalidOperation(string resName, Exception innerException)
+		{
+			return new InvalidOperationException(ExceptionResources.GetString(resName), innerException);
+		}
+		/// <summary>
+		/// 返回操作无效的异常。
 		/// </summary>
 		/// <param name="resName">异常信息的资源名称。</param>
 		/// <param name="args">异常信息的格式化值。</param>

@@ -237,6 +237,10 @@
     <value>Collection was of a fixed size.</value>
     <comment>集合是固定大小的。</comment>
   </data>
+  <data name="IComparerFailed" xml:space="preserve">
+    <value>Failed to compare two elements in the array.</value>
+    <comment>比较数组元素失败。</comment>
+  </data>
   <data name="InnerExceptionNull" xml:space="preserve">
     <value>An element of innerExceptions was null.</value>
     <comment>内部异常之一为 null。</comment>

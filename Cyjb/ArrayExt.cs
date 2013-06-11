@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Cyjb
@@ -10,6 +12,197 @@ namespace Cyjb
 	{
 
 		#region 填充
+
+		#region Array
+
+		/// <summary>
+		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// </summary>
+		/// <param name="array">要填充的数组。</param>
+		/// <param name="value">要填充数组的值。</param>
+		/// <returns>要填充的数组。</returns>
+		public static Array Fill(this Array array, object value)
+		{
+			if (array == null)
+			{
+				return array;
+			}
+			return Fill(array, value, 0, array.Length);
+		}
+		/// <summary>
+		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充。
+		/// </summary>
+		/// <param name="array">要填充的数组。</param>
+		/// <param name="value">要填充数组的值。</param>
+		/// <param name="startIndex">要填充的起始索引。</param>
+		/// <returns>要填充的数组。</returns>
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
+		/// 小于零或大于等于数组的长度。</exception>
+		public static Array Fill(this Array array, object value, int startIndex)
+		{
+			if (array == null)
+			{
+				return array;
+			}
+			return Fill(array, value, startIndex, array.Length - startIndex);
+		}
+		/// <summary>
+		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充指定的长度。
+		/// </summary>
+		/// <param name="array">要填充的数组。</param>
+		/// <param name="value">要填充数组的值。</param>
+		/// <param name="startIndex">要填充的起始索引。</param>
+		/// <param name="length">要填充的数组元素个数。</param>
+		/// <returns>要填充的数组。</returns>
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
+		/// 加 <paramref name="length"/> 之和大于数组的长度。</exception>
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
+		/// 或 <paramref name="length"/> 小于零。</exception>
+		public static Array Fill(this Array array, object value, int startIndex, int length)
+		{
+			if (array != null)
+			{
+				if (startIndex < 0 || startIndex >= array.Length)
+				{
+					throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				}
+				int len = startIndex + length;
+				if (length < 0 || len > array.Length)
+				{
+					throw ExceptionHelper.ArgumentOutOfRange("length");
+				}
+				for (int i = startIndex; i < len; i++)
+				{
+					array.SetValue(value, i);
+				}
+			}
+			return array;
+		}
+		/// <summary>
+		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// </summary>
+		/// <param name="array">要填充的数组。</param>
+		/// <param name="value">返回要填充数组的值的函数。</param>
+		/// <returns>要填充的数组。</returns>
+		public static Array Fill(this Array array, Func<object> value)
+		{
+			if (array == null)
+			{
+				return array;
+			}
+			return Fill(array, value, 0, array.Length);
+		}
+		/// <summary>
+		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充。
+		/// </summary>
+		/// <param name="array">要填充的数组。</param>
+		/// <param name="value">返回要填充数组的值的函数。</param>
+		/// <param name="startIndex">要填充的起始索引。</param>
+		/// <returns>要填充的数组。</returns>
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
+		/// 小于零或大于等于数组的长度。</exception>
+		public static Array Fill(this Array array, Func<object> value, int startIndex)
+		{
+			if (array == null)
+			{
+				return array;
+			}
+			return Fill(array, value, startIndex, array.Length - startIndex);
+		}
+		/// <summary>
+		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充指定的长度。
+		/// </summary>
+		/// <param name="array">要填充的数组。</param>
+		/// <param name="value">返回要填充数组的值的函数。</param>
+		/// <param name="startIndex">要填充的起始索引。</param>
+		/// <param name="length">要填充的数组元素个数。</param>
+		/// <returns>要填充的数组。</returns>
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
+		/// 加 <paramref name="length"/> 之和大于数组的长度。</exception>
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
+		/// 或 <paramref name="length"/> 小于零。</exception>
+		public static Array Fill(this Array array, Func<object> value, int startIndex, int length)
+		{
+			if (array != null)
+			{
+				if (startIndex < 0 || startIndex >= array.Length)
+				{
+					throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				}
+				int len = startIndex + length;
+				if (length < 0 || len > array.Length)
+				{
+					throw ExceptionHelper.ArgumentOutOfRange("length");
+				}
+				for (int i = startIndex; i < len; i++)
+				{
+					array.SetValue(value(), i);
+				}
+			}
+			return array;
+		}
+		/// <summary>
+		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// </summary>
+		/// <param name="array">要填充的数组。</param>
+		/// <param name="value">返回要填充数组指定索引的值的函数。</param>
+		/// <returns>要填充的数组。</returns>
+		public static Array Fill(this Array array, Func<int, object> value)
+		{
+			if (array == null)
+			{
+				return array;
+			}
+			return Fill(array, value, 0, array.Length);
+		}
+		/// <summary>
+		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充。
+		/// </summary>
+		/// <param name="array">要填充的数组。</param>
+		/// <param name="value">返回要填充数组的值的函数。</param>
+		/// <param name="startIndex">要填充的起始索引。</param>
+		/// <returns>要填充的数组。</returns>
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
+		/// 小于零或大于等于数组的长度。</exception>
+		public static Array Fill(this Array array, Func<int, object> value, int startIndex)
+		{
+			if (array == null)
+			{
+				return array;
+			}
+			return Fill(array, value, startIndex, array.Length - startIndex);
+		}
+		/// <summary>
+		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充指定的长度。
+		/// </summary>
+		/// <param name="array">要填充的数组。</param>
+		/// <param name="value">返回要填充数组指定索引的值的函数。</param>
+		/// <param name="startIndex">要填充的起始索引。</param>
+		/// <param name="length">要填充的数组元素个数。</param>
+		/// <returns>要填充的数组。</returns>
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
+		/// 加 <paramref name="length"/> 之和大于数组的长度。</exception>
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
+		/// 或 <paramref name="length"/> 小于零。</exception>
+		public static Array Fill(this Array array, Func<int, object> value, int startIndex, int length)
+		{
+			if (startIndex < 0 || startIndex >= array.Length)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+			}
+			int len = startIndex + length;
+			if (length < 0 || len > array.Length)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("length");
+			}
+			for (int i = startIndex; i < len; i++)
+			{
+				array.SetValue(value(i), i);
+			}
+			return array;
+		}
+
+		#endregion // Array
 
 		#region 一维数组
 
@@ -861,6 +1054,294 @@ namespace Cyjb
 		}
 
 		#endregion // 截取
+
+		#region 二分查找
+
+		#region Array 方法包装
+
+		/// <summary>
+		/// 使用由 <see cref="System.Array"/> 中每个元素和指定的对象实现的 
+		/// <see cref="System.IComparable&lt;T&gt;"/> 泛型接口，在整个一维排序 
+		/// <see cref="System.Array"/> 中搜索特定元素。
+		/// </summary>
+		/// <typeparam name="T">数组元素的类型。</typeparam>
+		/// <param name="array">要搜索的从零开始的一维排序 <see cref="System.Array"/>。</param>
+		/// <param name="value">要搜索的对象。</param>
+		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
+		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
+		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
+		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
+		public static int BinarySearch<T>(this T[] array, T value)
+		{
+			return Array.BinarySearch(array, value);
+		}
+		/// <summary>
+		/// 使用由 <see cref="System.Array"/> 中每个元素和指定的对象实现的 
+		/// <see cref="System.IComparable"/> 接口，在整个一维排序 
+		/// <see cref="System.Array"/> 中搜索特定元素。
+		/// </summary>
+		/// <param name="array">要搜索的从零开始的一维排序 <see cref="System.Array"/>。</param>
+		/// <param name="value">要搜索的对象。</param>
+		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
+		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
+		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
+		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
+		public static int BinarySearch(this Array array, object value)
+		{
+			return Array.BinarySearch(array, value);
+		}
+		/// <summary>
+		/// 使用指定的 <see cref="System.Collections.Generic.IComparer&lt;T&gt;"/> 泛型接口，在整个一维排序 
+		/// <see cref="System.Array"/> 中搜索特定元素。
+		/// </summary>
+		/// <typeparam name="T">数组元素的类型。</typeparam>
+		/// <param name="array">要搜索的从零开始的一维排序 <see cref="System.Array"/>。</param>
+		/// <param name="value">要搜索的对象。</param>
+		/// <param name="comparer">比较元素时要使用的 
+		/// <see cref="System.Collections.Generic.IComparer&lt;T&gt;"/> 实现。</param>
+		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
+		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
+		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
+		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
+		public static int BinarySearch<T>(this T[] array, T value, IComparer<T> comparer)
+		{
+			return Array.BinarySearch(array, value, comparer);
+		}
+		/// <summary>
+		/// 使用指定的 <see cref="System.Collections.IComparer"/> 接口，在整个一维排序 
+		/// <see cref="System.Array"/> 中搜索特定元素。
+		/// </summary>
+		/// <param name="array">要搜索的从零开始的一维排序 <see cref="System.Array"/>。</param>
+		/// <param name="value">要搜索的对象。</param>
+		/// <param name="comparer">比较元素时要使用的 <see cref="System.Collections.IComparer"/> 实现。</param>
+		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
+		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
+		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
+		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
+		public static int BinarySearch(this Array array, object value, IComparer comparer)
+		{
+			return Array.BinarySearch(array, value, comparer);
+		}
+		/// <summary>
+		/// 使用由 <see cref="System.Array"/> 中每个元素和指定的对象实现的 
+		/// <see cref="System.IComparable&lt;T&gt;"/> 泛型接口，在一维排序 
+		/// <see cref="System.Array"/> 的某个元素范围中搜索值。
+		/// </summary>
+		/// <typeparam name="T">数组元素的类型。</typeparam>
+		/// <param name="array">要搜索的从零开始的一维排序 <see cref="System.Array"/>。</param>
+		/// <param name="index">要搜索的范围的起始索引。</param>
+		/// <param name="length">要搜索的范围的长度。</param>
+		/// <param name="value">要搜索的对象。</param>
+		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
+		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
+		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
+		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
+		public static int BinarySearch<T>(this T[] array, int index, int length, T value)
+		{
+			return Array.BinarySearch(array, index, length, value);
+		}
+		/// <summary>
+		/// 使用由 <see cref="System.Array"/> 中每个元素和指定的对象实现的 
+		/// <see cref="System.IComparable"/> 接口，在一维排序 
+		/// <see cref="System.Array"/> 的某个元素范围中搜索值。
+		/// </summary>
+		/// <param name="array">要搜索的从零开始的一维排序 <see cref="System.Array"/>。</param>
+		/// <param name="index">要搜索的范围的起始索引。</param>
+		/// <param name="length">要搜索的范围的长度。</param>
+		/// <param name="value">要搜索的对象。</param>
+		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
+		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
+		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
+		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
+		public static int BinarySearch(this Array array, int index, int length, object value)
+		{
+			return Array.BinarySearch(array, index, length, value);
+		}
+		/// <summary>
+		/// 使用指定的 <see cref="System.Collections.Generic.IComparer&lt;T&gt;"/> 泛型接口，在一维排序 
+		/// <see cref="System.Array"/> 的某个元素范围中搜索值。
+		/// </summary>
+		/// <typeparam name="T">数组元素的类型。</typeparam>
+		/// <param name="array">要搜索的从零开始的一维排序 <see cref="System.Array"/>。</param>
+		/// <param name="index">要搜索的范围的起始索引。</param>
+		/// <param name="length">要搜索的范围的长度。</param>
+		/// <param name="value">要搜索的对象。</param>
+		/// <param name="comparer">比较元素时要使用的 
+		/// <see cref="System.Collections.Generic.IComparer&lt;T&gt;"/> 实现。</param>
+		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
+		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
+		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
+		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
+		public static int BinarySearch<T>(this T[] array, int index, int length, T value, IComparer<T> comparer)
+		{
+			return Array.BinarySearch(array, index, length, value, comparer);
+		}
+		/// <summary>
+		/// 使用指定的 <see cref="System.Collections.IComparer"/> 接口，在一维排序 
+		/// <see cref="System.Array"/> 的某个元素范围中搜索值。
+		/// </summary>
+		/// <param name="array">要搜索的从零开始的一维排序 <see cref="System.Array"/>。</param>
+		/// <param name="index">要搜索的范围的起始索引。</param>
+		/// <param name="length">要搜索的范围的长度。</param>
+		/// <param name="value">要搜索的对象。</param>
+		/// <param name="comparer">比较元素时要使用的 <see cref="System.Collections.IComparer"/> 实现。</param>
+		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
+		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
+		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
+		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
+		public static int BinarySearch(this Array array, int index, int length, object value, IComparer comparer)
+		{
+			return Array.BinarySearch(array, index, length, value, comparer);
+		}
+
+		#endregion // Array 方法包装
+
+		#region 键值搜索
+
+		/// <summary>
+		/// 使用由 <see cref="System.Array"/> 中每个元素和指定的对象实现的 
+		/// <see cref="System.IComparable&lt;T&gt;"/> 泛型接口，在整个一维排序 
+		/// <see cref="System.Array"/> 中搜索特定元素。
+		/// </summary>
+		/// <typeparam name="TElement">数组元素的类型。</typeparam>
+		/// <typeparam name="TKey">要查找的键的类型。</typeparam>
+		/// <param name="array">要搜索的从零开始的一维排序 <see cref="System.Array"/>。</param>
+		/// <param name="value">要搜索的键值。</param>
+		/// <param name="keySelector">用于从元素中提取键的函数。</param>
+		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
+		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
+		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
+		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
+		public static int BinarySearch<TElement, TKey>(this TElement[] array, TKey value,
+			Func<TElement, TKey> keySelector)
+		{
+			ExceptionHelper.CheckArgumentNull(array, "array");
+			return BinarySearch(array, 0, array.Length, value, keySelector, null);
+		}
+		/// <summary>
+		/// 使用指定的 <see cref="System.Collections.Generic.IComparer&lt;T&gt;"/> 泛型接口，在整个一维排序 
+		/// <see cref="System.Array"/> 中搜索特定元素。
+		/// </summary>
+		/// <typeparam name="TElement">数组元素的类型。</typeparam>
+		/// <typeparam name="TKey">要查找的键的类型。</typeparam>
+		/// <param name="array">要搜索的从零开始的一维排序 <see cref="System.Array"/>。</param>
+		/// <param name="value">要搜索的键值。</param>
+		/// <param name="keySelector">用于从元素中提取键的函数。</param>
+		/// <param name="comparer">比较元素时要使用的 
+		/// <see cref="System.Collections.Generic.IComparer&lt;T&gt;"/> 实现。</param>
+		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
+		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
+		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
+		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
+		public static int BinarySearch<TElement, TKey>(this TElement[] array, TKey value,
+			Func<TElement, TKey> keySelector, IComparer<TKey> comparer)
+		{
+			ExceptionHelper.CheckArgumentNull(array, "array");
+			return BinarySearch(array, 0, array.Length, value, keySelector, comparer);
+		}
+		/// <summary>
+		/// 使用由 <see cref="System.Array"/> 中每个元素和指定的对象实现的 
+		/// <see cref="System.IComparable&lt;T&gt;"/> 泛型接口，在一维排序 
+		/// <see cref="System.Array"/> 的某个元素范围中搜索值。
+		/// </summary>
+		/// <typeparam name="TElement">数组元素的类型。</typeparam>
+		/// <typeparam name="TKey">要查找的键的类型。</typeparam>
+		/// <param name="array">要搜索的从零开始的一维排序 <see cref="System.Array"/>。</param>
+		/// <param name="index">要搜索的范围的起始索引。</param>
+		/// <param name="length">要搜索的范围的长度。</param>
+		/// <param name="value">要搜索的键值。</param>
+		/// <param name="keySelector">用于从元素中提取键的函数。</param>
+		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
+		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
+		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
+		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
+		public static int BinarySearch<TElement, TKey>(this TElement[] array, int index, int length,
+			TKey value, Func<TElement, TKey> keySelector)
+		{
+			ExceptionHelper.CheckArgumentNull(array, "array");
+			return BinarySearch(array, index, length, value, keySelector, null);
+		}
+		/// <summary>
+		/// 使用指定的 <see cref="System.Collections.Generic.IComparer&lt;T&gt;"/> 泛型接口，在一维排序 
+		/// <see cref="System.Array"/> 的某个元素范围中搜索键值。
+		/// </summary>
+		/// <typeparam name="TElement">数组元素的类型。</typeparam>
+		/// <typeparam name="TKey">要查找的键的类型。</typeparam>
+		/// <param name="array">要搜索的从零开始的一维排序 <see cref="System.Array"/>。</param>
+		/// <param name="index">要搜索的范围的起始索引。</param>
+		/// <param name="length">要搜索的范围的长度。</param>
+		/// <param name="value">要搜索的键值。</param>
+		/// <param name="keySelector">用于从元素中提取键的函数。</param>
+		/// <param name="comparer">比较元素时要使用的 
+		/// <see cref="System.Collections.Generic.IComparer&lt;T&gt;"/> 实现。</param>
+		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
+		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
+		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
+		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
+		public static int BinarySearch<TElement, TKey>(this TElement[] array, int index, int length,
+			TKey value, Func<TElement, TKey> keySelector, IComparer<TKey> comparer)
+		{
+			ExceptionHelper.CheckArgumentNull(array, "array");
+			try
+			{
+				if (comparer == null)
+				{
+					comparer = Comparer<TKey>.Default;
+				}
+				int low = index;
+				int high = (index + length) - 1;
+				while (low <= high)
+				{
+					int mid = low + ((high - low) >> 1);
+					int cmp = comparer.Compare(keySelector(array[mid]), value);
+					if (cmp == 0)
+					{
+						return mid;
+					}
+					else if (cmp < 0)
+					{
+						low = mid + 1;
+					}
+					else
+					{
+						high = mid - 1;
+					}
+				}
+				return ~low;
+			}
+			catch (Exception ex)
+			{
+				throw ExceptionHelper.IComparerFailed(ex);
+			}
+		}
+
+		#endregion // 键值搜索
+
+		#endregion // 二分查找
 
 	}
 }

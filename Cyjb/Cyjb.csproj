@@ -50,6 +50,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Collections\BitList.cs" />
     <Compile Include="Collections\CharSet.cs" />
+    <Compile Include="Collections\ListExt`1.cs" />
     <Compile Include="Collections\ListStack`1.cs" />
     <Compile Include="Collections\ObjectModel\KeyedCollectionBase`2.cs" />
     <Compile Include="Collections\ObjectModel\KeyedListBase`2.cs" />

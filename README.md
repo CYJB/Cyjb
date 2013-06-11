@@ -32,6 +32,7 @@ My personal C# library.
 	- BitListEqualityComparer 类：可以根据内容比较 BitList 的比较器。
 	- CharSet 类：表示特定于字符的集合，[详细说明在这里](http://www.cnblogs.com/cyjb/archive/2013/04/04/CharSet.html)。
 	- ListEqualityComparer&lt;T&gt; 类：可以根据内容比较 IList&gt;T&gt; 列表的比较器。
+	- ListExt 类：提供对 IList&lt;T&gt; 的扩展方法。
 	- ListStack&lt;T&gt; 类：允许使用索引访问元素的堆栈。
 	- SetEqualityComparer&lt;T&gt; 类：可以根据内容比较 ISet&gt;T&gt; 集合的比较器。
 * Cyjb.Collections.ObjectModel 命名空间：包含通用的集合基类和只读的集合类。

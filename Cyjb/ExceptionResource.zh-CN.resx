@@ -237,6 +237,10 @@
     <value>集合是固定大小的。</value>
     <comment>集合是固定大小的。</comment>
   </data>
+  <data name="IComparerFailed" xml:space="preserve">
+    <value>未能比较数组中的两个元素。</value>
+    <comment>比较数组元素失败。</comment>
+  </data>
   <data name="InnerExceptionNull" xml:space="preserve">
     <value>innerExceptions 的一个元素为 null。</value>
     <comment>内部异常之一为 null。</comment>

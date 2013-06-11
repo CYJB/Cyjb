@@ -6,8 +6,28 @@ namespace Cyjb
 	/// <summary>
 	/// 提供对整数的扩展方法。
 	/// </summary>
-	public static class IntegerExt
+	public static partial class IntegerExt
 	{
+		/// <summary>
+		/// 用于计算末尾连续零的个数的数组。
+		/// </summary>
+		private static readonly int[] MultiplyDeBruijnBitPosition_32 = new int[] {
+			  0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 
+			  31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9 };
+		/// <summary>
+		/// 用于计算末尾连续零的个数的数组。
+		/// </summary>
+		private static readonly int[] MultiplyDeBruijnBitPosition_64 = new int[] {
+			 0, 1, 2, 56, 3, 32, 57, 46, 29, 4, 20, 33, 7, 58, 11, 47, 
+			 62, 30, 18, 5, 16, 21, 34, 23, 53, 8, 59, 36, 25, 12, 48, 39,
+			 63, 55, 31, 45, 28, 19, 6, 10, 61, 17, 15, 22, 52, 35, 24, 38, 
+			 54, 44, 27, 9, 60, 14, 51, 37, 43, 26, 13, 50, 42, 49, 41, 40 };
+		/// <summary>
+		/// 用于计算以 2 为底的对数值的数组。
+		/// </summary>
+		private static readonly int[] LogBase2_32 = new int[] { 
+			0, 9, 1, 10, 13, 21, 2, 29, 11, 14, 16, 18, 22, 25, 3, 30, 
+			8, 12, 20, 28, 15, 17, 24, 7, 19, 27, 23, 6, 26, 5, 4, 31 };
 
 		#region Int32 操作
 
@@ -154,19 +174,13 @@ namespace Cyjb
 			}
 		}
 		/// <summary>
-		/// 用于计算末尾连续零的个数的数组。
-		/// </summary>
-		private static readonly int[] MultiplyDeBruijnBitPosition32 = new int[] {
-			  0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 
-			  31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9 };
-		/// <summary>
 		/// 计算当前值的二进制表示中末尾连续零的个数。
 		/// </summary>
 		/// <param name="value">要计算二进制表示中末尾连续零的值。</param>
 		/// <returns>当前值的二进制表示中末尾连续零的个数。</returns>
 		public static int BinTrailingZeroCount(this int value)
 		{
-			return MultiplyDeBruijnBitPosition32[((uint)((value & -value) * 0x077CB531U)) >> 27];
+			return MultiplyDeBruijnBitPosition_32[((uint)((value & -value) * 0x077CB531U)) >> 27];
 		}
 		/// <summary>
 		/// 计算当前值的二进制表示中末尾连续一的个数。
@@ -184,12 +198,10 @@ namespace Cyjb
 		/// <returns>当前值的二进制表示中 1 的个数。</returns>
 		public static int BinOneCnt(this int value)
 		{
-			value = (value & 0x55555555) + ((value >> 1) & 0x55555555);
+			value -= (value >> 1) & 0x55555555;
 			value = (value & 0x33333333) + ((value >> 2) & 0x33333333);
-			value = (value & 0x0F0F0F0F) + ((value >> 4) & 0x0F0F0F0F);
-			value = (value & 0x00FF00FF) + ((value >> 8) & 0x00FF00FF);
-			value = (value & 0x0000FFFF) + ((value >> 16) & 0x0000FFFF);
-			return value;
+			value = (value + (value >> 4)) & 0x0F0F0F0F;
+			return (value * 0x01010101) >> 24;
 		}
 		/// <summary>
 		/// 计算当前值以 2 为底的对数值，得到的结果是大于等于当前值的最小对数值。
@@ -198,7 +210,12 @@ namespace Cyjb
 		/// <returns>当前值以 2 为底的对数值。</returns>
 		public static int LogBase2(this int value)
 		{
-			return LogBase2((uint)value);
+			value |= value >> 1;
+			value |= value >> 2;
+			value |= value >> 4;
+			value |= value >> 8;
+			value |= value >> 16;
+			return LogBase2_32[(uint)(value * 0x07C4ACDDU) >> 27];
 		}
 
 		#endregion // Int32 操作
@@ -346,6 +363,36 @@ namespace Cyjb
 					source--;
 				}
 			}
+		}
+		/// <summary>
+		/// 计算当前值的二进制表示中末尾连续零的个数。
+		/// </summary>
+		/// <param name="value">要计算二进制表示中末尾连续零的值。</param>
+		/// <returns>当前值的二进制表示中末尾连续零的个数。</returns>
+		public static int BinTrailingZeroCount(this long value)
+		{
+			return MultiplyDeBruijnBitPosition_64[((ulong)((value & -value) * 0x26752B916FC7B0DL)) >> 58];
+		}
+		/// <summary>
+		/// 计算当前值的二进制表示中末尾连续一的个数。
+		/// </summary>
+		/// <param name="value">要计算二进制表示中末尾连续一的值。</param>
+		/// <returns>当前值的二进制表示中末尾连续一的个数。</returns>
+		public static int BinTrailingOneCount(this long value)
+		{
+			return ((value ^ (value + 1)) >> 1).BinOneCnt();
+		}
+		/// <summary>
+		/// 计算当前值的二进制表示中 1 的个数。
+		/// </summary>
+		/// <param name="value">要计算的值。</param>
+		/// <returns>当前值的二进制表示中 1 的个数。</returns>
+		public static int BinOneCnt(this long value)
+		{
+			value -= (value >> 1) & 0x5555555555555555L;
+			value = (value & 0x3333333333333333L) + ((value >> 2) & 0x3333333333333333L);
+			value = (value + (value >> 4)) & 0x0F0F0F0F0F0F0F0FL;
+			return (int)((value * 0x0101010101010101L) >> 56);
 		}
 
 		#endregion // Int64 操作
@@ -511,7 +558,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static int BinTrailingZeroCount(this uint value)
 		{
-			return MultiplyDeBruijnBitPosition32[(uint)((value & -value) * 0x077CB531U) >> 27];
+			return MultiplyDeBruijnBitPosition_32[(uint)((value & -value) * 0x077CB531U) >> 27];
 		}
 		/// <summary>
 		/// 计算当前值的二进制表示中末尾连续一的个数。
@@ -531,19 +578,11 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static int BinOneCnt(this uint value)
 		{
-			value = (value & 0x55555555) + ((value >> 1) & 0x55555555);
-			value = (value & 0x33333333) + ((value >> 2) & 0x33333333);
-			value = (value & 0x0F0F0F0F) + ((value >> 4) & 0x0F0F0F0F);
-			value = (value & 0x00FF00FF) + ((value >> 8) & 0x00FF00FF);
-			value = (value & 0x0000FFFF) + ((value >> 16) & 0x0000FFFF);
-			return (int)value;
+			value -= (value >> 1) & 0x55555555U;
+			value = (value & 0x33333333U) + ((value >> 2) & 0x33333333U);
+			value = (value + (value >> 4)) & 0x0F0F0F0FU;
+			return (int)((value * 0x01010101U) >> 24);
 		}
-		/// <summary>
-		/// 用于计算以 2 为底的对数值的数组。
-		/// </summary>
-		private static readonly int[] LogBase2_32 = new int[] { 
-			0, 9, 1, 10, 13, 21, 2, 29, 11, 14, 16, 18, 22, 25, 3, 30, 
-			8, 12, 20, 28, 15, 17, 24, 7, 19, 27, 23, 6, 26, 5, 4, 31 };
 		/// <summary>
 		/// 计算当前值以 2 为底的对数值，得到的结果是大于等于当前值的最小对数值。
 		/// </summary>
@@ -714,6 +753,39 @@ namespace Cyjb
 				}
 				func(source);
 			}
+		}
+		/// <summary>
+		/// 计算当前值的二进制表示中末尾连续零的个数。
+		/// </summary>
+		/// <param name="value">要计算二进制表示中末尾连续零的值。</param>
+		/// <returns>当前值的二进制表示中末尾连续零的个数。</returns>
+		[CLSCompliant(false)]
+		public static int BinTrailingZeroCount(this ulong value)
+		{
+			return MultiplyDeBruijnBitPosition_64[((ulong)((value & (~value + 1UL)) * 0x26752B916FC7B0DUL)) >> 58];
+		}
+		/// <summary>
+		/// 计算当前值的二进制表示中末尾连续一的个数。
+		/// </summary>
+		/// <param name="value">要计算二进制表示中末尾连续一的值。</param>
+		/// <returns>当前值的二进制表示中末尾连续一的个数。</returns>
+		[CLSCompliant(false)]
+		public static int BinTrailingOneCount(this ulong value)
+		{
+			return ((value ^ (value + 1)) >> 1).BinOneCnt();
+		}
+		/// <summary>
+		/// 计算当前值的二进制表示中 1 的个数。
+		/// </summary>
+		/// <param name="value">要计算的值。</param>
+		/// <returns>当前值的二进制表示中 1 的个数。</returns>
+		[CLSCompliant(false)]
+		public static int BinOneCnt(this ulong value)
+		{
+			value -= (value >> 1) & 0x5555555555555555UL;
+			value = (value & 0x3333333333333333UL) + ((value >> 2) & 0x3333333333333333UL);
+			value = (value + (value >> 4)) & 0x0F0F0F0F0F0F0F0FUL;
+			return (int)((value * 0x0101010101010101UL) >> 56);
 		}
 
 		#endregion // UInt64 操作

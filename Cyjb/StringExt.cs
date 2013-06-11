@@ -394,5 +394,48 @@ namespace Cyjb
 		EndReverse:
 			return new string(strArr);
 		}
+		/// <summary>
+		/// 合并字符串中的空白。
+		/// </summary>
+		/// <param name="text">要合并空白的字符串。</param>
+		/// <returns>合并完成的字符串。</returns>
+		public static string CombineWhiteSpace(this string text)
+		{
+			return CombineWhiteSpace(text, " ");
+		}
+		/// <summary>
+		/// 合并字符串中的空白。
+		/// </summary>
+		/// <param name="text">要合并空白的字符串。</param>
+		/// <param name="replace">要替换空白的字符串。</param>
+		/// <returns>合并完成的字符串。</returns>
+		public static string CombineWhiteSpace(this string text, string replace)
+		{
+			StringBuilder builder = new StringBuilder(text.Length);
+			// 0：起始位置。
+			// 1：正常添加字符。
+			// 2：需要添加空白。
+			int state = 0;
+			for (int i = 0; i < text.Length; i++)
+			{
+				if (char.IsWhiteSpace(text, i))
+				{
+					if (state == 1)
+					{
+						state = 2;
+					}
+				}
+				else
+				{
+					if (state == 2)
+					{
+						builder.Append(replace);
+					}
+					builder.Append(text[i]);
+					state = 1;
+				}
+			}
+			return builder.ToString();
+		}
 	}
 }
