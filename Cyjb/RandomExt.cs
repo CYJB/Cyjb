@@ -69,6 +69,14 @@ namespace Cyjb
 			return random.Next(minValue, maxValue);
 		}
 		/// <summary>
+		/// 返回随机布尔值。
+		/// </summary>
+		/// <returns>随机布尔值。</returns>
+		public static bool NextBoolean()
+		{
+			return random.Next(2) == 1;
+		}
+		/// <summary>
 		/// 用随机数填充指定字节数组的元素。
 		/// </summary>
 		/// <param name="buffer">包含随机数的字节数组。</param>
@@ -77,6 +85,14 @@ namespace Cyjb
 		public static void NextBytes(byte[] buffer)
 		{
 			random.NextBytes(buffer);
+		}
+		/// <summary>
+		/// 返回一个介于 <c>0.0</c> 和 <c>1.0</c> 之间的随机数。
+		/// </summary>
+		/// <returns>大于等于 <c>0.0</c> 并且小于 <c>1.0</c> 的单精度浮点数。</returns>
+		public static float NextSingle()
+		{
+			return (float)random.NextDouble();
 		}
 		/// <summary>
 		/// 返回一个介于 <c>0.0</c> 和 <c>1.0</c> 之间的随机数。
