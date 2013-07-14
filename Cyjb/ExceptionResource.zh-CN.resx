@@ -249,10 +249,6 @@
     <value>基不在 2 至 36 之间。</value>
     <comment>无效的基。</comment>
   </data>
-  <data name="InvalidCacheOption" xml:space="preserve">
-    <value>无效的缓冲池选项 '{0}'，值 '{1}' 不是有效的 '{2}' 类型。</value>
-    <comment>缓冲池选项无效。</comment>
-  </data>
   <data name="InvalidCacheOptions" xml:space="preserve">
     <value>在缓冲池类型 '{0}' 中找不到与选项匹配的构造函数。</value>
     <comment>缓冲池选项无效。</comment>
@@ -260,10 +256,6 @@
   <data name="InvalidCacheType" xml:space="preserve">
     <value>无效的缓冲池类型 '{0}'。</value>
     <comment>缓冲池类型无效。</comment>
-  </data>
-  <data name="InvalidCacheType_CreateInstance" xml:space="preserve">
-    <value>创建缓冲池类型 '{0}' 的实例错误。</value>
-    <comment>缓冲池类型无效创建实例异常。</comment>
   </data>
   <data name="InvalidCacheType_ICache" xml:space="preserve">
     <value>无效的缓冲池类型 '{0}'，没有实现 ICache&lt;TKey, TValue&gt; 接口。</value>

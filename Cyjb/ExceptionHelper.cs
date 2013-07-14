@@ -742,33 +742,6 @@ namespace Cyjb
 				element.ElementInformation.Source, element.ElementInformation.LineNumber);
 		}
 		/// <summary>
-		/// 返回缓冲池类型创建实例的异常。
-		/// </summary>
-		/// <param name="element">无效的缓冲池配置元素。</param>
-		/// <param name="innerException">内部的异常信息。</param>
-		/// <returns><see cref="System.Configuration.ConfigurationErrorsException"/> 对象。</returns>
-		internal static ConfigurationErrorsException InvalidCacheType_CreateInstance(CacheElement element,
-			Exception innerException)
-		{
-			string message = ExceptionResources.GetString("InvalidCacheType_CreateInstance", element.CacheType);
-			return new ConfigurationErrorsException(message,
-				element.ElementInformation.Source, element.ElementInformation.LineNumber);
-		}
-		/// <summary>
-		/// 返回缓冲池选项无效的异常。
-		/// </summary>
-		/// <param name="element">无效的缓冲池选项配置元素。</param>
-		/// <param name="type">选项的类型。</param>
-		/// <param name="innerException">内部的异常信息。</param>
-		/// <returns><see cref="System.Configuration.ConfigurationErrorsException"/> 对象。</returns>
-		internal static ConfigurationErrorsException InvalidCacheOption(NameValueConfigurationElement element,
-			Type type, Exception innerException)
-		{
-			string message = ExceptionResources.GetString("InvalidCacheOption", element.Name, element.Value, type);
-			return new ConfigurationErrorsException(message,
-				element.ElementInformation.Source, element.ElementInformation.LineNumber);
-		}
-		/// <summary>
 		/// 返回缓冲池选项无效的异常。
 		/// </summary>
 		/// <param name="element">无效的缓冲池配置元素。</param>

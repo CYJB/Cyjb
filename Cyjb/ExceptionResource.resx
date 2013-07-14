@@ -249,10 +249,6 @@
     <value>Base is not between 2 and 36.</value>
     <comment>无效的基。</comment>
   </data>
-  <data name="InvalidCacheOption" xml:space="preserve">
-    <value>Invalid cache type '{0}', value '{1}' is not compatible with the type '{2}'.</value>
-    <comment>缓冲池选项无效。</comment>
-  </data>
   <data name="InvalidCacheOptions" xml:space="preserve">
     <value>Can not find constructor matchs options in type '{0}'.</value>
     <comment>缓冲池选项无效。</comment>
@@ -260,10 +256,6 @@
   <data name="InvalidCacheType" xml:space="preserve">
     <value>Invalid cache type '{0}'.</value>
     <comment>缓冲池类型无效。</comment>
-  </data>
-  <data name="InvalidCacheType_CreateInstance" xml:space="preserve">
-    <value>Can not create instance of type '{0}'.</value>
-    <comment>缓冲池类型无效创建实例异常。</comment>
   </data>
   <data name="InvalidCacheType_ICache" xml:space="preserve">
     <value>Invalid cache type '{0}', did not implement ICache&lt;TKey, TValue&gt;.</value>

@@ -87,10 +87,10 @@
     <Compile Include="Text\Token.cs" />
     <Compile Include="TypeExt.cs" />
     <Compile Include="UniqueValue`1.cs" />
-    <Compile Include="Utility\CacheCreateExceptionEventArgs.cs" />
     <Compile Include="Utility\CacheElement.cs" />
     <Compile Include="Utility\CacheElementCollection.cs" />
     <Compile Include="Utility\CacheFactory.cs" />
+    <Compile Include="Utility\CacheResolveEventArgs.cs" />
     <Compile Include="Utility\CacheSection.cs" />
     <Compile Include="Utility\LruCache`2.cs" />
     <Compile Include="Utility\LruNode`2.cs" />

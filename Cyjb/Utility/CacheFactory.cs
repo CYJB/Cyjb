@@ -13,12 +13,16 @@ namespace Cyjb.Utility
 	public static class CacheFactory
 	{
 		/// <summary>
+		/// 缓冲池配置节的名称。
+		/// </summary>
+		public const string SectionName = "cyjb.cache";
+		/// <summary>
 		/// 当创建缓冲池出现异常时发生。
 		/// </summary>
-		public static event EventHandler<CacheCreateExceptionEventArgs> CacheCreateException;
+		public static event EventHandler<CacheResolveEventArgs> CacheResolve;
 		/// <summary>
 		/// 返回与指定的键关联的缓冲池。如果配置信息不存在，则返回 <c>null</c>。
-		/// 如果配置文件出现错误，同样返回 <c>null</c>，这时候会发生 <see cref="CacheCreateException"/> 事件。
+		/// 如果配置文件出现错误，同样返回 <c>null</c>，这时候会发生 <see cref="CacheResolve"/> 事件。
 		/// </summary>
 		/// <typeparam name="TKey">缓冲对象的键的类型。</typeparam>
 		/// <typeparam name="TValue">缓冲对象的类型。</typeparam>
@@ -31,19 +35,25 @@ namespace Cyjb.Utility
 			CacheSection section = null;
 			try
 			{
-				section = ConfigurationManager.GetSection("cyjb.cache") as CacheSection;
+				section = ConfigurationManager.GetSection(SectionName) as CacheSection;
 			}
 			catch (ConfigurationErrorsException ex)
 			{
-				OnCacheCreateException(ex);
-				return null;
+				return OnCacheResolve<TKey, TValue>(key, ex);
 			}
 			if (section == null) { return null; }
 			CacheElement element = section.Caches[key];
 			if (element == null) { return null; }
 			// 读取缓冲池类型。
-			Type cacheType = GetCacheType<TKey, TValue>(element);
-			if (cacheType == null) { return null; }
+			Type cacheType = null;
+			try
+			{
+				cacheType = GetCacheType<TKey, TValue>(element);
+			}
+			catch (ConfigurationErrorsException ex)
+			{
+				return OnCacheResolve<TKey, TValue>(key, ex);
+			}
 			// 读取缓冲池设置。
 			int cnt = element.Options.Count;
 			Dictionary<string, NameValueConfigurationElement> options =
@@ -52,74 +62,53 @@ namespace Cyjb.Utility
 			{
 				options.Add(nv.Name, nv);
 			}
-			// 使用反射检索缓冲池类型。
+			// 使用反射检索缓冲池类型，这里不能直接用 PowerBinder，是因为参数类型是未知的。
 			// 找到与设置个数和名称匹配的构造函数。
 			ConstructorInfo[] ctors = cacheType.GetConstructors();
+			object[] values = new object[cnt];
 			for (int i = 0; i < ctors.Length; i++)
 			{
 				ParameterInfo[] parameters = ctors[i].GetParameters();
-				if (parameters.Length == cnt)
+				if (parameters.Length != cnt) { continue; }
+				// 测试参数名称是否全部能匹配上，并进行参数类型转换。
+				int j = 0;
+				for (; j < cnt; j++)
 				{
-					// 测试参数名称是否全部能匹配上。
-					int j = 0;
-					while (j < cnt)
+					NameValueConfigurationElement value;
+					if (!options.TryGetValue(parameters[j].Name, out value))
 					{
-						if (!options.ContainsKey(parameters[j++].Name))
-						{
-							break;
-						}
+						break;
 					}
-					if (j < cnt) { continue; }
-					// 仅当参数名称能够完全匹配上时，才进行参数类型转换。
-					object[] values = new object[cnt];
-					for (j = 0; j < cnt; j++)
-					{
-						NameValueConfigurationElement value = options[parameters[j].Name];
-						try
-						{
-							// 尝试进行类型转换。
-							values[j] = Convert.ChangeType(value.Value,
-								parameters[j].ParameterType, CultureInfo.InvariantCulture);
-							continue;
-						}
-						catch (InvalidCastException icex)
-						{
-							OnCacheCreateException(ExceptionHelper.InvalidCacheOption(value, parameters[j].ParameterType, icex));
-						}
-						catch (FormatException fex)
-						{
-							OnCacheCreateException(ExceptionHelper.InvalidCacheOption(value, parameters[j].ParameterType, fex));
-						}
-						catch (OverflowException oex)
-						{
-							OnCacheCreateException(ExceptionHelper.InvalidCacheOption(value, parameters[j].ParameterType, oex));
-						}
-						return null;
-					}
-					// 找到了匹配的构造函数，构造实例。
+					// 尝试进行类型转换。
 					try
 					{
-						return ctors[i].Invoke(values) as ICache<TKey, TValue>;
+						values[j] = Convert.ChangeType(value.Value,
+							parameters[j].ParameterType, CultureInfo.InvariantCulture);
 					}
-					catch (MemberAccessException maex)
+					catch (InvalidCastException)
 					{
-						OnCacheCreateException(ExceptionHelper.InvalidCacheType_CreateInstance(element, maex));
-						return null;
+						break;
 					}
-					catch (TargetInvocationException tiex)
+					catch (FormatException)
 					{
-						OnCacheCreateException(ExceptionHelper.InvalidCacheType_CreateInstance(element, tiex));
-						return null;
+						break;
 					}
-					catch (SecurityException sex)
+					catch (OverflowException)
 					{
-						OnCacheCreateException(ExceptionHelper.InvalidCacheType_CreateInstance(element, sex));
-						return null;
+						break;
 					}
 				}
+				if (j < cnt) { continue; }
+				// 找到了匹配的构造函数，构造实例。
+				try
+				{
+					return ctors[i].Invoke(values) as ICache<TKey, TValue>;
+				}
+				catch (MemberAccessException) { }
+				catch (TargetInvocationException) { }
+				catch (SecurityException) { }
 			}
-			OnCacheCreateException(ExceptionHelper.InvalidCacheOptions(element));
-			return null;
+			return OnCacheResolve<TKey, TValue>(key, ExceptionHelper.InvalidCacheOptions(element));
 		}
 		/// <summary>
 		/// 获取缓冲池的类型。
@@ -137,11 +126,10 @@ namespace Cyjb.Utility
 			{
 				typeName += "`2";
 			}
-			Type cacheType = Type.GetType(typeName, false, false);
+			Type cacheType = Type.GetType(typeName, false, true);
 			if (cacheType == null)
 			{
-				OnCacheCreateException(ExceptionHelper.InvalidCacheType(element));
-				return null;
+				throw ExceptionHelper.InvalidCacheType(element);
 			}
 			// 构造闭合泛型类型。
 			try
@@ -151,28 +139,34 @@ namespace Cyjb.Utility
 			catch (ArgumentException ex)
 			{
 				// 闭合泛型类型构造失败。
-				OnCacheCreateException(ExceptionHelper.InvalidCacheType(element, ex));
-				return null;
+				throw ExceptionHelper.InvalidCacheType(element, ex);
 			}
 			// 缓冲池类型不是 ICache&lt;TKey, TValue&gt;。
 			if (!typeof(ICache<TKey, TValue>).IsAssignableFrom(cacheType))
 			{
-				OnCacheCreateException(ExceptionHelper.InvalidCacheType_ICache(element));
-				return null;
+				throw ExceptionHelper.InvalidCacheType_ICache(element);
 			}
 			return cacheType;
 		}
 		/// <summary>
-		/// 引发 <see cref="CacheCreateException"/> 事件。
+		/// 引发 <see cref="CacheResolve"/> 事件。
 		/// </summary>
+		/// <typeparam name="TKey">缓冲对象的键的类型。</typeparam>
+		/// <typeparam name="TValue">缓冲对象的类型。</typeparam>
+		/// <param name="key">缓冲池的键。</param>
 		/// <param name="exception">配置错误异常。</param>
-		private static void OnCacheCreateException(ConfigurationErrorsException exception)
+		private static ICache<TKey, TValue> OnCacheResolve<TKey, TValue>(string key,
+			ConfigurationErrorsException exception)
 		{
-			EventHandler<CacheCreateExceptionEventArgs> events = CacheCreateException;
+			EventHandler<CacheResolveEventArgs> events = CacheResolve;
 			if (events != null)
 			{
-				events(null, new CacheCreateExceptionEventArgs(exception));
+				CacheResolveEventArgs args = new CacheResolveEventArgs(
+					key, typeof(TKey), typeof(TValue), exception);
+				events(null, args);
+				return args.CacheObject as ICache<TKey, TValue>;
 			}
+			return null;
 		}
 	}
 }
