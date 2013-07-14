@@ -119,6 +119,7 @@
     <Compile Include="Utility\LruCacheNoSync`2.cs" />
     <Compile Include="Utility\SimplyCache`2.cs" />
     <Compile Include="Utility\SimplyCacheNoSync`2.cs" />
+    <Compile Include="Utility\LruNodeNoSync`2.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CYJB_Code_Key.snk" />

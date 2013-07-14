@@ -29,15 +29,15 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 缓存对象的字典。
 		/// </summary>
-		private IDictionary<TKey, LruNode<TKey, TValue>> cacheDict = new Dictionary<TKey, LruNode<TKey, TValue>>();
+		private IDictionary<TKey, LruNodeNoSync<TKey, TValue>> cacheDict = new Dictionary<TKey, LruNodeNoSync<TKey, TValue>>();
 		/// <summary>
 		/// 链表的头节点，也是热端的头。
 		/// </summary>
-		private LruNode<TKey, TValue> head;
+		private LruNodeNoSync<TKey, TValue> head;
 		/// <summary>
 		/// 链表冷端的头节点。
 		/// </summary>
-		private LruNode<TKey, TValue> codeHead;
+		private LruNodeNoSync<TKey, TValue> codeHead;
 		/// <summary>
 		/// 使用指定的最大对象数目初始化 <see cref="LruCacheNoSync&lt;TKey,TValue&gt;"/> 类的新实例。
 		/// </summary>
@@ -134,7 +134,7 @@ namespace Cyjb.Utility
 		public void Remove(TKey key)
 		{
 			ExceptionHelper.CheckArgumentNull(key, "key");
-			LruNode<TKey, TValue> node;
+			LruNodeNoSync<TKey, TValue> node;
 			if (cacheDict.TryGetValue(key, out node))
 			{
 				cacheDict.Remove(key);
@@ -153,7 +153,7 @@ namespace Cyjb.Utility
 		public bool TryGet(TKey key, out TValue value)
 		{
 			ExceptionHelper.CheckArgumentNull(key, "key");
-			LruNode<TKey, TValue> node;
+			LruNodeNoSync<TKey, TValue> node;
 			if (cacheDict.TryGetValue(key, out node))
 			{
 				value = node.Value;
@@ -172,7 +172,7 @@ namespace Cyjb.Utility
 		/// 从链表中移除指定的节点。
 		/// </summary>
 		/// <param name="node">要移除的节点。</param>
-		private void Remove(LruNode<TKey, TValue> node)
+		private void Remove(LruNodeNoSync<TKey, TValue> node)
 		{
 			if (node.Next == node)
 			{
@@ -196,7 +196,7 @@ namespace Cyjb.Utility
 		/// 将指定的节点添加到链表热端的头部。
 		/// </summary>
 		/// <param name="node">要添加的节点。</param>
-		private void AddHotFirst(LruNode<TKey, TValue> node)
+		private void AddHotFirst(LruNodeNoSync<TKey, TValue> node)
 		{
 			if (this.head == null)
 			{
@@ -217,7 +217,7 @@ namespace Cyjb.Utility
 		/// 将指定的节点添加到链表冷端的头部。
 		/// </summary>
 		/// <param name="node">要添加的节点。</param>
-		private void AddCodeFirst(LruNode<TKey, TValue> node)
+		private void AddCodeFirst(LruNodeNoSync<TKey, TValue> node)
 		{
 			// 这里 codeHead != null，在调用的时候已经保证了这一点。
 			this.codeHead.AddBefore(node);
@@ -233,7 +233,7 @@ namespace Cyjb.Utility
 		/// <param name="value">要添加的对象。</param>
 		private void AddInternal(TKey key, TValue value)
 		{
-			LruNode<TKey, TValue> node;
+			LruNodeNoSync<TKey, TValue> node;
 			if (cacheDict.TryGetValue(key, out node))
 			{
 				// 更新节点。
@@ -246,7 +246,7 @@ namespace Cyjb.Utility
 				if (count < maxSize)
 				{
 					// 将节点添加到热端起始。
-					node = new LruNode<TKey, TValue>(key, value);
+					node = new LruNodeNoSync<TKey, TValue>(key, value);
 					AddHotFirst(node);
 					count++;
 					if (count == hotSize + 1)
