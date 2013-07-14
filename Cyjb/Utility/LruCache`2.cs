@@ -35,7 +35,8 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 缓存对象的字典。
 		/// </summary>
-		private Dictionary<TKey, LruNode<TKey, TValue>> cacheDict = new Dictionary<TKey, LruNode<TKey, TValue>>();
+		private Dictionary<TKey, LruNode<TKey, TValue>> cacheDict =
+			new Dictionary<TKey, LruNode<TKey, TValue>>();
 		/// <summary>
 		/// 链表的头节点，也是热端的头。
 		/// </summary>
@@ -113,7 +114,7 @@ namespace Cyjb.Utility
 		{
 			this.CheckDisposed();
 			ExceptionHelper.CheckArgumentNull(key, "key");
-			this.AddInternal(key, value);
+			this.AddInternal(key, new Lazy<TValue>(() => value, false));
 		}
 		/// <summary>
 		/// 清空缓存中的所有对象。
@@ -152,16 +153,27 @@ namespace Cyjb.Utility
 		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		public TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory)
 		{
+			this.CheckDisposed();
 			ExceptionHelper.CheckArgumentNull(key, "key");
 			ExceptionHelper.CheckArgumentNull(valueFactory, "valueFactory");
-			TValue value;
-			if (this.TryGet(key, out value))
+			LruNode<TKey, TValue> node;
+			cacheLock.EnterUpgradeableReadLock();
+			try
 			{
-				return value;
+				if (cacheDict.TryGetValue(key, out node))
+				{
+					Interlocked.Increment(ref node.VisitCount);
+				}
+				else
+				{
+					node = this.AddInternal(key, new Lazy<TValue>(() => valueFactory(key)));
+				}
 			}
-			value = valueFactory(key);
-			this.AddInternal(key, value);
-			return value;
+			finally
+			{
+				cacheLock.ExitUpgradeableReadLock();
+			}
+			return node.Value.Value;
 		}
 		/// <summary>
 		/// 从缓存中移除并返回具有指定键的对象。
@@ -209,23 +221,29 @@ namespace Cyjb.Utility
 		{
 			this.CheckDisposed();
 			ExceptionHelper.CheckArgumentNull(key, "key");
+			LruNode<TKey, TValue> node;
 			cacheLock.EnterReadLock();
 			try
 			{
-				LruNode<TKey, TValue> node;
 				if (cacheDict.TryGetValue(key, out node))
 				{
-					value = node.Value;
 					Interlocked.Increment(ref node.VisitCount);
-					return true;
 				}
 			}
 			finally
 			{
 				cacheLock.ExitReadLock();
 			}
-			value = default(TValue);
-			return false;
+			if (node == null)
+			{
+				value = default(TValue);
+				return false;
+			}
+			else
+			{
+				value = node.Value.Value;
+				return true;
+			}
 		}
 
 		#endregion // ICache<TKey, TValue> 成员
@@ -312,7 +330,7 @@ namespace Cyjb.Utility
 		/// </summary>
 		/// <param name="key">要添加的对象的键。</param>
 		/// <param name="value">要添加的对象。</param>
-		private void AddInternal(TKey key, TValue value)
+		private LruNode<TKey, TValue> AddInternal(TKey key, Lazy<TValue> value)
 		{
 			cacheLock.EnterWriteLock();
 			try
@@ -324,7 +342,6 @@ namespace Cyjb.Utility
 					node.Value = value;
 					// 写锁互斥，这里不用 Interlocked。
 					node.VisitCount++;
-					return;
 				}
 				else
 				{
@@ -340,7 +357,6 @@ namespace Cyjb.Utility
 							codeHead = head.Prev;
 						}
 						cacheDict.Add(key, node);
-						return;
 					}
 					else
 					{
@@ -365,6 +381,7 @@ namespace Cyjb.Utility
 						cacheDict.Add(key, node);
 					}
 				}
+				return node;
 			}
 			finally
 			{
