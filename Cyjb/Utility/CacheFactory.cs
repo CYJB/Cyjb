@@ -10,6 +10,19 @@ namespace Cyjb.Utility
 	/// <summary>
 	/// 允许根据配置文件使用不同的缓冲池配置的工厂类。
 	/// </summary>
+	/// <remarks>
+	/// 配置文件示例：
+	/// <configSections>
+	///		<!-- 这里的 Section 名称必须为 cyjb.cache -->
+	///		<section name="cyjb.cache" type="Cyjb.Utility.CacheSection, Cyjb"/>
+	/// </configSections>
+	/// <cyjb.cache>
+	///		<!-- key 是缓冲池的键，cacheType 是缓冲池的类型，option 是缓冲池构造函数参数的名称和相应的值。 -->
+	///		<cache key="Cyjb.EnumDescriptionCache" cacheType="Cyjb.Utility.LruCacheNoSync`2, Cyjb" >
+	///			<option name="maxSize" value="100" />
+	///		</cache>
+	/// </cyjb.cache>
+	/// </remarks>
 	public static class CacheFactory
 	{
 		/// <summary>
@@ -121,10 +134,14 @@ namespace Cyjb.Utility
 		{
 			string typeName = element.CacheType;
 			// 读取缓冲池类型，类型总是开放泛型类型。
-			// 自动补全类型名称最后的 `2。
-			if (!typeName.EndsWith("`2", StringComparison.Ordinal))
+			if (typeName.IndexOf(',') == -1)
 			{
-				typeName += "`2";
+				// 如果不是类型的限定名 AssemblyQualifiedName，
+				// 则尝试自动补全类型名称最后的 `2。
+				if (!typeName.EndsWith("`2", StringComparison.Ordinal))
+				{
+					typeName += "`2";
+				}
 			}
 			Type cacheType = Type.GetType(typeName, false, true);
 			if (cacheType == null)

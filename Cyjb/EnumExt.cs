@@ -13,6 +13,9 @@ namespace Cyjb
 	/// <summary>
 	/// 提供 <see cref="System.Enum"/> 类的扩展方法。
 	/// </summary>
+	/// <remarks>
+	/// 内部的缓存键为 Cyjb.EnumDescriptionCache。
+	/// </remarks>
 	public static class EnumExt
 	{
 
