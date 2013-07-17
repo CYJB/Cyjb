@@ -34,6 +34,10 @@ namespace Cyjb.Utility
 		/// </summary>
 		public static event EventHandler<CacheResolveEventArgs> CacheResolve;
 		/// <summary>
+		/// 当创建默认缓冲池时发生。
+		/// </summary>
+		public static event EventHandler<CacheDefaultEventArgs> CacheDefault;
+		/// <summary>
 		/// 返回与指定的键关联的缓冲池。如果配置信息不存在，则返回 <c>null</c>。
 		/// 如果配置文件出现错误，同样返回 <c>null</c>，这时候会发生 <see cref="CacheResolve"/> 事件。
 		/// </summary>
@@ -54,9 +58,15 @@ namespace Cyjb.Utility
 			{
 				return OnCacheResolve<TKey, TValue>(key, ex);
 			}
-			if (section == null) { return null; }
+			if (section == null)
+			{
+				return OnCacheDefault<TKey, TValue>(key);
+			}
 			CacheElement element = section.Caches[key];
-			if (element == null) { return null; }
+			if (element == null)
+			{
+				return OnCacheDefault<TKey, TValue>(key);
+			}
 			// 读取缓冲池类型。
 			Type cacheType = null;
 			try
@@ -180,6 +190,24 @@ namespace Cyjb.Utility
 			{
 				CacheResolveEventArgs args = new CacheResolveEventArgs(
 					key, typeof(TKey), typeof(TValue), exception);
+				events(null, args);
+				return args.CacheObject as ICache<TKey, TValue>;
+			}
+			return null;
+		}
+		/// <summary>
+		/// 引发 <see cref="CacheDefault"/> 事件。
+		/// </summary>
+		/// <typeparam name="TKey">缓冲对象的键的类型。</typeparam>
+		/// <typeparam name="TValue">缓冲对象的类型。</typeparam>
+		/// <param name="key">缓冲池的键。</param>
+		private static ICache<TKey, TValue> OnCacheDefault<TKey, TValue>(string key)
+		{
+			EventHandler<CacheDefaultEventArgs> events = CacheDefault;
+			if (events != null)
+			{
+				CacheDefaultEventArgs args = new CacheDefaultEventArgs(
+					key, typeof(TKey), typeof(TValue));
 				events(null, args);
 				return args.CacheObject as ICache<TKey, TValue>;
 			}

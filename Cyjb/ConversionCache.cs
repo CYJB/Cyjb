@@ -9,6 +9,9 @@ namespace Cyjb
 	/// <summary>
 	/// 表示用户定义类型转换的缓存。
 	/// </summary>
+	/// <remarks>
+	/// 内部的缓存键为 Cyjb.ConversionCache。
+	/// </remarks>
 	internal static class ConversionCache
 	{
 		/// <summary>
