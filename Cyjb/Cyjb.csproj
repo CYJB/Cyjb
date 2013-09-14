@@ -66,6 +66,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IO\AggregateSourceException.cs" />
+    <Compile Include="IO\DirectoryExt.cs" />
+    <Compile Include="IO\DriectoryInfoExt.cs" />
+    <Compile Include="IO\FileExt.cs" />
+    <Compile Include="IO\PathExt.cs" />
     <Compile Include="IO\SourceException.cs" />
     <Compile Include="IO\SourceLocation.cs" />
     <Compile Include="IO\SourceLocator.cs" />
