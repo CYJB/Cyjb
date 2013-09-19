@@ -1,9 +1,7 @@
 Cyjb
 ====
 
-My personal C# library.
-
-我的个人 C# 类库。欢迎访问我的[博客](http://www.cnblogs.com/cyjb/)。
+我开发的的 C# 类库，以 BSD 协议发布。欢迎访问我的[博客](http://www.cnblogs.com/cyjb/)。
 
 本项目包括一些核心类，包括：
 
