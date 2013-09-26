@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -6,11 +7,11 @@ using System.Threading;
 
 namespace Cyjb.Collections.ObjectModel
 {
-
 	/// <summary>
 	/// 为泛型只读列表提供基类。
 	/// </summary>
 	/// <typeparam name="T">列表中的元素类型。</typeparam>
+	[Serializable]
 	public class ReadOnlyList<T> : ListBase<T>
 	{
 		/// <summary>

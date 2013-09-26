@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Cyjb.Collections.ObjectModel
@@ -7,6 +8,7 @@ namespace Cyjb.Collections.ObjectModel
 	/// </summary>
 	/// <typeparam name="TKey">集合中键的类型。</typeparam>
 	/// <typeparam name="TItem">集合中的项的类型。</typeparam>
+	[Serializable]
 	public abstract class KeyedCollectionBase<TKey, TItem> : CollectionBase<TItem>
 	{
 		/// <summary>

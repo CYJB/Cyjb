@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -8,6 +9,7 @@ namespace Cyjb.Collections.ObjectModel
 	/// </summary>
 	/// <typeparam name="TKey">列表中键的类型。</typeparam>
 	/// <typeparam name="TItem">列表中的项的类型。</typeparam>
+	[Serializable]
 	public abstract class KeyedListBase<TKey, TItem> : ListBase<TItem>
 	{
 		/// <summary>

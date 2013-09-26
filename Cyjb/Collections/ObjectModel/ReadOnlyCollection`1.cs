@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -6,11 +7,11 @@ using System.Threading;
 
 namespace Cyjb.Collections.ObjectModel
 {
-
 	/// <summary>
 	/// 为泛型只读集合提供基类。
 	/// </summary>
 	/// <typeparam name="T">集合中的元素类型。</typeparam>
+	[Serializable]
 	public class ReadOnlyCollection<T> : CollectionBase<T>
 	{
 		/// <summary>

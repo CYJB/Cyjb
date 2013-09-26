@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -5,12 +6,12 @@ using System.Threading;
 
 namespace Cyjb.Collections.ObjectModel
 {
-
 	/// <summary>
 	/// 为泛型只读字典提供基类。
 	/// </summary>
 	/// <typeparam name="TKey">字典的键的类型。</typeparam>
 	/// <typeparam name="TValue">字典的值的类型。</typeparam>
+	[Serializable]
 	public class ReadOnlyDictionary<TKey, TValue> : DictionaryBase<TKey, TValue>
 	{
 		/// <summary>

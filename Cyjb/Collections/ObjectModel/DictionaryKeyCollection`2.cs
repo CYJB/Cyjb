@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Cyjb.Collections.ObjectModel
 {
@@ -7,6 +8,7 @@ namespace Cyjb.Collections.ObjectModel
 	/// </summary>
 	/// <typeparam name="TKey">字典的键的类型。</typeparam>
 	/// <typeparam name="TValue">字典的值的类型。</typeparam>
+	[Serializable]
 	internal sealed class DictionaryKeyCollection<TKey, TValue> : ReadOnlyCollection<TKey>
 	{
 		/// <summary>
