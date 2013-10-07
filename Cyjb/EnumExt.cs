@@ -19,8 +19,102 @@ namespace Cyjb
 	public static class EnumExt
 	{
 
-		#region 枚举描述
+		#region 枚举字符串
 
+		/// <summary>
+		/// 将指定具有整数值的对象转换为与其枚举值等效的字符串表示形式。
+		/// </summary>
+		/// <param name="enumType">枚举的类型</param>
+		/// <param name="value">要转换为与其枚举值等效的字符串的值。</param>
+		/// <returns>与给定值的枚举值等效的字符串表示形式。</returns>
+		public static string GetString(Type enumType, object value)
+		{
+			return GetString(enumType, ToUInt64(value), false);
+		}
+		/// <summary>
+		/// 将指定 8 位有符号整数转换为与其枚举值等效的字符串表示形式。
+		/// </summary>
+		/// <param name="enumType">枚举的类型</param>
+		/// <param name="value">要转换为与其枚举值等效的字符串的值。</param>
+		/// <returns>与给定值的枚举值等效的字符串表示形式。</returns>
+		[CLSCompliant(false)]
+		public static string GetString(Type enumType, sbyte value)
+		{
+			return GetString(enumType, (ulong)value, false);
+		}
+		/// <summary>
+		/// 将指定 16 位有符号整数转换为与其枚举值等效的字符串表示形式。
+		/// </summary>
+		/// <param name="enumType">枚举的类型</param>
+		/// <param name="value">要转换为与其枚举值等效的字符串的值。</param>
+		/// <returns>与给定值的枚举值等效的字符串表示形式。</returns>
+		public static string GetString(Type enumType, short value)
+		{
+			return GetString(enumType, (ulong)value, false);
+		}
+		/// <summary>
+		/// 将指定 32 位有符号整数转换为与其枚举值等效的字符串表示形式。
+		/// </summary>
+		/// <param name="enumType">枚举的类型</param>
+		/// <param name="value">要转换为与其枚举值等效的字符串的值。</param>
+		/// <returns>与给定值的枚举值等效的字符串表示形式。</returns>
+		public static string GetString(Type enumType, int value)
+		{
+			return GetString(enumType, (ulong)value, false);
+		}
+		/// <summary>
+		/// 将指定 64 位有符号整数转换为与其枚举值等效的字符串表示形式。
+		/// </summary>
+		/// <param name="enumType">枚举的类型</param>
+		/// <param name="value">要转换为与其枚举值等效的字符串的值。</param>
+		/// <returns>与给定值的枚举值等效的字符串表示形式。</returns>
+		public static string GetString(Type enumType, long value)
+		{
+			return GetString(enumType, (ulong)value, false);
+		}
+		/// <summary>
+		/// 将指定 8 位无符号整数转换为与其枚举值等效的字符串表示形式。
+		/// </summary>
+		/// <param name="enumType">枚举的类型</param>
+		/// <param name="value">要转换为与其枚举值等效的字符串的值。</param>
+		/// <returns>与给定值的枚举值等效的字符串表示形式。</returns>
+		public static string GetString(Type enumType, byte value)
+		{
+			return GetString(enumType, value, false);
+		}
+		/// <summary>
+		/// 将指定 16 位无符号整数转换为与其枚举值等效的字符串表示形式。
+		/// </summary>
+		/// <param name="enumType">枚举的类型</param>
+		/// <param name="value">要转换为与其枚举值等效的字符串的值。</param>
+		/// <returns>与给定值的枚举值等效的字符串表示形式。</returns>
+		[CLSCompliant(false)]
+		public static string GetString(Type enumType, ushort value)
+		{
+			return GetString(enumType, value, false);
+		}
+		/// <summary>
+		/// 将指定 32 位无符号整数转换为与其枚举值等效的字符串表示形式。
+		/// </summary>
+		/// <param name="enumType">枚举的类型</param>
+		/// <param name="value">要转换为与其枚举值等效的字符串的值。</param>
+		/// <returns>与给定值的枚举值等效的字符串表示形式。</returns>
+		[CLSCompliant(false)]
+		public static string GetString(Type enumType, uint value)
+		{
+			return GetString(enumType, value, false);
+		}
+		/// <summary>
+		/// 将指定 64 位无符号整数转换为与其枚举值等效的字符串表示形式。
+		/// </summary>
+		/// <param name="enumType">枚举的类型</param>
+		/// <param name="value">要转换为与其枚举值等效的字符串的值。</param>
+		/// <returns>与给定值的枚举值等效的字符串表示形式。</returns>
+		[CLSCompliant(false)]
+		public static string GetString(Type enumType, ulong value)
+		{
+			return GetString(enumType, value, false);
+		}
 		/// <summary>
 		/// 返回指定枚举值的描述（通过 
 		/// <see cref="System.ComponentModel.DescriptionAttribute"/> 指定）。
@@ -30,41 +124,51 @@ namespace Cyjb
 		/// <returns>指定枚举值的描述。</returns>
 		public static string GetDescription(this Enum value)
 		{
-			Type enumType = value.GetType();
+			return GetString(value.GetType(), ToUInt64(value), true);
+		}
+		/// <summary>
+		/// 将指定 64 位有符号整数转换为与其枚举值等效的字符串表示形式。
+		/// </summary>
+		/// <param name="enumType">枚举的类型</param>
+		/// <param name="value">要转换为与其枚举值等效的字符串的值。</param>
+		/// <param name="useDescription">是否获得枚举的描述。</param>
+		/// <returns>与给定值的枚举值等效的字符串表示形式。</returns>
+		private static string GetString(Type enumType, ulong value, bool useDescription)
+		{
 			// 寻找枚举值的组合。
 			EnumCache cache = GetEnumCache(enumType);
-			ulong valueUL = ToUInt64(value);
-			int idx = Array.BinarySearch(cache.Values, valueUL);
+			int idx = Array.BinarySearch(cache.Values, value);
+			string[] names = useDescription ? cache.Descriptions : cache.Names;
 			if (idx >= 0)
 			{
-				// 枚举值已定义，直接返回相应的描述。
-				return cache.Descriptions[idx];
+				// 枚举值已定义，直接返回相应的名称。
+				return names[idx];
 			}
 			// 不是可组合的枚举，直接返回枚举值得字符串形式。
 			if (!cache.HasFlagsAttribute)
 			{
-				return GetStringValue(enumType, valueUL);
+				return GetStringValue(enumType, value);
 			}
 			List<string> list = new List<string>();
 			// 从后向前寻找匹配的二进制。
-			for (int i = cache.Values.Length - 1; i >= 0 && valueUL != 0UL; i--)
+			for (int i = cache.Values.Length - 1; i >= 0 && value != 0UL; i--)
 			{
 				ulong enumValue = cache.Values[i];
 				if (enumValue == 0UL)
 				{
 					continue;
 				}
-				if ((valueUL & enumValue) == enumValue)
+				if ((value & enumValue) == enumValue)
 				{
-					valueUL -= enumValue;
-					list.Add(cache.Descriptions[i]);
+					value -= enumValue;
+					list.Add(names[i]);
 				}
 			}
 			list.Reverse();
 			// 添加最后剩余的未定义值。
-			if (list.Count == 0 || valueUL != 0UL)
+			if (list.Count == 0 || value != 0UL)
 			{
-				list.Add(GetStringValue(enumType, valueUL));
+				list.Add(GetStringValue(enumType, value));
 			}
 			return string.Join(", ", list);
 		}
