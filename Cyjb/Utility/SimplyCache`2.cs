@@ -9,7 +9,7 @@ namespace Cyjb.Utility
 	/// </summary>
 	/// <typeparam name="TKey">缓存对象的键的类型。</typeparam>
 	/// <typeparam name="TValue">缓存对象的类型。</typeparam>
-	/// <remarks>该类仅仅是 <see cref="ConcurrentDictionary"/> 类的一个简单包装。
+	/// <remarks>该类仅仅是 <see cref="ConcurrentDictionary&lt;TKey,TValue&gt;"/> 类的一个简单包装。
 	/// 缓存的对象数量会一直增长下去，通常应仅作为测试使用。</remarks>
 	[DebuggerDisplay("Count = {Count}")]
 	public sealed class SimplyCache<TKey, TValue> : ICache<TKey, TValue>
@@ -25,6 +25,7 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 获取实际包含在缓存中的对象数目。
 		/// </summary>
+		/// <value>实际包含在缓存中的对象数目。</value>
 		public int Count { get { return cacheDict.Count; } }
 
 		#region ICache<TKey, TValue> 成员

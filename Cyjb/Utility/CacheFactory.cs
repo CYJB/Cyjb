@@ -12,6 +12,7 @@ namespace Cyjb.Utility
 	/// </summary>
 	/// <remarks>
 	/// 配置文件示例：
+	/// <code>
 	/// <configSections>
 	///		<!-- 这里的 Section 名称必须为 cyjb.cache -->
 	///		<section name="cyjb.cache" type="Cyjb.Utility.CacheSection, Cyjb"/>
@@ -22,6 +23,7 @@ namespace Cyjb.Utility
 	///			<option name="maxSize" value="100" />
 	///		</cache>
 	/// </cyjb.cache>
+	/// </code>
 	/// </remarks>
 	public static class CacheFactory
 	{

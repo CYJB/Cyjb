@@ -8,8 +8,13 @@ namespace Cyjb.Utility
 	public sealed class CacheElement : ConfigurationElement
 	{
 		/// <summary>
+		/// 初始化 <see cref="CacheElement"/> 类的新实例。
+		/// </summary>
+		public CacheElement() { }
+		/// <summary>
 		/// 获取或设置缓冲池配置的键。
 		/// </summary>
+		/// <value>缓冲池配置的键。</value>
 		[ConfigurationProperty("key", IsRequired = true, IsKey = true)]
 		public string Key
 		{
@@ -19,6 +24,7 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 获取或设置的缓冲池的类名。
 		/// </summary>
+		/// <value>缓冲池的类名。</value>
 		[ConfigurationProperty("cacheType", IsRequired = true)]
 		public string CacheType
 		{
@@ -28,6 +34,7 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 获取缓冲池的选项列表。
 		/// </summary>
+		/// <value>缓冲池的选项列表。</value>
 		[ConfigurationProperty("", IsDefaultCollection = true)]
 		[ConfigurationCollection(typeof(NameValueConfigurationCollection), AddItemName = "option")]
 		public NameValueConfigurationCollection Options

@@ -28,18 +28,22 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 获取或设置新的缓冲池对象。
 		/// </summary>
+		/// <value>缓冲池对象。</value>
 		public object CacheObject { get; set; }
 		/// <summary>
 		/// 获取缓冲池的键。
 		/// </summary>
+		/// <value>缓冲池的键。</value>
 		public string Key { get; private set; }
 		/// <summary>
 		/// 缓冲对象的键的类型。
 		/// </summary>
+		/// <value>缓冲对象的键的类型。</value>
 		public Type CacheKeyType { get; private set; }
 		/// <summary>
 		/// 缓冲对象的类型。
 		/// </summary>
+		/// <value>缓冲对象的类型。</value>
 		public Type CacheValueType { get; private set; }
 		/// <summary>
 		/// 获取创建缓冲池时已发生的 <see cref="System.Configuration.ConfigurationErrorsException"/>。

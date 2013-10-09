@@ -10,6 +10,10 @@ namespace Cyjb.Utility
 	public sealed class CacheElementCollection : ConfigurationElementCollection<string, CacheElement>
 	{
 		/// <summary>
+		/// 初始化 <see cref="CacheElementCollection"/> 类的新实例。
+		/// </summary>
+		public CacheElementCollection() { }
+		/// <summary>
 		/// 创建一个新的 <see cref="System.Configuration.ConfigurationElement"/>。
 		/// </summary>
 		/// <returns>新的 <see cref="System.Configuration.ConfigurationElement"/>。</returns>

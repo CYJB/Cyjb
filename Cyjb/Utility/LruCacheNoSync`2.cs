@@ -50,6 +50,11 @@ namespace Cyjb.Utility
 		/// 使用指定的最大对象数目初始化 <see cref="LruCacheNoSync&lt;TKey,TValue&gt;"/> 类的新实例。
 		/// </summary>
 		/// <param name="maxSize">缓存中可以保存的最大对象数目，必须大于等于 2。</param>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="LruCacheNoSync&lt;TKey,TValue&gt;"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		public LruCacheNoSync(int maxSize)
 			: this(maxSize, 0.5)
 		{ }
@@ -75,10 +80,12 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 获取实际包含在缓存中的对象数目。
 		/// </summary>
+		/// <value>实际包含在缓存中的对象数目。</value>
 		public int Count { get { return count; } }
 		/// <summary>
 		/// 获取缓存中可以保存的最大对象数目。
 		/// </summary>
+		/// <value>缓存中可以保存的最大对象数目。</value>
 		public int MaxSize { get { return maxSize; } }
 
 		#region ICache<TKey, TValue> 成员
