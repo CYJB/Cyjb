@@ -66,6 +66,7 @@
     <Compile Include="UnitTestCharExt.cs" />
     <Compile Include="UnitTestConvertExt.cs" />
     <Compile Include="UnitTestStringExt.cs" />
+    <Compile Include="UnitTestEnumerableExt.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cyjb\Cyjb.csproj">

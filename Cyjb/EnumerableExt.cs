@@ -20,6 +20,11 @@ namespace Cyjb
 		/// <param name="action">用于对每个元素执行的操作的函数。</param>
 		/// <returns>类型为 <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> 
 		/// 的输入序列。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 对序列中的所有元素依次执行操作。
+		/// </summary>
+		/// </overloads>
 		public static IEnumerable<TSource> Each<TSource>(
 			this IEnumerable<TSource> source, Action<TSource> action)
 		{
@@ -72,12 +77,16 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 通过使用默认的相等比较器对值进行比较返回序列中的重复元素。
-		/// 重复多次的元素只得到其中的第一个。
 		/// </summary>
 		/// <typeparam name="TSource"><paramref name="source"/> 中的元素的类型。
 		/// </typeparam>
 		/// <param name="source">要从中得到重复元素的序列。</param>
 		/// <returns>一个序列，包含源序列中的重复元素。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回序列中的重复元素。
+		/// </summary>
+		/// </overloads>
 		public static IEnumerable<TSource> Iterative<TSource>(
 			this IEnumerable<TSource> source)
 		{
@@ -86,7 +95,7 @@ namespace Cyjb
 		/// <summary>
 		/// 通过使用指定的 
 		/// <see cref="System.Collections.Generic.IEqualityComparer&lt;T&gt;"/> 
-		/// 对值进行比较返回序列中的重复元素。重复多次的元素只得到其中的第一个。
+		/// 对值进行比较返回序列中的重复元素。
 		/// </summary>
 		/// <typeparam name="TSource"><paramref name="source"/> 中的元素的类型。
 		/// </typeparam>
@@ -98,12 +107,21 @@ namespace Cyjb
 			this IEnumerable<TSource> source, IEqualityComparer<TSource> comparer)
 		{
 			ExceptionHelper.CheckArgumentNull(source, "source");
-			HashSet<TSource> set = new HashSet<TSource>(comparer);
+			Dictionary<TSource, bool> dict = new Dictionary<TSource, bool>(comparer);
 			foreach (TSource item in source)
 			{
-				if (!set.Add(item))
+				bool flag;
+				if (dict.TryGetValue(item, out flag))
 				{
-					yield return item;
+					if (flag)
+					{
+						yield return item;
+						dict[item] = false;
+					}
+				}
+				else
+				{
+					dict.Add(item, true);
 				}
 			}
 		}

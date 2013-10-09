@@ -11,11 +11,41 @@ namespace UnitTestCyjb
 	internal static class AssertExt
 	{
 		/// <summary>
-		/// 验证方法是否抛出了指定的异常。如果未抛出异常或不在期待的类型中，
-		/// 则断言失败。
+		/// 验证两个集合是否相同。如果不同，则断言失败。
 		/// </summary>
-		/// <param name="action">要测试的方法。</param>
-		/// <param name="expectedException">期待抛出的异常集合。</param>
+		/// <param name="expected">期待出现的集合。</param>
+		/// <param name="actual">实际得到的集合。</param>
+		public static void SetEqual<T>(T[] expected, IEnumerable<T> actual)
+		{
+			if (expected == null)
+			{
+				if (actual != null)
+				{
+					Assert.Fail("实际的集合 {{{0}}} 不为 null", string.Join(", ", actual));
+				}
+			}
+			else
+			{
+				if (actual == null)
+				{
+					Assert.Fail("实际的集合为 null");
+				}
+				else
+				{
+					HashSet<T> e = new HashSet<T>(expected);
+					if (!e.SetEquals(actual))
+					{
+						Assert.Fail("期望得到 {{{0}}}，而实际得到的是 {{{1}}}",
+							string.Join(", ", expected), string.Join(", ", actual));
+					}
+				}
+			}
+		}
+		/// <summary>
+		/// 验证两个数组是否相同。如果不同，则断言失败。
+		/// </summary>
+		/// <param name="expected">期待出现的数组。</param>
+		/// <param name="actual">实际得到的数组。</param>
 		public static void AreEqual<T>(T[] expected, T[] actual)
 		{
 			if (expected == null)
