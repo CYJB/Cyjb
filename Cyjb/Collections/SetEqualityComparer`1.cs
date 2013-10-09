@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Cyjb
+namespace Cyjb.Collections
 {
 	/// <summary>
 	/// 表示根据内容比较 <see cref="System.Collections.Generic.ISet&lt;T&gt;"/> 集合的比较器。
@@ -10,12 +10,13 @@ namespace Cyjb
 	public sealed class SetEqualityComparer<T> : EqualityComparer<ISet<T>>
 	{
 		/// <summary>
-		/// 默认的比较器。
+		/// 默认的相等比较器。
 		/// </summary>
 		private static SetEqualityComparer<T> defaultValue;
 		/// <summary>
-		/// 返回一个默认的相等比较器。
+		/// 获取默认的相等比较器。
 		/// </summary>
+		/// <value>一个默认的 <see cref="SetEqualityComparer&lt;T&gt;"/> 比较器。</value>
 		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
 		public new static SetEqualityComparer<T> Default
 		{
@@ -28,6 +29,10 @@ namespace Cyjb
 				return defaultValue;
 			}
 		}
+		/// <summary>
+		/// 初始化 <see cref="SetEqualityComparer&lt;T&gt;"/> 类的新实例。
+		/// </summary>
+		public SetEqualityComparer() { }
 
 		#region EqualityComparer<ISet<T>> 成员
 

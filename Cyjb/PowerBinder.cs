@@ -9,6 +9,37 @@ namespace Cyjb
 	/// 从候选者列表中选择一个成员，并执行实参类型到形参类型的类型转换。
 	/// 在选择时，支持对泛型方法进行选择，并允许进行强制类型转换。
 	/// </summary>
+	/// <example>
+	/// 下面的例子演示了 <see cref="PowerBinder"/> 对泛型方法和强制类型转换的支持。
+	/// <code>
+	/// class TestClass {
+	/// 	public static void TestMethod(int value) { }
+	/// 	public static void TestMethod2&lt;T&gt;(T value) { }
+	/// }
+	/// Type type = typeof(TestClass);
+	/// Console.WriteLine(type.GetMethod("TestMethod", new Type[] { typeof(long) }));
+	/// Console.WriteLine(type.GetMethod("TestMethod", BindingFlags.Static | BindingFlags.Public, 
+	///		PowerBinder.CastBinder, new Type[] { typeof(long) }, null));
+	/// Console.WriteLine(type.GetMethod("TestMethod2", new Type[] { typeof(string) }));
+	/// Console.WriteLine(type.GetMethod("TestMethod2", BindingFlags.Static | BindingFlags.Public, 
+	///		PowerBinder.DefaultBinder, new Type[] { typeof(string) }, null));
+	/// </code>
+	/// </example>
+	/// <remarks>
+	/// <para><see cref="PowerBinder"/> 类是对 <see cref="Binder"/> 类的扩展，
+	/// 支持泛型方法和强制类型转换，可以有效的扩展反射得到类型成员的过程。</para>
+	/// <para>关于 <see cref="Binder"/> 类的原理，以及 <see cref="PowerBinder"/> 类的实现，
+	/// 可以参见我的博文
+	/// <see href="http://www.cnblogs.com/cyjb/archive/p/PowerBinder.html">
+	/// 《C# 使用 Binder 类自定义反射》</see>。</para>
+	/// <para>关于进行泛型类型推断的原理，可以参考我的博文
+	/// <see href="http://www.cnblogs.com/cyjb/archive/p/GenericArgumentsInferences.html">
+	/// 《C# 泛型方法的类型推断》</see>。</para>
+	/// </remarks>
+	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/PowerBinder.html">
+	/// 《C# 使用 Binder 类自定义反射》</seealso>
+	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/GenericArgumentsInferences.html">
+	/// 《C# 泛型方法的类型推断》</seealso>
 	[Serializable]
 	public sealed class PowerBinder : Binder
 	{
@@ -23,6 +54,7 @@ namespace Cyjb
 		/// <summary>
 		/// 获取默认的 <see cref="Cyjb.PowerBinder"/> 实例。
 		/// </summary>
+		/// <value>默认的 <see cref="Cyjb.PowerBinder"/> 实例，只对泛型方法提供支持。</value>
 		public static PowerBinder DefaultBinder
 		{
 			get
@@ -37,6 +69,8 @@ namespace Cyjb
 		/// <summary>
 		/// 获取允许强制类型转换的 <see cref="Cyjb.PowerBinder"/> 实例。
 		/// </summary>
+		/// <value>允许强制类型转换的 <see cref="Cyjb.PowerBinder"/> 实例，
+		/// 对强制类型转换和泛型方法提供支持。</value>
 		public static PowerBinder CastBinder
 		{
 			get
@@ -219,7 +253,7 @@ namespace Cyjb
 			return info.Method;
 		}
 		/// <summary>
-		/// 将给定 <seealso cref="System.Object"/> 的类型更改为给定 <see cref="System.Type"/>。
+		/// 将给定 <see cref="System.Object"/> 的类型更改为给定 <see cref="System.Type"/>。
 		/// </summary>
 		/// <param name="value">要更改为新 <see cref="System.Type"/> 的对象。</param>
 		/// <param name="type"><paramref name="value"/> 将变成的新 <see cref="System.Type"/>。</param>

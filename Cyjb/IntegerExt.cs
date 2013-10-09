@@ -41,6 +41,11 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="source">要执行操作的次数。只有大于 <c>0</c> 时才有效。</param>
 		/// <param name="action">要执行的操作。</param>
+		/// <overloads>
+		/// <summary>
+		/// 将指定操作执行多次，或者得到指定值重复多次的序列。
+		/// </summary>
+		/// </overloads>
 		public static void Times(this int source, Action action)
 		{
 			ExceptionHelper.CheckArgumentNull(action, "action");
@@ -109,6 +114,11 @@ namespace Cyjb
 		/// <param name="source">要执行操作的起始值。</param>
 		/// <param name="destination">要执行操作的目标值。</param>
 		/// <returns>数值递增（递减）的序列。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回从当前值递增（递减）到指定值的序列。
+		/// </summary>
+		/// </overloads>
 		public static IEnumerable<int> To(this int source, int destination)
 		{
 			if (source < destination)
@@ -159,6 +169,11 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="value">要计算二进制表示中末尾连续零的值。</param>
 		/// <returns>当前值的二进制表示中末尾连续零的个数。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 计算当前值的二进制表示中末尾连续零的个数。
+		/// </summary>
+		/// </overloads>
 		public static int BinTrailingZeroCount(this int value)
 		{
 			return MultiplyDeBruijnBitPosition_32[((uint)((value & -value) * 0x077CB531U)) >> 27];
@@ -168,6 +183,11 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="value">要计算二进制表示中末尾连续一的值。</param>
 		/// <returns>当前值的二进制表示中末尾连续一的个数。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 计算当前值的二进制表示中末尾连续一的个数。
+		/// </summary>
+		/// </overloads>
 		public static int BinTrailingOneCount(this int value)
 		{
 			return ((value ^ (value + 1)) >> 1).BinOneCnt();
@@ -177,6 +197,11 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="value">要计算的值。</param>
 		/// <returns>当前值的二进制表示中 1 的个数。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 计算当前值的二进制表示中 1 的个数。
+		/// </summary>
+		/// </overloads>
 		public static int BinOneCnt(this int value)
 		{
 			value -= (value >> 1) & 0x55555555;
@@ -189,6 +214,11 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="value">要计算对数的值。</param>
 		/// <returns>当前值以 2 为底的对数值。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 计算当前值以 2 为底的对数值，得到的结果是大于等于当前值的最小对数值。
+		/// </summary>
+		/// </overloads>
 		public static int LogBase2(this int value)
 		{
 			value |= value >> 1;

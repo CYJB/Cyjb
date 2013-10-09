@@ -70,6 +70,29 @@ namespace Cyjb
 		/// <param name="fromType">要与当前类型进行比较的类型。</param>
 		/// <returns>如果当前 <see cref="System.Type"/> 可以从 <paramref name="fromType"/>
 		/// 的实例分配或进行隐式类型转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <remarks>
+		/// 判断类型间能否进行隐式类型转换的算法来自于 《CSharp Language Specification》v5.0 
+		/// 的第 6.1 节，更多信息可以参考我的博客文章 
+		/// <see href="http://www.cnblogs.com/cyjb/archive/p/TypeAssignableFrom.html">
+		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</see>。</remarks>
+		/// <example>
+		/// 下面是 <see cref="IsImplicitFrom"/> 方法与 <see cref="System.Type.IsAssignableFrom"/> 方法的一些对比。
+		/// <code>
+		/// Console.WriteLine(typeof(object).IsAssignableFrom(typeof(uint))); // True 
+		/// Console.WriteLine(typeof(object).IsImplicitFrom(typeof(uint))); // True
+		/// Console.WriteLine(typeof(int).IsAssignableFrom(typeof(short))); // False
+		/// Console.WriteLine(typeof(int).IsImplicitFrom(typeof(short))); // True
+		/// Console.WriteLine(typeof(long?).IsAssignableFrom(typeof(int?))); // False
+		/// Console.WriteLine(typeof(long?).IsImplicitFrom(typeof(int?))); // True
+		/// Console.WriteLine(typeof(long).IsAssignableFrom(typeof(TestClass))); // False
+		/// Console.WriteLine(typeof(long).IsImplicitFrom(typeof(TestClass))); // True
+		/// class TestClass {
+		///     public static implicit operator int(TestClass t) { return 1; }
+		/// }
+		/// </code>
+		/// </example>
+		/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/TypeAssignableFrom.html">
+		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</seealso>
 		public static bool IsImplicitFrom(this Type type, Type fromType)
 		{
 			if (type == null || fromType == null)
@@ -161,6 +184,25 @@ namespace Cyjb
 		/// <param name="fromType">要与当前类型进行比较的类型。</param>
 		/// <returns>如果当前 <see cref="System.Type"/> 可以从 <paramref name="fromType"/>
 		/// 的实例分配或进行强制类型转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <remarks>
+		/// 判断类型间能否进行显式类型转换的算法来自于 《CSharp Language Specification》v5.0 
+		/// 的第 6.2 节，更多信息可以参考我的博客文章 
+		/// <see href="http://www.cnblogs.com/cyjb/archive/p/TypeAssignableFrom.html">
+		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</see>。</remarks>
+		/// <example>
+		/// 下面是 <see cref="IsImplicitFrom"/> 方法的一些实例。
+		/// <code>
+		/// Console.WriteLine(typeof(uint).IsExplicitFrom(typeof(object))); // True
+		/// Console.WriteLine(typeof(short).IsExplicitFrom(typeof(int))); // True
+		/// Console.WriteLine(typeof(int).IsExplicitFrom(typeof(long?))); // True
+		/// Console.WriteLine(typeof(long).IsExplicitFrom(typeof(TestClass))); // True
+		/// class TestClass {
+		///     public static explicit operator int(TestClass t) { return 1; }
+		/// }
+		/// </code>
+		/// </example>
+		/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/TypeAssignableFrom.html">
+		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</seealso>
 		public static bool IsExplicitFrom(this Type type, Type fromType)
 		{
 			if (type == null || fromType == null)
@@ -205,6 +247,19 @@ namespace Cyjb
 		/// <param name="fromType">要与当前类型进行比较的类型。</param>
 		/// <returns>如果当前的开放泛型类型可以从 <paramref name="fromType"/>
 		/// 的实例分配，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <example>
+		/// 下面是 <see cref="OpenGenericIsAssignableFrom(Type,Type)"/> 方法的简单示例：
+		/// <code>
+		/// Console.WriteLine(typeof(IEnumerable&lt;&gt;).UniqueOpenGenericIsAssignableFrom(
+		///		typeof(List&gt;int&gt;))); // True
+		/// </code>
+		/// </example>
+		/// <remarks>
+		/// 关于判断是否可以分配到开放泛型类型的算法可以参考我的博客文章 
+		/// <see href="http://www.cnblogs.com/cyjb/archive/p/TypeAssignableFrom.html">
+		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</see>。</remarks>
+		/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/TypeAssignableFrom.html">
+		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</seealso>
 		public static bool OpenGenericIsAssignableFrom(this Type type, Type fromType)
 		{
 			Type closedType;
@@ -220,6 +275,30 @@ namespace Cyjb
 		/// 否则返回 <c>null</c>。</param>
 		/// <returns>如果当前的开放泛型类型可以从 <paramref name="fromType"/> 的实例分配，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <example>
+		/// 下面是 <see cref="OpenGenericIsAssignableFrom(Type,Type,out Type)"/> 方法的简单示例：
+		/// <code>
+		/// Type type;
+		/// Console.WriteLine(typeof(IEnumerable&lt;&gt;).UniqueOpenGenericIsAssignableFrom(
+		///		typeof(List&gt;int&gt;), out type));
+		/// Console.WriteLine(type);
+		/// // 示例输出：
+		/// // True
+		/// // System.Collections.Generic.IEnumerable`1[System.Int32]
+		/// </code>
+		/// </example>
+		/// <remarks>
+		/// <para>如果一个类将一个泛型接口实现了多次，则只会返回其中的某一个实现。</para>
+		/// <para>关于判断是否可以分配到开放泛型类型的算法可以参考我的博客文章 
+		/// <see href="http://www.cnblogs.com/cyjb/archive/p/TypeAssignableFrom.html">
+		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</see>。</para></remarks>
+		/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/TypeAssignableFrom.html">
+		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</seealso>
+		/// <overloads>
+		/// <summary>
+		/// 确定当前的开放泛型类型的实例是否可以从指定 <see cref="System.Type"/> 的实例分配。
+		/// </summary>
+		/// </overloads>
 		public static bool OpenGenericIsAssignableFrom(this Type type, Type fromType, out Type closedType)
 		{
 			if (type != null && fromType != null && type.IsGenericTypeDefinition)
@@ -254,6 +333,23 @@ namespace Cyjb
 		/// <param name="fromType">要与当前类型进行比较的类型。</param>
 		/// <returns>如果当前的开放泛型类型可以从 <paramref name="fromType"/>
 		/// 的实例唯一分配，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <example>
+		/// 下面是 <see cref="UniqueOpenGenericIsAssignableFrom(Type,Type)"/> 方法的简单示例：
+		/// <code>
+		/// Type type;
+		/// Console.WriteLine(typeof(IEnumerable&lt;&gt;).UniqueOpenGenericIsAssignableFrom(
+		///		typeof(List&gt;int&gt;))); // True
+		/// Console.WriteLine(typeof(IEnumerable&lt;&gt;).UniqueOpenGenericIsAssignableFrom(
+		///		typeof(TestClass))); // False
+		/// class TestClass : IEnumerable&lt;int&gt;, IEnumerable&lt;long&gt; { }
+		/// </code>
+		/// </example>
+		/// <remarks>
+		/// <para>如果一个类将一个泛型接口实现了多次，则不满足唯一实现，会返回 <c>false</c>。
+		/// 仅当实现了一次时，才会返回 <c>true</c>，以及相应的封闭泛型类型。</para>
+		/// <para>关于判断是否可以分配到开放泛型类型的算法可以参考我的博客文章 
+		/// <see href="http://www.cnblogs.com/cyjb/archive/p/TypeAssignableFrom.html">
+		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</see>。</para></remarks>
 		public static bool UniqueOpenGenericIsAssignableFrom(this Type type, Type fromType)
 		{
 			Type closedType;
@@ -269,6 +365,35 @@ namespace Cyjb
 		/// 否则返回 <c>null</c>。</param>
 		/// <returns>如果当前的开放泛型类型可以从 <paramref name="fromType"/> 的实例唯一分配，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <example>
+		/// 下面是 <see cref="UniqueOpenGenericIsAssignableFrom(Type,Type,out Type)"/> 方法的简单示例：
+		/// <code>
+		/// Type type;
+		/// Console.WriteLine(typeof(IEnumerable&lt;&gt;).UniqueOpenGenericIsAssignableFrom(
+		///		typeof(List&gt;int&gt;), out type));
+		/// Console.WriteLine(type);
+		/// Console.WriteLine(typeof(IEnumerable&lt;&gt;).UniqueOpenGenericIsAssignableFrom(
+		///		typeof(TestClass)));
+		/// class TestClass : IEnumerable&lt;int&gt;, IEnumerable&lt;long&gt; { }
+		/// // 示例输出：
+		/// // True
+		/// // System.Collections.Generic.IEnumerable`1[System.Int32]
+		/// // False
+		/// </code>
+		/// </example>
+		/// <remarks>
+		/// <para>如果一个类将一个泛型接口实现了多次，则不满足唯一实现，会返回 <c>false</c>。
+		/// 仅当实现了一次时，才会返回 <c>true</c>，以及相应的封闭泛型类型。</para>
+		/// <para>关于判断是否可以分配到开放泛型类型的算法可以参考我的博客文章 
+		/// <see href="http://www.cnblogs.com/cyjb/archive/p/TypeAssignableFrom.html">
+		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</see>。</para></remarks>
+		/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/TypeAssignableFrom.html">
+		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</seealso>
+		/// <overloads>
+		/// <summary>
+		/// 确定当前的开放泛型类型的实例是否可以从指定 <see cref="System.Type"/> 的实例唯一分配。
+		/// </summary>
+		/// </overloads>
 		public static bool UniqueOpenGenericIsAssignableFrom(this Type type, Type fromType, out Type closedType)
 		{
 			if (type != null && fromType != null && type.IsGenericTypeDefinition)
@@ -399,7 +524,8 @@ namespace Cyjb
 
 		/// <summary>
 		/// 根据给定的类型数组推断泛型参数组的类型参数。
-		/// 允许通过为 types 的某一项为 null 来指定对应参数是引用类型，但不会进行其它的推断。
+		/// 允许通过为 <paramref name="types"/> 的某一项为 <c>null</c> 
+		/// 来指定对应参数是引用类型，但不会进行其它的推断。
 		/// </summary>
 		/// <param name="genericArgs">泛型类型参数数组。</param>
 		/// <param name="paramTypes">形参参数数组。</param>

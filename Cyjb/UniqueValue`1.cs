@@ -23,6 +23,11 @@ namespace Cyjb
 		/// <summary>
 		/// 初始化 <see cref="UniqueValue&lt;TValue&gt;"/> 类的新实例。
 		/// </summary>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="UniqueValue&lt;TValue&gt;"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		public UniqueValue()
 		{
 			this.comparer = EqualityComparer<TValue>.Default;
@@ -65,9 +70,11 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 获取或设置唯一的值。
-		/// 如果值未设置，则返回值是不可预料的。
-		/// 如果值是重复的，则为第一次设置的值。
 		/// </summary>
+		/// <value>
+		/// 如果值是唯一的，则为唯一的值；如果值是重复的，则为第一次设置的值；
+		/// 如果值未设置，则返回值是不可预料的。
+		/// </value>
 		public TValue Value
 		{
 			get { return uniqueValue; }
@@ -85,22 +92,27 @@ namespace Cyjb
 			}
 		}
 		/// <summary>
-		/// 获取设置的值是否是唯一的。
+		/// 获取被设置的值是否是唯一的。
 		/// </summary>
+		/// <value>如果值被设置了，而且是唯一的，则为 <c>true</c>；
+		/// 如果值未被设置，或者不唯一，则为 <c>false</c>。</value>
 		public bool IsUnique
 		{
 			get { return isUnique == Tristate.True; }
 		}
 		/// <summary>
-		/// 获取设置的值是否是冲突的。
+		/// 获取被设置的值是否是冲突的。
 		/// </summary>
+		/// <value>如果值被设置了，而且存在冲突，则为 <c>true</c>；
+		/// 如果值未被设置，或者值唯一，则为 <c>false</c>。</value>
 		public bool IsAmbig
 		{
 			get { return isUnique == Tristate.False; }
 		}
 		/// <summary>
-		/// 获取是否还为设置值。
+		/// 获取是否还未设置值。
 		/// </summary>
+		/// <value>如果值已被设置，则为 <c>true</c>；否则为 <c>false</c>。</value>
 		public bool IsEmpty
 		{
 			get { return isUnique == Tristate.NotSure; }

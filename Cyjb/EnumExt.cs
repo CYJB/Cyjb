@@ -14,8 +14,16 @@ namespace Cyjb
 	/// 提供 <see cref="System.Enum"/> 类的扩展方法。
 	/// </summary>
 	/// <remarks>
-	/// 内部的缓存键为 Cyjb.EnumDescriptionCache。
+	/// <para>关于枚举类型的 <see cref="System.ComponentModel.DescriptionAttribute"/> 
+	/// 获取与解析，可以参考我的博文 
+	/// <see href="http://www.cnblogs.com/cyjb/archive/p/EnumDescription.html">
+	/// C# 获取与解析枚举类型的 DescriptionAttribute</see></para>
+	/// <para>内部使用 <see cref="Cyjb.Utility.ICache&lt;TKey,TValue&gt;"/> 
+	/// 接口缓存枚举的描述，使用的键为 Cyjb.EnumDescriptionCache。
+	/// 关于如何设置缓存，可以参见 <see cref="CacheFactory"/>。</para>
 	/// </remarks>
+	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/EnumDescription.html">
+	/// C# 获取与解析枚举类型的 DescriptionAttribute</seealso>
 	public static class EnumExt
 	{
 
@@ -27,6 +35,11 @@ namespace Cyjb
 		/// <param name="enumType">枚举的类型</param>
 		/// <param name="value">要转换为与其枚举值等效的字符串的值。</param>
 		/// <returns>与给定值的枚举值等效的字符串表示形式。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 将指定具有整数值的对象转换为与其枚举值等效的字符串表示形式。
+		/// </summary>
+		/// </overloads>
 		public static string GetString(Type enumType, object value)
 		{
 			return GetString(enumType, ToUInt64(value), false);
@@ -220,6 +233,11 @@ namespace Cyjb
 		/// 该集合的元素按枚举阐述的二进制值排序。</returns>
 		/// <exception cref="System.ArgumentException">
 		/// <paramref name="enumType"/> 不是 <see cref="System.Enum"/>。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 检索指定枚举类型中常数文本和值的集合。
+		/// </summary>
+		/// </overloads>
 		public static TextValuePairCollection GetTextValues(Type enumType)
 		{
 			return GetTextValues(enumType, true);
@@ -304,6 +322,11 @@ namespace Cyjb
 		/// <exception cref="System.OverflowException">
 		/// <paramref name="value"/> 超出 <typeparamref name="TEnum"/> 
 		/// 基础类型的范围。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 将一个或多个枚举常数的名称或数字值的字符串表示转换成等效的枚举对象。
+		/// </summary>
+		/// </overloads>
 		public static TEnum Parse<TEnum>(string value)
 		{
 			return (TEnum)Enum.Parse(typeof(TEnum), value);
@@ -349,6 +372,11 @@ namespace Cyjb
 		/// <exception cref="System.OverflowException">
 		/// <paramref name="value"/> 超出 <paramref name="enumType"/> 
 		/// 基础类型的范围。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 将一个或多个枚举常数的名称、描述或数字值的字符串表示转换成等效的枚举对象。
+		/// </summary>
+		/// </overloads>
 		public static object ParseEx(Type enumType, string value)
 		{
 			return ParseEx(enumType, value, false);

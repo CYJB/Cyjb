@@ -3,7 +3,7 @@
 namespace Cyjb
 {
 	/// <summary>
-	/// 表示一个全局的伪随机数生成器。
+	/// 表示一个全局的伪随机数生成器，并提供关于随机数的扩展方法。
 	/// </summary>
 	public static class RandomExt
 	{

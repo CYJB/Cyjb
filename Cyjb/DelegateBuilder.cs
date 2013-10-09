@@ -20,6 +20,41 @@ namespace Cyjb
 	/// <summary>
 	/// 提供动态构造方法、属性或字段委托的方法。
 	/// </summary>
+	/// <example>
+	/// 一下是一些简单的示例，很容易构造出需要的委托。
+	/// <code>
+	/// class Program {
+	/// 	public delegate void MyDelegate(params int[] args);
+	/// 	public static void TestMethod(int value) { }
+	/// 	public void TestMethod(uint value) { }
+	/// 	public static void TestMethod&lt;T&gt;(params T[] arg) { }
+	/// 	static void Main(string[] args) {
+	/// 		Type type = typeof(Program);
+	/// 		Action&lt;int&gt; m1 = type.CreateDelegate&lt;Action&lt;int&gt;&gt;("TestMethod");
+	/// 		m1(10);
+	/// 		Program p = new Program();
+	/// 		Action&lt;Program, uint&gt; m2 = type.CreateDelegate&lt;Action&lt;Program, uint&gt;&gt;("TestMethod");
+	/// 		m2(p, 10);
+	/// 		Action&lt;object, uint&gt; m3 = type.CreateDelegate&lt;Action&lt;object, uint&gt;&gt;("TestMethod");
+	/// 		m3(p, 10);
+	/// 		Action&lt;uint&gt; m4 = type.CreateDelegate&lt;Action&lt;uint&gt;&gt;("TestMethod", p);
+	/// 		m4(10);
+	/// 		MyDelegate m5 = type.CreateDelegate&lt;MyDelegate&gt;("TestMethod");
+	/// 		m5(0, 1, 2);
+	/// 	}
+	/// }
+	/// </code>
+	/// </example>
+	/// <remarks>
+	/// <para><see cref="DelegateBuilder"/> 类提供的 <c>CreateDelegate</c> 方法，其的用法与 
+	/// <c>Delegate.CreateDelegate</c> 完全相同，功能却大大丰富，
+	/// 几乎可以只依靠委托类型、反射类型和成员名称构造出任何需要的委托，
+	/// 省去了自己反射获取类型成员的过程。</para>
+	/// <para>关于对反射创建委托的效率问题，以及该类的实现原理，可以参见我的博文 
+	/// <see href="http://www.cnblogs.com/cyjb/archive/p/DelegateBuilder.html">
+	/// 《C# 反射的委托创建器》</see>。</para>
+	/// </remarks>
+	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/DelegateBuilder.html">《C# 反射的委托创建器》</seealso>
 	public static class DelegateBuilder
 	{
 
@@ -28,7 +63,7 @@ namespace Cyjb
 		/// <summary>
 		/// 创建用于表示指定静态或实例方法的指定类型的委托。
 		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="method">描述委托要表示的静态或实例方法的 
@@ -42,6 +77,12 @@ namespace Cyjb
 		/// 的 <c>Invoke</c> 方法。</exception>
 		/// <exception cref="System.MethodAccessException">调用方无权访问
 		/// <paramref name="method"/>。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 创建用于表示指定静态或实例方法、字段或属性的指定类型的委托。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
+		/// </summary>
+		/// </overloads>
 		public static TDelegate CreateDelegate<TDelegate>(this MethodInfo method)
 			where TDelegate : class
 		{
@@ -50,7 +91,7 @@ namespace Cyjb
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示指定静态或实例方法的指定类型的委托。
 		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="method">描述委托要表示的静态或实例方法的 
@@ -75,7 +116,7 @@ namespace Cyjb
 		/// <summary>
 		/// 创建用于表示指定静态或实例方法的指定类型的委托。
 		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="method">描述委托要表示的静态或实例方法的 
@@ -97,7 +138,7 @@ namespace Cyjb
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示指定静态或实例方法的指定类型的委托。
 		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="method">描述委托要表示的静态或实例方法的 
@@ -172,7 +213,7 @@ namespace Cyjb
 		/// <summary>
 		/// 创建指定的静态或实例方法的指定类型的开放方法委托。
 		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="invoke">委托的方法信息。</param>
@@ -231,7 +272,7 @@ namespace Cyjb
 
 		/// <summary>
 		/// 使用指定的第一个参数创建表示指定的静态或实例方法的指定类型的委托。 
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="method">描述委托要表示的静态或实例方法的 
@@ -254,7 +295,7 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建表示指定的静态或实例方法的指定类型的委托。 
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="method">描述委托要表示的静态或实例方法的 
@@ -281,7 +322,7 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用指定的第一个参数创建表示指定的静态或实例方法的指定类型的委托。 
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="method">描述委托要表示的静态或实例方法的 
@@ -304,7 +345,7 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建表示指定的静态或实例方法的指定类型的委托。 
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="method">描述委托要表示的静态或实例方法的 
@@ -342,7 +383,7 @@ namespace Cyjb
 		/// <summary>
 		/// 创建指定的静态或实例方法的指定类型的带有第一个参数的方法委托。
 		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">委托的类型。</param>
 		/// <param name="firstArgument">委托表示的方法的第一个参数。</param>
@@ -375,7 +416,7 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 创建指定的实例方法的通过空引用封闭的方法委托。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">委托的类型。</param>
 		/// <param name="invoke">委托的方法信息。</param>
@@ -428,7 +469,7 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 创建指定的静态或实例方法的指定类型的封闭方法委托。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">委托的类型。</param>
 		/// <param name="firstArgument">委托表示的方法的第一个参数。</param>
@@ -502,7 +543,7 @@ namespace Cyjb
 
 		/// <summary>
 		/// 创建用于表示指定构造函数的指定类型的委托。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="ctor">描述委托要表示的构造函数的 
@@ -523,7 +564,7 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示指定构造函数的指定类型的委托。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="ctor">描述委托要表示的构造函数的 
@@ -547,7 +588,7 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 创建用于表示指定构造函数的指定类型的委托。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="ctor">描述委托要表示的构造函数的 
@@ -568,7 +609,7 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示指定构造函数的指定类型的委托。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="ctor">描述委托要表示的构造函数的 
@@ -654,10 +695,10 @@ namespace Cyjb
 		#region 从 PropertyInfo 构造属性委托
 
 		/// <summary>
-		/// ，创建用于表示获取或设置指定静态或实例属性的指定类型的委托。
+		/// 创建用于表示获取或设置指定静态或实例属性的指定类型的委托。
 		/// 如果是实例属性，需要将实例对象作为委托的第一个参数。
 		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="property">描述委托要表示的静态或实例属性的 
@@ -680,7 +721,7 @@ namespace Cyjb
 		/// 使用针对绑定失败的指定行为，创建用于表示获取或设置指定静态或实例属性的指定类型的委托。
 		/// 如果是实例属性，需要将实例对象作为委托的第一个参数。
 		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="property">描述委托要表示的静态或实例属性的 
@@ -706,7 +747,7 @@ namespace Cyjb
 		/// 创建用于表示获取或设置指定静态或实例属性的指定类型的委托。
 		/// 如果是实例属性，需要将实例对象作为委托的第一个参数。
 		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="property">描述委托要表示的静态或实例属性的 
@@ -729,7 +770,7 @@ namespace Cyjb
 		/// 使用针对绑定失败的指定行为，创建用于表示获取或设置指定静态或实例属性的指定类型的委托。
 		/// 如果是实例属性，需要将实例对象作为委托的第一个参数。
 		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="property">描述委托要表示的静态或实例属性的 
@@ -739,13 +780,13 @@ namespace Cyjb
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例属性。</returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承
+		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承 
 		/// <see cref="System.MulticastDelegate"/>。</exception>
 		/// <exception cref="System.ArgumentException">不能绑定 <paramref name="property"/> 
 		/// 且 <paramref name="throwOnBindFailure"/> 为 <c>true</c>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <paramref name="type"/>
+		/// <exception cref="System.MissingMethodException">未找到 <paramref name="type"/> 
 		/// 的 <c>Invoke</c> 方法。</exception>
-		/// <exception cref="System.MethodAccessException">调用方无权访问
+		/// <exception cref="System.MethodAccessException">调用方无权访问 
 		/// <paramref name="property"/>。</exception>
 		public static Delegate CreateDelegate(Type type, PropertyInfo property, bool throwOnBindFailure)
 		{
@@ -790,7 +831,7 @@ namespace Cyjb
 		/// <summary>
 		/// 使用指定的第一个参数，创建表示获取或设置指定的静态或实例属性的指定类型的委托。 
 		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="property">描述委托要表示的静态或实例属性的 
@@ -814,7 +855,7 @@ namespace Cyjb
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建表示获取或设置指定的静态或实例属性的指定类型的委托。 
 		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="property">描述委托要表示的静态或实例属性的 
@@ -842,7 +883,7 @@ namespace Cyjb
 		/// <summary>
 		/// 使用指定的第一个参数，创建表示获取或设置指定的静态或实例属性的指定类型的委托。 
 		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="property">描述委托要表示的静态或实例属性的 
@@ -866,7 +907,7 @@ namespace Cyjb
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建表示获取或设置指定的静态或实例属性的指定类型的委托。 
 		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="property">描述委托要表示的静态或实例属性的 
@@ -931,7 +972,7 @@ namespace Cyjb
 		/// <summary>
 		/// 创建表示获取或设置指定的静态或实例字段的指定类型的委托。 
 		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="field">描述委托要表示的静态或实例字段的 
@@ -953,7 +994,7 @@ namespace Cyjb
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建表示获取或设置指定的静态或实例字段的指定类型的委托。 
 		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="field">描述委托要表示的静态或实例字段的 
@@ -978,7 +1019,7 @@ namespace Cyjb
 		/// <summary>
 		/// 创建表示获取或设置指定的静态或实例字段的指定类型的委托。 
 		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="field">描述委托要表示的静态或实例字段的 
@@ -1000,7 +1041,7 @@ namespace Cyjb
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建表示获取或设置指定的静态或实例字段的指定类型的委托。 
 		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="field">描述委托要表示的静态或实例字段的 
@@ -1033,7 +1074,7 @@ namespace Cyjb
 		/// <summary>
 		/// 创建指定的静态或实例字段的指定类型的开放字段委托。
 		/// 如果是实例字段，需要将实例对象作为委托的第一个参数。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="field">目标字段的信息。</param>
@@ -1091,7 +1132,7 @@ namespace Cyjb
 		/// <summary>
 		/// 使用指定的第一个参数创建表示获取或设置指定的静态或实例字段的指定类型的委托。 
 		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="field">描述委托要表示的静态或实例字段的 
@@ -1115,7 +1156,7 @@ namespace Cyjb
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建表示获取或设置指定的静态或实例字段的指定类型的委托。 
 		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="field">描述委托要表示的静态或实例字段的 
@@ -1142,7 +1183,7 @@ namespace Cyjb
 		/// <summary>
 		/// 使用指定的第一个参数创建表示获取或设置指定的静态或实例字段的指定类型的委托。 
 		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="field">描述委托要表示的静态或实例字段的 
@@ -1166,7 +1207,7 @@ namespace Cyjb
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建表示获取或设置指定的静态或实例字段的指定类型的委托。 
 		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="field">描述委托要表示的静态或实例字段的 
@@ -1226,7 +1267,7 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 创建指定的静态或实例字段的指定类型的封闭字段委托。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="field">目标字段的信息。</param>
@@ -1319,7 +1360,7 @@ namespace Cyjb
 		/// 如果是实例成员，需要将实例对象作为委托的第一个参数。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
@@ -1334,6 +1375,14 @@ namespace Cyjb
 		/// <exception cref="System.MissingMethodException">未找到 <typeparamref name="TDelegate"/>
 		/// 的 <c>Invoke</c> 方法。</exception>
 		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 使用指定的名称创建用于表示静态或实例成员的指定类型的委托。
+		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
+		/// 按照方法、属性、字段的顺序查找匹配的成员。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
+		/// </summary>
+		/// </overloads>
 		public static Lazy<TDelegate> CreateDelegateLazy<TDelegate>(this Type target, string memberName)
 			where TDelegate : class
 		{
@@ -1345,7 +1394,7 @@ namespace Cyjb
 		/// 如果是实例成员，需要将实例对象作为委托的第一个参数。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1376,7 +1425,7 @@ namespace Cyjb
 		/// 如果是实例成员，需要将实例对象作为委托的第一个参数。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1411,7 +1460,7 @@ namespace Cyjb
 		/// 如果是实例成员，需要将实例对象作为委托的第一个参数。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
@@ -1436,7 +1485,7 @@ namespace Cyjb
 		/// 如果是实例成员，需要将实例对象作为委托的第一个参数。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1466,7 +1515,7 @@ namespace Cyjb
 		/// 如果是实例成员，需要将实例对象作为委托的第一个参数。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1500,7 +1549,7 @@ namespace Cyjb
 		/// 如果是实例成员，需要将实例对象作为委托的第一个参数。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
@@ -1525,7 +1574,7 @@ namespace Cyjb
 		/// 如果是实例成员，需要将实例对象作为委托的第一个参数。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1555,7 +1604,7 @@ namespace Cyjb
 		/// 如果是实例成员，需要将实例对象作为委托的第一个参数。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1779,7 +1828,7 @@ namespace Cyjb
 		/// 并将 <paramref name="firstArgument"/> 作为实例。如果为 <c>null</c>，则搜索静态成员。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1811,7 +1860,7 @@ namespace Cyjb
 		/// 并将 <paramref name="firstArgument"/> 作为实例。如果为 <c>null</c>，则搜索静态成员。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1846,7 +1895,7 @@ namespace Cyjb
 		/// 并将 <paramref name="firstArgument"/> 作为实例。如果为 <c>null</c>，则搜索静态成员。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1884,7 +1933,7 @@ namespace Cyjb
 		/// 并将 <paramref name="firstArgument"/> 作为实例。如果为 <c>null</c>，则搜索静态成员。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1916,7 +1965,7 @@ namespace Cyjb
 		/// 并将 <paramref name="firstArgument"/> 作为实例。如果为 <c>null</c>，则搜索静态成员。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1951,7 +2000,7 @@ namespace Cyjb
 		/// 并将 <paramref name="firstArgument"/> 作为实例。如果为 <c>null</c>，则搜索静态成员。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -1989,7 +2038,7 @@ namespace Cyjb
 		/// 并将 <paramref name="firstArgument"/> 作为实例。如果为 <c>null</c>，则搜索静态成员。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2020,7 +2069,7 @@ namespace Cyjb
 		/// 并将 <paramref name="firstArgument"/> 作为实例。如果为 <c>null</c>，则搜索静态成员。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2054,7 +2103,7 @@ namespace Cyjb
 		/// 并将 <paramref name="firstArgument"/> 作为实例。如果为 <c>null</c>，则搜索静态成员。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2168,7 +2217,7 @@ namespace Cyjb
 		/// 使用指定的实例和名称，创建用于表示实例成员的指定类型的委托。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2196,7 +2245,7 @@ namespace Cyjb
 		/// 使用指定的实例、名称和搜索方式，创建用于表示实例成员的指定类型的委托。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2226,7 +2275,7 @@ namespace Cyjb
 		/// 使用指定的实例、名称、搜索方式和针对绑定失败的指定行为，创建用于表示实例成员的指定类型的委托。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2260,7 +2309,7 @@ namespace Cyjb
 		/// 使用指定的实例和名称创建用于表示实例成员的指定类型的委托。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2287,7 +2336,7 @@ namespace Cyjb
 		/// 使用指定的实例、名称和搜索方式，创建用于表示实例成员的指定类型的委托。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
@@ -2316,7 +2365,7 @@ namespace Cyjb
 		/// 使用指定的实例、名称、搜索方式和针对绑定失败的指定行为，创建用于表示实例成员的指定类型的委托。
 		/// 对于属性和字段成员，如果委托具有返回值，则认为是获取属性或字段，否则认为是设置。
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不相同。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// 可以通过指定 <see cref="BindingFlags.InvokeMethod"/>，<see cref="BindingFlags.CreateInstance"/>，
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。

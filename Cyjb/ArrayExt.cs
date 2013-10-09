@@ -16,11 +16,16 @@ namespace Cyjb
 		#region Array
 
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定的值填充。
 		/// </summary>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">要填充数组的值。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 将数组使用指定的值填充。
+		/// </summary>
+		/// </overloads>
 		public static Array Fill(this Array array, object value)
 		{
 			if (array == null)
@@ -30,12 +35,12 @@ namespace Cyjb
 			return Fill(array, value, 0, array.Length);
 		}
 		/// <summary>
-		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充。
+		/// 将数组从指定的索引位置开始使用指定的值填充。
 		/// </summary>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">要填充数组的值。</param>
-		/// <param name="startIndex">要填充的起始索引。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <param name="startIndex">要开始填充的起始索引。</param>
+		/// <returns>填充完毕的数组。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
 		/// 小于零或大于等于数组的长度。</exception>
 		public static Array Fill(this Array array, object value, int startIndex)
@@ -47,13 +52,13 @@ namespace Cyjb
 			return Fill(array, value, startIndex, array.Length - startIndex);
 		}
 		/// <summary>
-		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充指定的长度。
+		/// 将数组从指定的索引位置开始使用指定的值填充指定的长度。
 		/// </summary>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">要填充数组的值。</param>
-		/// <param name="startIndex">要填充的起始索引。</param>
+		/// <param name="startIndex">要开始填充的起始索引。</param>
 		/// <param name="length">要填充的数组元素个数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
 		/// 加 <paramref name="length"/> 之和大于数组的长度。</exception>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
@@ -79,11 +84,11 @@ namespace Cyjb
 			return array;
 		}
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定函数的返回值填充。
 		/// </summary>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">返回要填充数组的值的函数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		public static Array Fill(this Array array, Func<object> value)
 		{
 			if (array == null)
@@ -93,12 +98,12 @@ namespace Cyjb
 			return Fill(array, value, 0, array.Length);
 		}
 		/// <summary>
-		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充。
+		/// 将数组从指定的索引位置开始使用指定的函数的返回值填充。
 		/// </summary>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">返回要填充数组的值的函数。</param>
-		/// <param name="startIndex">要填充的起始索引。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <param name="startIndex">要开始填充的起始索引。</param>
+		/// <returns>填充完毕的数组。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
 		/// 小于零或大于等于数组的长度。</exception>
 		public static Array Fill(this Array array, Func<object> value, int startIndex)
@@ -110,13 +115,13 @@ namespace Cyjb
 			return Fill(array, value, startIndex, array.Length - startIndex);
 		}
 		/// <summary>
-		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充指定的长度。
+		/// 将数组从指定的索引位置开始使用指定的函数的返回值填充指定的长度。
 		/// </summary>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">返回要填充数组的值的函数。</param>
-		/// <param name="startIndex">要填充的起始索引。</param>
+		/// <param name="startIndex">要开始填充的起始索引。</param>
 		/// <param name="length">要填充的数组元素个数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
 		/// 加 <paramref name="length"/> 之和大于数组的长度。</exception>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
@@ -142,11 +147,11 @@ namespace Cyjb
 			return array;
 		}
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定的函数的返回值填充。
 		/// </summary>
 		/// <param name="array">要填充的数组。</param>
-		/// <param name="value">返回要填充数组指定索引的值的函数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <param name="value">返回要填充数组指定索引的值的函数，其参数是当前填充到的索引。</param>
+		/// <returns>填充完毕的数组。</returns>
 		public static Array Fill(this Array array, Func<int, object> value)
 		{
 			if (array == null)
@@ -156,12 +161,12 @@ namespace Cyjb
 			return Fill(array, value, 0, array.Length);
 		}
 		/// <summary>
-		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充。
+		/// 将数组从指定的索引位置开始使用指定的函数的返回值填充。
 		/// </summary>
 		/// <param name="array">要填充的数组。</param>
-		/// <param name="value">返回要填充数组的值的函数。</param>
-		/// <param name="startIndex">要填充的起始索引。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <param name="value">返回要填充数组的值的函数，其参数是当前填充到的索引。</param>
+		/// <param name="startIndex">要开始填充的起始索引。</param>
+		/// <returns>填充完毕的数组。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
 		/// 小于零或大于等于数组的长度。</exception>
 		public static Array Fill(this Array array, Func<int, object> value, int startIndex)
@@ -173,13 +178,13 @@ namespace Cyjb
 			return Fill(array, value, startIndex, array.Length - startIndex);
 		}
 		/// <summary>
-		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充指定的长度。
+		/// 将数组从指定的索引位置开始使用指定的函数的返回值填充指定的长度。
 		/// </summary>
 		/// <param name="array">要填充的数组。</param>
-		/// <param name="value">返回要填充数组指定索引的值的函数。</param>
-		/// <param name="startIndex">要填充的起始索引。</param>
+		/// <param name="value">返回要填充数组指定索引的值的函数，其参数是当前填充到的索引。</param>
+		/// <param name="startIndex">要开始填充的起始索引。</param>
 		/// <param name="length">要填充的数组元素个数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
 		/// 加 <paramref name="length"/> 之和大于数组的长度。</exception>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
@@ -207,12 +212,12 @@ namespace Cyjb
 		#region 一维数组
 
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定的值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">要填充数组的值。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		public static T[] Fill<T>(this T[] array, T value)
 		{
 			if (array == null)
@@ -222,13 +227,13 @@ namespace Cyjb
 			return Fill(array, value, 0, array.Length);
 		}
 		/// <summary>
-		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充。
+		/// 将数组从指定的索引位置开始使用指定的值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">要填充数组的值。</param>
-		/// <param name="startIndex">要填充的起始索引。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <param name="startIndex">要开始填充的起始索引。</param>
+		/// <returns>填充完毕的数组。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
 		/// 小于零或大于等于数组的长度。</exception>
 		public static T[] Fill<T>(this T[] array, T value, int startIndex)
@@ -240,14 +245,14 @@ namespace Cyjb
 			return Fill(array, value, startIndex, array.Length - startIndex);
 		}
 		/// <summary>
-		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充指定的长度。
+		/// 将数组从指定的索引位置开始使用指定的值填充指定的长度。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">要填充数组的值。</param>
-		/// <param name="startIndex">要填充的起始索引。</param>
+		/// <param name="startIndex">要开始填充的起始索引。</param>
 		/// <param name="length">要填充的数组元素个数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
 		/// 加 <paramref name="length"/> 之和大于数组的长度。</exception>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
@@ -273,12 +278,12 @@ namespace Cyjb
 			return array;
 		}
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定的函数的返回值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">返回要填充数组的值的函数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		public static T[] Fill<T>(this T[] array, Func<T> value)
 		{
 			if (array == null)
@@ -288,13 +293,13 @@ namespace Cyjb
 			return Fill(array, value, 0, array.Length);
 		}
 		/// <summary>
-		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充。
+		/// 将数组从指定的索引位置开始使用指定的函数的返回值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">返回要填充数组的值的函数。</param>
-		/// <param name="startIndex">要填充的起始索引。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <param name="startIndex">要开始填充的起始索引。</param>
+		/// <returns>填充完毕的数组。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
 		/// 小于零或大于等于数组的长度。</exception>
 		public static T[] Fill<T>(this T[] array, Func<T> value, int startIndex)
@@ -306,14 +311,14 @@ namespace Cyjb
 			return Fill(array, value, startIndex, array.Length - startIndex);
 		}
 		/// <summary>
-		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充指定的长度。
+		/// 将数组从指定的索引位置开始使用指定的函数的返回值填充指定的长度。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">返回要填充数组的值的函数。</param>
-		/// <param name="startIndex">要填充的起始索引。</param>
+		/// <param name="startIndex">要开始填充的起始索引。</param>
 		/// <param name="length">要填充的数组元素个数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
 		/// 加 <paramref name="length"/> 之和大于数组的长度。</exception>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
@@ -339,12 +344,12 @@ namespace Cyjb
 			return array;
 		}
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定的函数的返回值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
-		/// <param name="value">返回要填充数组指定索引的值的函数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <param name="value">返回要填充数组指定索引的值的函数，其参数是当前填充到的索引。</param>
+		/// <returns>填充完毕的数组。</returns>
 		public static T[] Fill<T>(this T[] array, Func<int, T> value)
 		{
 			if (array == null)
@@ -354,13 +359,13 @@ namespace Cyjb
 			return Fill(array, value, 0, array.Length);
 		}
 		/// <summary>
-		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充。
+		/// 将数组从指定的索引位置开始使用指定的函数的返回值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
-		/// <param name="value">返回要填充数组的值的函数。</param>
-		/// <param name="startIndex">要填充的起始索引。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <param name="value">返回要填充数组的值的函数，其参数是当前填充到的索引。</param>
+		/// <param name="startIndex">要开始填充的起始索引。</param>
+		/// <returns>填充完毕的数组。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
 		/// 小于零或大于等于数组的长度。</exception>
 		public static T[] Fill<T>(this T[] array, Func<int, T> value, int startIndex)
@@ -372,14 +377,14 @@ namespace Cyjb
 			return Fill(array, value, startIndex, array.Length - startIndex);
 		}
 		/// <summary>
-		/// 将数组从指定的索引位置开始使用指定的 <paramref name="value"/> 填充指定的长度。
+		/// 将数组从指定的索引位置开始使用指定的函数的返回值填充指定的长度。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
-		/// <param name="value">返回要填充数组指定索引的值的函数。</param>
-		/// <param name="startIndex">要填充的起始索引。</param>
+		/// <param name="value">返回要填充数组指定索引的值的函数，其参数是当前填充到的索引。</param>
+		/// <param name="startIndex">要开始填充的起始索引。</param>
 		/// <param name="length">要填充的数组元素个数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
 		/// 加 <paramref name="length"/> 之和大于数组的长度。</exception>
 		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="startIndex"/>
@@ -407,12 +412,12 @@ namespace Cyjb
 		#region 二维数组
 
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定的值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">要填充数组的值。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "0#")]
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[,] Fill<T>(this T[,] array, T value)
@@ -430,12 +435,12 @@ namespace Cyjb
 			return array;
 		}
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定的函数的返回值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">返回要填充数组的值的函数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "0#")]
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[,] Fill<T>(this T[,] array, Func<T> value)
@@ -453,12 +458,12 @@ namespace Cyjb
 			return array;
 		}
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定的函数的返回值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
-		/// <param name="value">返回要填充数组指定索引的值的函数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <param name="value">返回要填充数组指定索引的值的函数，其参数是当前填充到的索引。</param>
+		/// <returns>填充完毕的数组。</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "0#")]
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[,] Fill<T>(this T[,] array, Func<int, int, T> value)
@@ -481,12 +486,12 @@ namespace Cyjb
 		#region 二维交错数组
 
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定的值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">要填充数组的值。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		public static T[][] Fill<T>(this T[][] array, T value)
 		{
 			if (array != null)
@@ -502,12 +507,12 @@ namespace Cyjb
 			return array;
 		}
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定的函数的返回值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">返回要填充数组的值的函数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		public static T[][] Fill<T>(this T[][] array, Func<T> value)
 		{
 			if (array != null)
@@ -523,12 +528,12 @@ namespace Cyjb
 			return array;
 		}
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定的函数的返回值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
-		/// <param name="value">返回要填充数组指定索引的值的函数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <param name="value">返回要填充数组指定索引的值的函数，其参数是当前填充到的索引。</param>
+		/// <returns>填充完毕的数组。</returns>
 		public static T[][] Fill<T>(this T[][] array, Func<int, int, T> value)
 		{
 			if (array != null)
@@ -549,12 +554,12 @@ namespace Cyjb
 		#region 三维数组
 
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定的值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">要填充数组的值。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "0#")]
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[, ,] Fill<T>(this T[, ,] array, T value)
@@ -575,12 +580,12 @@ namespace Cyjb
 			return array;
 		}
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定函数的返回的值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">返回要填充数组的值的函数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "0#")]
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[, ,] Fill<T>(this T[, ,] array, Func<T> value)
@@ -601,12 +606,12 @@ namespace Cyjb
 			return array;
 		}
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定函数的返回的值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
-		/// <param name="value">返回要填充数组指定索引的值的函数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <param name="value">返回要填充数组指定索引的值的函数，其参数是当前填充到的索引。</param>
+		/// <returns>填充完毕的数组。</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "0#")]
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[, ,] Fill<T>(this T[, ,] array, Func<int, int, int, T> value)
@@ -632,12 +637,12 @@ namespace Cyjb
 		#region 三维交错数组
 
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定的值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">要填充数组的值。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		public static T[][][] Fill<T>(this T[][][] array, T value)
 		{
 			if (array != null)
@@ -656,12 +661,12 @@ namespace Cyjb
 			return array;
 		}
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定函数的返回的值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
 		/// <param name="value">返回要填充数组的值的函数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <returns>填充完毕的数组。</returns>
 		public static T[][][] Fill<T>(this T[][][] array, Func<T> value)
 		{
 			if (array != null)
@@ -680,12 +685,12 @@ namespace Cyjb
 			return array;
 		}
 		/// <summary>
-		/// 将数组使用指定的 <paramref name="value"/> 填充。
+		/// 将数组使用指定函数的返回的值填充。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
 		/// <param name="array">要填充的数组。</param>
-		/// <param name="value">返回要填充数组指定索引的值的函数。</param>
-		/// <returns>要填充的数组。</returns>
+		/// <param name="value">返回要填充数组指定索引的值的函数，其参数是当前填充到的索引。</param>
+		/// <returns>填充完毕的数组。</returns>
 		public static T[][][] Fill<T>(this T[][][] array, Func<int, int, int, T> value)
 		{
 			if (array != null)
@@ -714,9 +719,10 @@ namespace Cyjb
 		/// 将数组进行随机排序。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
-		/// <param name="array">要随机排序的数组。</param>
-		/// <returns>要随机排序数组。</returns>
-		/// <remarks>采用下面的代码进行测试：
+		/// <param name="array">要进行随机排序的数组。</param>
+		/// <returns>已完成随机排序的数组。</returns>
+		/// <remarks>应保证每个元素出现在每个位置的概率基本相同。
+		/// 采用下面的代码进行测试：
 		/// <code>int size = 10;
 		/// int[] arr = new int[size];
 		/// int[,] cnt = new int[size, size];
@@ -732,6 +738,11 @@ namespace Cyjb
 		/// 	Console.WriteLine();
 		/// }</code>
 		/// </remarks>
+		/// <overloads>
+		/// <summary>
+		/// 将数组进行随机排序。
+		/// </summary>
+		/// </overloads>
 		public static T[] Random<T>(this T[] array)
 		{
 			for (int i = array.Length - 1; i > 0; i--)
@@ -750,9 +761,10 @@ namespace Cyjb
 		/// 将数组进行随机排序。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
-		/// <param name="array">要随机排序的数组。</param>
-		/// <returns>要随机排序数组。</returns>
-		/// <remarks>采用下面的代码进行测试：
+		/// <param name="array">要进行随机排序的数组。</param>
+		/// <returns>已完成随机排序的数组。</returns>
+		/// <remarks>应保证每个元素出现在每个位置的概率基本相同。
+		/// 采用下面的代码进行测试：
 		/// <code>int w = 4;
 		/// int h = 3;
 		/// int size = w * h;
@@ -796,9 +808,10 @@ namespace Cyjb
 		/// 将数组进行随机排序。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
-		/// <param name="array">要随机排序的数组。</param>
-		/// <returns>要随机排序数组。</returns>
-		/// <remarks>采用下面的代码进行测试：
+		/// <param name="array">要进行随机排序的数组。</param>
+		/// <returns>已完成随机排序的数组。</returns>
+		/// <remarks>应保证每个元素出现在每个位置的概率基本相同。
+		/// 采用下面的代码进行测试：
 		/// <code>int w = 2;
 		/// int h = 2;
 		/// int d = 3;
@@ -855,11 +868,11 @@ namespace Cyjb
 		/// 从当前数组的左端截取一部分。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
-		/// <param name="array">从该数组返回最左端截取一部分。</param>
-		/// <param name="length">指示要截取的元素数的数值表达式。
+		/// <param name="array">从该数组返回其最左端截取的部分。</param>
+		/// <param name="length">要截取的元素个数。
 		/// 如果为 <c>0</c>，则返回空数组。如果大于或等于 <paramref name="array"/> 的长度，
-		/// 则返回整个数组的一个拷贝。</param>
-		/// <returns>从指定数组的左端截取的一部分。</returns>
+		/// 则返回整个数组的一个浅拷贝。</param>
+		/// <returns>从指定数组的左端截取的部分。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException">
 		/// <paramref name="length"/> 小于 <c>0</c>。</exception>
 		public static T[] Left<T>(this T[] array, int length)
@@ -882,11 +895,11 @@ namespace Cyjb
 		/// 从当前数组的右端截取一部分。
 		/// </summary>
 		/// <typeparam name="T">数组中元素的类型。</typeparam>
-		/// <param name="array">从该数组返回最右端截取一部分。</param>
-		/// <param name="length">指示要截取的元素数的数值表达式。
+		/// <param name="array">从该数组返回其最右端截取的部分。</param>
+		/// <param name="length">要截取的元素个数。
 		/// 如果为 <c>0</c>，则返回空数组。如果大于或等于 <paramref name="array"/> 的长度，
-		/// 则返回整个数组的一个拷贝。</param>
-		/// <returns>从指定数组的右端截取的一部分。</returns>
+		/// 则返回整个数组的一个浅拷贝。</param>
+		/// <returns>从指定数组的右端截取的部分。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException">
 		/// <paramref name="length"/> 小于 <c>0</c>。</exception>
 		public static T[] Right<T>(this T[] array, int length)
@@ -1068,11 +1081,16 @@ namespace Cyjb
 		/// <param name="array">要搜索的从零开始的一维排序 <see cref="System.Array"/>。</param>
 		/// <param name="value">要搜索的对象。</param>
 		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
-		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
-		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
-		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
-		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的指定值的索引。如果找不到值
+		/// 且值小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于值的第一个元素的索引的按位求补。
+		/// 如果找不到值且值大于 <paramref name="array"/> 
 		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 使用二分搜索算法在一维的排序 <see cref="System.Array"/> 中搜索特定值。
+		/// </summary>
+		/// </overloads>
 		public static int BinarySearch<T>(this T[] array, T value)
 		{
 			return Array.BinarySearch(array, value);
@@ -1085,10 +1103,10 @@ namespace Cyjb
 		/// <param name="array">要搜索的从零开始的一维排序 <see cref="System.Array"/>。</param>
 		/// <param name="value">要搜索的对象。</param>
 		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
-		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
-		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
-		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
-		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的指定值的索引。如果找不到值
+		/// 且值小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于值的第一个元素的索引的按位求补。
+		/// 如果找不到值且值大于 <paramref name="array"/> 
 		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
 		public static int BinarySearch(this Array array, object value)
 		{
@@ -1104,10 +1122,10 @@ namespace Cyjb
 		/// <param name="comparer">比较元素时要使用的 
 		/// <see cref="System.Collections.Generic.IComparer&lt;T&gt;"/> 实现。</param>
 		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
-		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
-		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
-		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
-		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的指定值的索引。如果找不到值
+		/// 且值小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于值的第一个元素的索引的按位求补。
+		/// 如果找不到值且值大于 <paramref name="array"/> 
 		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
 		public static int BinarySearch<T>(this T[] array, T value, IComparer<T> comparer)
 		{
@@ -1121,10 +1139,10 @@ namespace Cyjb
 		/// <param name="value">要搜索的对象。</param>
 		/// <param name="comparer">比较元素时要使用的 <see cref="System.Collections.IComparer"/> 实现。</param>
 		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
-		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
-		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
-		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
-		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的指定值的索引。如果找不到值
+		/// 且值小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于值的第一个元素的索引的按位求补。
+		/// 如果找不到值且值大于 <paramref name="array"/> 
 		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
 		public static int BinarySearch(this Array array, object value, IComparer comparer)
 		{
@@ -1141,10 +1159,10 @@ namespace Cyjb
 		/// <param name="length">要搜索的范围的长度。</param>
 		/// <param name="value">要搜索的对象。</param>
 		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
-		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
-		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
-		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
-		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的指定值的索引。如果找不到值
+		/// 且值小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于值的第一个元素的索引的按位求补。
+		/// 如果找不到值且值大于 <paramref name="array"/> 
 		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
 		public static int BinarySearch<T>(this T[] array, int index, int length, T value)
 		{
@@ -1160,10 +1178,10 @@ namespace Cyjb
 		/// <param name="length">要搜索的范围的长度。</param>
 		/// <param name="value">要搜索的对象。</param>
 		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
-		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
-		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
-		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
-		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的指定值的索引。如果找不到值
+		/// 且值小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于值的第一个元素的索引的按位求补。
+		/// 如果找不到值且值大于 <paramref name="array"/> 
 		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
 		public static int BinarySearch(this Array array, int index, int length, object value)
 		{
@@ -1181,10 +1199,10 @@ namespace Cyjb
 		/// <param name="comparer">比较元素时要使用的 
 		/// <see cref="System.Collections.Generic.IComparer&lt;T&gt;"/> 实现。</param>
 		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
-		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
-		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
-		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
-		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的指定值的索引。如果找不到值
+		/// 且值小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于值的第一个元素的索引的按位求补。
+		/// 如果找不到值且值大于 <paramref name="array"/> 
 		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
 		public static int BinarySearch<T>(this T[] array, int index, int length, T value, IComparer<T> comparer)
 		{
@@ -1200,10 +1218,10 @@ namespace Cyjb
 		/// <param name="value">要搜索的对象。</param>
 		/// <param name="comparer">比较元素时要使用的 <see cref="System.Collections.IComparer"/> 实现。</param>
 		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
-		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
-		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
-		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
-		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的指定值的索引。如果找不到值
+		/// 且值小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于值的第一个元素的索引的按位求补。
+		/// 如果找不到值且值大于 <paramref name="array"/> 
 		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
 		public static int BinarySearch(this Array array, int index, int length, object value, IComparer comparer)
 		{
@@ -1225,10 +1243,10 @@ namespace Cyjb
 		/// <param name="value">要搜索的键值。</param>
 		/// <param name="keySelector">用于从元素中提取键的函数。</param>
 		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
-		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
-		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
-		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
-		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的指定值的索引。如果找不到值
+		/// 且值小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于值的第一个元素的索引的按位求补。
+		/// 如果找不到值且值大于 <paramref name="array"/> 
 		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
 		public static int BinarySearch<TElement, TKey>(this TElement[] array, TKey value,
 			Func<TElement, TKey> keySelector)
@@ -1248,10 +1266,10 @@ namespace Cyjb
 		/// <param name="comparer">比较元素时要使用的 
 		/// <see cref="System.Collections.Generic.IComparer&lt;T&gt;"/> 实现。</param>
 		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
-		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
-		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
-		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
-		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的指定值的索引。如果找不到值
+		/// 且值小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于值的第一个元素的索引的按位求补。
+		/// 如果找不到值且值大于 <paramref name="array"/> 
 		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
 		public static int BinarySearch<TElement, TKey>(this TElement[] array, TKey value,
 			Func<TElement, TKey> keySelector, IComparer<TKey> comparer)
@@ -1272,10 +1290,10 @@ namespace Cyjb
 		/// <param name="value">要搜索的键值。</param>
 		/// <param name="keySelector">用于从元素中提取键的函数。</param>
 		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
-		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
-		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
-		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
-		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的指定值的索引。如果找不到值
+		/// 且值小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于值的第一个元素的索引的按位求补。
+		/// 如果找不到值且值大于 <paramref name="array"/> 
 		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
 		public static int BinarySearch<TElement, TKey>(this TElement[] array, int index, int length,
 			TKey value, Func<TElement, TKey> keySelector)
@@ -1297,10 +1315,10 @@ namespace Cyjb
 		/// <param name="comparer">比较元素时要使用的 
 		/// <see cref="System.Collections.Generic.IComparer&lt;T&gt;"/> 实现。</param>
 		/// <returns>如果找到 <paramref name="value"/>，则为指定 <paramref name="array"/> 
-		/// 中的指定 <paramref name="value"/> 的索引。如果找不到 <paramref name="value"/> 
-		/// 且 <paramref name="value"/> 小于 <paramref name="array"/> 中的一个或多个元素，
-		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
-		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="array"/> 
+		/// 中的指定值的索引。如果找不到值
+		/// 且值小于 <paramref name="array"/> 中的一个或多个元素，
+		/// 则为一个负数，该负数是大于值的第一个元素的索引的按位求补。
+		/// 如果找不到值且值大于 <paramref name="array"/> 
 		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
 		public static int BinarySearch<TElement, TKey>(this TElement[] array, int index, int length,
 			TKey value, Func<TElement, TKey> keySelector, IComparer<TKey> comparer)

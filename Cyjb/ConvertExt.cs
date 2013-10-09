@@ -6,7 +6,7 @@ using System.Reflection;
 namespace Cyjb
 {
 	/// <summary>
-	/// 将一个数据类型转换为另一个数据类型的方法。
+	/// 提供将一个数据类型转换为另一个数据类型的方法。
 	/// </summary>
 	public static class ConvertExt
 	{
@@ -20,7 +20,8 @@ namespace Cyjb
 		/// <param name="value">要转换的对象。</param>
 		/// <param name="conversionType">要返回的对象的类型。</param>
 		/// <param name="provider">一个提供区域性特定的格式设置信息的对象。</param>
-		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，并且其值等效于 <paramref name="value"/>。</returns>
+		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，
+		/// 并且其值等效于 <paramref name="value"/>。</returns>
 		internal static object ImplicitChangeType(object value, Type conversionType, IFormatProvider provider)
 		{
 			Type nonNullableType;
@@ -165,8 +166,7 @@ namespace Cyjb
 		#region 类型转换
 
 		/// <summary>
-		/// 返回指定类型的对象，其值等效于指定对象。
-		/// 对可空类型、枚举和用户自定义隐式类型转换提供支持。
+		/// 返回指定类型的对象，其值等效于指定对象。支持可空类型、枚举和用户自定义类型转换。
 		/// </summary>
 		/// <typeparam name="T">要转换到的类型。</typeparam>
 		/// <param name="value">要转换的对象。</param>
@@ -178,7 +178,7 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 返回指定类型的对象，其值等效于指定对象。参数提供区域性特定的格式设置信息。
-		/// 对可空类型、枚举和用户自定义隐式类型转换提供支持。
+		/// 支持可空类型、枚举和用户自定义类型转换。
 		/// </summary>
 		/// <typeparam name="T">要转换到的类型。</typeparam>
 		/// <param name="value">要转换的对象。</param>
@@ -190,8 +190,7 @@ namespace Cyjb
 			return (T)ChangeType(value, typeof(T), provider);
 		}
 		/// <summary>
-		/// 返回指定类型的对象，其值等效于指定对象。 
-		/// 对可空类型、枚举和用户自定义隐式类型转换提供支持。
+		/// 返回指定类型的对象，其值等效于指定对象。 支持可空类型、枚举和用户自定义类型转换。
 		/// </summary>
 		/// <param name="value">要转换的对象。</param>
 		/// <param name="conversionType">要返回的对象的类型。</param>
@@ -203,13 +202,18 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 返回指定类型的对象，其值等效于指定对象。参数提供区域性特定的格式设置信息。
-		/// 对可空类型、枚举和用户自定义类型转换提供支持。
+		/// 支持可空类型、枚举和用户自定义类型转换。
 		/// </summary>
 		/// <param name="value">要转换的对象。</param>
 		/// <param name="conversionType">要返回的对象的类型。</param>
 		/// <param name="provider">一个提供区域性特定的格式设置信息的对象。</param>
 		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，
 		/// 并且其值等效于 <paramref name="value"/>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回指定类型的对象，其值等效于指定对象。支持可空类型、枚举和用户自定义类型转换。
+		/// </summary>
+		/// </overloads>
 		public static object ChangeType(object value, Type conversionType, IFormatProvider provider)
 		{
 			Type nonNullableType;
@@ -282,7 +286,8 @@ namespace Cyjb
 		/// <param name="conversionType">要返回的对象的类型。</param>
 		/// <param name="provider">一个提供区域性特定的格式设置信息的对象。</param>
 		/// <param name="success">如果标准显式类型转换成功，则为 <c>true</c>；否则为 <c>false</c>。</param>
-		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，并且其值等效于 <paramref name="value"/>。</returns>
+		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，
+		/// 并且其值等效于 <paramref name="value"/>。</returns>
 		private static object StandardExplicitChangeType(object value, Type type, Type conversionType,
 			IFormatProvider provider, out bool success)
 		{
@@ -691,6 +696,11 @@ namespace Cyjb
 		/// 的字符串表示形式。</returns>
 		/// <exception cref="System.ArgumentException">
 		/// <paramref name="toBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 将给定的整数值转换为其指定基的等效字符串表示形式。
+		/// </summary>
+		/// </overloads>
 		[CLSCompliant(false)]
 		public static string ToString(this sbyte value, int toBase)
 		{

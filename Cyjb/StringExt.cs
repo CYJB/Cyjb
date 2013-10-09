@@ -16,6 +16,11 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="str">要转换的字符串。</param>
 		/// <returns>转换后的字符串。</returns>
+		/// <remarks>
+		/// <para>解码方法支持 \x，\u 和 \U 转义，其中 \x 之后可跟 1~4 个十六进制字符，
+		/// \u 后面是 4 个十六进制字符，\U 后面则是 8 个十六进制字符。
+		/// 使用 \U 转义时，大于 0x10FFFF 的值不被支持，会被舍弃。</para>
+		/// <para>如果不满足上面的情况，则不会进行转义，也不会报错。</para></remarks>
 		public static string DecodeUnicode(this string str)
 		{
 			if (string.IsNullOrEmpty(str))
@@ -125,7 +130,8 @@ namespace Cyjb
 			return maxLength;
 		}
 		/// <summary>
-		/// 将字符串中不可显示字符（0x00~0x1F,0x7F之后）转义为 \\u 形式，其中十六进制以大写字母形式输出。
+		/// 将字符串中不可显示字符（0x00~0x1F, 0x7F之后）转义为 \\u 形式，
+		/// 其中十六进制以大写字母形式输出。
 		/// </summary>
 		/// <param name="str">要转换的字符串。</param>
 		/// <returns>转换后的字符串。</returns>
@@ -134,12 +140,17 @@ namespace Cyjb
 			return EncodeUnicode(str, true);
 		}
 		/// <summary>
-		/// 将字符串中不可显示字符（0x00~0x1F,0x7F之后）转义为 \\u 形式。
+		/// 将字符串中不可显示字符（0x00~0x1F, 0x7F之后）转义为 \\u 形式。
 		/// </summary>
 		/// <param name="str">要转换的字符串。</param>
-		/// <param name="upperCase">是否以大写字母形式输出十六进制。如果为 <c>true</c> 则是以大写字母形式输出十六进制，
-		/// 否则以小写字母形式输出。</param>
+		/// <param name="upperCase">是否以大写字母形式输出十六进制。
+		/// 如果为 <c>true</c> 则是以大写字母形式输出十六进制，否则以小写字母形式输出。</param>
 		/// <returns>转换后的字符串。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 将字符串中不可显示字符（0x00~0x1F, 0x7F之后）转义为 \\u 形式。
+		/// </summary>
+		/// </overloads>
 		public static string EncodeUnicode(this string str, bool upperCase)
 		{
 			if (string.IsNullOrEmpty(str))
@@ -234,6 +245,7 @@ namespace Cyjb
 		/// <paramref name="startIndex"/> 大于此实例的长度。</exception>
 		/// <exception cref="System.ArgumentOutOfRangeException">
 		/// <paramref name="startIndex"/> 小于负的此实例的长度。</exception>
+		/// <seealso cref="System.String.Substring(int)"/>
 		public static string SubstringEx(this string str, int startIndex)
 		{
 			ExceptionHelper.CheckArgumentNull(str, "str");
@@ -262,6 +274,12 @@ namespace Cyjb
 		/// <paramref name="startIndex"/> 小于负的此实例的长度。</exception>
 		/// <exception cref="System.ArgumentOutOfRangeException">
 		/// <paramref name="length"/> 小于零。</exception>
+		/// <seealso cref="System.String.Substring(int,int)"/>
+		/// <overloads>
+		/// <summary>
+		/// 从此实例检索子字符串。
+		/// </summary>
+		/// </overloads>
 		public static string SubstringEx(this string str, int startIndex, int length)
 		{
 			ExceptionHelper.CheckArgumentNull(str, "str");
@@ -316,6 +334,11 @@ namespace Cyjb
 		/// <exception cref="System.ArgumentOutOfRangeException">
 		/// <paramref name="startIndex"/> 或 <paramref name="endIndex"/>
 		/// 指示的位置不在此实例中。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 从此实例检索子字符串。
+		/// </summary>
+		/// </overloads>
 		public static string Slice(this string str, int startIndex, int endIndex)
 		{
 			ExceptionHelper.CheckArgumentNull(str, "str");
@@ -404,11 +427,16 @@ namespace Cyjb
 			return CombineWhiteSpace(text, " ");
 		}
 		/// <summary>
-		/// 合并字符串中的空白。
+		/// 合并字符串中的空白，并使用指定字符串替换空白字符串。
 		/// </summary>
 		/// <param name="text">要合并空白的字符串。</param>
 		/// <param name="replace">要替换空白的字符串。</param>
 		/// <returns>合并完成的字符串。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 合并字符串中的空白。
+		/// </summary>
+		/// </overloads>
 		public static string CombineWhiteSpace(this string text, string replace)
 		{
 			StringBuilder builder = new StringBuilder(text.Length);

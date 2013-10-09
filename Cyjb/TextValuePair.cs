@@ -47,6 +47,11 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="text">文本。</param>
 		/// <param name="value">文本对应的值。</param>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="Cyjb.TextValuePair"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		public TextValuePair(string text, object value)
 		{
 			this.text = text;
@@ -55,6 +60,7 @@ namespace Cyjb
 		/// <summary>
 		/// 获取或设置文本。
 		/// </summary>
+		/// <value>文本。</value>
 		public string Text
 		{
 			get { return text; }
@@ -68,6 +74,7 @@ namespace Cyjb
 		/// <summary>
 		/// 获取或设置文本对应的值。
 		/// </summary>
+		/// <value>文本对应的值。</value>
 		public object Value
 		{
 			get { return pairValue; }
@@ -206,6 +213,11 @@ namespace Cyjb
 		/// <param name="other">与此对象进行比较的对象。</param>
 		/// <returns>如果当前对象等于 <paramref name="other"/> 参数，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 指示当前对象是否等于另一个对象。
+		/// </summary>
+		/// </overloads>
 		public bool Equals(TextValuePair other)
 		{
 			if (object.ReferenceEquals(other, this))

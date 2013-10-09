@@ -58,6 +58,11 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="ch">要获取可打印字符串形式的字符。</param>
 		/// <returns>字符的可打印字符串形式。</returns>
+		/// <remarks>
+		/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），会返回原始字符。</para>
+		/// <para>对于某些特殊字符（\, \a, \b, \e, \f, \n, \r, \t, \v），会返回其转义形式。</para>
+		/// <para>对于其它字符，会返回其十六进制表示形式（\x00 或 \u0000）。</para>
+		/// </remarks>
 		public static string ToPrintableString(this char ch)
 		{
 			// 转换字符转义。
