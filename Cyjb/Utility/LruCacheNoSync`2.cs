@@ -5,10 +5,17 @@ using System.Diagnostics;
 namespace Cyjb.Utility
 {
 	/// <summary>
-	/// 表示使用改进的最近最少使用算法的对象缓冲池，不包含多线程同步。
+	/// 表示使用改进的 LRU（最近最少使用）算法的对象缓冲池，不包含多线程同步。
 	/// </summary>
-	/// <typeparam name="TKey">缓冲对象的键的类型。</typeparam>
-	/// <typeparam name="TValue">缓冲对象的类型。</typeparam>
+	/// <typeparam name="TKey">缓存对象的键的类型。</typeparam>
+	/// <typeparam name="TValue">缓存对象的类型。</typeparam>
+	/// <remarks>
+	/// <para>该类不包含多线程同步，请仅在单线程应用中使用。</para>
+	/// <para>关于改进的 LRU（最近最少使用）算法，可以参考我的博文
+	/// <see href="http://www.cnblogs.com/cyjb/archive/p/LruCache.html">
+	/// 《一个改进 LRU 算法的缓冲池》</see>。</para></remarks>
+	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/LruCache.html">
+	/// 《一个改进 LRU 算法的缓冲池》</seealso>
 	[DebuggerDisplay("Count = {Count}")]
 	public sealed class LruCacheNoSync<TKey, TValue> : ICache<TKey, TValue>
 	{
@@ -29,7 +36,8 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 缓存对象的字典。
 		/// </summary>
-		private IDictionary<TKey, LruNodeNoSync<TKey, TValue>> cacheDict = new Dictionary<TKey, LruNodeNoSync<TKey, TValue>>();
+		private Dictionary<TKey, LruNodeNoSync<TKey, TValue>> cacheDict =
+			new Dictionary<TKey, LruNodeNoSync<TKey, TValue>>();
 		/// <summary>
 		/// 链表的头节点，也是热端的头。
 		/// </summary>
@@ -80,11 +88,21 @@ namespace Cyjb.Utility
 		/// </summary>
 		/// <param name="key">要添加的对象的键。</param>
 		/// <param name="value">要添加的对象。</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public void Add(TKey key, TValue value)
 		{
-			ExceptionHelper.CheckArgumentNull(key, "key");
-			this.AddInternal(key, value);
+			LruNodeNoSync<TKey, TValue> node;
+			if (cacheDict.TryGetValue(key, out node))
+			{
+				// 更新节点。
+				node.Value = value;
+				node.VisitCount++;
+			}
+			else
+			{
+				this.AddInternal(key, value);
+			}
 		}
 		/// <summary>
 		/// 清空缓存中的所有对象。
@@ -99,23 +117,30 @@ namespace Cyjb.Utility
 		/// 确定缓存中是否包含指定的键。
 		/// </summary>
 		/// <param name="key">要在缓存中查找的键。</param>
-		/// <returns>如果缓存中包含具有指定键的元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <returns>如果缓存中包含具有指定键的元素，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public bool Contains(TKey key)
 		{
-			ExceptionHelper.CheckArgumentNull(key, "key");
 			return cacheDict.ContainsKey(key);
 		}
 		/// <summary>
-		/// 从缓存中获取与指定的键关联的对象，如果不存在则将对象添加到缓存中。
+		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
 		/// </summary>
 		/// <param name="key">要获取的对象的键。</param>
-		/// <param name="valueFactory">用于为键生成对象的函数。</param>
-		/// <returns>如果在缓存中找到该键，则为对应的对象；否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <param name="valueFactory">用于根据键生成新对象的函数。</param>
+		/// <returns>如果在缓存中找到该键，则为对应的对象；
+		/// 否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
+		/// </summary>
+		/// </overloads>
 		public TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory)
 		{
-			ExceptionHelper.CheckArgumentNull(key, "key");
 			ExceptionHelper.CheckArgumentNull(valueFactory, "valueFactory");
 			TValue value;
 			if (this.TryGet(key, out value))
@@ -127,13 +152,59 @@ namespace Cyjb.Utility
 			return value;
 		}
 		/// <summary>
-		/// 从缓存中移除并返回具有指定键的对象。
+		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
 		/// </summary>
-		/// <param name="key">要移除并返回的对象的键。</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <param name="key">要获取的对象的键。</param>
+		/// <param name="arg">用于生成新对象的参数。</param>
+		/// <param name="valueFactory">用于根据键和参数生成新对象的函数。</param>
+		/// <returns>如果在缓存中找到该键，则为对应的对象；
+		/// 否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		public TValue GetOrAdd<TArg>(TKey key, TArg arg, Func<TKey, TArg, TValue> valueFactory)
+		{
+			ExceptionHelper.CheckArgumentNull(valueFactory, "valueFactory");
+			TValue value;
+			if (this.TryGet(key, out value))
+			{
+				return value;
+			}
+			value = valueFactory(key, arg);
+			this.AddInternal(key, value);
+			return value;
+		}
+		/// <summary>
+		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
+		/// </summary>
+		/// <param name="key">要获取的对象的键。</param>
+		/// <param name="arg0">用于生成新对象的第一个参数。</param>
+		/// <param name="arg1">用于生成新对象的第二个参数。</param>
+		/// <param name="valueFactory">用于根据键和参数生成新对象的函数。</param>
+		/// <returns>如果在缓存中找到该键，则为对应的对象；
+		/// 否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		public TValue GetOrAdd<TArg0, TArg1>(TKey key, TArg0 arg0, TArg1 arg1,
+			Func<TKey, TArg0, TArg1, TValue> valueFactory)
+		{
+			ExceptionHelper.CheckArgumentNull(valueFactory, "valueFactory");
+			TValue value;
+			if (this.TryGet(key, out value))
+			{
+				return value;
+			}
+			value = valueFactory(key, arg0, arg1);
+			this.AddInternal(key, value);
+			return value;
+		}
+		/// <summary>
+		/// 从缓存中移除具有指定键的对象。
+		/// </summary>
+		/// <param name="key">要移除的对象的键。</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public void Remove(TKey key)
 		{
-			ExceptionHelper.CheckArgumentNull(key, "key");
 			LruNodeNoSync<TKey, TValue> node;
 			if (cacheDict.TryGetValue(key, out node))
 			{
@@ -148,11 +219,12 @@ namespace Cyjb.Utility
 		/// <param name="key">要获取的对象的键。</param>
 		/// <param name="value">此方法返回时，<paramref name="value"/> 包含缓存中具有指定键的对象；
 		/// 如果操作失败，则包含默认值。</param>
-		/// <returns>如果在缓存中找到该键，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <returns>如果在缓存中找到该键，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public bool TryGet(TKey key, out TValue value)
 		{
-			ExceptionHelper.CheckArgumentNull(key, "key");
 			LruNodeNoSync<TKey, TValue> node;
 			if (cacheDict.TryGetValue(key, out node))
 			{
@@ -234,51 +306,39 @@ namespace Cyjb.Utility
 		private void AddInternal(TKey key, TValue value)
 		{
 			LruNodeNoSync<TKey, TValue> node;
-			if (cacheDict.TryGetValue(key, out node))
+			if (count < maxSize)
 			{
-				// 更新节点。
-				node.Value = value;
-				node.VisitCount++;
-				return;
+				// 将节点添加到热端的头。
+				node = new LruNodeNoSync<TKey, TValue>(key, value);
+				AddHotFirst(node);
+				count++;
+				if (count == hotSize + 1)
+				{
+					codeHead = head.Prev;
+				}
 			}
 			else
 			{
-				if (count < maxSize)
+				// 从冷端末尾尝试淘汰旧节点，将访问次数大于 1 的移动到热端的头。
+				// 由于双向链表是环形存储的，就相当于将 head 前移。
+				while (head.Prev.VisitCount >= 2)
 				{
-					// 将节点添加到热端起始。
-					node = new LruNodeNoSync<TKey, TValue>(key, value);
-					AddHotFirst(node);
-					count++;
-					if (count == hotSize + 1)
-					{
-						codeHead = head.Prev;
-					}
-					cacheDict.Add(key, node);
-					return;
+					// 清零访问计数。
+					head.Prev.VisitCount = 0;
+					head = head.Prev;
+					codeHead = codeHead.Prev;
 				}
-				else
-				{
-					// 从冷端末尾尝试淘汰旧节点，将访问次数大于 1 的移动到热端的头。
-					// 由于双向链表是环形存储的，就相当于将 head 前移。
-					while (head.Prev.VisitCount >= 2)
-					{
-						// 清零访问计数。
-						head.Prev.VisitCount = 0;
-						head = head.Prev;
-						codeHead = codeHead.Prev;
-					}
-					// 将 node 移除，并添加到冷端的头。
-					node = head.Prev;
-					this.cacheDict.Remove(node.Key);
-					this.Remove(node);
-					// 这里直接重用旧节点。
-					node.Key = key;
-					node.Value = value;
-					node.VisitCount = 1;
-					this.AddCodeFirst(node);
-					cacheDict.Add(key, node);
-				}
+				// 将 node 移除，并添加到冷端的头。
+				node = head.Prev;
+				this.cacheDict.Remove(node.Key);
+				this.Remove(node);
+				// 这里直接重用旧节点。
+				node.Key = key;
+				node.Value = value;
+				node.VisitCount = 1;
+				this.AddCodeFirst(node);
 			}
+			cacheDict.Add(key, node);
 		}
 	}
 }

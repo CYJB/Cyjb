@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Cyjb.Utility
@@ -8,15 +7,17 @@ namespace Cyjb.Utility
 	/// <summary>
 	/// 表示缓存个数不受限制的对象缓冲池。
 	/// </summary>
-	/// <typeparam name="TKey">缓冲对象的键的类型。</typeparam>
-	/// <typeparam name="TValue">缓冲对象的类型。</typeparam>
+	/// <typeparam name="TKey">缓存对象的键的类型。</typeparam>
+	/// <typeparam name="TValue">缓存对象的类型。</typeparam>
+	/// <remarks>该类仅仅是 <see cref="ConcurrentDictionary"/> 类的一个简单包装。
+	/// 缓存的对象数量会一直增长下去，通常应仅作为测试使用。</remarks>
 	[DebuggerDisplay("Count = {Count}")]
 	public sealed class SimplyCache<TKey, TValue> : ICache<TKey, TValue>
 	{
 		/// <summary>
 		/// 缓存对象的字典。
 		/// </summary>
-		private IDictionary<TKey, TValue> cacheDict = new ConcurrentDictionary<TKey, TValue>();
+		private ConcurrentDictionary<TKey, TValue> cacheDict = new ConcurrentDictionary<TKey, TValue>();
 		/// <summary>
 		/// 初始化 <see cref="SimplyCache&lt;TKey,TValue&gt;"/> 类的新实例。
 		/// </summary>
@@ -33,7 +34,8 @@ namespace Cyjb.Utility
 		/// </summary>
 		/// <param name="key">要添加的对象的键。</param>
 		/// <param name="value">要添加的对象。</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public void Add(TKey key, TValue value)
 		{
 			ExceptionHelper.CheckArgumentNull(key, "key");
@@ -50,42 +52,73 @@ namespace Cyjb.Utility
 		/// 确定缓存中是否包含指定的键。
 		/// </summary>
 		/// <param name="key">要在缓存中查找的键。</param>
-		/// <returns>如果缓存中包含具有指定键的元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <returns>如果缓存中包含具有指定键的元素，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public bool Contains(TKey key)
 		{
 			ExceptionHelper.CheckArgumentNull(key, "key");
 			return cacheDict.ContainsKey(key);
 		}
 		/// <summary>
-		/// 从缓存中获取与指定的键关联的对象，如果不存在则将对象添加到缓存中。
+		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
 		/// </summary>
 		/// <param name="key">要获取的对象的键。</param>
-		/// <param name="valueFactory">用于为键生成对象的函数。</param>
-		/// <returns>如果在缓存中找到该键，则为对应的对象；否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <param name="valueFactory">用于根据键生成新对象的函数。</param>
+		/// <returns>如果在缓存中找到该键，则为对应的对象；
+		/// 否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
+		/// </summary>
+		/// </overloads>
 		public TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory)
 		{
-			ExceptionHelper.CheckArgumentNull(key, "key");
-			ExceptionHelper.CheckArgumentNull(valueFactory, "valueFactory");
-			TValue value;
-			if (this.TryGet(key, out value))
-			{
-				return value;
-			}
-			value = valueFactory(key);
-			this.cacheDict[key] = value;
-			return value;
+			return cacheDict.GetOrAdd(key, valueFactory);
 		}
 		/// <summary>
-		/// 从缓存中移除并返回具有指定键的对象。
+		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
 		/// </summary>
-		/// <param name="key">要移除并返回的对象的键。</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <param name="key">要获取的对象的键。</param>
+		/// <param name="arg">用于生成新对象的参数。</param>
+		/// <param name="valueFactory">用于根据键和参数生成新对象的函数。</param>
+		/// <returns>如果在缓存中找到该键，则为对应的对象；
+		/// 否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		public TValue GetOrAdd<TArg>(TKey key, TArg arg, Func<TKey, TArg, TValue> valueFactory)
+		{
+			return cacheDict.GetOrAdd(key, k => valueFactory(k, arg));
+		}
+		/// <summary>
+		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
+		/// </summary>
+		/// <param name="key">要获取的对象的键。</param>
+		/// <param name="arg0">用于生成新对象的第一个参数。</param>
+		/// <param name="arg1">用于生成新对象的第二个参数。</param>
+		/// <param name="valueFactory">用于根据键和参数生成新对象的函数。</param>
+		/// <returns>如果在缓存中找到该键，则为对应的对象；
+		/// 否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		public TValue GetOrAdd<TArg0, TArg1>(TKey key, TArg0 arg0, TArg1 arg1,
+			Func<TKey, TArg0, TArg1, TValue> valueFactory)
+		{
+			return cacheDict.GetOrAdd(key, k => valueFactory(k, arg0, arg1));
+		}
+		/// <summary>
+		/// 从缓存中移除具有指定键的对象。
+		/// </summary>
+		/// <param name="key">要移除的对象的键。</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public void Remove(TKey key)
 		{
-			ExceptionHelper.CheckArgumentNull(key, "key");
-			cacheDict.Remove(key);
+			TValue value;
+			cacheDict.TryRemove(key, out value);
 		}
 		/// <summary>
 		/// 尝试从缓存中获取与指定的键关联的对象。
@@ -93,17 +126,13 @@ namespace Cyjb.Utility
 		/// <param name="key">要获取的对象的键。</param>
 		/// <param name="value">此方法返回时，<paramref name="value"/> 包含缓存中具有指定键的对象；
 		/// 如果操作失败，则包含默认值。</param>
-		/// <returns>如果在缓存中找到该键，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <returns>如果在缓存中找到该键，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public bool TryGet(TKey key, out TValue value)
 		{
-			ExceptionHelper.CheckArgumentNull(key, "key");
-			if (cacheDict.TryGetValue(key, out value))
-			{
-				return true;
-			}
-			value = default(TValue);
-			return false;
+			return cacheDict.TryGetValue(key, out value);
 		}
 
 		#endregion // ICache<TKey, TValue> 成员
