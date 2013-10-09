@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -6,18 +7,23 @@ using System.Threading;
 namespace Cyjb.Utility
 {
 	/// <summary>
-	/// 表示使用改进的最近最少使用算法的对象缓冲池。
+	/// 表示使用改进的 LRU（最近最少使用）算法的对象缓冲池。
 	/// </summary>
-	/// <typeparam name="TKey">缓冲对象的键的类型。</typeparam>
-	/// <typeparam name="TValue">缓冲对象的类型。</typeparam>
+	/// <typeparam name="TKey">缓存对象的键的类型。</typeparam>
+	/// <typeparam name="TValue">缓存对象的类型。</typeparam>
+	/// <remarks>关于改进的 LRU（最近最少使用）算法，可以参考我的博文
+	/// <see href="http://www.cnblogs.com/cyjb/archive/p/LruCache.html">
+	/// 《一个改进 LRU 算法的缓冲池》</see>。</remarks>
+	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/LruCache.html">
+	/// 《一个改进 LRU 算法的缓冲池》</seealso>
 	[DebuggerDisplay("Count = {Count}")]
-	public sealed class LruCache<TKey, TValue> : ICache<TKey, TValue>, IDisposable
+	public sealed class LruCache<TKey, TValue> : ICache<TKey, TValue>
 	{
 		/// <summary>
 		/// 用于多线程同步的锁。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private ReaderWriterLockSlim cacheLock = new ReaderWriterLockSlim();
+		private object cacheLock = new object();
 		/// <summary>
 		/// 缓冲池中可以保存的最大对象数目。
 		/// </summary>
@@ -31,12 +37,12 @@ namespace Cyjb.Utility
 		/// 缓冲池中当前存储的对象数目。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private int count;
+		private volatile int count;
 		/// <summary>
-		/// 缓存对象的字典。
+		/// 缓存对象的字典，字典本身是多线程同步的。
 		/// </summary>
-		private Dictionary<TKey, LruNode<TKey, TValue>> cacheDict =
-			new Dictionary<TKey, LruNode<TKey, TValue>>();
+		private ConcurrentDictionary<TKey, LruNode<TKey, TValue>> cacheDict =
+			new ConcurrentDictionary<TKey, LruNode<TKey, TValue>>();
 		/// <summary>
 		/// 链表的头节点，也是热端的头。
 		/// </summary>
@@ -46,13 +52,18 @@ namespace Cyjb.Utility
 		/// </summary>
 		private LruNode<TKey, TValue> codeHead;
 		/// <summary>
-		/// 当前对象是否已释放资源。
+		/// 键的比较器。
 		/// </summary>
-		private bool isDisposed = false;
+		private IEqualityComparer<TKey> comparer = EqualityComparer<TKey>.Default;
 		/// <summary>
 		/// 使用指定的最大对象数目初始化 <see cref="LruCache&lt;TKey,TValue&gt;"/> 类的新实例。
 		/// </summary>
 		/// <param name="maxSize">缓存中可以保存的最大对象数目，必须大于等于 2。</param>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="LruCache&lt;TKey,TValue&gt;"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		public LruCache(int maxSize)
 			: this(maxSize, 0.5)
 		{ }
@@ -78,29 +89,13 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 获取实际包含在缓存中的对象数目。
 		/// </summary>
+		/// <value>实际包含在缓存中的对象数目。</value>
 		public int Count { get { return count; } }
 		/// <summary>
 		/// 获取缓存中可以保存的最大对象数目。
 		/// </summary>
+		/// <value>缓存中可以保存的最大对象数目。</value>
 		public int MaxSize { get { return maxSize; } }
-
-		#region IDisposable 成员
-
-		/// <summary>
-		/// 执行与释放或重置非托管资源相关的应用程序定义的任务。
-		/// </summary>
-		public void Dispose()
-		{
-			if (!this.isDisposed)
-			{
-				this.isDisposed = true;
-				this.ClearInternal();
-				cacheLock.Dispose();
-				GC.SuppressFinalize(this);
-			}
-		}
-
-		#endregion // IDisposable 成员
 
 		#region ICache<TKey, TValue> 成员
 
@@ -109,104 +104,135 @@ namespace Cyjb.Utility
 		/// </summary>
 		/// <param name="key">要添加的对象的键。</param>
 		/// <param name="value">要添加的对象。</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public void Add(TKey key, TValue value)
 		{
-			this.CheckDisposed();
 			ExceptionHelper.CheckArgumentNull(key, "key");
-			this.AddInternal(key, new Lazy<TValue>(() => value, false));
+			this.AddInternal(key, new Lazy<TValue>(() => value, false), true);
 		}
 		/// <summary>
 		/// 清空缓存中的所有对象。
 		/// </summary>
 		public void Clear()
 		{
-			CheckDisposed();
-			ClearInternal();
+			lock (cacheLock)
+			{
+				cacheDict.Clear();
+				head = codeHead = null;
+				count = 0;
+			}
 		}
 		/// <summary>
 		/// 确定缓存中是否包含指定的键。
 		/// </summary>
 		/// <param name="key">要在缓存中查找的键。</param>
-		/// <returns>如果缓存中包含具有指定键的元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <returns>如果缓存中包含具有指定键的元素，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public bool Contains(TKey key)
 		{
-			this.CheckDisposed();
-			ExceptionHelper.CheckArgumentNull(key, "key");
-			cacheLock.EnterReadLock();
-			try
-			{
-				return cacheDict.ContainsKey(key);
-			}
-			finally
-			{
-				cacheLock.ExitReadLock();
-			}
+			return cacheDict.ContainsKey(key);
 		}
 		/// <summary>
-		/// 从缓存中获取与指定的键关联的对象，如果不存在则将对象添加到缓存中。
+		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
 		/// </summary>
 		/// <param name="key">要获取的对象的键。</param>
-		/// <param name="valueFactory">用于为键生成对象的函数。</param>
-		/// <returns>如果在缓存中找到该键，则为对应的对象；否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <param name="valueFactory">用于根据键生成新对象的函数。</param>
+		/// <returns>如果在缓存中找到该键，则为对应的对象；
+		/// 否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
+		/// </summary>
+		/// </overloads>
 		public TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory)
 		{
-			this.CheckDisposed();
-			ExceptionHelper.CheckArgumentNull(key, "key");
 			ExceptionHelper.CheckArgumentNull(valueFactory, "valueFactory");
 			LruNode<TKey, TValue> node;
-			cacheLock.EnterUpgradeableReadLock();
-			try
+			if (cacheDict.TryGetValue(key, out node))
 			{
-				if (cacheDict.TryGetValue(key, out node))
-				{
-					Interlocked.Increment(ref node.VisitCount);
-				}
-				else
-				{
-					node = this.AddInternal(key, new Lazy<TValue>(() => valueFactory(key)));
-				}
+				Interlocked.Increment(ref node.VisitCount);
 			}
-			finally
+			else
 			{
-				cacheLock.ExitUpgradeableReadLock();
+				node = this.AddInternal(key, new Lazy<TValue>(() => valueFactory(key)), false);
 			}
 			return node.Value.Value;
 		}
 		/// <summary>
-		/// 从缓存中移除并返回具有指定键的对象。
+		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
 		/// </summary>
-		/// <param name="key">要移除并返回的对象的键。</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <param name="key">要获取的对象的键。</param>
+		/// <param name="arg">用于生成新对象的参数。</param>
+		/// <param name="valueFactory">用于根据键和参数生成新对象的函数。</param>
+		/// <returns>如果在缓存中找到该键，则为对应的对象；
+		/// 否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		public TValue GetOrAdd<TArg>(TKey key, TArg arg, Func<TKey, TArg, TValue> valueFactory)
+		{
+			ExceptionHelper.CheckArgumentNull(valueFactory, "valueFactory");
+			LruNode<TKey, TValue> node;
+			if (cacheDict.TryGetValue(key, out node))
+			{
+				Interlocked.Increment(ref node.VisitCount);
+			}
+			else
+			{
+				node = this.AddInternal(key, new Lazy<TValue>(() => valueFactory(key, arg)), false);
+			}
+			return node.Value.Value;
+		}
+		/// <summary>
+		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
+		/// </summary>
+		/// <param name="key">要获取的对象的键。</param>
+		/// <param name="arg0">用于生成新对象的第一个参数。</param>
+		/// <param name="arg1">用于生成新对象的第二个参数。</param>
+		/// <param name="valueFactory">用于根据键和参数生成新对象的函数。</param>
+		/// <returns>如果在缓存中找到该键，则为对应的对象；
+		/// 否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		public TValue GetOrAdd<TArg0, TArg1>(TKey key, TArg0 arg0, TArg1 arg1,
+			Func<TKey, TArg0, TArg1, TValue> valueFactory)
+		{
+			ExceptionHelper.CheckArgumentNull(valueFactory, "valueFactory");
+			LruNode<TKey, TValue> node;
+			if (cacheDict.TryGetValue(key, out node))
+			{
+				Interlocked.Increment(ref node.VisitCount);
+			}
+			else
+			{
+				node = this.AddInternal(key, new Lazy<TValue>(() => valueFactory(key, arg0, arg1)), false);
+			}
+			return node.Value.Value;
+		}
+		/// <summary>
+		/// 从缓存中移除具有指定键的对象。
+		/// </summary>
+		/// <param name="key">要移除的对象的键。</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public void Remove(TKey key)
 		{
-			this.CheckDisposed();
-			ExceptionHelper.CheckArgumentNull(key, "key");
-			cacheLock.EnterUpgradeableReadLock();
-			try
+			LruNode<TKey, TValue> node;
+			if (cacheDict.TryRemove(key, out node))
 			{
-				LruNode<TKey, TValue> node;
-				if (cacheDict.TryGetValue(key, out node))
+				lock (cacheLock)
 				{
-					cacheLock.EnterWriteLock();
-					try
+					node.VisitCount = -1;
+					if (node.Prev != null)
 					{
-						cacheDict.Remove(key);
 						Remove(node);
-						// 写锁互斥，这里不用 Interlocked。
 						count--;
 					}
-					finally
-					{
-						cacheLock.ExitWriteLock();
-					}
 				}
-			}
-			finally
-			{
-				cacheLock.ExitUpgradeableReadLock();
 			}
 		}
 		/// <summary>
@@ -215,35 +241,21 @@ namespace Cyjb.Utility
 		/// <param name="key">要获取的对象的键。</param>
 		/// <param name="value">此方法返回时，<paramref name="value"/> 包含缓存中具有指定键的对象；
 		/// 如果操作失败，则包含默认值。</param>
-		/// <returns>如果在缓存中找到该键，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <returns>如果在缓存中找到该键，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public bool TryGet(TKey key, out TValue value)
 		{
-			this.CheckDisposed();
-			ExceptionHelper.CheckArgumentNull(key, "key");
 			LruNode<TKey, TValue> node;
-			cacheLock.EnterReadLock();
-			try
+			if (cacheDict.TryGetValue(key, out node))
 			{
-				if (cacheDict.TryGetValue(key, out node))
-				{
-					Interlocked.Increment(ref node.VisitCount);
-				}
-			}
-			finally
-			{
-				cacheLock.ExitReadLock();
-			}
-			if (node == null)
-			{
-				value = default(TValue);
-				return false;
-			}
-			else
-			{
+				Interlocked.Increment(ref node.VisitCount);
 				value = node.Value.Value;
 				return true;
 			}
+			value = default(TValue);
+			return false;
 		}
 
 		#endregion // ICache<TKey, TValue> 成员
@@ -251,7 +263,7 @@ namespace Cyjb.Utility
 		#region 链表操作
 
 		/// <summary>
-		/// 从链表中移除指定的节点。
+		/// 从链表中移除指定的节点，链表操作本身是非线程安全的。
 		/// </summary>
 		/// <param name="node">要移除的节点。</param>
 		private void Remove(LruNode<TKey, TValue> node)
@@ -275,7 +287,7 @@ namespace Cyjb.Utility
 			}
 		}
 		/// <summary>
-		/// 将指定的节点添加到链表热端的头部。
+		/// 将指定的节点添加到链表热端的头部，链表操作本身是非线程安全的。
 		/// </summary>
 		/// <param name="node">要添加的节点。</param>
 		private void AddHotFirst(LruNode<TKey, TValue> node)
@@ -296,12 +308,12 @@ namespace Cyjb.Utility
 			this.head = node;
 		}
 		/// <summary>
-		/// 将指定的节点添加到链表冷端的头部。
+		/// 将指定的节点添加到链表冷端的头部，链表操作本身是非线程安全的。
 		/// </summary>
 		/// <param name="node">要添加的节点。</param>
 		private void AddCodeFirst(LruNode<TKey, TValue> node)
 		{
-			// 这里 codeHead != null，在调用的时候已经保证了这一点。
+			Debug.Assert(codeHead != null);
 			this.codeHead.AddBefore(node);
 			this.codeHead = node;
 		}
@@ -309,54 +321,40 @@ namespace Cyjb.Utility
 		#endregion // 链表操作
 
 		/// <summary>
-		/// 清空缓存中的所有对象。
-		/// </summary>
-		private void ClearInternal()
-		{
-			cacheLock.EnterWriteLock();
-			try
-			{
-				cacheDict.Clear();
-				head = codeHead = null;
-				count = 0;
-			}
-			finally
-			{
-				cacheLock.ExitWriteLock();
-			}
-		}
-		/// <summary>
 		/// 将指定的键和对象添加到缓存中，并返回添加的节点。
 		/// </summary>
 		/// <param name="key">要添加的对象的键。</param>
 		/// <param name="value">要添加的对象。</param>
-		private LruNode<TKey, TValue> AddInternal(TKey key, Lazy<TValue> value)
+		/// <param name="force">是否要强制更新已有键相应的对象。</param>
+		private LruNode<TKey, TValue> AddInternal(TKey key, Lazy<TValue> value, bool force)
 		{
-			cacheLock.EnterWriteLock();
-			try
+			LruNode<TKey, TValue> newNode = new LruNode<TKey, TValue>(key, value);
+			LruNode<TKey, TValue> node = cacheDict.AddOrUpdate(key, newNode, (k, v) =>
 			{
-				LruNode<TKey, TValue> node;
-				if (cacheDict.TryGetValue(key, out node))
+				if (force)
 				{
-					// 更新节点。
-					node.Value = value;
-					// 写锁互斥，这里不用 Interlocked。
-					node.VisitCount++;
+					v.Value = value;
 				}
-				else
+				return v;
+			});
+			if (node != newNode)
+			{
+				return node;
+			}
+			// 将节点添加到链表中。
+			lock (cacheLock)
+			{
+				if (node.VisitCount != -1)
 				{
 					if (count < maxSize)
 					{
-						// 将节点添加到热端起始。
-						node = new LruNode<TKey, TValue>(key, value);
-						AddHotFirst(node);
-						// 写锁互斥，这里不用 Interlocked。
+						// 将新节点添加到热端的头。
+						AddHotFirst(newNode);
 						count++;
 						if (count == hotSize + 1)
 						{
 							codeHead = head.Prev;
 						}
-						cacheDict.Add(key, node);
 					}
 					else
 					{
@@ -369,33 +367,17 @@ namespace Cyjb.Utility
 							head = head.Prev;
 							codeHead = codeHead.Prev;
 						}
-						// 将 node 移除，并添加到冷端的头。
-						node = head.Prev;
-						this.cacheDict.Remove(node.Key);
-						this.Remove(node);
-						// 这里直接重用旧节点。
-						node.Key = key;
-						node.Value = value;
-						node.VisitCount = 1;
-						this.AddCodeFirst(node);
-						cacheDict.Add(key, node);
+						// 将旧 node 移除。
+						if (!comparer.Equals(head.Prev.Key, key))
+						{
+							this.cacheDict.TryRemove(head.Prev.Key, out node);
+						}
+						this.Remove(head.Prev);
+						// 将新节点添加到冷端的头。
+						this.AddCodeFirst(newNode);
 					}
 				}
-				return node;
-			}
-			finally
-			{
-				cacheLock.ExitWriteLock();
-			}
-		}
-		/// <summary>
-		/// 检查当前对象是否已释放资源。
-		/// </summary>
-		private void CheckDisposed()
-		{
-			if (this.isDisposed)
-			{
-				throw ExceptionHelper.ObjectDisposed();
+				return newNode;
 			}
 		}
 	}
