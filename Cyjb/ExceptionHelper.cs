@@ -295,6 +295,16 @@ namespace Cyjb
 			return GetArgumentOutOfRangeException(paramName, "ArgumentOutOfRangeBetween");
 		}
 		/// <summary>
+		/// 返回参数最小值大于最大值的异常。
+		/// </summary>
+		/// <param name="minParamName">表示最小值的参数名称。</param>
+		/// <param name="maxParamName">表示最大值的参数名称。</param>
+		/// <returns><see cref="System.ArgumentOutOfRangeException"/> 对象。</returns>
+		public static ArgumentOutOfRangeException ArgumentMinMaxValue(string minParamName, string maxParamName)
+		{
+			return GetArgumentOutOfRangeException(minParamName, "ArgumentMinMaxValue", minParamName, maxParamName);
+		}
+		/// <summary>
 		/// 返回基无效的异常。
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
@@ -322,6 +332,18 @@ namespace Cyjb
 			string resName)
 		{
 			return new ArgumentOutOfRangeException(paramName, ExceptionResources.GetString(resName));
+		}
+		/// <summary>
+		/// 返回参数超出范围的异常。
+		/// </summary>
+		/// <param name="paramName">发生异常的参数名称。</param>
+		/// <param name="resName">异常信息的资源名称。</param>
+		/// <param name="args">异常信息的格式化对象。</param>
+		/// <returns><see cref="System.ArgumentOutOfRangeException"/> 对象。</returns>
+		private static ArgumentOutOfRangeException GetArgumentOutOfRangeException(string paramName,
+			string resName, params object[] args)
+		{
+			return new ArgumentOutOfRangeException(paramName, ExceptionResources.GetString(resName, args));
 		}
 
 		#endregion // ArgumentOutOfRangeException

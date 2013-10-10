@@ -137,6 +137,10 @@
     <value>At least one object must implement IComparable.</value>
     <comment>必须至少有一个对象实现 IComparable。</comment>
   </data>
+  <data name="ArgumentMinMaxValue" xml:space="preserve">
+    <value>'{0}' cannot be greater than '{1}'.</value>
+    <comment>最小值大于最大值。</comment>
+  </data>
   <data name="ArgumentMustBePositive" xml:space="preserve">
     <value>Parameter values must be greater than zero.</value>
     <comment>参数小于等于零。</comment>
