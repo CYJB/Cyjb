@@ -2397,6 +2397,68 @@ namespace Cyjb
 
 		#endregion // 从 Object 构造成员委托
 
+		#region 委托类型包装
+
+		/// <summary>
+		/// 将指定的委托用指定类型的委托包装，支持对参数进行强制类型转换。
+		/// </summary>
+		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
+		/// <param name="dlg">要被包装的委托。</param>
+		/// <returns>指定类型的委托，其包装了 <paramref name="dlg"/>。
+		/// 如果参数个数不同，或者参数间不能执行强制类型转换，则为 <c>null</c>。</returns>
+		/// <exception cref="System.ArgumentNullException"><paramref name="dlg"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentException"><typeparamref name="TDelegate"/> 不继承
+		/// <see cref="System.MulticastDelegate"/>。</exception>
+		/// <exception cref="System.MissingMethodException">未找到 <typeparamref name="TDelegate"/>
+		/// 的 <c>Invoke</c> 方法。</exception>
+		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
+		public static TDelegate Wrap<TDelegate>(this Delegate dlg)
+			where TDelegate : class
+		{
+			return Wrap(typeof(TDelegate), dlg) as TDelegate;
+		}
+		/// <summary>
+		/// 将指定的委托用指定类型的委托包装，支持对参数进行强制类型转换。
+		/// </summary>
+		/// <param name="type">要创建的委托的类型。</param>
+		/// <param name="dlg">要被包装的委托。</param>
+		/// <returns>指定类型的委托，其包装了 <paramref name="dlg"/>。
+		/// 如果参数个数不同，或者参数间不能执行强制类型转换，则为 <c>null</c>。</returns>
+		/// <exception cref="System.ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="dlg"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承
+		/// <see cref="System.MulticastDelegate"/>。</exception>
+		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
+		public static Delegate Wrap(Type type, Delegate dlg)
+		{
+			ExceptionHelper.CheckArgumentNull(dlg, "dlg");
+			CheckDelegateType(type, "type");
+			MethodInfo invoke = dlg.GetType().GetMethod("Invoke");
+			MethodInfo targetInvoke = type.GetMethod("Invoke");
+			ParameterInfo[] paramInfos = invoke.GetParameters();
+			ParameterInfo[] targetParamInfos = targetInvoke.GetParameters();
+			if (paramInfos.Length != targetParamInfos.Length)
+			{
+				return null;
+			}
+			ParameterExpression[] paramList = GetParameters(targetParamInfos);
+			// 构造调用参数列表。
+			Expression[] paramExps = GetParameterExpressions(paramList, 0, paramInfos, 0);
+			if (paramExps == null)
+			{
+				return null;
+			}
+			Expression dlgInvoke = GetReturn(Expression.Invoke(Expression.Constant(dlg), paramExps),
+				targetInvoke.ReturnType);
+			if (dlgInvoke == null)
+			{
+				return null;
+			}
+			return Expression.Lambda(type, dlgInvoke, paramList).Compile();
+		}
+
+		#endregion // 委托类型包装
+
 		#region 参数检查
 
 		/// <summary>
@@ -2536,7 +2598,10 @@ namespace Cyjb
 		/// <returns>指定返回值到目标类型的强制类型转换的表达式。</returns>
 		private static Expression GetReturn(Expression returnExp, Type returnType)
 		{
-			if (returnType == typeof(void) || returnType.IsAssignableFrom(returnExp.Type))
+			if (returnType == typeof(void) || returnExp.Type == returnType ||
+				// Expression 不能处理值类型的类型转换。
+				(!returnType.IsValueType && !returnExp.Type.IsValueType &&
+				returnType.IsAssignableFrom(returnExp.Type)))
 			{
 				return returnExp;
 			}
