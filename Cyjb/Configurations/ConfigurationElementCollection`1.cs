@@ -12,6 +12,10 @@ namespace Cyjb.Configurations
 		ConfigurationElementCollection, IList<TElement>, IList, ICollection<TElement>, ICollection
 		where TElement : ConfigurationElement
 	{
+		/// <summary>
+		/// 初始化 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 类的新实例。
+		/// </summary>
+		protected ConfigurationElementCollection() { }
 
 		#region IList<TElement> 成员
 

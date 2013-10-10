@@ -35,6 +35,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 初始化使用默认相等比较器的 <see cref="KeyedListBase&lt;TKey, TItem&gt;"/> 类的新实例。
 		/// </summary>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="KeyedListBase&lt;TKey, TItem&gt;"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		protected KeyedListBase()
 			: this(null, 0, false)
 		{ }
@@ -120,6 +125,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 获取用于确定列表中的键是否相等的泛型相等比较器。
 		/// </summary>
+		/// <value>用于确定列表中的键是否相等的泛型相等比较器。</value>
 		public IEqualityComparer<TKey> Comparer
 		{
 			get { return this.comparer; }
@@ -127,6 +133,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 获取 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 的查找字典。
 		/// </summary>
+		/// <value><see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 的查找字典。</value>
 		protected IDictionary<TKey, TItem> Dictionary
 		{
 			get { return this.dict; }

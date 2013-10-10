@@ -38,6 +38,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 初始化 <see cref="ReadOnlyCollection&lt;T&gt;"/> 类的新实例。
 		/// </summary>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="ReadOnlyCollection&lt;T&gt;"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		protected ReadOnlyCollection() : base(true) { }
 		/// <summary>
 		/// 将 <see cref="ReadOnlyCollection&lt;T&gt;"/> 类的新实例初始化为指定集合的包装。

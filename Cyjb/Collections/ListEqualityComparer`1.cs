@@ -14,8 +14,9 @@ namespace Cyjb.Collections
 		/// </summary>
 		private static ListEqualityComparer<T> defaultValue;
 		/// <summary>
-		/// 返回一个默认的相等比较器。
+		/// 获取默认的相等比较器。
 		/// </summary>
+		/// <value>一个默认的 <see cref="ListEqualityComparer&lt;T&gt;"/> 比较器。</value>
 		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
 		public new static ListEqualityComparer<T> Default
 		{
@@ -35,6 +36,11 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 初始化 <see cref="ListEqualityComparer&lt;T&gt;"/> 类的新实例。
 		/// </summary>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="ListEqualityComparer&lt;T&gt;"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		public ListEqualityComparer()
 		{
 			this.comparer = EqualityComparer<T>.Default;

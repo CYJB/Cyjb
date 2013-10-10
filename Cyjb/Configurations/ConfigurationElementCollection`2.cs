@@ -11,6 +11,10 @@ namespace Cyjb.Configurations
 		where TElement : ConfigurationElement
 	{
 		/// <summary>
+		/// 初始化 <see cref="ConfigurationElementCollection&lt;TKey,TElement&gt;"/> 类的新实例。
+		/// </summary>
+		protected ConfigurationElementCollection() { }
+		/// <summary>
 		/// 基于所提供的键，从集合中移除 <see cref="System.Configuration.ConfigurationElement"/> 对象。
 		/// </summary>
 		/// <param name="key">要移除的 <see cref="System.Configuration.ConfigurationElement"/> 

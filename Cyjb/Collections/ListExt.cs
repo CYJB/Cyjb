@@ -25,6 +25,12 @@ namespace Cyjb.Collections
 		/// 则为一个负数，该负数是大于 <paramref name="value"/> 的第一个元素的索引的按位求补。
 		/// 如果找不到 <paramref name="value"/> 且 <paramref name="value"/> 大于 <paramref name="list"/> 
 		/// 中的任何元素，则为一个负数，该负数是（最后一个元素的索引加 1）的按位求补。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 在整个排序 <see cref="System.Collections.Generic.IList&lt;T&gt;"/> 
+		/// 中搜索特定元素。
+		/// </summary>
+		/// </overloads>
 		public static int BinarySearch<T>(this IList<T> list, T value)
 		{
 			ExceptionHelper.CheckArgumentNull(list, "list");

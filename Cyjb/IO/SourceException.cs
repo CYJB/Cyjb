@@ -18,6 +18,11 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 初始化 <see cref="SourceException"/> 类的新实例。
 		/// </summary>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="SourceException"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		public SourceException()
 			: base()
 		{ }
@@ -244,10 +249,12 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 获取异常的起始位置。
 		/// </summary>
+		/// <value>异常的起始位置。</value>
 		public SourceLocation Start { get; private set; }
 		/// <summary>
 		/// 获取异常的结束位置。
 		/// </summary>
+		/// <value>异常的结束位置。</value>
 		public SourceLocation End { get; private set; }
 		/// <summary>
 		/// 获取或设置源文件的位置。

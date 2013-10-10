@@ -9,6 +9,12 @@ namespace Cyjb.IO
 	/// <summary>
 	/// 表示支持行列计数的源文件读取器。
 	/// </summary>
+	/// <remarks><see cref="SourceReader"/> 类中，包含一个环形字符缓冲区，
+	/// 关于环形字符缓冲区的详细解释，请参见我的 C# 词法分析器系列博文
+	/// <see href="http://www.cnblogs.com/cyjb/archive/p/LexerInputBuffer.html">
+	/// 《C# 词法分析器（二）输入缓冲和代码定位》</see>。</remarks>
+	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/LexerInputBuffer.html">
+	/// 《C# 词法分析器（二）输入缓冲和代码定位》</seealso>
 	public sealed class SourceReader : IDisposable
 	{
 		/// <summary>
@@ -64,6 +70,11 @@ namespace Cyjb.IO
 		/// 使用指定的字符读取器初始化 <see cref="SourceReader"/> 类的新实例。
 		/// </summary>
 		/// <param name="reader">用于读取源文件的字符读取器。</param>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="SourceReader"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		public SourceReader(TextReader reader) : this(reader, 4) { }
 		/// <summary>
 		/// 使用指定的字符读取器和 Tab 宽度初始化 <see cref="SourceReader"/> 类的新实例。
@@ -83,20 +94,23 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 获取基础的字符读取器。
 		/// </summary>
+		/// <value>基础的字符读取器。</value>
 		public TextReader BaseReader
 		{
 			get { return reader; }
 		}
 		/// <summary>
-		/// 当前的字符索引。
+		/// 获取当前的字符索引。
 		/// </summary>
+		/// <value>当前的字符索引，该索引从零开始。</value>
 		public int Index
 		{
 			get { return globalIndex; }
 		}
 		/// <summary>
-		/// 起始索引之前的源代码位置（不包括被丢弃的字符）。
+		/// 获取起始索引之前的源代码位置（不包括被丢弃的字符）。
 		/// </summary>
+		/// <value>起始索引之前的源代码位置。起始索引会从上一次丢弃或接受字符开始算起。</value>
 		public SourceLocation BeforeStartLocation
 		{
 			get { return locator.Location; }
@@ -104,6 +118,7 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 起始索引的源代码位置（不包括被丢弃的字符）。
 		/// </summary>
+		/// <value>起始索引的源代码位置。起始索引会从上一次丢弃或接受字符开始算起。</value>
 		public SourceLocation StartLocation
 		{
 			get { return locator.NextLocation; }
@@ -139,6 +154,11 @@ namespace Cyjb.IO
 		/// 返回下一个可用的字符，但不使用它。
 		/// </summary>
 		/// <returns>表示下一个要读取的字符的整数，或者如果没有要读取的字符，则为 <c>-1</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回之后可用的字符，但不使用它。
+		/// </summary>
+		/// </overloads>
 		public int Peek()
 		{
 			if (reader == null)
@@ -195,6 +215,11 @@ namespace Cyjb.IO
 		/// 读取文本读取器中的下一个字符并使该字符的位置提升一个字符。
 		/// </summary>
 		/// <returns>文本读取器中的下一个字符，或为 <c>-1</c>（如果没有更多的可用字符）。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回之后可用的字符，并使该字符的位置提升。
+		/// </summary>
+		/// </overloads>
 		public int Read()
 		{
 			if (reader == null)
@@ -393,6 +418,13 @@ namespace Cyjb.IO
 		/// </summary>
 		/// <param name="tokenIndex">返回的 <see cref="Cyjb.Text.Token"/> 的字符索引。</param>
 		/// <returns>当前位置之前的数据。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 将当前位置之前的数据全部丢弃，并以 <see cref="Cyjb.Text.Token"/> 
+		/// 的形式返回被丢弃的数据。
+		/// 之后的 <see cref="Unget()"/> 操作至多回退到当前位置。
+		/// </summary>
+		/// </overloads>
 		public Token AcceptToken(int tokenIndex)
 		{
 			return AcceptToken(tokenIndex, null);

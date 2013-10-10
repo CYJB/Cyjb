@@ -8,6 +8,18 @@ namespace Cyjb.IO
 	/// 提供可以用于在源文件中定位的方法。
 	/// 支持 \n（Unix） 和 \r\n（Windows） 作为换行符。
 	/// </summary>
+	/// <remarks>
+	/// <para>对代码定位方法的详细解释，请参见我的 C# 词法分析器系列博文
+	/// <see href="http://www.cnblogs.com/cyjb/archive/p/LexerInputBuffer.html#SourceLocation">
+	/// 《C# 词法分析器（二）输入缓冲和代码定位》</see>。</para>
+	/// <para>在大量调用 <see cref="Encoding.GetByteCount(char[])"/> 方法（用于判断字符是全角还是半角）的时候，
+	/// 可能会导致多次垃圾回收，影响程序的效率。关于此问题的详细解释，请参见我的博文
+	/// <see href="http://www.cnblogs.com/cyjb/archive/p/GetByteCountMemoryProblem.html">
+	/// 《C# 中容易忽视的 Encoding.GetByteCount 内存问题》</see>。</para></remarks>
+	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/GetByteCountMemoryProblem.html">
+	/// 《C# 中容易忽视的 Encoding.GetByteCount 内存问题》</seealso>
+	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/LexerInputBuffer.html#SourceLocation">
+	/// 《C# 词法分析器（二）输入缓冲和代码定位》</seealso>
 	[DebuggerDisplay("Location")]
 	public sealed class SourceLocator
 	{
@@ -54,6 +66,11 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 使用默认的 Tab 宽度初始化 <see cref="SourceLocator"/> 类的新实例。
 		/// </summary>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="SourceLocator"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		public SourceLocator() : this(DefaultTabSize) { }
 		/// <summary>
 		/// 使用默认的 Tab 宽度初始化 <see cref="SourceLocator"/> 类的新实例。
@@ -67,6 +84,7 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 获取 Tab 的宽度。
 		/// </summary>
+		/// <value>Tab 字符的宽度。</value>
 		public int TabSize
 		{
 			get { return tabSize; }
@@ -74,6 +92,7 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 获取当前读进字符的的位置。
 		/// </summary>
+		/// <value>当前读进字符的位置。</value>
 		public SourceLocation Location
 		{
 			get { return new SourceLocation(curIndex, curLine, curCol); }
@@ -81,6 +100,7 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 获取下一个字符的位置。
 		/// </summary>
+		/// <value>下一个未读进字符的位置。</value>
 		public SourceLocation NextLocation
 		{
 			get { return new SourceLocation(curIndex + 1, nextLine, nextCol); }
@@ -99,6 +119,11 @@ namespace Cyjb.IO
 		/// 在源文件中前进一个字符。
 		/// </summary>
 		/// <param name="ch">源文件中前进的字符。</param>
+		/// <overloads>
+		/// <summary>
+		/// 在源文件中前进一个或多个字符。
+		/// </summary>
+		/// </overloads>
 		public void Forward(char ch)
 		{
 			curIndex++;

@@ -14,6 +14,11 @@ namespace Cyjb.IO
 		/// <param name="path">文件的路径。</param>
 		/// <param name="fileName">文件的名称。</param>
 		/// <returns>与当前区域性相关的文件名，如果不存在则为 <c>null</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回与当前区域性相关的文件名。
+		/// </summary>
+		/// </overloads>
 		public static string GetCultureSpecificFile(string path, string fileName)
 		{
 			return GetCultureSpecificFile(path, fileName, CultureInfo.CurrentCulture);

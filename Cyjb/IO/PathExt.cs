@@ -24,6 +24,7 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 获取在路径中无效的字符集合。
 		/// </summary>
+		/// <value>在路径中无效的字符集合。</value>
 		public static ISet<char> InvalidPathChars
 		{
 			get { return invalidPathChars; }
@@ -31,6 +32,7 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 获取在文件名中无效的字符集合。
 		/// </summary>
+		/// <value>在文件名中无效的字符集合。</value>
 		public static ISet<char> InvalidFileNameChars
 		{
 			get { return invalidFileNameChars; }
@@ -40,6 +42,11 @@ namespace Cyjb.IO
 		/// </summary>
 		/// <param name="path">要获取的路径。</param>
 		/// <returns>得到的有效路径。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回有效的路径，路径中的无效字符会被删去或替换。
+		/// </summary>
+		/// </overloads>
 		public static string GetValidPath(string path)
 		{
 			return GetValidPath(path, string.Empty);
@@ -72,6 +79,11 @@ namespace Cyjb.IO
 		/// </summary>
 		/// <param name="fileName">要获取的文件名。</param>
 		/// <returns>得到的有效文件名。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回有效的文件名，文件名中的无效字符会被删去或替换。
+		/// </summary>
+		/// </overloads>
 		public static string GetValidFileName(string fileName)
 		{
 			return GetValidFileName(fileName, string.Empty);

@@ -7,8 +7,9 @@ using Cyjb.Collections.ObjectModel;
 namespace Cyjb.Collections
 {
 	/// <summary>
-	/// 表示数组的一部分的列表。
-	/// 与 ArraySegment&lt;T&gt; 的区别就是其访问方式与普通的列表相同。
+	/// 表示数组的一部分的列表。与 <see cref="System.ArraySegment&lt;T&gt;"/> 
+	/// 的区别就是 <see cref="ArrayAdapter&lt;T&gt;"/> 实现了 <see cref="IList&lt;T&gt;"/> 接口，
+	/// 访问方式与普通的列表相同。
 	/// </summary>
 	/// <typeparam name="T">元素的类型。</typeparam>
 	public sealed class ArrayAdapter<T> : ListBase<T>, IList
@@ -30,6 +31,11 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 初始化 <see cref="Cyjb.Collections.ArrayAdapter&lt;T&gt;"/> 类的新实例。
 		/// </summary>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="Cyjb.Collections.ArrayAdapter&lt;T&gt;"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		public ArrayAdapter()
 		{
 			items = new T[0];

@@ -45,6 +45,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 初始化 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 类的新实例。
 		/// </summary>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		protected DictionaryBase()
 		{
 			this.items = new Dictionary<TKey, TValue>();
@@ -149,8 +154,11 @@ namespace Cyjb.Collections.ObjectModel
 			return this.items.TryGetValue(key, out value);
 		}
 		/// <summary>
-		/// 获取 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 周围的 <see cref="IDictionary&lt;TKey,TValue&gt;"/> 包装。
+		/// 获取 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 周围的 
+		/// <see cref="IDictionary&lt;TKey,TValue&gt;"/> 包装。
 		/// </summary>
+		/// <value><see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 周围的 
+		/// <see cref="IDictionary&lt;TKey,TValue&gt;"/> 包装。</value>
 		protected IDictionary<TKey, TValue> Items
 		{
 			get { return items; }

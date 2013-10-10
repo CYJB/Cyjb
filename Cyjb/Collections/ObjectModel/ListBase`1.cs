@@ -32,6 +32,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 初始化 <see cref="ListBase&lt;T&gt;"/> 类的新实例。
 		/// </summary>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="ListBase&lt;T&gt;"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		protected ListBase()
 		{
 			this.items = new List<T>();
@@ -69,6 +74,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 获取 <see cref="ListBase&lt;T&gt;"/> 周围的 <see cref="IList&lt;T&gt;"/> 包装。
 		/// </summary>
+		/// <value><see cref="ListBase&lt;T&gt;"/> 周围的 <see cref="IList&lt;T&gt;"/> 包装。</value>
 		protected IList<T> Items
 		{
 			get { return items; }

@@ -58,6 +58,11 @@ namespace Cyjb.Text
 		/// <param name="idx">符号索引。</param>
 		/// <param name="text">文本。</param>
 		/// <param name="start">起始位置。</param>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="Token"/> 结构的新实例。
+		/// </summary>
+		/// </overloads>
 		public Token(int idx, string text, SourceLocation start)
 		{
 			this.index = idx;
@@ -108,22 +113,27 @@ namespace Cyjb.Text
 		/// <summary>
 		/// 获取词法单元的符号索引。
 		/// </summary>
+		/// <value>词法单元的符号索引。</value>
 		public int Index { get { return index; } }
 		/// <summary>
 		/// 获取词法单元的文本。
 		/// </summary>
+		/// <value>词法单元的文本。</value>
 		public string Text { get { return text; } }
 		/// <summary>
 		/// 获取词法单元的起始位置。
 		/// </summary>
+		/// <value>词法单元的起始位置。</value>
 		public SourceLocation Start { get { return start; } }
 		/// <summary>
 		/// 获取词法单元的结束位置。
 		/// </summary>
+		/// <value>词法单元的结束位置。</value>
 		public SourceLocation End { get { return end; } }
 		/// <summary>
 		/// 获取词法单元的值。
 		/// </summary>
+		/// <value>词法单元的值。</value>
 		public object Value { get { return value; } }
 
 		#region IEquatable<Token> 成员
@@ -132,7 +142,13 @@ namespace Cyjb.Text
 		/// 指示当前对象是否等于同一类型的另一个对象。
 		/// </summary>
 		/// <param name="other">与此对象进行比较的对象。</param>
-		/// <returns>如果当前对象等于 <paramref name="other"/> 参数，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <returns>如果当前对象等于 <paramref name="other"/> 参数，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 指示当前对象是否等于另一个对象。
+		/// </summary>
+		/// </overloads>
 		public bool Equals(Token other)
 		{
 			if (this.index != other.index)
@@ -158,7 +174,8 @@ namespace Cyjb.Text
 		/// 确定指定的 <see cref="System.Object"/> 是否等于当前的 <see cref="Token"/>。
 		/// </summary>
 		/// <param name="obj">与当前的 <see cref="Token"/> 进行比较的 <see cref="System.Object"/>。</param>
-		/// <returns>如果指定的 <see cref="System.Object"/> 等于当前的 <see cref="Token"/>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <returns>如果指定的 <see cref="System.Object"/> 等于当前的 <see cref="Token"/>，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is Token))
@@ -199,7 +216,8 @@ namespace Cyjb.Text
 		/// </summary>
 		/// <param name="obj1">要比较的第一个 <see cref="Token"/> 对象。</param>
 		/// <param name="obj2">要比较的第二个 <see cref="Token"/> 对象。</param>
-		/// <returns>如果两个 <see cref="Token"/> 对象相同，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <returns>如果两个 <see cref="Token"/> 对象相同，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
 		public static bool operator ==(Token obj1, Token obj2)
 		{
 			if (object.ReferenceEquals(obj1, obj2))
@@ -218,7 +236,8 @@ namespace Cyjb.Text
 		/// </summary>
 		/// <param name="obj1">要比较的第一个 <see cref="Token"/> 对象。</param>
 		/// <param name="obj2">要比较的第二个 <see cref="Token"/> 对象。</param>
-		/// <returns>如果两个 <see cref="Token"/> 对象不同，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <returns>如果两个 <see cref="Token"/> 对象不同，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
 		public static bool operator !=(Token obj1, Token obj2)
 		{
 			return !(obj1 == obj2);

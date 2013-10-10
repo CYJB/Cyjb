@@ -33,6 +33,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 初始化 <see cref="SetBase&lt;T&gt;"/> 类的新实例。
 		/// </summary>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="SetBase&lt;T&gt;"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		protected SetBase()
 		{
 			this.items = new HashSet<T>();
@@ -71,6 +76,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 获取 <see cref="SetBase&lt;T&gt;"/> 周围的 <see cref="ISet&lt;T&gt;"/> 包装。
 		/// </summary>
+		/// <value><see cref="SetBase&lt;T&gt;"/> 周围的 <see cref="ISet&lt;T&gt;"/> 包装。</value>
 		protected ISet<T> Items
 		{
 			get { return items; }

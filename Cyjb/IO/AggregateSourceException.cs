@@ -25,6 +25,11 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 初始化 <see cref="AggregateSourceException"/> 类的新实例。
 		/// </summary>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="AggregateSourceException"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		public AggregateSourceException()
 			: base()
 		{ }

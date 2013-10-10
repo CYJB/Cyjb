@@ -10,6 +10,15 @@ namespace Cyjb.Collections
 	/// 管理位值的压缩列表，该值表示为布尔值，其中 <c>true</c> 表示位是打开的 (1)，
 	/// <c>false</c> 表示位是关闭的 (0)。
 	/// </summary>
+	/// <remarks>
+	/// <para><see cref="BitList"/> 类采用位示图来保存布尔值，关于该数据结构的更多解释，
+	/// 请参见我的博文<see href="http://www.cnblogs.com/cyjb/archive/p/BitList.html">
+	/// 《C# 位压缩列表》</see>。</para>
+	/// <para>由于位操作的复杂性，<see cref="BitList"/> 类的一些方法效率并不高，
+	/// 实际使用时需要做好相应的测试。</para>
+	/// </remarks>
+	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/BitList.html">
+	/// 《C# 位压缩列表》</seealso>
 	[Serializable]
 	public sealed class BitList : ListBase<bool>, ICollection
 	{
@@ -40,6 +49,11 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 初始化 <see cref="Cyjb.Collections.BitList "/> 类的新实例。
 		/// </summary>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="Cyjb.Collections.BitList "/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		public BitList()
 			: this(0)
 		{ }
@@ -160,6 +174,11 @@ namespace Cyjb.Collections
 		/// <see cref="Cyjb.Collections.BitList"/> 的末尾，其中每个整数表示 32 个连续位。</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="collection"/> 为 <c>null</c>。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 将指定集合的元素添加到 <see cref="Cyjb.Collections.BitList"/> 的末尾。
+		/// </summary>
+		/// </overloads>
 		public void AddRange(IEnumerable<uint> collection)
 		{
 			this.InsertRange(this.count, collection);
@@ -232,6 +251,11 @@ namespace Cyjb.Collections
 		/// <paramref name="index"/> 小于 <c>0</c>。</exception>
 		/// <exception cref="System.ArgumentOutOfRangeException">
 		/// <paramref name="index"/> 大于 <see cref="Count"/>。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 将指定集合中的元素插入 <see cref="Cyjb.Collections.BitList"/> 的指定索引处。
+		/// </summary>
+		/// </overloads>
 		public void InsertRange(int index, IEnumerable<int> collection)
 		{
 			ExceptionHelper.CheckArgumentNull(collection, "collection");

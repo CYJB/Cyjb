@@ -36,16 +36,19 @@ namespace Cyjb.IO
 			this.col = col;
 		}
 		/// <summary>
-		/// 获取所在的行，从 <c>1</c> 开始。
+		/// 获取所在的行。
 		/// </summary>
+		/// <value>表示当前位置所在行的整数，从 <c>1</c> 开始。</value>
 		public int Line { get { return this.line; } }
 		/// <summary>
-		/// 获取所在的列，从 <c>1</c> 开始。
+		/// 获取所在的列。
 		/// </summary>
+		/// <value>表示当前位置所在列的整数，从 <c>1</c> 开始。</value>
 		public int Col { get { return this.col; } }
 		/// <summary>
-		/// 获取从零开始的索引。
+		/// 获取索引。
 		/// </summary>
+		/// <value>表示当前位置从起始位置从零开始的索引。</value>
 		public int Index { get { return this.index; } }
 
 		#region IComparable<SourceLocation> 成员
@@ -55,6 +58,7 @@ namespace Cyjb.IO
 		/// </summary>
 		/// <param name="other">与此对象进行比较的对象。</param>
 		/// <returns>一个值，指示要比较的对象的相对顺序。</returns>
+		/// <remarks>首先按行比较，其次按列比较，最后考虑索引的值。</remarks>
 		public int CompareTo(SourceLocation other)
 		{
 			int tmp = this.line - other.line;
@@ -62,7 +66,12 @@ namespace Cyjb.IO
 			{
 				return tmp;
 			}
-			return this.col - other.col;
+			tmp = this.col - other.col;
+			if (tmp != 0)
+			{
+				return tmp;
+			}
+			return this.index - other.index;
 		}
 
 		#endregion // IComparable<SourceLocation> 成员
@@ -73,7 +82,13 @@ namespace Cyjb.IO
 		/// 指示当前对象是否等于同一类型的另一个对象。
 		/// </summary>
 		/// <param name="other">与此对象进行比较的对象。</param>
-		/// <returns>如果当前对象等于 <paramref name="other"/> 参数，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <returns>如果当前对象等于 <paramref name="other"/> 参数，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 指示当前对象是否等于另一个对象。
+		/// </summary>
+		/// </overloads>
 		public bool Equals(SourceLocation other)
 		{
 			if (index != other.index)
@@ -95,7 +110,8 @@ namespace Cyjb.IO
 		/// 确定指定的 <see cref="System.Object"/> 是否等于当前的 <see cref="SourceLocation"/>。
 		/// </summary>
 		/// <param name="obj">与当前的 <see cref="SourceLocation"/> 进行比较的 <see cref="System.Object"/>。</param>
-		/// <returns>如果指定的 <see cref="System.Object"/> 等于当前的 <see cref="SourceLocation"/>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <returns>如果指定的 <see cref="System.Object"/> 等于当前的 <see cref="SourceLocation"/>，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is SourceLocation))
@@ -134,7 +150,8 @@ namespace Cyjb.IO
 		/// </summary>
 		/// <param name="obj1">要比较的第一个 <see cref="SourceLocation"/> 对象。</param>
 		/// <param name="obj2">要比较的第二个 <see cref="SourceLocation"/> 对象。</param>
-		/// <returns>如果两个 <see cref="SourceLocation"/> 对象相同，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <returns>如果两个 <see cref="SourceLocation"/> 对象相同，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
 		public static bool operator ==(SourceLocation obj1, SourceLocation obj2)
 		{
 			if (object.ReferenceEquals(obj1, obj2))
@@ -153,7 +170,8 @@ namespace Cyjb.IO
 		/// </summary>
 		/// <param name="obj1">要比较的第一个 <see cref="SourceLocation"/> 对象。</param>
 		/// <param name="obj2">要比较的第二个 <see cref="SourceLocation"/> 对象。</param>
-		/// <returns>如果两个 <see cref="SourceLocation"/> 对象不同，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <returns>如果两个 <see cref="SourceLocation"/> 对象不同，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
 		public static bool operator !=(SourceLocation obj1, SourceLocation obj2)
 		{
 			return !(obj1 == obj2);
