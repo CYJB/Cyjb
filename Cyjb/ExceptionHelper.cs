@@ -228,6 +228,11 @@ namespace Cyjb
 		/// <param name="paramName">要检查的参数名。</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="value"/> 为 <c>null</c>。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 检查参数是否为 <c>null</c>，如果为 <c>null</c> 则抛出异常。
+		/// </summary>
+		/// </overloads>
 		public static void CheckArgumentNull(object value, string paramName)
 		{
 			if (value == null)
@@ -279,6 +284,11 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">超出范围的参数名称。</param>
 		/// <returns><see cref="System.ArgumentOutOfRangeException"/> 对象。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回参数超出范围的异常。
+		/// </summary>
+		/// </overloads>
 		public static ArgumentOutOfRangeException ArgumentOutOfRange(string paramName)
 		{
 			return GetArgumentOutOfRangeException(paramName, "ArgumentOutOfRange");
@@ -354,6 +364,11 @@ namespace Cyjb
 		/// 返回数组类型与集合项类型不兼容的异常。
 		/// </summary>
 		/// <returns><see cref="System.ArrayTypeMismatchException"/> 对象。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回数组类型与集合项类型不兼容的异常。
+		/// </summary>
+		/// </overloads>
 		public static ArrayTypeMismatchException ArrayTypeInvalid()
 		{
 			return new ArrayTypeMismatchException(ExceptionResources.GetString("ArrayTypeInvalid"));
@@ -448,6 +463,11 @@ namespace Cyjb
 		/// <param name="value">无效的值。</param>
 		/// <param name="type">要转换到的类型。</param>
 		/// <returns><see cref="System.InvalidCastException"/> 对象。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回转换无效的异常。
+		/// </summary>
+		/// </overloads>
 		public static InvalidCastException ConvertInvalidValue(object value, Type type)
 		{
 			return GetInvalidCast("ConvertInvalidValue", value, type);

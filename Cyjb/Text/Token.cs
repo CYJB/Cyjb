@@ -17,6 +17,11 @@ namespace Cyjb.Text
 		/// </summary>
 		/// <param name="loc">文件结束的位置。</param>
 		/// <returns>表示文件结束的词法单元。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回表示文件结束的词法单元。
+		/// </summary>
+		/// </overloads>
 		public static Token GetEndOfFile(SourceLocation loc)
 		{
 			return new Token(EndOfFileIndex, string.Empty, loc);

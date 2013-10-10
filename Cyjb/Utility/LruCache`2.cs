@@ -166,6 +166,7 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
 		/// </summary>
+		/// <typeparam name="TArg">参数的类型。</typeparam>
 		/// <param name="key">要获取的对象的键。</param>
 		/// <param name="arg">用于生成新对象的参数。</param>
 		/// <param name="valueFactory">用于根据键和参数生成新对象的函数。</param>
@@ -190,6 +191,8 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
 		/// </summary>
+		/// <typeparam name="TArg0">第一个参数的类型。</typeparam>
+		/// <typeparam name="TArg1">第二个参数的类型。</typeparam>
 		/// <param name="key">要获取的对象的键。</param>
 		/// <param name="arg0">用于生成新对象的第一个参数。</param>
 		/// <param name="arg1">用于生成新对象的第二个参数。</param>

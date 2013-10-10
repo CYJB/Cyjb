@@ -931,6 +931,11 @@ namespace Cyjb
 		/// <paramref name="startIndex"/> 大于数组的长度。</exception>
 		/// <exception cref="System.ArgumentOutOfRangeException">
 		/// <paramref name="startIndex"/> 小于负的数组的长度。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 从当前数组的指定索引开始截取一部分。
+		/// </summary>
+		/// </overloads>
 		public static T[] Subarray<T>(this T[] array, int startIndex)
 		{
 			if (array == null || startIndex == array.Length)
@@ -987,6 +992,11 @@ namespace Cyjb
 		/// <returns>截取得到的数组。如果 <paramref name="startIndex"/> 等于数组的长度，则为空数组。</returns>
 		/// <exception cref="System.ArgumentOutOfRangeException">
 		/// <paramref name="startIndex"/> 指示的位置不在此数组中。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 从当前数组的指定索引开始截取一部分。
+		/// </summary>
+		/// </overloads>
 		public static T[] Slice<T>(this T[] array, int startIndex)
 		{
 			if (array == null || startIndex == array.Length)

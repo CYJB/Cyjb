@@ -8,8 +8,30 @@ namespace Cyjb.Collections
 	/// 该集合还允许使用索引访问堆栈中的元素。
 	/// </summary>
 	/// <typeparam name="T">指定堆栈中的元素的类型。</typeparam>
+	/// <seealso cref="System.Collections.Generic.Stack&lt;T&gt;"/>
 	public sealed class ListStack<T> : Stack<T>
 	{
+		/// <summary>
+		/// 初始化 <see cref="ListStack&lt;T&gt;"/> 类的新实例，该实例为空并且具有默认初始容量。
+		/// </summary>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="ListStack&lt;T&gt;"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
+		public ListStack() { }
+		/// <summary>
+		/// 初始化 <see cref="ListStack&lt;T&gt;"/> 类的新实例，
+		/// 该实例包含从指定集合复制的元素并且具有足够的容量来容纳所复制的元素。
+		/// </summary>
+		/// <param name="collection">从其中复制元素的集合。</param>
+		public ListStack(IEnumerable<T> collection) : base(collection) { }
+		/// <summary>
+		/// 初始化 <see cref="ListStack&lt;T&gt;"/> 类的新实例，
+		/// 该实例为空并且具有指定的初始容量或默认初始容量（这两个容量中的较大者）。
+		/// </summary>
+		/// <param name="capacity"><see cref="ListStack&lt;T&gt;"/> 可包含的初始元素数。</param>
+		public ListStack(int capacity) : base(capacity) { }
 		/// <summary>
 		/// 获取 Stack&lt;T&gt; 实例的 _array 字段。
 		/// </summary>

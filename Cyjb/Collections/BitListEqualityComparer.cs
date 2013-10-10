@@ -12,8 +12,9 @@ namespace Cyjb.Collections
 		/// </summary>
 		private static BitListEqualityComparer defaultValue;
 		/// <summary>
-		/// 返回一个默认的相等比较器。。
+		/// 返回一个默认的相等比较器。
 		/// </summary>
+		/// <value>默认的 <see cref="BitListEqualityComparer"/> 对象实例。</value>
 		public new static BitListEqualityComparer Default
 		{
 			get
@@ -40,6 +41,11 @@ namespace Cyjb.Collections
 		/// <param name="y">要比较的第二个 
 		/// <see cref="System.Collections.Generic.IList&lt;T&gt;"/> 的对象。</param>
 		/// <returns>如果指定的对象相等，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 确定指定的对象是否相等。
+		/// </summary>
+		/// </overloads>
 		public override bool Equals(BitList x, BitList y)
 		{
 			if (x == null)
@@ -63,6 +69,11 @@ namespace Cyjb.Collections
 		/// <returns>指定对象的哈希代码。</returns>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="obj"/> 为 <c>null</c>。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 返回指定对象的哈希代码。
+		/// </summary>
+		/// </overloads>
 		public override int GetHashCode(BitList obj)
 		{
 			ExceptionHelper.CheckArgumentNull(obj, "obj");

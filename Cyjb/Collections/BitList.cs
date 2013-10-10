@@ -819,6 +819,7 @@ namespace Cyjb.Collections
 		/// 以便将设置为 <c>true</c> 的元素更改为 <c>false</c>；
 		/// 将设置为 <c>false</c> 的元素更改为 <c>true</c>。
 		/// </summary>
+		/// <returns>当前 <see cref="BitList"/> 对象。</returns>
 		public BitList Not()
 		{
 			int cnt = this.count >> IndexShift;
@@ -834,6 +835,7 @@ namespace Cyjb.Collections
 		/// </summary>
 		/// <param name="offset">要左移的位数，
 		/// 实际的移位数会对 <see cref="BitList.Count"/> 取模。</param>
+		/// <returns>当前 <see cref="BitList"/> 对象。</returns>
 		public BitList LeftShift(int offset)
 		{
 			if (this.count > 0)
@@ -851,6 +853,7 @@ namespace Cyjb.Collections
 		/// </summary>
 		/// <param name="offset">要左移的位数，
 		/// 实际的移位数会对 <see cref="BitList.Count"/> 取模。</param>
+		/// <returns>当前 <see cref="BitList"/> 对象。</returns>
 		public BitList RightShift(int offset)
 		{
 			if (this.count > 0)

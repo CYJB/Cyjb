@@ -143,6 +143,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		/// <param name="key">要获取的元素的键。</param>
 		/// <returns>带有指定键的元素。如果未找到具有指定键的元素，则引发异常。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 获取指定的元素。
+		/// </summary>
+		/// </overloads>
 		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods")]
 		public TItem this[TKey key]
 		{
@@ -170,6 +175,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// <param name="key">要定位的元素的键。</param>
 		/// <returns>如果在 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 
 		/// 中找到具有指定键的元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 确定特定元素是否在 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中。
+		/// </summary>
+		/// </overloads>
 		public bool Contains(TKey key)
 		{
 			if (this.dict != null)
@@ -192,6 +202,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// <param name="key">要在 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中定位的元素的键。</param>
 		/// <returns>如果在 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中找到 <paramref name="key"/>，
 		/// 则为该项的索引；否则为 <c>-1</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 确定 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中特定元素的索引。
+		/// </summary>
+		/// </overloads>
 		public int IndexOf(TKey key)
 		{
 			if (this.dict != null)
@@ -220,6 +235,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// <returns>如果已从 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中成功移除元素，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。如果在原始 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 
 		/// 中没有找到指定的键，该方法也会返回 <c>false</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 从 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中移除特定元素。
+		/// </summary>
+		/// </overloads>
 		public bool Remove(TKey key)
 		{
 			int index = IndexOf(key);

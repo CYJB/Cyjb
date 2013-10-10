@@ -24,6 +24,11 @@ namespace Cyjb.Configurations
 		/// </summary>
 		/// <param name="index">要获取或设置的元素从零开始的索引。</param>
 		/// <value>指定索引处的元素。</value>
+		/// <overloads>
+		/// <summary>
+		/// 获取或设置此 <see cref="ConfigurationElementCollection&lt;T&gt;"/> 对象的属性、特性或子元素。
+		/// </summary>
+		/// </overloads>
 		public TElement this[int index]
 		{
 			get { return base.BaseGet(index) as TElement; }
@@ -280,6 +285,12 @@ namespace Cyjb.Configurations
 		/// <exception cref="System.ArgumentException">源 
 		/// <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中的元素数目大于从 
 		/// <paramref name="arrayIndex"/> 到目标 <paramref name="array"/> 末尾之间的可用空间。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 将 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 的元素复制到一个 
+		/// <see cref="System.Array"/> 中。
+		/// </summary>
+		/// </overloads>
 		public void CopyTo(TElement[] array, int arrayIndex)
 		{
 			base.CopyTo(array, arrayIndex);

@@ -133,9 +133,9 @@ namespace Cyjb.Collections
 		}
 		/// <summary>
 		/// 使用默认的比较器，在整个排序 <see cref="System.Collections.Generic.IList&lt;T&gt;"/> 中搜索特定元素。
+		/// </summary>
 		/// <typeparam name="TElement">列表元素的类型。</typeparam>
 		/// <typeparam name="TKey">要查找的键的类型。</typeparam>
-		/// </summary>
 		/// <param name="list">要搜索的从零开始的排序 
 		/// <see cref="System.Collections.Generic.IList&lt;T&gt;"/>。</param>
 		/// <param name="value">要搜索的键值。</param>

@@ -70,6 +70,7 @@ namespace Cyjb
 		/// <summary>
 		/// 返回将指定值重复多次的序列。
 		/// </summary>
+		/// <typeparam name="T">要重复的值的类型。</typeparam>
 		/// <param name="source">要重复的次数。只有大于 <c>0</c> 时才有效。</param>
 		/// <param name="value">要重复的值。</param>
 		/// <returns>将指定值重复多次的序列。</returns>
@@ -83,6 +84,7 @@ namespace Cyjb
 		/// <summary>
 		/// 返回将指定函数的返回值重复多次的序列。
 		/// </summary>
+		/// <typeparam name="T">要重复的值的类型。</typeparam>
 		/// <param name="source">要重复的次数。只有大于 <c>0</c> 时才有效。</param>
 		/// <param name="value">返回要重复的值的函数。</param>
 		/// <returns>将指定函数的返回值重复多次的序列。</returns>
@@ -97,6 +99,7 @@ namespace Cyjb
 		/// <summary>
 		/// 返回将指定函数的返回值重复多次的序列。
 		/// </summary>
+		/// <typeparam name="T">要重复的值的类型。</typeparam>
 		/// <param name="source">要重复的次数。只有大于 <c>0</c> 时才有效。</param>
 		/// <param name="value">返回要重复的值的函数，参数为已执行的次数。</param>
 		/// <returns>将指定函数的返回值重复多次的序列。</returns>
@@ -262,6 +265,7 @@ namespace Cyjb
 		/// <summary>
 		/// 返回将指定值重复多次的序列。
 		/// </summary>
+		/// <typeparam name="T">要重复的值的类型。</typeparam>
 		/// <param name="source">要重复的次数。只有大于<c>0</c>时才有效。</param>
 		/// <param name="value">要重复的值。</param>
 		/// <returns>将指定值重复多次的序列。</returns>
@@ -275,6 +279,7 @@ namespace Cyjb
 		/// <summary>
 		/// 返回将指定函数的返回值重复多次的序列。
 		/// </summary>
+		/// <typeparam name="T">要重复的值的类型。</typeparam>
 		/// <param name="source">要重复的次数。只有大于<c>0</c>时才有效。</param>
 		/// <param name="value">返回要重复的值的函数。</param>
 		/// <returns>将指定函数的返回值重复多次的序列。</returns>
@@ -289,6 +294,7 @@ namespace Cyjb
 		/// <summary>
 		/// 返回将指定函数的返回值重复多次的序列。
 		/// </summary>
+		/// <typeparam name="T">要重复的值的类型。</typeparam>
 		/// <param name="source">要重复的次数。只有大于<c>0</c>时才有效。</param>
 		/// <param name="value">返回要重复的值的函数，参数为当前执行的次数。</param>
 		/// <returns>将指定函数的返回值重复多次的序列。</returns>
@@ -417,6 +423,7 @@ namespace Cyjb
 		/// <summary>
 		/// 返回将指定值重复多次的序列。
 		/// </summary>
+		/// <typeparam name="T">要重复的值的类型。</typeparam>
 		/// <param name="source">要重复的次数。</param>
 		/// <param name="value">要重复的值。</param>
 		/// <returns>将指定值重复多次的序列。</returns>
@@ -431,6 +438,7 @@ namespace Cyjb
 		/// <summary>
 		/// 返回将指定函数的返回值重复多次的序列。
 		/// </summary>
+		/// <typeparam name="T">要重复的值的类型。</typeparam>
 		/// <param name="source">要重复的次数。</param>
 		/// <param name="value">返回要重复的值的函数。</param>
 		/// <returns>将指定函数的返回值重复多次的序列。</returns>
@@ -446,6 +454,7 @@ namespace Cyjb
 		/// <summary>
 		/// 返回将指定函数的返回值重复多次的序列。
 		/// </summary>
+		/// <typeparam name="T">要重复的值的类型。</typeparam>
 		/// <param name="source">要重复的次数。</param>
 		/// <param name="value">返回要重复的值的函数，参数为当前执行的次数。</param>
 		/// <returns>将指定函数的返回值重复多次的序列。</returns>
@@ -599,6 +608,7 @@ namespace Cyjb
 		/// <summary>
 		/// 返回将指定值重复多次的序列。
 		/// </summary>
+		/// <typeparam name="T">要重复的值的类型。</typeparam>
 		/// <param name="source">要重复的次数。</param>
 		/// <param name="value">要重复的值。</param>
 		/// <returns>将指定值重复多次的序列。</returns>
@@ -613,6 +623,7 @@ namespace Cyjb
 		/// <summary>
 		/// 返回将指定函数的返回值重复多次的序列。
 		/// </summary>
+		/// <typeparam name="T">要重复的值的类型。</typeparam>
 		/// <param name="source">要重复的次数。</param>
 		/// <param name="value">返回要重复的值的函数。</param>
 		/// <returns>将指定函数的返回值重复多次的序列。</returns>
@@ -628,6 +639,7 @@ namespace Cyjb
 		/// <summary>
 		/// 返回将指定函数的返回值重复多次的序列。
 		/// </summary>
+		/// <typeparam name="T">要重复的值的类型。</typeparam>
 		/// <param name="source">要重复的次数。</param>
 		/// <param name="value">返回要重复的值的函数，参数为当前执行的次数。</param>
 		/// <returns>将指定函数的返回值重复多次的序列。</returns>

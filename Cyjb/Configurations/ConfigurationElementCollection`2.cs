@@ -19,6 +19,11 @@ namespace Cyjb.Configurations
 		/// </summary>
 		/// <param name="key">要移除的 <see cref="System.Configuration.ConfigurationElement"/> 
 		/// 对象的键。</param>
+		/// <overloads>
+		/// <summary>
+		/// 从集合中移除 <see cref="System.Configuration.ConfigurationElement"/> 对象。
+		/// </summary>
+		/// </overloads>
 		public void Remove(TKey key)
 		{
 			base.BaseRemove(key);
@@ -28,6 +33,11 @@ namespace Cyjb.Configurations
 		/// </summary>
 		/// <param name="key">集合中包含的子配置元素的键。</param>
 		/// <returns>子配置元素，如果不存在则返回 <c>null</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 获取或设置此 <see cref="ConfigurationElementCollection&lt;T&gt;"/> 对象的属性、特性或子元素。
+		/// </summary>
+		/// </overloads>
 		public TElement this[TKey key]
 		{
 			get { return base.BaseGet(key as object) as TElement; }

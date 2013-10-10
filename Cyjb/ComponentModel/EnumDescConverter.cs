@@ -26,6 +26,11 @@ namespace Cyjb.ComponentModel
 		/// 如果未提供区域性设置，则使用当前区域性。</param>
 		/// <param name="value">要转换的 <see cref="System.Object"/>。</param>
 		/// <returns>表示转换的 <paramref name="value"/> 的 <see cref="System.Object"/>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 将给定值转换为此转换器的类型。
+		/// </summary>
+		/// </overloads>
 		public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
 		{
 			string strValue = value as string;
@@ -45,6 +50,11 @@ namespace Cyjb.ComponentModel
 		/// <param name="value">要转换的 <see cref="System.Object"/>。</param>
 		/// <param name="destinationType">要将值转换成的 <see cref="System.Type"/>。</param>
 		/// <returns>表示转换的 <paramref name="value"/> 的 <see cref="System.Object"/>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 将给定值对象转换为指定的类型。
+		/// </summary>
+		/// </overloads>
 		public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture,
 			object value, Type destinationType)
 		{

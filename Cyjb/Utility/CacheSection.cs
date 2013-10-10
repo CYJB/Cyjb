@@ -10,6 +10,10 @@ namespace Cyjb.Utility
 	public sealed class CacheSection : ConfigurationSection
 	{
 		/// <summary>
+		/// 初始化 <see cref="CacheSection"/> 类的新实例。
+		/// </summary>
+		public CacheSection() { }
+		/// <summary>
 		/// 获取缓存配置。
 		/// </summary>
 		/// <value>缓存配置。</value>

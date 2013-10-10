@@ -23,6 +23,11 @@ namespace Cyjb
 		/// <param name="ch">要计算的 Unicode 字符。</param>
 		/// <returns>如果 <paramref name="ch"/> 是十进制数字，则为 <c>true</c>；
 		/// 否则，为 <c>false</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 指示指定的 Unicode 字符是否属于十六进制数字类别。
+		/// </summary>
+		/// </overloads>
 		public static bool IsHex(this char ch)
 		{
 			if (ch <= 'f')

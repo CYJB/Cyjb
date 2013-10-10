@@ -149,6 +149,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// 否则，将返回 <paramref name="key"/> 参数的类型的默认值。该参数未经初始化即被传递。</param>
 		/// <returns>如果 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 对象包含具有指定键的元素，
 		/// 则为 <c>true</c>；否则，为 <c>false</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 获取与指定的键相关联的值。
+		/// </summary>
+		/// </overloads>
 		protected virtual bool TryGetValue(TKey key, bool queryValue, out TValue value)
 		{
 			return this.items.TryGetValue(key, out value);
@@ -233,7 +238,7 @@ namespace Cyjb.Collections.ObjectModel
 		}
 
 		/// <summary>
-		/// 在 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 中添加一个带有所提供的键和值的元素。
+		/// 向 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 中添加一个带有所提供的键和值的元素。
 		/// </summary>
 		/// <param name="key">用作要添加的元素的键的对象。</param>
 		/// <param name="value">用作要添加的元素的值的对象。</param>
@@ -241,6 +246,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// 对象中已存在具有相同键的元素。</exception>
 		/// <exception cref="System.NotSupportedException"><see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 
 		/// 是只读的。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 向 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 中添加一个带有所提供的键和值的元素。
+		/// </summary>
+		/// </overloads>
 		public void Add(TKey key, TValue value)
 		{
 			if (this.isReadOnly)
@@ -271,6 +281,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// 此方法则返回 <c>false</c>。</returns>
 		/// <exception cref="System.NotSupportedException">
 		/// <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 是只读的。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 从 <see cref="DictionaryBase&lt;TKey,TValue&gt;"/> 中移除指定的值。
+		/// </summary>
+		/// </overloads>
 		public bool Remove(TKey key)
 		{
 			if (this.isReadOnly)

@@ -190,6 +190,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// <returns>如果已从 <see cref="KeyedCollectionBase&lt;TKey,TItem&gt;"/> 中成功移除元素，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。如果在原始 <see cref="KeyedCollectionBase&lt;TKey,TItem&gt;"/> 
 		/// 中没有找到指定的键，该方法也会返回 <c>false</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 从 <see cref="KeyedCollectionBase&lt;TKey,TItem&gt;"/> 中移除特定元素。
+		/// </summary>
+		/// </overloads>
 		public bool Remove(TKey key)
 		{
 			if (this.dict != null)
@@ -290,6 +295,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// 移除 <see cref="KeyedCollectionBase&lt;TKey,TItem&gt;"/> 的指定元素。
 		/// </summary>
 		/// <param name="item">要移除的元素。</param>
+		/// <returns>如果成功移除了元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		protected override bool RemoveItem(TItem item)
 		{
 			this.RemoveKey(this.GetKeyForItem(item));
@@ -306,6 +312,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// <param name="item">要在 <see cref="KeyedCollectionBase&lt;TKey,TItem&gt;"/> 中定位的对象。</param>
 		/// <returns>如果在 <see cref="KeyedCollectionBase&lt;TKey,TItem&gt;"/> 中找到 <paramref name="item"/>，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 确定 <see cref="KeyedCollectionBase&lt;TKey,TItem&gt;"/> 是否包含特定值。
+		/// </summary>
+		/// </overloads>
 		public override bool Contains(TItem item)
 		{
 			ExceptionHelper.CheckArgumentNull(item, "item");

@@ -12,14 +12,19 @@ namespace Cyjb
 		/// </summary>
 		private static Random random = new Random();
 		/// <summary>
-		/// 更新种子值为与时间相关的值。
+		/// 更新随机数的种子值为与时间相关的值。
 		/// </summary>
+		/// <overloads>
+		/// <summary>
+		/// 更新随机数的种子值。
+		/// </summary>
+		/// </overloads>
 		public static void UpdateSeed()
 		{
 			random = new Random();
 		}
 		/// <summary>
-		/// 更新种子值为与指定的值。
+		/// 更新随机数的种子值为与指定的值。
 		/// </summary>
 		/// <param name="seed">用来计算伪随机数序列起始值的数字。
 		/// 如果指定的是负数，则使用其绝对值。</param>

@@ -10,11 +10,20 @@ namespace Cyjb
 	public class TextValuePairCollection : BindingList<TextValuePair>
 	{
 		/// <summary>
+		/// 初始化 <see cref="TextValuePairCollection"/> 类的新实例。
+		/// </summary>
+		public TextValuePairCollection() { }
+		/// <summary>
 		/// 返回指定文本在集合中的索引。
 		/// </summary>
 		/// <param name="text">要获取索引的文本。</param>
 		/// <returns>指定文本在集合中的索引，如果在集合中不存在，则返回 
 		/// <c>-1</c>。 </returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回指定元素在集合中的索引。
+		/// </summary>
+		/// </overloads>
 		public int IndexOf(string text)
 		{
 			for (int i = 0; i < Items.Count; i++)
@@ -31,6 +40,11 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="text">要添加的文本。</param>
 		/// <param name="value">要添加的值。</param>
+		/// <overloads>
+		/// <summary>
+		/// 将指定的文本和值添加到集合中。
+		/// </summary>
+		/// </overloads>
 		public void Add(string text, object value)
 		{
 			Add(new TextValuePair(text, value));

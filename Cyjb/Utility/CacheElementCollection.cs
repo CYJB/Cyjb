@@ -17,6 +17,11 @@ namespace Cyjb.Utility
 		/// 创建一个新的 <see cref="System.Configuration.ConfigurationElement"/>。
 		/// </summary>
 		/// <returns>新的 <see cref="System.Configuration.ConfigurationElement"/>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 创建一个新的 <see cref="System.Configuration.ConfigurationElement"/>。
+		/// </summary>
+		/// </overloads>
 		protected override ConfigurationElement CreateNewElement()
 		{
 			return new CacheElement();

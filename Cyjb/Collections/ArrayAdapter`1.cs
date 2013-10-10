@@ -79,6 +79,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 获取由数组段分隔的范围中的第一个元素的位置（相对于原始数组的开始位置）。
 		/// </summary>
+		/// <value>由数组段分隔的范围中的第一个元素的位置（相对于原始数组的开始位置）。</value>
 		public int Offset { get { return offset; } }
 
 		#region ListBase<T> 成员
