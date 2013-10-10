@@ -2412,6 +2412,11 @@ namespace Cyjb
 		/// <exception cref="System.MissingMethodException">未找到 <typeparamref name="TDelegate"/>
 		/// 的 <c>Invoke</c> 方法。</exception>
 		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 将指定的委托用指定类型的委托包装，支持对参数进行强制类型转换。
+		/// </summary>
+		/// </overloads>
 		public static TDelegate Wrap<TDelegate>(this Delegate dlg)
 			where TDelegate : class
 		{
@@ -2433,9 +2438,8 @@ namespace Cyjb
 		{
 			ExceptionHelper.CheckArgumentNull(dlg, "dlg");
 			CheckDelegateType(type, "type");
-			MethodInfo invoke = dlg.GetType().GetMethod("Invoke");
+			ParameterInfo[] paramInfos = dlg.GetType().GetMethod("Invoke").GetParameters();
 			MethodInfo targetInvoke = type.GetMethod("Invoke");
-			ParameterInfo[] paramInfos = invoke.GetParameters();
 			ParameterInfo[] targetParamInfos = targetInvoke.GetParameters();
 			if (paramInfos.Length != targetParamInfos.Length)
 			{
