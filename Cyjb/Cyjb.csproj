@@ -68,6 +68,7 @@
     <Compile Include="DelegateBuilder.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ExpressionHelper.cs" />
     <Compile Include="IO\AggregateSourceException.cs" />
     <Compile Include="IO\DirectoryExt.cs" />
     <Compile Include="IO\DriectoryInfoExt.cs" />
@@ -78,6 +79,8 @@
     <Compile Include="IO\SourceLocator.cs" />
     <Compile Include="IO\SourceReader.cs" />
     <Compile Include="MethodExt.cs" />
+    <Compile Include="MethodSwitcher.cs" />
+    <Compile Include="MethodSwitcherManual`1.cs" />
     <Compile Include="PowerBinder.cs" />
     <Compile Include="CharExt.cs" />
     <Compile Include="Collections\ArrayAdapter`1.cs" />
@@ -92,6 +95,7 @@
     <Compile Include="EnumExt.cs" />
     <Compile Include="IntegerExt.cs" />
     <Compile Include="RandomExt.cs" />
+    <Compile Include="ProcessorAttribute.cs" />
     <Compile Include="Text\Token.cs" />
     <Compile Include="TypeExt.cs" />
     <Compile Include="UniqueValue`1.cs" />

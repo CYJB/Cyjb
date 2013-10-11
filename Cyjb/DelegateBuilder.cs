@@ -159,7 +159,7 @@ namespace Cyjb
 		public static Delegate CreateDelegate(Type type, MethodInfo method, bool throwOnBindFailure)
 		{
 			ExceptionHelper.CheckArgumentNull(method, "method");
-			CheckDelegateType(type, "type");
+			ExceptionHelper.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			Delegate dlg = CreateOpenDelegate(type, invoke, invoke.GetParameters(), method, method.GetParameters());
 			if (dlg == null && throwOnBindFailure)
@@ -196,13 +196,12 @@ namespace Cyjb
 			for (int i = 0; i < methodParams.Length; i++)
 			{
 				// (Ti)parameters[i]
-				paramExps[i] = ConvertType(
-					Expression.ArrayIndex(parametersParam, Expression.Constant(i)),
-					methodParams[i].ParameterType);
+				paramExps[i] = Expression.ArrayIndex(parametersParam, Expression.Constant(i))
+					.ConvertType(methodParams[i].ParameterType);
 			}
 			// 静态方法不需要实例，实例方法需要 (TInstance)instance
 			Expression instanceCast = method.IsStatic ? null :
-				ConvertType(instanceParam, method.DeclaringType);
+				instanceParam.ConvertType(method.DeclaringType);
 			// 调用方法。
 			Expression methodCall = Expression.Call(instanceCast, method, paramExps);
 			// 添加参数数量检测。
@@ -240,7 +239,7 @@ namespace Cyjb
 					methodParams = method.GetParameters();
 				}
 				// 方法的参数列表。
-				ParameterExpression[] paramList = GetParameters(invokeParams);
+				ParameterExpression[] paramList = invokeParams.ToExpressions();
 				// 构造调用参数列表。
 				Expression[] paramExps = GetParameterExpressions(paramList, skipIdx, methodParams, 0);
 				if (paramExps != null)
@@ -249,7 +248,7 @@ namespace Cyjb
 					Expression instance = null;
 					if (skipIdx == 1)
 					{
-						instance = ConvertType(paramList[0], method.DeclaringType);
+						instance = paramList[0].ConvertType(method.DeclaringType);
 						if (instance == null)
 						{
 							return null;
@@ -368,7 +367,7 @@ namespace Cyjb
 		public static Delegate CreateDelegate(Type type, MethodInfo method, object firstArgument, bool throwOnBindFailure)
 		{
 			ExceptionHelper.CheckArgumentNull(method, "method");
-			CheckDelegateType(type, "type");
+			ExceptionHelper.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			ParameterInfo[] invokeParams = invoke.GetParameters();
 			ParameterInfo[] methodParams = method.GetParameters();
@@ -452,7 +451,7 @@ namespace Cyjb
 				if (dlg != null)
 				{
 					// 将由 Delegate 创建的委托进行参数的强制类型转换。
-					ParameterExpression[] paramList = GetParameters(invokeParams);
+					ParameterExpression[] paramList = invokeParams.ToExpressions();
 					Expression[] paramExps = GetParameterExpressions(paramList, 0, methodParams, 0);
 					if (paramExps != null)
 					{
@@ -502,7 +501,7 @@ namespace Cyjb
 					methodParams = method.GetParameters();
 				}
 				// 方法的参数列表。
-				ParameterExpression[] paramList = GetParameters(invokeParams);
+				ParameterExpression[] paramList = invokeParams.ToExpressions();
 				// 构造调用参数列表。
 				Expression[] paramExps = GetParameterExpressions(paramList, 0, methodParams, skipIdx);
 				if (paramExps != null)
@@ -510,7 +509,7 @@ namespace Cyjb
 					Expression instance = null;
 					if (skipIdx == 1)
 					{
-						paramExps[0] = ConvertType(Expression.Constant(firstArgument), methodParams[0].ParameterType);
+						paramExps[0] = Expression.Constant(firstArgument).ConvertType(methodParams[0].ParameterType);
 						if (paramExps[0] == null)
 						{
 							// 不允许进行强制类型转换。
@@ -519,7 +518,7 @@ namespace Cyjb
 					}
 					else
 					{
-						instance = ConvertType(Expression.Constant(firstArgument), method.DeclaringType);
+						instance = Expression.Constant(firstArgument).ConvertType(method.DeclaringType);
 						if (instance == null)
 						{
 							// 不允许进行强制类型转换。
@@ -630,7 +629,7 @@ namespace Cyjb
 		public static Delegate CreateDelegate(Type type, ConstructorInfo ctor, bool throwOnBindFailure)
 		{
 			ExceptionHelper.CheckArgumentNull(ctor, "ctor");
-			CheckDelegateType(type, "type");
+			ExceptionHelper.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			ParameterInfo[] invokeParams = invoke.GetParameters();
 			ParameterInfo[] methodParams = ctor.GetParameters();
@@ -638,7 +637,7 @@ namespace Cyjb
 			if (invokeParams.Length == methodParams.Length)
 			{
 				// 构造函数的参数列表。
-				ParameterExpression[] paramList = GetParameters(invokeParams);
+				ParameterExpression[] paramList = invokeParams.ToExpressions();
 				// 构造调用参数列表。
 				Expression[] paramExps = GetParameterExpressions(paramList, 0, methodParams, 0);
 				if (paramExps != null)
@@ -678,9 +677,8 @@ namespace Cyjb
 			for (int i = 0; i < methodParams.Length; i++)
 			{
 				// (Ti)parameters[i]
-				paramExps[i] = ConvertType(
-					Expression.ArrayIndex(parametersParam, Expression.Constant(i)),
-					methodParams[i].ParameterType);
+				paramExps[i] = Expression.ArrayIndex(parametersParam, Expression.Constant(i))
+					.ConvertType(methodParams[i].ParameterType);
 			}
 			// 新建实例。
 			Expression methodCall = Expression.New(ctor, paramExps);
@@ -791,7 +789,7 @@ namespace Cyjb
 		public static Delegate CreateDelegate(Type type, PropertyInfo property, bool throwOnBindFailure)
 		{
 			ExceptionHelper.CheckArgumentNull(property, "property");
-			CheckDelegateType(type, "type");
+			ExceptionHelper.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			// 判断是获取属性还是设置属性。
 			MethodInfo method = null;
@@ -931,7 +929,7 @@ namespace Cyjb
 			bool throwOnBindFailure)
 		{
 			ExceptionHelper.CheckArgumentNull(property, "property");
-			CheckDelegateType(type, "type");
+			ExceptionHelper.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			// 判断是获取属性还是设置属性。
 			MethodInfo method = null;
@@ -1062,7 +1060,7 @@ namespace Cyjb
 		public static Delegate CreateDelegate(Type type, FieldInfo field, bool throwOnBindFailure)
 		{
 			ExceptionHelper.CheckArgumentNull(field, "field");
-			CheckDelegateType(type, "type");
+			ExceptionHelper.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			Delegate dlg = CreateOpenDelegate(type, field, invoke, invoke.GetParameters());
 			if (dlg == null && throwOnBindFailure)
@@ -1093,12 +1091,12 @@ namespace Cyjb
 			if (invokeParams.Length == paramLen)
 			{
 				// 委托的参数列表。
-				ParameterExpression[] paramList = GetParameters(invokeParams);
+				ParameterExpression[] paramList = invokeParams.ToExpressions();
 				// 访问字段的实例对象。
 				Expression instance = null;
 				if (!field.IsStatic)
 				{
-					instance = ConvertType(paramList[0], field.DeclaringType);
+					instance = paramList[0].ConvertType(field.DeclaringType);
 					if (instance == null)
 					{
 						return null;
@@ -1108,7 +1106,7 @@ namespace Cyjb
 				if (setField)
 				{
 					// 字段的设置值。
-					Expression value = ConvertType(paramList[paramLen - 1], field.FieldType);
+					Expression value = paramList[paramLen - 1].ConvertType(field.FieldType);
 					if (value == null)
 					{
 						return null;
@@ -1230,7 +1228,7 @@ namespace Cyjb
 		public static Delegate CreateDelegate(Type type, FieldInfo field, object firstArgument, bool throwOnBindFailure)
 		{
 			ExceptionHelper.CheckArgumentNull(field, "field");
-			CheckDelegateType(type, "type");
+			ExceptionHelper.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			ParameterInfo[] invokeParams = invoke.GetParameters();
 			// 尝试创建开放的字段委托。
@@ -1248,7 +1246,7 @@ namespace Cyjb
 				{
 					// 通过空引用封闭的实例字段委托。
 					// 委托的参数列表。
-					ParameterExpression[] paramList = GetParameters(invokeParams);
+					ParameterExpression[] paramList = invokeParams.ToExpressions();
 					Expression throwExp = Expression.Throw(Expression.New(typeof(NullReferenceException)));
 					Expression fieldExp = Expression.Block(throwExp, Expression.Default(field.FieldType));
 					dlg = Expression.Lambda(type, fieldExp, paramList).Compile();
@@ -1281,12 +1279,12 @@ namespace Cyjb
 			MethodInfo invoke, ParameterInfo[] invokeParams)
 		{
 			// 委托的参数列表。
-			ParameterExpression[] paramList = GetParameters(invokeParams);
+			ParameterExpression[] paramList = invokeParams.ToExpressions();
 			// 访问字段的实例对象。
 			Expression instance = null;
 			if (!field.IsStatic)
 			{
-				instance = ConvertType(Expression.Constant(firstArgument), field.DeclaringType);
+				instance = Expression.Constant(firstArgument).ConvertType(field.DeclaringType);
 				if (instance == null)
 				{
 					return null;
@@ -1299,11 +1297,11 @@ namespace Cyjb
 				Expression value = null;
 				if (field.IsStatic)
 				{
-					value = ConvertType(Expression.Constant(firstArgument), field.FieldType);
+					value = Expression.Constant(firstArgument).ConvertType(field.FieldType);
 				}
 				else
 				{
-					value = ConvertType(paramList[0], field.FieldType);
+					value = paramList[0].ConvertType(field.FieldType);
 				}
 				if (value == null)
 				{
@@ -1632,7 +1630,7 @@ namespace Cyjb
 			bool throwOnBindFailure)
 		{
 			ExceptionHelper.CheckArgumentNull(memberName, "memberName");
-			CheckDelegateType(type, "type");
+			ExceptionHelper.CheckDelegateType(type, "type");
 			CheckTargetType(target, "target");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			ParameterInfo[] paramInfos = invoke.GetParameters();
@@ -2133,7 +2131,7 @@ namespace Cyjb
 			BindingFlags bindingAttr, bool throwOnBindFailure)
 		{
 			ExceptionHelper.CheckArgumentNull(memberName, "memberName");
-			CheckDelegateType(type, "type");
+			ExceptionHelper.CheckDelegateType(type, "type");
 			CheckTargetType(target, "target");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			ParameterInfo[] paramInfos = invoke.GetParameters();
@@ -2437,7 +2435,7 @@ namespace Cyjb
 		public static Delegate Wrap(Type type, Delegate dlg)
 		{
 			ExceptionHelper.CheckArgumentNull(dlg, "dlg");
-			CheckDelegateType(type, "type");
+			ExceptionHelper.CheckDelegateType(type, "type");
 			ParameterInfo[] paramInfos = dlg.GetType().GetMethod("Invoke").GetParameters();
 			MethodInfo targetInvoke = type.GetMethod("Invoke");
 			ParameterInfo[] targetParamInfos = targetInvoke.GetParameters();
@@ -2445,7 +2443,7 @@ namespace Cyjb
 			{
 				return null;
 			}
-			ParameterExpression[] paramList = GetParameters(targetParamInfos);
+			ParameterExpression[] paramList = targetParamInfos.ToExpressions();
 			// 构造调用参数列表。
 			Expression[] paramExps = GetParameterExpressions(paramList, 0, paramInfos, 0);
 			if (paramExps == null)
@@ -2465,20 +2463,6 @@ namespace Cyjb
 
 		#region 参数检查
 
-		/// <summary>
-		/// 检查委托的类型是否合法。
-		/// </summary>
-		/// <param name="type">委托的类型。</param>
-		/// <param name="paramName">参数的名称。</param>
-		private static void CheckDelegateType(Type type, string paramName)
-		{
-			ExceptionHelper.CheckArgumentNull(type, paramName);
-			Type baseType = type.BaseType;
-			if (baseType == null || baseType != typeof(MulticastDelegate))
-			{
-				throw ExceptionHelper.MustBeDelegate(paramName);
-			}
-		}
 		/// <summary>
 		/// 检查目标类型是否合法。
 		/// </summary>
@@ -2514,20 +2498,6 @@ namespace Cyjb
 				Expression.Throw(Expression.New(typeof(TargetParameterCountException))));
 		}
 		/// <summary>
-		/// 根据给定的参数信息创建参数表达式列表。
-		/// </summary>
-		/// <param name="paramInfos">参数信息。</param>
-		/// <returns>参数表达式列表。</returns>
-		private static ParameterExpression[] GetParameters(ParameterInfo[] paramInfos)
-		{
-			ParameterExpression[] paramList = new ParameterExpression[paramInfos.Length];
-			for (int i = 0; i < paramInfos.Length; i++)
-			{
-				paramList[i] = Expression.Parameter(paramInfos[i].ParameterType);
-			}
-			return paramList;
-		}
-		/// <summary>
 		/// 返回给定的参数信息的参数类型列表。
 		/// </summary>
 		/// <param name="paramInfos">参数信息。</param>
@@ -2560,7 +2530,7 @@ namespace Cyjb
 			Expression[] paramExps = new Expression[paramInfos.Length];
 			for (int i = invokeIndex, j = methodIndex; j < paramExps.Length; i++, j++)
 			{
-				Expression exp = ConvertType(parameters[i], paramInfos[j].ParameterType);
+				Expression exp = parameters[i].ConvertType(paramInfos[j].ParameterType);
 				if (exp == null)
 				{
 					// 不能进行强制类型转换。
@@ -2569,30 +2539,6 @@ namespace Cyjb
 				paramExps[j] = exp;
 			}
 			return paramExps;
-		}
-		/// <summary>
-		/// 返回对指定表达式到目标类型的强制类型转换的表达式。如果不能进行强制类型转换，则为 <c>null</c>。
-		/// </summary>
-		/// <param name="exp">要引用的表达式。</param>
-		/// <param name="expType">要强制类型转换到的目标类型。</param>
-		/// <returns>对指定表达式到目标类型的强制类型转换的表达式。</returns>
-		private static Expression ConvertType(Expression exp, Type expType)
-		{
-			// 对于可隐式类型转换和 ref 参数，不进行类型转换。
-			if (exp.Type == expType || expType.IsAssignableFrom(exp.Type) || expType.IsByRef)
-			{
-				return exp;
-			}
-			try
-			{
-				// 需要强制转换。
-				return Expression.Convert(exp, expType);
-			}
-			catch (InvalidOperationException)
-			{
-				// 不允许进行强制类型转换。
-				return null;
-			}
 		}
 		/// <summary>
 		/// 返回对指定返回值到目标类型的强制类型转换的表达式。

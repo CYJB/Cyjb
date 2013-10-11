@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="CYJB 基本规则集" Description="该规则集由 Microsoft 基本设计准则规则修改而来。这些规则主要用于强制实施最佳做法，使您的代码易于理解和使用。如果项目包含库代码或者您希望强制实施最佳做法以获得易于维护的代码，请包含此规则集。" ToolsVersion="10.0">
+<RuleSet Name="CYJB 基本规则集" Description="该规则集由 Microsoft 基本设计准则规则修改而来。这些规则主要用于强制实施最佳做法，使您的代码易于理解和使用。如果项目包含库代码或者您希望强制实施最佳做法以获得易于维护的代码，请包含此规则集。" ToolsVersion="11.0">
   <Include Path="minimumrecommendedrules.ruleset" Action="Default" />
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
-    <Rule Id="CA1000" Action="Warning" />
     <Rule Id="CA1002" Action="Warning" />
     <Rule Id="CA1003" Action="Warning" />
     <Rule Id="CA1004" Action="Warning" />

@@ -221,6 +221,10 @@
     <value>'{0}' 不是 '{1}' 的有效值。</value>
     <comment>转换无效。</comment>
   </data>
+  <data name="DelegateCompatible" xml:space="preserve">
+    <value>委托的类型与 {0} 不兼容。</value>
+    <comment>委托的类型不兼容。</comment>
+  </data>
   <data name="EnumFailedVersion" xml:space="preserve">
     <value>集合已修改；可能无法执行枚举操作。</value>
     <comment>无法执行枚举操作。</comment>
@@ -344,6 +348,22 @@
   <data name="OverflowUInt64" xml:space="preserve">
     <value>值对于 UInt64 太大或太小。</value>
     <comment>值对于 UInt64 太大或太小。</comment>
+  </data>
+  <data name="ProcessorMismatch" xml:space="preserve">
+    <value>类型 '{0}' 中标识符为 '{1}' 的方法处理器，与请求的静态/实例类型不匹配。</value>
+    <comment>方法处理器不匹配。</comment>
+  </data>
+  <data name="ProcessorMixed" xml:space="preserve">
+    <value>在类型 '{0}' 上方法处理器标识符为 '{1}' 的方法中，既有静态方法，也有实例方法。</value>
+    <comment>方法处理器中混杂着静态和实例方法。</comment>
+  </data>
+  <data name="ProcessorNotFound" xml:space="preserve">
+    <value>在类型 '{0}' 上找不到方法处理器标识符为 '{1}' 的方法。</value>
+    <comment>找不到方法处理器。</comment>
+  </data>
+  <data name="ProcessorNotFound_Type" xml:space="preserve">
+    <value>找不到类型 '{0}' 对应的方法处理器。</value>
+    <comment>特定类型的方法处理器未能找到。</comment>
   </data>
   <data name="ReadOnlyCollection" xml:space="preserve">
     <value>集合是只读的。</value>

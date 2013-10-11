@@ -221,6 +221,10 @@
     <value>'{0}' is not a valid value for '{1}'.</value>
     <comment>转换无效。</comment>
   </data>
+  <data name="DelegateCompatible" xml:space="preserve">
+    <value>Delegate type not compatible with {0}.</value>
+    <comment>委托的类型不兼容。</comment>
+  </data>
   <data name="EnumFailedVersion" xml:space="preserve">
     <value>Collection was modified; enumeration operation may not execute.</value>
     <comment>无法执行枚举操作。</comment>
@@ -344,6 +348,22 @@
   <data name="OverflowUInt64" xml:space="preserve">
     <value>Value was either too large or too small for a UInt64.</value>
     <comment>值对于 UInt64 太大或太小。</comment>
+  </data>
+  <data name="ProcessorMismatch" xml:space="preserve">
+    <value>Method processor identified '{1}' of type '{0}', mismatch with requested static or instance.</value>
+    <comment>方法处理器不匹配。</comment>
+  </data>
+  <data name="ProcessorMixed" xml:space="preserve">
+    <value>Existing static and instance method in method processors identified '{1}' of type '{0}'.</value>
+    <comment>方法处理器中混杂着静态和实例方法。</comment>
+  </data>
+  <data name="ProcessorNotFound" xml:space="preserve">
+    <value>Can not find method processor identified '{1}' of type '{0}'.</value>
+    <comment>找不到方法处理器。</comment>
+  </data>
+  <data name="ProcessorNotFound_Type" xml:space="preserve">
+    <value>Can not find method processor for type '{0}'.</value>
+    <comment>特定类型的方法处理器未能找到。</comment>
   </data>
   <data name="ReadOnlyCollection" xml:space="preserve">
     <value>Collection is read-only.</value>

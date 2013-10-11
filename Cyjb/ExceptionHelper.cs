@@ -838,6 +838,20 @@ namespace Cyjb
 		#region DelegateBuilder 异常
 
 		/// <summary>
+		/// 检查委托的类型是否合法。
+		/// </summary>
+		/// <param name="type">委托的类型。</param>
+		/// <param name="paramName">参数的名称。</param>
+		internal static void CheckDelegateType(Type type, string paramName)
+		{
+			ExceptionHelper.CheckArgumentNull(type, paramName);
+			Type baseType = type.BaseType;
+			if (baseType != typeof(MulticastDelegate))
+			{
+				throw ExceptionHelper.MustBeDelegate(paramName);
+			}
+		}
+		/// <summary>
 		/// 返回绑定到目标方法出错的异常。
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
@@ -902,6 +916,71 @@ namespace Cyjb
 		}
 
 		#endregion // DelegateBuilder 异常
+
+		#region MethodSwitcher 异常
+
+		/// <summary>
+		/// 返回找不到方法处理器的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <param name="type">查找方法的类型。</param>
+		/// <param name="id">方法处理器的标识符。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException ProcessorNotFound(string paramName, Type type, string id)
+		{
+			throw GetArgumentException(paramName, "ProcessorNotFound", type, id);
+		}
+		/// <summary>
+		/// 返回方法处理器不匹配的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <param name="type">查找方法的类型。</param>
+		/// <param name="id">方法处理器的标识符。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException ProcessorMismatch(string paramName, Type type, string id)
+		{
+			throw GetArgumentException(paramName, "ProcessorMismatch", type, id);
+		}
+		/// <summary>
+		/// 返回方法切换器中混杂着静态和实例方法的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <param name="type">查找方法的类型。</param>
+		/// <param name="id">方法切换器的标识符。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException ProcessorMixed(string paramName, Type type, string id)
+		{
+			throw GetArgumentException(paramName, "ProcessorMixed", type, id);
+		}
+		/// <summary>
+		/// 返回特定类型的方法处理器未能找到的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <param name="type">未能找到的类型。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException ProcessorNotFound(string paramName, Type type)
+		{
+			if (type == null)
+			{
+				return GetArgumentException(paramName, "ProcessorNotFound_Type", "null");
+			}
+			else
+			{
+				return GetArgumentException(paramName, "ProcessorNotFound_Type", type);
+			}
+		}
+		/// <summary>
+		/// 返回委托类型不兼容的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <param name="target">需要兼容的目标。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		internal static ArgumentException DelegateCompatible(string paramName, Type target)
+		{
+			return GetArgumentException(paramName, "DelegateCompatible", target);
+		}
+
+		#endregion // MethodSwitcher 异常
 
 	}
 }
