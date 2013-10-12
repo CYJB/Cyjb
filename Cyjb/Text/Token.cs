@@ -9,9 +9,9 @@ namespace Cyjb.Text
 	public struct Token : IEquatable<Token>
 	{
 		/// <summary>
-		/// 表示文件结束的符号索引。
+		/// 表示文件结束的词法单元标识符。
 		/// </summary>
-		public const int EndOfFileIndex = -1;
+		public const string EndOfFile = "EOF";
 		/// <summary>
 		/// 返回表示文件结束的词法单元。
 		/// </summary>
@@ -24,7 +24,7 @@ namespace Cyjb.Text
 		/// </overloads>
 		public static Token GetEndOfFile(SourceLocation loc)
 		{
-			return new Token(EndOfFileIndex, string.Empty, loc);
+			return new Token(EndOfFile, string.Empty, loc);
 		}
 		/// <summary>
 		/// 返回表示文件结束的词法单元。
@@ -34,12 +34,12 @@ namespace Cyjb.Text
 		/// <returns>表示文件结束的词法单元。</returns>
 		public static Token GetEndOfFile(SourceLocation loc, object value)
 		{
-			return new Token(EndOfFileIndex, string.Empty, loc, SourceLocation.Invalid, value);
+			return new Token(EndOfFile, string.Empty, loc, SourceLocation.Invalid, value);
 		}
 		/// <summary>
-		/// 词法单元的符号索引。
+		/// 词法单元的标识符。
 		/// </summary>
-		private int index;
+		private string id;
 		/// <summary>
 		/// 词法单元的文本。
 		/// </summary>
@@ -58,9 +58,9 @@ namespace Cyjb.Text
 		private object value;
 		/// <summary>
 		/// 使用词法单元的相关信息初始化 <see cref="Token"/> 结构的新实例。
-		/// 结束位置会被置位无效位置。
+		/// 结束位置会被置为无效位置。
 		/// </summary>
-		/// <param name="idx">符号索引。</param>
+		/// <param name="id">标识符。</param>
 		/// <param name="text">文本。</param>
 		/// <param name="start">起始位置。</param>
 		/// <overloads>
@@ -68,9 +68,9 @@ namespace Cyjb.Text
 		/// 初始化 <see cref="Token"/> 结构的新实例。
 		/// </summary>
 		/// </overloads>
-		public Token(int idx, string text, SourceLocation start)
+		public Token(string id, string text, SourceLocation start)
 		{
-			this.index = idx;
+			this.id = id;
 			this.text = text;
 			this.start = start;
 			this.end = SourceLocation.Invalid;
@@ -79,17 +79,17 @@ namespace Cyjb.Text
 		/// <summary>
 		/// 使用词法单元的相关信息初始化 <see cref="Token"/> 结构的新实例。
 		/// </summary>
-		/// <param name="idx">符号索引。</param>
+		/// <param name="id">标识符。</param>
 		/// <param name="text">文本。</param>
 		/// <param name="start">起始位置。</param>
 		/// <param name="end">结束位置。</param>
-		public Token(int idx, string text, SourceLocation start, SourceLocation end)
+		public Token(string id, string text, SourceLocation start, SourceLocation end)
 		{
 			if (start > end && end != SourceLocation.Invalid)
 			{
 				throw ExceptionHelper.ReversedArgument("start", "end");
 			}
-			this.index = idx;
+			this.id = id;
 			this.text = text;
 			this.start = start;
 			this.end = end;
@@ -98,28 +98,28 @@ namespace Cyjb.Text
 		/// <summary>
 		/// 使用词法单元的相关信息初始化 <see cref="Token"/> 结构的新实例。
 		/// </summary>
-		/// <param name="idx">符号索引。</param>
+		/// <param name="id">标识符。</param>
 		/// <param name="text">文本。</param>
 		/// <param name="start">起始位置。</param>
 		/// <param name="end">结束位置。</param>
 		/// <param name="value">词法单元的值。</param>
-		public Token(int idx, string text, SourceLocation start, SourceLocation end, object value)
+		public Token(string id, string text, SourceLocation start, SourceLocation end, object value)
 		{
 			if (start > end && end != SourceLocation.Invalid)
 			{
 				throw ExceptionHelper.ReversedArgument("start", "end");
 			}
-			this.index = idx;
+			this.id = id;
 			this.text = text;
 			this.start = start;
 			this.end = end;
 			this.value = value;
 		}
 		/// <summary>
-		/// 获取词法单元的符号索引。
+		/// 获取词法单元的标识符。
 		/// </summary>
-		/// <value>词法单元的符号索引。</value>
-		public int Index { get { return index; } }
+		/// <value>词法单元的标识符。</value>
+		public string Id { get { return id; } }
 		/// <summary>
 		/// 获取词法单元的文本。
 		/// </summary>
@@ -140,6 +140,14 @@ namespace Cyjb.Text
 		/// </summary>
 		/// <value>词法单元的值。</value>
 		public object Value { get { return value; } }
+		/// <summary>
+		/// 获取当前词法单元是否表示文件的结束。
+		/// </summary>
+		/// <value>如果表示文件的结束，则为 <c>true</c>；否则为 <c>false</c>。</value>
+		public bool IsEndOfFile
+		{
+			get { return this.id == EndOfFile; }
+		}
 
 		#region IEquatable<Token> 成员
 
@@ -156,7 +164,7 @@ namespace Cyjb.Text
 		/// </overloads>
 		public bool Equals(Token other)
 		{
-			if (this.index != other.index)
+			if (this.id != other.id)
 			{
 				return false;
 			}
@@ -197,7 +205,10 @@ namespace Cyjb.Text
 		public override int GetHashCode()
 		{
 			int hashCode = 3321;
-			hashCode ^= index;
+			if (id != null)
+			{
+				hashCode ^= id.GetHashCode();
+			}
 			hashCode ^= text.GetHashCode();
 			hashCode ^= start.GetHashCode() << 4;
 			hashCode ^= end.GetHashCode() << 8;
@@ -209,7 +220,7 @@ namespace Cyjb.Text
 		/// <returns>当前对象的字符串表示形式。</returns>
 		public override string ToString()
 		{
-			return string.Concat("Token #", index, " ", text);
+			return string.Concat("Token #", id, " ", text);
 		}
 
 		#endregion // object 成员

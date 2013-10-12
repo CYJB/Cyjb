@@ -421,7 +421,7 @@ namespace Cyjb.IO
 		/// 的形式返回被丢弃的数据。
 		/// 之后的 <see cref="Unget()"/> 操作至多回退到当前位置。
 		/// </summary>
-		/// <param name="tokenIndex">返回的 <see cref="Cyjb.Text.Token"/> 的字符索引。</param>
+		/// <param name="id">返回的 <see cref="Cyjb.Text.Token"/> 的标识符。</param>
 		/// <returns>当前位置之前的数据。</returns>
 		/// <overloads>
 		/// <summary>
@@ -430,22 +430,22 @@ namespace Cyjb.IO
 		/// 之后的 <see cref="Unget()"/> 操作至多回退到当前位置。
 		/// </summary>
 		/// </overloads>
-		public Token AcceptToken(int tokenIndex)
+		public Token AcceptToken(string id)
 		{
-			return AcceptToken(tokenIndex, null);
+			return AcceptToken(id, null);
 		}
 		/// <summary>
 		/// 将当前位置之前的数据全部丢弃，并以 <see cref="Cyjb.Text.Token"/> 
 		/// 的形式返回被丢弃的数据。
 		/// 之后的 <see cref="Unget()"/> 操作至多回退到当前位置。
 		/// </summary>
-		/// <param name="tokenIndex">返回的 <see cref="Cyjb.Text.Token"/> 的字符索引。</param>
+		/// <param name="id">返回的 <see cref="Cyjb.Text.Token"/> 的标识符。</param>
 		/// <param name="value"><see cref="Cyjb.Text.Token"/> 的值。</param>
 		/// <returns>当前位置之前的数据。</returns>
-		public Token AcceptToken(int tokenIndex, object value)
+		public Token AcceptToken(string id, object value)
 		{
 			SourceLocation start = locator.NextLocation;
-			return new Token(tokenIndex, Accept(), start, locator.Location, value);
+			return new Token(id, Accept(), start, locator.Location, value);
 		}
 
 		#endregion // 读取字符
