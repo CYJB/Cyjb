@@ -26,6 +26,7 @@ namespace Cyjb.Text
 		/// <summary>
 		/// 获取要扫描的源文件。
 		/// </summary>
+		/// <value>要扫描的源文件。</value>
 		public SourceReader Source { get; private set; }
 		/// <summary>
 		/// 读取输入流中的下一个词法单元并提升输入流的字符位置。
