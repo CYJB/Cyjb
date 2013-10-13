@@ -4,7 +4,7 @@ using Cyjb.IO;
 namespace Cyjb.Text
 {
 	/// <summary>
-	/// 表示一个词法单元。在比较时不考虑 Value 字段。
+	/// 表示一个词法单元。在比较时不考虑 <see cref="Token.Value"/> 属性。
 	/// </summary>
 	public struct Token : IEquatable<Token>
 	{

@@ -5,6 +5,7 @@ namespace Cyjb.Text
 	/// <summary>
 	/// 表示词法单元的读取器。
 	/// </summary>
+	/// <seealso cref="Token"/>
 	public abstract class TokenReader
 	{
 		/// <summary>
