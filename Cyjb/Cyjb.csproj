@@ -97,6 +97,7 @@
     <Compile Include="RandomExt.cs" />
     <Compile Include="ProcessorAttribute.cs" />
     <Compile Include="Text\Token.cs" />
+    <Compile Include="Text\TokenReader.cs" />
     <Compile Include="TypeExt.cs" />
     <Compile Include="UniqueValue`1.cs" />
     <Compile Include="Utility\CacheElement.cs" />

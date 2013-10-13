@@ -220,7 +220,14 @@ namespace Cyjb.Text
 		/// <returns>当前对象的字符串表示形式。</returns>
 		public override string ToString()
 		{
-			return string.Concat("Token #", id, " ", text);
+			if (string.IsNullOrEmpty(text))
+			{
+				return string.Concat("[", id, "]");
+			}
+			else
+			{
+				return string.Concat("[", id, "] ", text);
+			}
 		}
 
 		#endregion // object 成员
