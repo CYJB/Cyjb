@@ -77,7 +77,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// 获取 <see cref="CollectionBase&lt;T&gt;"/> 周围的 <see cref="ICollection&lt;T&gt;"/> 包装。
 		/// </summary>
 		/// <value><see cref="CollectionBase&lt;T&gt;"/> 周围的 <see cref="ICollection&lt;T&gt;"/> 包装。</value>
-		protected ICollection<T> Items
+		protected virtual ICollection<T> Items
 		{
 			get { return items; }
 		}
@@ -86,7 +86,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		protected virtual void ClearItems()
 		{
-			this.items.Clear();
+			this.Items.Clear();
 		}
 		/// <summary>
 		/// 将元素添加到 <see cref="CollectionBase&lt;T&gt;"/> 中。
@@ -95,7 +95,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// 对于引用类型，该值可以为 <c>null</c>。</param>
 		protected virtual void AddItem(T item)
 		{
-			this.items.Add(item);
+			this.Items.Add(item);
 		}
 		/// <summary>
 		/// 移除 <see cref="CollectionBase&lt;T&gt;"/> 的指定元素。
@@ -106,7 +106,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// 中没有找到 <paramref name="item"/>，该方法也会返回 <c>false</c>。</returns>
 		protected virtual bool RemoveItem(T item)
 		{
-			return this.items.Remove(item);
+			return this.Items.Remove(item);
 		}
 
 		#region ICollection<T> 成员
@@ -117,7 +117,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <value><see cref="CollectionBase&lt;T&gt;"/> 中包含的元素数。</value>
 		public virtual int Count
 		{
-			get { return this.items.Count; }
+			get { return this.Items.Count; }
 		}
 		/// <summary>
 		/// 获取一个值，该值指示 <see cref="CollectionBase&lt;T&gt;"/> 是否为只读。
@@ -164,7 +164,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public virtual bool Contains(T item)
 		{
-			return this.items.Contains(item);
+			return this.Items.Contains(item);
 		}
 
 		/// <summary>
@@ -186,7 +186,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// 末尾之间的可用空间。</exception>
 		public virtual void CopyTo(T[] array, int arrayIndex)
 		{
-			this.items.CopyTo(array, arrayIndex);
+			this.Items.CopyTo(array, arrayIndex);
 		}
 
 		/// <summary>
@@ -243,7 +243,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (this.syncRoot == null)
 				{
-					ICollection colItems = this.items as ICollection;
+					ICollection colItems = this.Items as ICollection;
 					Interlocked.CompareExchange(ref this.syncRoot,
 						colItems == null ? new object() : colItems.SyncRoot, null);
 				}
@@ -285,7 +285,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <returns>可用于循环访问集合的 <see cref="System.Collections.Generic.IEnumerator&lt;T&gt;"/>。</returns>
 		public virtual IEnumerator<T> GetEnumerator()
 		{
-			return this.items.GetEnumerator();
+			return this.Items.GetEnumerator();
 		}
 
 		#endregion // IEnumerable<T> 成员
