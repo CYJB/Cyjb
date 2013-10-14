@@ -1,4 +1,5 @@
-﻿using Cyjb.IO;
+﻿using System;
+using Cyjb.IO;
 
 namespace Cyjb.Text
 {
@@ -6,7 +7,7 @@ namespace Cyjb.Text
 	/// 表示词法单元的读取器。
 	/// </summary>
 	/// <seealso cref="Token"/>
-	public abstract class TokenReader
+	public abstract class TokenReader : IDisposable
 	{
 		/// <summary>
 		/// 要读取的下一个词法单元。
@@ -22,8 +23,34 @@ namespace Cyjb.Text
 		/// <param name="reader">要使用的源文件读取器。</param>
 		protected TokenReader(SourceReader reader)
 		{
+			ExceptionHelper.CheckArgumentNull(reader, "reader");
 			this.Source = reader;
 		}
+
+		#region IDisposable 成员
+
+		/// <summary>
+		/// 执行与释放或重置非托管资源相关的应用程序定义的任务。
+		/// </summary>
+		public void Dispose()
+		{
+			this.Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+		/// <summary>
+		/// 执行与释放或重置非托管资源相关的应用程序定义的任务。
+		/// </summary>
+		/// <param name="disposing">是否释放托管资源。</param>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				this.Source.Dispose();
+			}
+		}
+
+		#endregion // IDisposable 成员
+
 		/// <summary>
 		/// 获取要扫描的源文件。
 		/// </summary>
