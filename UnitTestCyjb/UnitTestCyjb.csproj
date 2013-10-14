@@ -57,6 +57,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="AssertExt.cs" />
     <Compile Include="Collections\UnitTestCharSet.cs" />
+    <Compile Include="IO\UnitTestSourceReader.cs" />
     <Compile Include="UnitTestDelegateBuilder.cs" />
     <Compile Include="UnitTestMethodExt.cs" />
     <Compile Include="UnitTestTextValuePair`1.cs" />

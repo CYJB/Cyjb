@@ -396,7 +396,7 @@ namespace Cyjb.IO
 		/// 返回当前位置之前的数据。
 		/// </summary>
 		/// <returns>当前位置之前的数据。</returns>
-		public string ReadBlock()
+		public string ReadedBlock()
 		{
 			if (reader == null)
 			{
@@ -413,6 +413,7 @@ namespace Cyjb.IO
 				buf = buf.Next;
 			}
 			CopyToBuilder(buf, fIndex, index - fIndex);
+			builder.Length = builderCopiedLen;
 			return builder.ToString();
 		}
 		/// <summary>
@@ -456,6 +457,7 @@ namespace Cyjb.IO
 			CopyToBuilder(first, firstIndex, index - firstIndex);
 			locator.Forward(current.Buffer, firstIndex, index - firstIndex);
 			firstIndex = index;
+			builder.Length = builderCopiedLen;
 			return builder.ToString();
 		}
 		/// <summary>
@@ -519,11 +521,12 @@ namespace Cyjb.IO
 			if (builderCopiedLen == builder.Length)
 			{
 				builder.Append(buffer.Buffer, start, len);
+				builderCopiedLen += len;
 			}
 			else if ((builderCopiedLen += len) > builder.Length)
 			{
-				len = builderCopiedLen - builder.Length;
-				builder.Append(buffer.Buffer, BufferSize - len, len);
+				int l = builderCopiedLen - builder.Length;
+				builder.Append(buffer.Buffer, len - l, l);
 			}
 		}
 
