@@ -6,7 +6,7 @@ namespace Cyjb.Text
 	/// <summary>
 	/// 表示一个词法单元。在比较时不考虑 <see cref="Token.Value"/> 属性。
 	/// </summary>
-	public struct Token : IEquatable<Token>
+	public class Token : IEquatable<Token>
 	{
 		/// <summary>
 		/// 表示文件结束的词法单元标识符。
@@ -57,7 +57,7 @@ namespace Cyjb.Text
 		/// </summary>
 		private object value;
 		/// <summary>
-		/// 使用词法单元的相关信息初始化 <see cref="Token"/> 结构的新实例。
+		/// 使用词法单元的相关信息初始化 <see cref="Token"/> 类的新实例。
 		/// 结束位置会被置为无效位置。
 		/// </summary>
 		/// <param name="id">标识符。</param>
@@ -65,7 +65,7 @@ namespace Cyjb.Text
 		/// <param name="start">起始位置。</param>
 		/// <overloads>
 		/// <summary>
-		/// 初始化 <see cref="Token"/> 结构的新实例。
+		/// 初始化 <see cref="Token"/> 类的新实例。
 		/// </summary>
 		/// </overloads>
 		public Token(string id, string text, SourceLocation start)
@@ -77,7 +77,7 @@ namespace Cyjb.Text
 			this.value = null;
 		}
 		/// <summary>
-		/// 使用词法单元的相关信息初始化 <see cref="Token"/> 结构的新实例。
+		/// 使用词法单元的相关信息初始化 <see cref="Token"/> 类的新实例。
 		/// </summary>
 		/// <param name="id">标识符。</param>
 		/// <param name="text">文本。</param>
@@ -96,7 +96,7 @@ namespace Cyjb.Text
 			this.value = null;
 		}
 		/// <summary>
-		/// 使用词法单元的相关信息初始化 <see cref="Token"/> 结构的新实例。
+		/// 使用词法单元的相关信息初始化 <see cref="Token"/> 类的新实例。
 		/// </summary>
 		/// <param name="id">标识符。</param>
 		/// <param name="text">文本。</param>
@@ -164,6 +164,14 @@ namespace Cyjb.Text
 		/// </overloads>
 		public bool Equals(Token other)
 		{
+			if (object.ReferenceEquals(this, other))
+			{
+				return true;
+			}
+			if (other == null)
+			{
+				return false;
+			}
 			if (this.id != other.id)
 			{
 				return false;
@@ -191,11 +199,12 @@ namespace Cyjb.Text
 		/// 否则为 <c>false</c>。</returns>
 		public override bool Equals(object obj)
 		{
-			if (!(obj is Token))
+			Token token = obj as Token;
+			if (token == null)
 			{
 				return false;
 			}
-			return this.Equals((Token)obj);
+			return this.Equals(token);
 		}
 
 		/// <summary>
@@ -209,7 +218,10 @@ namespace Cyjb.Text
 			{
 				hashCode ^= id.GetHashCode();
 			}
-			hashCode ^= text.GetHashCode();
+			if (text != null)
+			{
+				hashCode ^= text.GetHashCode();
+			}
 			hashCode ^= start.GetHashCode() << 4;
 			hashCode ^= end.GetHashCode() << 8;
 			return hashCode;
