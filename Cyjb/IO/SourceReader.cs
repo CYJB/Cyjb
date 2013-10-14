@@ -100,12 +100,23 @@ namespace Cyjb.IO
 			get { return reader; }
 		}
 		/// <summary>
-		/// 获取当前的字符索引。
+		/// 获取或设置当前的字符索引。
 		/// </summary>
-		/// <value>当前的字符索引，该索引从零开始。</value>
+		/// <value>当前的字符索引，该索引从零开始。设置索引时，不能达到被丢弃的字符，或者超出文件结尾。</value>
 		public int Index
 		{
 			get { return globalIndex; }
+			set
+			{
+				if (value > this.globalIndex)
+				{
+					this.Read(value - this.globalIndex - 1);
+				}
+				else if (value < this.globalIndex)
+				{
+					this.Unget(this.globalIndex - value);
+				}
+			}
 		}
 		/// <summary>
 		/// 获取起始索引之前的源代码位置（不包括被丢弃的字符）。
@@ -238,7 +249,7 @@ namespace Cyjb.IO
 		}
 		/// <summary>
 		/// 读取文本读取器中之后的 <paramref name="idx"/> 索引的字符，并使该字符的位置提升。
-		/// Read(0) 就相当于 Read()，但效率不如 Read()。
+		/// <c>Read(0)</c> 与 <see cref="Read()"/> 等价。
 		/// </summary>
 		/// <returns>文本读取器中之后的 <paramref name="idx"/> 索引的字符，
 		/// 或为 <c>-1</c>（如果没有更多的可用字符）。</returns>
@@ -251,6 +262,10 @@ namespace Cyjb.IO
 			if (idx < 0)
 			{
 				throw ExceptionHelper.ArgumentOutOfRange("idx");
+			}
+			else if (idx == 0)
+			{
+				return Read();
 			}
 			while (true)
 			{
@@ -309,7 +324,7 @@ namespace Cyjb.IO
 		}
 		/// <summary>
 		/// 回退 <paramref name="count"/> 个字符，只有之前的数据未被丢弃时才可以进行回退。
-		/// Unget(1) 相当于 Unget()，但效率不如 Unget()。
+		/// <c>Unget(1)</c> 与 <see cref="Unget()"/> 等价。
 		/// </summary>
 		/// <param name="count">要回退的字符个数。</param>
 		/// <returns>实际回退的字符个数，小于等于 <paramref name="count"/>。</returns>
@@ -323,9 +338,13 @@ namespace Cyjb.IO
 			{
 				throw ExceptionHelper.ArgumentOutOfRange("count");
 			}
-			if (count == 0)
+			else if (count == 0)
 			{
 				return 0;
+			}
+			else if (count == 1)
+			{
+				return this.Unget() ? 1 : 0;
 			}
 			int backCount = 0;
 			while (true)
@@ -364,6 +383,35 @@ namespace Cyjb.IO
 			}
 			globalIndex -= backCount;
 			return backCount;
+		}
+		/// <summary>
+		/// 返回当前位置之前的数据。
+		/// </summary>
+		/// <returns>当前位置之前的数据。</returns>
+		public string ReadBlock()
+		{
+			if (reader == null)
+			{
+				throw ExceptionHelper.SourceReaderClosed();
+			}
+			if (builder == null)
+			{
+				builder = new StringBuilder();
+			}
+			else
+			{
+				builder.Length = 0;
+			}
+			builder.EnsureCapacity(GetDropSize());
+			// 将字符串复制到 StringBuilder 中。
+			SourceBuffer buffer = first;
+			while (buffer != current)
+			{
+				builder.Append(first.Buffer, firstIndex, BufferSize - firstIndex);
+				buffer = buffer.Next;
+			}
+			builder.Append(current.Buffer, firstIndex, index - firstIndex);
+			return builder.ToString();
 		}
 		/// <summary>
 		/// 将当前位置之前的数据全部丢弃，之后的 <see cref="Unget()"/> 操作至多回退到当前位置。
