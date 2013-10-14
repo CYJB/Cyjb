@@ -49,7 +49,7 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 当前缓冲区的字符长度。
 		/// </summary>
-		private int len = 0;
+		private int length = 0;
 		/// <summary>
 		/// 第一块缓冲区的字符索引。
 		/// </summary>
@@ -57,11 +57,19 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 最后一块缓冲区的字符长度。
 		/// </summary>
-		private int lastLen = 0;
+		private int lastLength = 0;
 		/// <summary>
-		/// 用于构造字符串的 StringBuilder 实例。
+		/// 用于构造字符串的 <see cref="StringBuilder"/> 实例。
 		/// </summary>
 		private StringBuilder builder = null;
+		/// <summary>
+		/// 构造字符串时的起始索引。
+		/// </summary>
+		private int builderIndex = -1;
+		/// <summary>
+		/// 已向 <see cref="builder"/> 中复制了的字符串长度。
+		/// </summary>
+		private int builderCopiedLen = 0;
 		/// <summary>
 		/// 源代码位置计数器。
 		/// </summary>
@@ -87,7 +95,7 @@ namespace Cyjb.IO
 			locator = new SourceLocator(tabSize);
 			this.reader = reader;
 			current = first = last = new SourceBuffer();
-			firstIndex = lastLen = 0;
+			firstIndex = lastLength = 0;
 			current.Buffer = new char[BufferSize];
 			current.Next = current;
 		}
@@ -176,7 +184,7 @@ namespace Cyjb.IO
 			{
 				throw ExceptionHelper.SourceReaderClosed();
 			}
-			if (index == len)
+			if (index == length)
 			{
 				if (!SwitchNextBuffer())
 				{
@@ -202,7 +210,7 @@ namespace Cyjb.IO
 				throw ExceptionHelper.ArgumentOutOfRange("count");
 			}
 			SourceBuffer temp = current;
-			int tempLen = len;
+			int tempLen = length;
 			idx += index;
 			while (true)
 			{
@@ -237,7 +245,7 @@ namespace Cyjb.IO
 			{
 				throw ExceptionHelper.SourceReaderClosed();
 			}
-			if (index == len)
+			if (index == length)
 			{
 				if (!SwitchNextBuffer())
 				{
@@ -269,15 +277,15 @@ namespace Cyjb.IO
 			}
 			while (true)
 			{
-				if (idx >= len - index)
+				if (idx >= length - index)
 				{
-					globalIndex += len - index;
-					idx -= len - index;
-					index = len;
+					globalIndex += length - index;
+					idx -= length - index;
+					index = length;
 					if (!SwitchNextBuffer())
 					{
 						// 没有数据了，返回。
-						index = len;
+						index = length;
 						return -1;
 					}
 				}
@@ -394,23 +402,17 @@ namespace Cyjb.IO
 			{
 				throw ExceptionHelper.SourceReaderClosed();
 			}
-			if (builder == null)
-			{
-				builder = new StringBuilder();
-			}
-			else
-			{
-				builder.Length = 0;
-			}
-			builder.EnsureCapacity(GetDropSize());
+			InitBuilder();
 			// 将字符串复制到 StringBuilder 中。
-			SourceBuffer buffer = first;
-			while (buffer != current)
+			SourceBuffer buf = first;
+			int fIndex = firstIndex;
+			while (buf != current)
 			{
-				builder.Append(first.Buffer, firstIndex, BufferSize - firstIndex);
-				buffer = buffer.Next;
+				CopyToBuilder(buf, fIndex, BufferSize - fIndex);
+				fIndex = 0;
+				buf = buf.Next;
 			}
-			builder.Append(current.Buffer, firstIndex, index - firstIndex);
+			CopyToBuilder(buf, fIndex, index - fIndex);
 			return builder.ToString();
 		}
 		/// <summary>
@@ -442,24 +444,16 @@ namespace Cyjb.IO
 			{
 				throw ExceptionHelper.SourceReaderClosed();
 			}
-			if (builder == null)
-			{
-				builder = new StringBuilder();
-			}
-			else
-			{
-				builder.Length = 0;
-			}
-			builder.EnsureCapacity(GetDropSize());
+			InitBuilder();
 			// 将字符串复制到 StringBuilder 中。
 			while (first != current)
 			{
-				builder.Append(first.Buffer, firstIndex, BufferSize - firstIndex);
+				CopyToBuilder(first, firstIndex, BufferSize - firstIndex);
 				locator.Forward(first.Buffer, firstIndex, BufferSize - firstIndex);
 				firstIndex = 0;
 				first = first.Next;
 			}
-			builder.Append(current.Buffer, firstIndex, index - firstIndex);
+			CopyToBuilder(first, firstIndex, index - firstIndex);
 			locator.Forward(current.Buffer, firstIndex, index - firstIndex);
 			firstIndex = index;
 			return builder.ToString();
@@ -495,33 +489,55 @@ namespace Cyjb.IO
 			SourceLocation start = locator.NextLocation;
 			return new Token(id, Accept(), start, locator.Location, value);
 		}
+		/// <summary>
+		/// 初始化构造字符串的 <see cref="StringBuilder"/>。
+		/// </summary>
+		private void InitBuilder()
+		{
+			if (builder == null)
+			{
+				builder = new StringBuilder(BufferSize);
+				builderIndex = StartLocation.Index;
+			}
+			else if (builderIndex != StartLocation.Index)
+			{
+				builder.Clear();
+				builderIndex = StartLocation.Index;
+			}
+			builderCopiedLen = 0;
+		}
+		/// <summary>
+		/// 将指定缓冲区中从指定索引开始，指定长度的字符串复制到 <see cref="builder"/> 中。
+		/// </summary>
+		/// <param name="buffer">要复制字符串的缓冲区。</param>
+		/// <param name="start">要复制的起始长度。</param>
+		/// <param name="len">要复制的长度。</param>
+		private void CopyToBuilder(SourceBuffer buffer, int start, int len)
+		{
+			Debug.Assert(start >= 0);
+			Debug.Assert(start + len <= BufferSize);
+			if (builderCopiedLen == builder.Length)
+			{
+				builder.Append(buffer.Buffer, start, len);
+			}
+			else if ((builderCopiedLen += len) > builder.Length)
+			{
+				len = builderCopiedLen - builder.Length;
+				builder.Append(buffer.Buffer, BufferSize - len, len);
+			}
+		}
 
 		#endregion // 读取字符
 
 		#region 缓冲区操作
 
 		/// <summary>
-		/// 估算需要被抛弃的字符个数。
-		/// </summary>
-		/// <returns>要被抛弃的字符个数的估算值。</returns>
-		private int GetDropSize()
-		{
-			SourceBuffer temp = first;
-			int size = BufferSize;
-			while (temp != current)
-			{
-				size += BufferSize;
-				temp = temp.Next;
-			}
-			return size;
-		}
-		/// <summary>
 		/// 切换到下一块缓冲区。如果没有有效的数据，则从基础字符读取器中读取字符，并填充到缓冲区中。
 		/// </summary>
 		/// <returns>如果切换成功，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		private bool SwitchNextBuffer()
 		{
-			Debug.Assert(index == len);
+			Debug.Assert(index == length);
 			Debug.Assert(reader != null);
 			if (current == last)
 			{
@@ -530,7 +546,7 @@ namespace Cyjb.IO
 				{
 					return false;
 				}
-				len = lastLen;
+				length = lastLength;
 				current = last;
 			}
 			else
@@ -539,11 +555,11 @@ namespace Cyjb.IO
 				current = current.Next;
 				if (current == last)
 				{
-					len = lastLen;
+					length = lastLength;
 				}
 			}
 			index = 0;
-			return len > 0;
+			return length > 0;
 		}
 		/// <summary>
 		/// 从基础字符读取器中读取字符，并填充到新的缓冲区中。
@@ -555,7 +571,7 @@ namespace Cyjb.IO
 			{
 				return 0;
 			}
-			if (len > 0)
+			if (length > 0)
 			{
 				if (last.Next == first)
 				{
@@ -574,12 +590,12 @@ namespace Cyjb.IO
 				// len 为 0 应仅当 last == current 时。
 				Debug.Assert(last == current);
 			}
-			lastLen = reader.ReadBlock(last.Buffer, 0, BufferSize);
-			if (len == 0)
+			lastLength = reader.ReadBlock(last.Buffer, 0, BufferSize);
+			if (length == 0)
 			{
-				len = lastLen;
+				length = lastLength;
 			}
-			return lastLen;
+			return lastLength;
 		}
 		/// <summary>
 		/// 切换到上一块缓冲区。
@@ -588,7 +604,7 @@ namespace Cyjb.IO
 		{
 			Debug.Assert(current != first);
 			current = current.Prev;
-			index = len = BufferSize;
+			index = length = BufferSize;
 		}
 		/// <summary>
 		/// 表示 <see cref="Cyjb.IO.SourceReader"/> 的字符缓冲区。
