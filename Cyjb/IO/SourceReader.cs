@@ -461,35 +461,39 @@ namespace Cyjb.IO
 			return builder.ToString();
 		}
 		/// <summary>
-		/// 将当前位置之前的数据全部丢弃，并以 <see cref="Cyjb.Text.Token"/> 
+		/// 将当前位置之前的数据全部丢弃，并以 <see cref="Cyjb.Text.Token&lt;T&gt;"/> 
 		/// 的形式返回被丢弃的数据。
 		/// 之后的 <see cref="Unget()"/> 操作至多回退到当前位置。
 		/// </summary>
-		/// <param name="id">返回的 <see cref="Cyjb.Text.Token"/> 的标识符。</param>
+		/// <typeparam name="T">词法单元标识符的类型，必须是一个枚举类型。</typeparam>
+		/// <param name="id">返回的 <see cref="Cyjb.Text.Token&lt;T&gt;"/> 的标识符。</param>
 		/// <returns>当前位置之前的数据。</returns>
 		/// <overloads>
 		/// <summary>
-		/// 将当前位置之前的数据全部丢弃，并以 <see cref="Cyjb.Text.Token"/> 
+		/// 将当前位置之前的数据全部丢弃，并以 <see cref="Cyjb.Text.Token&lt;T&gt;"/> 
 		/// 的形式返回被丢弃的数据。
 		/// 之后的 <see cref="Unget()"/> 操作至多回退到当前位置。
 		/// </summary>
 		/// </overloads>
-		public Token AcceptToken(string id)
+		public Token<T> AcceptToken<T>(T id)
+			where T : struct
 		{
 			return AcceptToken(id, null);
 		}
 		/// <summary>
-		/// 将当前位置之前的数据全部丢弃，并以 <see cref="Cyjb.Text.Token"/> 
+		/// 将当前位置之前的数据全部丢弃，并以 <see cref="Cyjb.Text.Token&lt;T&gt;"/> 
 		/// 的形式返回被丢弃的数据。
 		/// 之后的 <see cref="Unget()"/> 操作至多回退到当前位置。
 		/// </summary>
-		/// <param name="id">返回的 <see cref="Cyjb.Text.Token"/> 的标识符。</param>
-		/// <param name="value"><see cref="Cyjb.Text.Token"/> 的值。</param>
+		/// <typeparam name="T">词法单元标识符的类型，必须是一个枚举类型。</typeparam>
+		/// <param name="id">返回的 <see cref="Cyjb.Text.Token&lt;T&gt;"/> 的标识符。</param>
+		/// <param name="value"><see cref="Cyjb.Text.Token&lt;T&gt;"/> 的值。</param>
 		/// <returns>当前位置之前的数据。</returns>
-		public Token AcceptToken(string id, object value)
+		public Token<T> AcceptToken<T>(T id, object value)
+			where T : struct
 		{
 			SourceLocation start = locator.NextLocation;
-			return new Token(id, Accept(), start, locator.Location, value);
+			return new Token<T>(id, Accept(), start, locator.Location, value);
 		}
 		/// <summary>
 		/// 初始化构造字符串的 <see cref="StringBuilder"/>。

@@ -1,17 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cyjb.IO;
 
 namespace Cyjb.Text
 {
 	/// <summary>
-	/// 表示一个词法单元。在比较时不考虑 <see cref="Token.Value"/> 属性。
+	/// 表示一个词法单元。在比较时不考虑 <see cref="Token&lt;T&gt;.Value"/> 属性。
 	/// </summary>
-	public class Token : IEquatable<Token>
+	/// <typeparam name="T">词法单元标识符的类型，必须是一个枚举类型。</typeparam>
+	/// <remarks><typeparamref name="T"/> 必须的枚举类型，
+	/// 该类型的特殊值 <c>-1</c> 将用于表示文件结束。</remarks>
+	public class Token<T> : IEquatable<Token<T>>
+		where T : struct
 	{
 		/// <summary>
 		/// 表示文件结束的词法单元标识符。
 		/// </summary>
-		public const string EndOfFile = "EOF";
+		/// <remarks>其值为 <c>-1</c>。</remarks>
+		public static readonly T EndOfFile = (T)Enum.ToObject(typeof(T), -1);
+		/// <summary>
+		/// 表示语法产生式的错误的特殊标识符。
+		/// </summary>
+		/// <remarks>该标识符用于定义语法产生式，其值为 <c>-2</c>。</remarks>
+		public static readonly T Error = (T)Enum.ToObject(typeof(T), -2);
 		/// <summary>
 		/// 返回表示文件结束的词法单元。
 		/// </summary>
@@ -22,9 +33,9 @@ namespace Cyjb.Text
 		/// 返回表示文件结束的词法单元。
 		/// </summary>
 		/// </overloads>
-		public static Token GetEndOfFile(SourceLocation loc)
+		public static Token<T> GetEndOfFile(SourceLocation loc)
 		{
-			return new Token(EndOfFile, string.Empty, loc);
+			return new Token<T>(EndOfFile, string.Empty, loc);
 		}
 		/// <summary>
 		/// 返回表示文件结束的词法单元。
@@ -32,14 +43,14 @@ namespace Cyjb.Text
 		/// <param name="loc">文件结束的位置。</param>
 		/// <param name="value">词法单元的值。</param>
 		/// <returns>表示文件结束的词法单元。</returns>
-		public static Token GetEndOfFile(SourceLocation loc, object value)
+		public static Token<T> GetEndOfFile(SourceLocation loc, object value)
 		{
-			return new Token(EndOfFile, string.Empty, loc, SourceLocation.Invalid, value);
+			return new Token<T>(EndOfFile, string.Empty, loc, SourceLocation.Invalid, value);
 		}
 		/// <summary>
 		/// 词法单元的标识符。
 		/// </summary>
-		private string id;
+		private T id;
 		/// <summary>
 		/// 词法单元的文本。
 		/// </summary>
@@ -57,7 +68,7 @@ namespace Cyjb.Text
 		/// </summary>
 		private object value;
 		/// <summary>
-		/// 使用词法单元的相关信息初始化 <see cref="Token"/> 类的新实例。
+		/// 使用词法单元的相关信息初始化 <see cref="Token&lt;T&gt;"/> 类的新实例。
 		/// 结束位置会被置为无效位置。
 		/// </summary>
 		/// <param name="id">标识符。</param>
@@ -65,10 +76,10 @@ namespace Cyjb.Text
 		/// <param name="start">起始位置。</param>
 		/// <overloads>
 		/// <summary>
-		/// 初始化 <see cref="Token"/> 类的新实例。
+		/// 初始化 <see cref="Token&lt;T&gt;"/> 类的新实例。
 		/// </summary>
 		/// </overloads>
-		public Token(string id, string text, SourceLocation start)
+		public Token(T id, string text, SourceLocation start)
 		{
 			this.id = id;
 			this.text = text;
@@ -77,13 +88,13 @@ namespace Cyjb.Text
 			this.value = null;
 		}
 		/// <summary>
-		/// 使用词法单元的相关信息初始化 <see cref="Token"/> 类的新实例。
+		/// 使用词法单元的相关信息初始化 <see cref="Token&lt;T&gt;"/> 类的新实例。
 		/// </summary>
 		/// <param name="id">标识符。</param>
 		/// <param name="text">文本。</param>
 		/// <param name="start">起始位置。</param>
 		/// <param name="end">结束位置。</param>
-		public Token(string id, string text, SourceLocation start, SourceLocation end)
+		public Token(T id, string text, SourceLocation start, SourceLocation end)
 		{
 			if (start > end && end != SourceLocation.Invalid)
 			{
@@ -96,14 +107,14 @@ namespace Cyjb.Text
 			this.value = null;
 		}
 		/// <summary>
-		/// 使用词法单元的相关信息初始化 <see cref="Token"/> 类的新实例。
+		/// 使用词法单元的相关信息初始化 <see cref="Token&lt;T&gt;"/> 类的新实例。
 		/// </summary>
 		/// <param name="id">标识符。</param>
 		/// <param name="text">文本。</param>
 		/// <param name="start">起始位置。</param>
 		/// <param name="end">结束位置。</param>
 		/// <param name="value">词法单元的值。</param>
-		public Token(string id, string text, SourceLocation start, SourceLocation end, object value)
+		public Token(T id, string text, SourceLocation start, SourceLocation end, object value)
 		{
 			if (start > end && end != SourceLocation.Invalid)
 			{
@@ -119,7 +130,7 @@ namespace Cyjb.Text
 		/// 获取词法单元的标识符。
 		/// </summary>
 		/// <value>词法单元的标识符。</value>
-		public string Id { get { return id; } }
+		public T Id { get { return id; } }
 		/// <summary>
 		/// 获取词法单元的文本。
 		/// </summary>
@@ -146,7 +157,7 @@ namespace Cyjb.Text
 		/// <value>如果表示文件的结束，则为 <c>true</c>；否则为 <c>false</c>。</value>
 		public bool IsEndOfFile
 		{
-			get { return this.id == EndOfFile; }
+			get { return EqualityComparer<T>.Default.Equals(this.id, EndOfFile); }
 		}
 
 		#region IEquatable<Token> 成员
@@ -162,7 +173,7 @@ namespace Cyjb.Text
 		/// 指示当前对象是否等于另一个对象。
 		/// </summary>
 		/// </overloads>
-		public bool Equals(Token other)
+		public bool Equals(Token<T> other)
 		{
 			if (object.ReferenceEquals(this, other))
 			{
@@ -172,7 +183,7 @@ namespace Cyjb.Text
 			{
 				return false;
 			}
-			if (this.id != other.id)
+			if (!EqualityComparer<T>.Default.Equals(this.id, other.id))
 			{
 				return false;
 			}
@@ -192,14 +203,14 @@ namespace Cyjb.Text
 		#region object 成员
 
 		/// <summary>
-		/// 确定指定的 <see cref="System.Object"/> 是否等于当前的 <see cref="Token"/>。
+		/// 确定指定的 <see cref="System.Object"/> 是否等于当前的 <see cref="Token&lt;T&gt;"/>。
 		/// </summary>
-		/// <param name="obj">与当前的 <see cref="Token"/> 进行比较的 <see cref="System.Object"/>。</param>
-		/// <returns>如果指定的 <see cref="System.Object"/> 等于当前的 <see cref="Token"/>，则为 <c>true</c>；
+		/// <param name="obj">与当前的 <see cref="Token&lt;T&gt;"/> 进行比较的 <see cref="System.Object"/>。</param>
+		/// <returns>如果指定的 <see cref="System.Object"/> 等于当前的 <see cref="Token&lt;T&gt;"/>，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</returns>
 		public override bool Equals(object obj)
 		{
-			Token token = obj as Token;
+			Token<T> token = obj as Token<T>;
 			if (token == null)
 			{
 				return false;
@@ -208,16 +219,13 @@ namespace Cyjb.Text
 		}
 
 		/// <summary>
-		/// 用于 <see cref="Token"/> 类型的哈希函数。
+		/// 用于 <see cref="Token&lt;T&gt;"/> 类型的哈希函数。
 		/// </summary>
-		/// <returns>当前 <see cref="Token"/> 的哈希代码。</returns>
+		/// <returns>当前 <see cref="Token&lt;T&gt;"/> 的哈希代码。</returns>
 		public override int GetHashCode()
 		{
 			int hashCode = 3321;
-			if (id != null)
-			{
-				hashCode ^= id.GetHashCode();
-			}
+			hashCode ^= id.GetHashCode();
 			if (text != null)
 			{
 				hashCode ^= text.GetHashCode();
@@ -234,11 +242,11 @@ namespace Cyjb.Text
 		{
 			if (string.IsNullOrEmpty(text))
 			{
-				return string.Concat("[", id, "]");
+				return id.ToString();
 			}
 			else
 			{
-				return string.Concat("[", id, "] ", text);
+				return string.Concat(id, " \"", text, "\"");
 			}
 		}
 
@@ -247,13 +255,13 @@ namespace Cyjb.Text
 		#region 运算符重载
 
 		/// <summary>
-		/// 判断两个 <see cref="Token"/> 是否相同。
+		/// 判断两个 <see cref="Token&lt;T&gt;"/> 是否相同。
 		/// </summary>
-		/// <param name="obj1">要比较的第一个 <see cref="Token"/> 对象。</param>
-		/// <param name="obj2">要比较的第二个 <see cref="Token"/> 对象。</param>
-		/// <returns>如果两个 <see cref="Token"/> 对象相同，则为 <c>true</c>；
+		/// <param name="obj1">要比较的第一个 <see cref="Token&lt;T&gt;"/> 对象。</param>
+		/// <param name="obj2">要比较的第二个 <see cref="Token&lt;T&gt;"/> 对象。</param>
+		/// <returns>如果两个 <see cref="Token&lt;T&gt;"/> 对象相同，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</returns>
-		public static bool operator ==(Token obj1, Token obj2)
+		public static bool operator ==(Token<T> obj1, Token<T> obj2)
 		{
 			if (object.ReferenceEquals(obj1, obj2))
 			{
@@ -267,13 +275,13 @@ namespace Cyjb.Text
 		}
 
 		/// <summary>
-		/// 判断两个 <see cref="Token"/> 是否不同。
+		/// 判断两个 <see cref="Token&lt;T&gt;"/> 是否不同。
 		/// </summary>
-		/// <param name="obj1">要比较的第一个 <see cref="Token"/> 对象。</param>
-		/// <param name="obj2">要比较的第二个 <see cref="Token"/> 对象。</param>
-		/// <returns>如果两个 <see cref="Token"/> 对象不同，则为 <c>true</c>；
+		/// <param name="obj1">要比较的第一个 <see cref="Token&lt;T&gt;"/> 对象。</param>
+		/// <param name="obj2">要比较的第二个 <see cref="Token&lt;T&gt;"/> 对象。</param>
+		/// <returns>如果两个 <see cref="Token&lt;T&gt;"/> 对象不同，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</returns>
-		public static bool operator !=(Token obj1, Token obj2)
+		public static bool operator !=(Token<T> obj1, Token<T> obj2)
 		{
 			return !(obj1 == obj2);
 		}
