@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Cyjb.IO;
 
 namespace Cyjb.Text
@@ -50,10 +51,12 @@ namespace Cyjb.Text
 		/// <summary>
 		/// 词法单元的标识符。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private T id;
 		/// <summary>
 		/// 词法单元的文本。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private string text;
 		/// <summary>
 		/// 词法单元的起始位置。
@@ -62,10 +65,12 @@ namespace Cyjb.Text
 		/// <summary>
 		/// 词法单元的结束位置。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private SourceLocation end;
 		/// <summary>
 		/// 词法单元的值。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private object value;
 		/// <summary>
 		/// 使用词法单元的相关信息初始化 <see cref="Token&lt;T&gt;"/> 类的新实例。
