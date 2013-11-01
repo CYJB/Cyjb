@@ -79,6 +79,9 @@
     <Compile Include="MethodExt.cs" />
     <Compile Include="MethodSwitcher.cs" />
     <Compile Include="MethodSwitcherManual`1.cs" />
+    <Compile Include="Net\HttpWebClient.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="PowerBinder.cs" />
     <Compile Include="CharExt.cs" />
     <Compile Include="Collections\ArrayAdapter`1.cs" />
