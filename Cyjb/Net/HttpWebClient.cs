@@ -99,6 +99,10 @@ namespace Cyjb.Net
 		#endregion // HTTP 标头字段
 
 		/// <summary>
+		/// 初始化 <see cref="HttpWebClient"/> 类的新实例。
+		/// </summary>
+		public HttpWebClient() { }
+		/// <summary>
 		/// 为指定资源返回一个 <see cref="WebRequest"/> 对象。
 		/// </summary>
 		/// <param name="address">一个 <see cref="Uri"/>，用于标识要请求的资源。</param>
