@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Cyjb.Utility;
@@ -633,11 +633,12 @@ namespace Cyjb
 					// 获取常数名称。
 					names[i] = descs[i] = fieldInfo.Name;
 					// 尝试获取描述。
-					DescriptionAttribute attr = Attribute.GetCustomAttribute(fieldInfo,
-						typeof(DescriptionAttribute), false) as DescriptionAttribute;
+					CustomAttributeData attr = fieldInfo.GetCustomAttributesData().FirstOrDefault(
+						data => data.Constructor.ReflectedType.FullName
+							.Equals("System.ComponentModel.DescriptionAttribute", StringComparison.Ordinal));
 					if (attr != null)
 					{
-						descs[i] = attr.Description;
+						descs[i] = attr.ConstructorArguments[0].Value as string;
 						hasDesc = true;
 					}
 				}
@@ -647,7 +648,10 @@ namespace Cyjb
 					descs = names;
 				}
 				// 将是否包含 FlagsAttribute 一并缓存，能有效的提高性能。
-				return new EnumCache(type.IsDefined(typeof(FlagsAttribute), false), hasDesc, values, names, descs);
+				bool hasFlags = type.GetCustomAttributesData().Any(
+					data => data.Constructor.ReflectedType.FullName
+						.Equals("System.FlagsAttribute", StringComparison.Ordinal));
+				return new EnumCache(hasFlags, hasDesc, values, names, descs);
 			});
 		}
 		/// <summary>
