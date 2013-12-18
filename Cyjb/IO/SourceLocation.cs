@@ -5,12 +5,13 @@ namespace Cyjb.IO
 	/// <summary>
 	/// 表示源文件中的位置信息。
 	/// </summary>
+	[Serializable]
 	public struct SourceLocation : IEquatable<SourceLocation>, IComparable<SourceLocation>
 	{
 		/// <summary>
-		/// 表示无效的位置信息。
+		/// 表示未知的位置信息。
 		/// </summary>
-		public readonly static SourceLocation Invalid = new SourceLocation(-1, -1, -1);
+		public readonly static SourceLocation Unknown;
 		/// <summary>
 		/// 所在的行。
 		/// </summary>
@@ -31,6 +32,18 @@ namespace Cyjb.IO
 		/// <param name="col">所在的列。</param>
 		public SourceLocation(int idx, int line, int col)
 		{
+			if (idx < 0)
+			{
+				throw ExceptionHelper.ArgumentNegative("idx");
+			}
+			if (line < 1)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("line");
+			}
+			if (col < 1)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("col");
+			}
 			this.index = idx;
 			this.line = line;
 			this.col = col;
@@ -61,15 +74,15 @@ namespace Cyjb.IO
 		/// <remarks>首先按行比较，其次按列比较，最后考虑索引的值。</remarks>
 		public int CompareTo(SourceLocation other)
 		{
-			int tmp = this.line - other.line;
-			if (tmp != 0)
+			int cmp = this.line - other.line;
+			if (cmp != 0)
 			{
-				return tmp;
+				return cmp;
 			}
-			tmp = this.col - other.col;
-			if (tmp != 0)
+			cmp = this.col - other.col;
+			if (cmp != 0)
 			{
-				return tmp;
+				return cmp;
 			}
 			return this.index - other.index;
 		}
@@ -138,6 +151,10 @@ namespace Cyjb.IO
 		/// <returns>当前对象的字符串表示形式。</returns>
 		public override string ToString()
 		{
+			if (this == Unknown)
+			{
+				return "Unknown";
+			}
 			return string.Concat(index, "(Line ", line, ", Col ", col, ")");
 		}
 

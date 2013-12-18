@@ -381,6 +381,14 @@
     <value>无法从已关闭的 SourceReader 中读取。</value>
     <comment>不能从关闭的 SourceReader 中读取。</comment>
   </data>
+  <data name="StringEmpty" xml:space="preserve">
+    <value>参数 '{0}' 需要一个非空的字符串。</value>
+    <comment>参数需要非空的字符串。</comment>
+  </data>
+  <data name="StringWhiteSpace" xml:space="preserve">
+    <value>参数 '{0}' 需要一个非空白的字符串。</value>
+    <comment>参数需要非空白的字符串。</comment>
+  </data>
   <data name="UnboundGenParam" xml:space="preserve">
     <value>不能对 ContainsGenericParameters 为 True 的类型或方法执行后期绑定操作。</value>
     <comment>不能是开放式泛型类型。</comment>

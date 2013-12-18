@@ -27,6 +27,24 @@ namespace Cyjb
 			return GetArgumentException(paramName, "ArrayEmpty");
 		}
 		/// <summary>
+		/// 检查数组是否为 <c>null</c> 或长度为 <c>0</c>，如果是则抛出异常。
+		/// </summary>
+		/// <param name="arr">要检查的数组。</param>
+		/// <param name="paramName">要检查的数组参数名。</param>
+		/// <exception cref="System.ArgumentException"><paramref name="arr"/>
+		/// 为 <c>null</c> 或长度为 <c>0</c>。</exception>
+		public static void CheckArrayEmpty(Array arr, string paramName)
+		{
+			if (arr == null)
+			{
+				throw ArgumentNull(paramName);
+			}
+			if (arr.Length == 0)
+			{
+				throw ArrayEmpty(paramName);
+			}
+		}
+		/// <summary>
 		/// 返回数组下限不为 <c>0</c> 的异常。
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
@@ -82,6 +100,69 @@ namespace Cyjb
 		}
 
 		#endregion // 数组异常
+
+		#region 字符串异常
+
+		/// <summary>
+		/// 返回字符串为空的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		public static ArgumentException StringEmpty(string paramName)
+		{
+			return GetArgumentException("StringEmpty", paramName);
+		}
+		/// <summary>
+		/// 返回字符串只包含空白的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		public static ArgumentException StringWhiteSpace(string paramName)
+		{
+			return GetArgumentException("StringWhiteSpace", paramName);
+		}
+		/// <summary>
+		/// 检查字符串是否为 <c>null</c> 或空字符串，如果是则抛出异常。
+		/// </summary>
+		/// <param name="str">要检查的字符串。</param>
+		/// <param name="paramName">要检查的字符串参数名。</param>
+		/// <exception cref="System.ArgumentException"><paramref name="str"/>
+		/// 为 <c>null</c> 或空字符串。</exception>
+		public static void CheckStringEmpty(string str, string paramName)
+		{
+			if (str == null)
+			{
+				throw ArgumentNull(paramName);
+			}
+			if (str.Length == 0)
+			{
+				throw StringEmpty(paramName);
+			}
+		}
+		/// <summary>
+		/// 检查字符串是否为 <c>null</c>、空字符串或只包含空白，如果是则抛出异常。
+		/// </summary>
+		/// <param name="str">要检查的字符串。</param>
+		/// <param name="paramName">要检查的字符串参数名。</param>
+		/// <exception cref="System.ArgumentException"><paramref name="str"/>
+		/// 为 <c>null</c>、空字符串或只包含空白。</exception>
+		public static void CheckStringWhiteSpace(string str, string paramName)
+		{
+			if (str == null)
+			{
+				throw ArgumentNull(paramName);
+			}
+			if (str.Length == 0)
+			{
+				throw StringEmpty(paramName);
+			}
+			if (string.IsNullOrWhiteSpace(str))
+			{
+				throw StringWhiteSpace(paramName);
+			}
+		}
+
+		#endregion // 字符串异常
 
 		/// <summary>
 		/// 返回至少有一个对象实现 <see cref="System.IComparable"/> 的异常。

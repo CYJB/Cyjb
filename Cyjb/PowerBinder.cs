@@ -191,11 +191,7 @@ namespace Cyjb
 		public override MethodBase BindToMethod(BindingFlags bindingAttr, MethodBase[] match, ref object[] args,
 			ParameterModifier[] modifiers, CultureInfo culture, string[] names, out object state)
 		{
-			ExceptionHelper.CheckArgumentNull(match, "match");
-			if (match.Length == 0)
-			{
-				throw ExceptionHelper.ArrayEmpty("match");
-			}
+			ExceptionHelper.CheckArrayEmpty(match, "match");
 			// 检查参数名称数组，不能出现名称相同的两个参数。
 			if (names != null)
 			{
@@ -297,11 +293,7 @@ namespace Cyjb
 		public override MethodBase SelectMethod(BindingFlags bindingAttr, MethodBase[] match, Type[] types,
 			ParameterModifier[] modifiers)
 		{
-			ExceptionHelper.CheckArgumentNull(match, "match");
-			if (match.Length == 0)
-			{
-				throw ExceptionHelper.ArrayEmpty("match");
-			}
+			ExceptionHelper.CheckArrayEmpty(match, "match");
 			// 构造方法信息数组。
 			MatchInfo[] infos = new MatchInfo[match.Length];
 			MatchInfo info = null;

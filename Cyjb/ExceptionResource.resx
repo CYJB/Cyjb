@@ -381,6 +381,14 @@
     <value>Cannot read from a closed SourceReader.</value>
     <comment>不能从关闭的 SourceReader 中读取。</comment>
   </data>
+  <data name="StringEmpty" xml:space="preserve">
+    <value>Expecting non-empty string for '{0}' parameter.</value>
+    <comment>参数需要非空的字符串。</comment>
+  </data>
+  <data name="StringWhiteSpace" xml:space="preserve">
+    <value>Expecting non-whitespace string for '{0}' parameter.</value>
+    <comment>参数需要非空白的字符串。</comment>
+  </data>
   <data name="UnboundGenParam" xml:space="preserve">
     <value>Late bound operations cannot be performed on types or methods for which ContainsGenericParameters is true.</value>
     <comment>不能是开放式泛型类型。</comment>

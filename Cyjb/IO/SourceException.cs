@@ -9,7 +9,7 @@ namespace Cyjb.IO
 	/// 表示源文件中出现异常。
 	/// </summary>
 	[Serializable]
-	public class SourceException : Exception
+	public class SourceException : Exception, ISourceLocatable
 	{
 		/// <summary>
 		/// 默认的源文件。
@@ -82,7 +82,7 @@ namespace Cyjb.IO
 		/// <param name="source">源文件的位置。</param>
 		/// <param name="isWarning">异常表示的是否是警告。</param>
 		public SourceException(string message, string source, bool isWarning)
-			: this(message, SourceLocation.Invalid, SourceLocation.Invalid, source, isWarning)
+			: this(message, SourceLocation.Unknown, SourceLocation.Unknown, source, isWarning)
 		{ }
 		/// <summary>
 		/// 使用指定的错误消息初始化 <see cref="SourceException"/> 类的新实例。
@@ -157,7 +157,7 @@ namespace Cyjb.IO
 		/// <param name="source">源文件的位置。</param>
 		/// <param name="innerException">导致当前异常的异常；如果未指定内部异常，则是一个 <c>null</c> 引用。</param>
 		public SourceException(string message, string source, Exception innerException)
-			: this(message, SourceLocation.Invalid, SourceLocation.Invalid, source, false, innerException)
+			: this(message, SourceLocation.Unknown, SourceLocation.Unknown, source, false, innerException)
 		{ }
 		/// <summary>
 		/// 使用指定的错误消息和对导致此异常的内部异常的引用初始化 <see cref="SourceException"/> 类的新实例。
@@ -176,7 +176,7 @@ namespace Cyjb.IO
 		/// <param name="isWarning">异常表示的是否是警告。</param>
 		/// <param name="innerException">导致当前异常的异常；如果未指定内部异常，则是一个 <c>null</c> 引用。</param>
 		public SourceException(string message, string source, bool isWarning, Exception innerException)
-			: this(message, SourceLocation.Invalid, SourceLocation.Invalid, source, isWarning, innerException)
+			: this(message, SourceLocation.Unknown, SourceLocation.Unknown, source, isWarning, innerException)
 		{ }
 		/// <summary>
 		/// 使用指定的错误消息和对导致此异常的内部异常的引用初始化 <see cref="SourceException"/> 类的新实例。
@@ -225,6 +225,10 @@ namespace Cyjb.IO
 			string source, bool isWarning, Exception innerException)
 			: base(message, innerException)
 		{
+			if (start > end)
+			{
+				throw ExceptionHelper.ReversedArgument("start", "end");
+			}
 			this.Start = start;
 			this.End = end;
 			this.SourceFile = source;
@@ -277,9 +281,9 @@ namespace Cyjb.IO
 				StringBuilder text = new StringBuilder();
 				text.Append(Resources.GetString(IsWarning ? "WarningText" : "ErrorText"));
 				text.Append(base.Message);
-				if (Start != SourceLocation.Invalid)
+				if (Start != SourceLocation.Unknown && End != SourceLocation.Unknown)
 				{
-					if (End == SourceLocation.Invalid)
+					if (Start == End)
 					{
 						text.AppendLine();
 						text.Append(Resources.GetString("AtText", Start));

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Cyjb.IO;
 
 namespace Cyjb.Text
@@ -11,7 +10,7 @@ namespace Cyjb.Text
 	/// <typeparam name="T">词法单元标识符的类型，必须是一个枚举类型。</typeparam>
 	/// <remarks><typeparamref name="T"/> 必须的枚举类型，
 	/// 该类型的特殊值 <c>-1</c> 将用于表示文件结束。</remarks>
-	public class Token<T> : IEquatable<Token<T>>
+	public class Token<T> : ISourceLocatable, IEquatable<Token<T>>
 		where T : struct
 	{
 		/// <summary>
@@ -46,51 +45,25 @@ namespace Cyjb.Text
 		/// <returns>表示文件结束的词法单元。</returns>
 		public static Token<T> GetEndOfFile(SourceLocation loc, object value)
 		{
-			return new Token<T>(EndOfFile, string.Empty, loc, SourceLocation.Invalid, value);
+			return new Token<T>(EndOfFile, string.Empty, loc, loc, value);
 		}
-		/// <summary>
-		/// 词法单元的标识符。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private T id;
-		/// <summary>
-		/// 词法单元的文本。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private string text;
-		/// <summary>
-		/// 词法单元的起始位置。
-		/// </summary>
-		private SourceLocation start;
-		/// <summary>
-		/// 词法单元的结束位置。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private SourceLocation end;
-		/// <summary>
-		/// 词法单元的值。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private object value;
 		/// <summary>
 		/// 使用词法单元的相关信息初始化 <see cref="Token&lt;T&gt;"/> 类的新实例。
 		/// 结束位置会被置为无效位置。
 		/// </summary>
 		/// <param name="id">标识符。</param>
 		/// <param name="text">文本。</param>
-		/// <param name="start">起始位置。</param>
+		/// <param name="loc">词法单元的位置。</param>
 		/// <overloads>
 		/// <summary>
 		/// 初始化 <see cref="Token&lt;T&gt;"/> 类的新实例。
 		/// </summary>
 		/// </overloads>
-		public Token(T id, string text, SourceLocation start)
+		public Token(T id, string text, SourceLocation loc)
 		{
-			this.id = id;
-			this.text = text;
-			this.start = start;
-			this.end = SourceLocation.Invalid;
-			this.value = null;
+			this.Id = id;
+			this.Text = text;
+			this.Start = this.End = loc;
 		}
 		/// <summary>
 		/// 使用词法单元的相关信息初始化 <see cref="Token&lt;T&gt;"/> 类的新实例。
@@ -101,15 +74,14 @@ namespace Cyjb.Text
 		/// <param name="end">结束位置。</param>
 		public Token(T id, string text, SourceLocation start, SourceLocation end)
 		{
-			if (start > end && end != SourceLocation.Invalid)
+			if (start > end)
 			{
 				throw ExceptionHelper.ReversedArgument("start", "end");
 			}
-			this.id = id;
-			this.text = text;
-			this.start = start;
-			this.end = end;
-			this.value = null;
+			this.Id = id;
+			this.Text = text;
+			this.Start = start;
+			this.End = end;
 		}
 		/// <summary>
 		/// 使用词法单元的相关信息初始化 <see cref="Token&lt;T&gt;"/> 类的新实例。
@@ -121,48 +93,48 @@ namespace Cyjb.Text
 		/// <param name="value">词法单元的值。</param>
 		public Token(T id, string text, SourceLocation start, SourceLocation end, object value)
 		{
-			if (start > end && end != SourceLocation.Invalid)
+			if (start > end)
 			{
 				throw ExceptionHelper.ReversedArgument("start", "end");
 			}
-			this.id = id;
-			this.text = text;
-			this.start = start;
-			this.end = end;
-			this.value = value;
+			this.Id = id;
+			this.Text = text;
+			this.Start = start;
+			this.End = end;
+			this.Value = value;
 		}
 		/// <summary>
 		/// 获取词法单元的标识符。
 		/// </summary>
 		/// <value>词法单元的标识符。</value>
-		public T Id { get { return id; } }
+		public T Id { get; private set; }
 		/// <summary>
 		/// 获取词法单元的文本。
 		/// </summary>
 		/// <value>词法单元的文本。</value>
-		public string Text { get { return text; } }
+		public string Text { get; private set; }
 		/// <summary>
 		/// 获取词法单元的起始位置。
 		/// </summary>
 		/// <value>词法单元的起始位置。</value>
-		public SourceLocation Start { get { return start; } }
+		public SourceLocation Start { get; private set; }
 		/// <summary>
 		/// 获取词法单元的结束位置。
 		/// </summary>
 		/// <value>词法单元的结束位置。</value>
-		public SourceLocation End { get { return end; } }
+		public SourceLocation End { get; private set; }
 		/// <summary>
 		/// 获取词法单元的值。
 		/// </summary>
 		/// <value>词法单元的值。</value>
-		public object Value { get { return value; } }
+		public object Value { get; private set; }
 		/// <summary>
 		/// 获取当前词法单元是否表示文件的结束。
 		/// </summary>
 		/// <value>如果表示文件的结束，则为 <c>true</c>；否则为 <c>false</c>。</value>
 		public bool IsEndOfFile
 		{
-			get { return EqualityComparer<T>.Default.Equals(this.id, EndOfFile); }
+			get { return EqualityComparer<T>.Default.Equals(this.Id, EndOfFile); }
 		}
 
 		#region IEquatable<Token> 成员
@@ -188,19 +160,19 @@ namespace Cyjb.Text
 			{
 				return false;
 			}
-			if (!EqualityComparer<T>.Default.Equals(this.id, other.id))
+			if (!EqualityComparer<T>.Default.Equals(this.Id, other.Id))
 			{
 				return false;
 			}
-			if (this.text != other.text)
+			if (this.Text != other.Text)
 			{
 				return false;
 			}
-			if (this.start != other.start)
+			if (this.Start != other.Start)
 			{
 				return false;
 			}
-			return this.end == other.end;
+			return this.End == other.End;
 		}
 
 		#endregion // IEquatable<Token> 成员
@@ -230,13 +202,13 @@ namespace Cyjb.Text
 		public override int GetHashCode()
 		{
 			int hashCode = 3321;
-			hashCode ^= id.GetHashCode();
-			if (text != null)
+			hashCode ^= Id.GetHashCode();
+			if (Text != null)
 			{
-				hashCode ^= text.GetHashCode();
+				hashCode ^= Text.GetHashCode();
 			}
-			hashCode ^= start.GetHashCode() << 4;
-			hashCode ^= end.GetHashCode() << 8;
+			hashCode ^= Start.GetHashCode() << 4;
+			hashCode ^= End.GetHashCode() << 8;
 			return hashCode;
 		}
 		/// <summary>
@@ -245,13 +217,13 @@ namespace Cyjb.Text
 		/// <returns>当前对象的字符串表示形式。</returns>
 		public override string ToString()
 		{
-			if (string.IsNullOrEmpty(text))
+			if (string.IsNullOrEmpty(Text))
 			{
-				return id.ToString();
+				return Id.ToString();
 			}
 			else
 			{
-				return string.Concat(id, " \"", text, "\"");
+				return string.Concat(Id, " \"", Text, "\"");
 			}
 		}
 
