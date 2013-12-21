@@ -129,10 +129,10 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		/// <param name="index">要获取或设置的元素从零开始的索引。</param>
 		/// <value>指定索引处的元素。</value>
+		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <paramref name="index"/> 不是 <see cref="ListBase&lt;T&gt;"/> 中的有效索引。</exception>
 		/// <exception cref="System.ArgumentOutOfRangeException">设置该属性，
 		/// 而且 <see cref="ListBase&lt;T&gt;"/> 为只读。</exception>
-		/// <exception cref="System.NotSupportedException">
-		/// <see cref="ListBase&lt;T&gt;"/> 是只读的。</exception>
 		public T this[int index]
 		{
 			get { return GetItem(index); }
@@ -274,7 +274,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (this.isReadOnly)
 			{
-				ExceptionHelper.ReadOnlyCollection();
+				throw ExceptionHelper.ReadOnlyCollection();
 			}
 			int idx = this.Count;
 			if (value is T)
@@ -297,7 +297,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (this.isReadOnly)
 			{
-				ExceptionHelper.ReadOnlyCollection();
+				throw ExceptionHelper.ReadOnlyCollection();
 			}
 			this.ClearItems();
 		}
@@ -341,7 +341,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (this.isReadOnly)
 			{
-				ExceptionHelper.ReadOnlyCollection();
+				throw ExceptionHelper.ReadOnlyCollection();
 			}
 			if (index < 0 || index >= this.Count)
 			{
@@ -367,7 +367,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (this.isReadOnly)
 			{
-				ExceptionHelper.ReadOnlyCollection();
+				throw ExceptionHelper.ReadOnlyCollection();
 			}
 			if (value is T)
 			{
