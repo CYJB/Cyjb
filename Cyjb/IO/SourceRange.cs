@@ -93,7 +93,8 @@ namespace Cyjb.IO
 			int idx = -1;
 			if (!this.IsValid)
 			{
-				idx = ranges.FirstIndex(range => range.Start != SourceLocation.Unknown &&
+				idx = ranges.FirstIndex(range => range != null &&
+					range.Start != SourceLocation.Unknown &&
 					range.End != SourceLocation.Unknown);
 				if (idx == -1)
 				{
@@ -114,7 +115,8 @@ namespace Cyjb.IO
 			{
 				return Unknown;
 			}
-			int idx = ranges.FirstIndex(range => range.Start != SourceLocation.Unknown &&
+			int idx = ranges.FirstIndex(range => range != null &&
+				range.Start != SourceLocation.Unknown &&
 				range.End != SourceLocation.Unknown);
 			if (idx == -1)
 			{
@@ -134,6 +136,10 @@ namespace Cyjb.IO
 			Debug.Assert(range.IsValid);
 			for (int i = idx; i < ranges.Length; i++)
 			{
+				if (ranges[i] == null)
+				{
+					continue;
+				}
 				SourceLocation start = ranges[i].Start;
 				SourceLocation end = ranges[i].End;
 				// 防止 ranges 中范围的 Start 和 End 颠倒。

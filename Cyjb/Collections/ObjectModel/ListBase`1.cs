@@ -405,28 +405,28 @@ namespace Cyjb.Collections.ObjectModel
 		#region ICollection<T> 成员
 
 		/// <summary>
-		/// 获取 <see cref="CollectionBase&lt;T&gt;"/> 中包含的元素数。
+		/// 获取 <see cref="ListBase&lt;T&gt;"/> 中包含的元素数。
 		/// </summary>
-		/// <value><see cref="CollectionBase&lt;T&gt;"/> 中包含的元素数。</value>
+		/// <value><see cref="ListBase&lt;T&gt;"/> 中包含的元素数。</value>
 		public virtual int Count
 		{
 			get { return this.items.Count; }
 		}
 		/// <summary>
-		/// 获取一个值，该值指示 <see cref="CollectionBase&lt;T&gt;"/> 是否为只读。
+		/// 获取一个值，该值指示 <see cref="ListBase&lt;T&gt;"/> 是否为只读。
 		/// </summary>
-		/// <value>如果 <see cref="CollectionBase&lt;T&gt;"/> 为只读，则为 <c>true</c>；
+		/// <value>如果 <see cref="ListBase&lt;T&gt;"/> 为只读，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</value>
 		public bool IsReadOnly
 		{
 			get { return this.isReadOnly; }
 		}
 		/// <summary>
-		/// 将某元素添加到 <see cref="CollectionBase&lt;T&gt;"/> 中。
+		/// 将某元素添加到 <see cref="ListBase&lt;T&gt;"/> 中。
 		/// </summary>
-		/// <param name="item">要添加到 <see cref="CollectionBase&lt;T&gt;"/> 的元素。</param>
+		/// <param name="item">要添加到 <see cref="ListBase&lt;T&gt;"/> 的元素。</param>
 		/// <exception cref="System.NotSupportedException">
-		/// <see cref="CollectionBase&lt;T&gt;"/> 是只读的。</exception>
+		/// <see cref="ListBase&lt;T&gt;"/> 是只读的。</exception>
 		public void Add(T item)
 		{
 			if (this.isReadOnly)
@@ -436,10 +436,10 @@ namespace Cyjb.Collections.ObjectModel
 			this.Insert(this.Count, item);
 		}
 		/// <summary>
-		/// 从 <see cref="CollectionBase&lt;T&gt;"/> 中移除所有元素。
+		/// 从 <see cref="ListBase&lt;T&gt;"/> 中移除所有元素。
 		/// </summary>
 		/// <exception cref="System.NotSupportedException">
-		/// <see cref="CollectionBase&lt;T&gt;"/> 是只读的。</exception>
+		/// <see cref="ListBase&lt;T&gt;"/> 是只读的。</exception>
 		public void Clear()
 		{
 			if (this.isReadOnly)
@@ -450,10 +450,10 @@ namespace Cyjb.Collections.ObjectModel
 		}
 
 		/// <summary>
-		/// 确定 <see cref="CollectionBase&lt;T&gt;"/> 是否包含特定值。
+		/// 确定 <see cref="ListBase&lt;T&gt;"/> 是否包含特定值。
 		/// </summary>
-		/// <param name="item">要在 <see cref="CollectionBase&lt;T&gt;"/> 中定位的对象。</param>
-		/// <returns>如果在 <see cref="CollectionBase&lt;T&gt;"/> 中找到 <paramref name="item"/>，
+		/// <param name="item">要在 <see cref="ListBase&lt;T&gt;"/> 中定位的对象。</param>
+		/// <returns>如果在 <see cref="ListBase&lt;T&gt;"/> 中找到 <paramref name="item"/>，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public virtual bool Contains(T item)
 		{
@@ -462,9 +462,9 @@ namespace Cyjb.Collections.ObjectModel
 
 		/// <summary>
 		/// 从特定的 <see cref="System.Array"/> 索引处开始，
-		/// 将 <see cref="CollectionBase&lt;T&gt;"/> 的元素复制到一个 <see cref="System.Array"/> 中。
+		/// 将 <see cref="ListBase&lt;T&gt;"/> 的元素复制到一个 <see cref="System.Array"/> 中。
 		/// </summary>
-		/// <param name="array">作为从 <see cref="CollectionBase&lt;T&gt;"/> 
+		/// <param name="array">作为从 <see cref="ListBase&lt;T&gt;"/> 
 		/// 复制的元素的目标位置的一维 <see cref="System.Array"/>。
 		/// <see cref="System.Array"/> 必须具有从零开始的索引。</param>
 		/// <param name="arrayIndex"><paramref name="array"/> 中从零开始的索引，在此处开始复制。</param>
@@ -474,7 +474,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <paramref name="arrayIndex"/> 小于零。</exception>
 		/// <exception cref="System.ArgumentException">
 		/// <paramref name="array"/> 是多维的。</exception>
-		/// <exception cref="System.ArgumentException">源 <see cref="CollectionBase&lt;T&gt;"/> 
+		/// <exception cref="System.ArgumentException">源 <see cref="ListBase&lt;T&gt;"/> 
 		/// 中的元素数目大于从 <paramref name="arrayIndex"/> 到目标 <paramref name="array"/> 
 		/// 末尾之间的可用空间。</exception>
 		public virtual void CopyTo(T[] array, int arrayIndex)
@@ -483,14 +483,14 @@ namespace Cyjb.Collections.ObjectModel
 		}
 
 		/// <summary>
-		/// 从 <see cref="CollectionBase&lt;T&gt;"/> 中移除特定对象的第一个匹配项。
+		/// 从 <see cref="ListBase&lt;T&gt;"/> 中移除特定对象的第一个匹配项。
 		/// </summary>
-		/// <param name="item">要从 <see cref="CollectionBase&lt;T&gt;"/> 中移除的对象。</param>
-		/// <returns>如果已从 <see cref="CollectionBase&lt;T&gt;"/> 中成功移除 <paramref name="item"/>，
-		/// 则为 <c>true</c>；否则为 <c>false</c>。如果在原始 <see cref="CollectionBase&lt;T&gt;"/> 
+		/// <param name="item">要从 <see cref="ListBase&lt;T&gt;"/> 中移除的对象。</param>
+		/// <returns>如果已从 <see cref="ListBase&lt;T&gt;"/> 中成功移除 <paramref name="item"/>，
+		/// 则为 <c>true</c>；否则为 <c>false</c>。如果在原始 <see cref="ListBase&lt;T&gt;"/> 
 		/// 中没有找到 <paramref name="item"/>，该方法也会返回 <c>false</c>。</returns>
 		/// <exception cref="System.NotSupportedException">
-		/// <see cref="CollectionBase&lt;T&gt;"/> 是只读的。</exception>
+		/// <see cref="ListBase&lt;T&gt;"/> 是只读的。</exception>
 		public bool Remove(T item)
 		{
 			if (this.isReadOnly)
@@ -511,9 +511,9 @@ namespace Cyjb.Collections.ObjectModel
 		#region ICollection 成员
 
 		/// <summary>
-		/// 获取 <see cref="CollectionBase&lt;T&gt;"/> 中包含的元素数。
+		/// 获取 <see cref="ListBase&lt;T&gt;"/> 中包含的元素数。
 		/// </summary>
-		/// <value><see cref="CollectionBase&lt;T&gt;"/> 中包含的元素数。</value>
+		/// <value><see cref="ListBase&lt;T&gt;"/> 中包含的元素数。</value>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		int ICollection.Count
 		{
@@ -521,9 +521,9 @@ namespace Cyjb.Collections.ObjectModel
 		}
 
 		/// <summary>
-		/// 获取一个值，该值指示是否同步对 <see cref="CollectionBase&lt;T&gt;"/> 的访问（线程安全）。
+		/// 获取一个值，该值指示是否同步对 <see cref="ListBase&lt;T&gt;"/> 的访问（线程安全）。
 		/// </summary>
-		/// <value>如果对 <see cref="CollectionBase&lt;T&gt;"/> 的访问是同步的（线程安全），
+		/// <value>如果对 <see cref="ListBase&lt;T&gt;"/> 的访问是同步的（线程安全），
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</value>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		bool ICollection.IsSynchronized
@@ -532,9 +532,9 @@ namespace Cyjb.Collections.ObjectModel
 		}
 
 		/// <summary>
-		/// 获取一个可用于同步对 <see cref="CollectionBase&lt;T&gt;"/> 的访问的对象。
+		/// 获取一个可用于同步对 <see cref="ListBase&lt;T&gt;"/> 的访问的对象。
 		/// </summary>
-		/// <value>可用于同步对 <see cref="CollectionBase&lt;T&gt;"/> 的访问的对象。</value>
+		/// <value>可用于同步对 <see cref="ListBase&lt;T&gt;"/> 的访问的对象。</value>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		object ICollection.SyncRoot
 		{
@@ -552,9 +552,9 @@ namespace Cyjb.Collections.ObjectModel
 
 		/// <summary>
 		/// 从特定的 <see cref="System.Array"/> 索引处开始，将 
-		/// <see cref="CollectionBase&lt;T&gt;"/> 的元素复制到一个 <see cref="System.Array"/> 中。
+		/// <see cref="ListBase&lt;T&gt;"/> 的元素复制到一个 <see cref="System.Array"/> 中。
 		/// </summary>
-		/// <param name="array">作为从 <see cref="CollectionBase&lt;T&gt;"/> 
+		/// <param name="array">作为从 <see cref="ListBase&lt;T&gt;"/> 
 		/// 复制的元素的目标位置的一维 <see cref="System.Array"/>。
 		/// <see cref="System.Array"/> 必须具有从零开始的索引。</param>
 		/// <param name="index"><paramref name="array"/> 中从零开始的索引，在此处开始复制。</param>
@@ -564,10 +564,10 @@ namespace Cyjb.Collections.ObjectModel
 		/// <paramref name="index"/> 小于零。</exception>
 		/// <exception cref="System.ArgumentException">
 		/// <paramref name="array"/> 是多维的。</exception>
-		/// <exception cref="System.ArgumentException">源 <see cref="CollectionBase&lt;T&gt;"/> 
+		/// <exception cref="System.ArgumentException">源 <see cref="ListBase&lt;T&gt;"/> 
 		/// 中的元素数目大于从 <paramref name="index"/> 到目标 
 		/// <paramref name="array"/> 末尾之间的可用空间。</exception>
-		/// <exception cref="System.ArgumentException">源 <see cref="CollectionBase&lt;T&gt;"/> 
+		/// <exception cref="System.ArgumentException">源 <see cref="ListBase&lt;T&gt;"/> 
 		/// 的类型无法自动转换为目标 <paramref name="array"/> 的类型。</exception>
 		void ICollection.CopyTo(Array array, int index)
 		{
