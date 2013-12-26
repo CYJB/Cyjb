@@ -156,7 +156,7 @@ namespace Cyjb.IO
 				{
 					range.Start = start;
 				}
-				else if (range.End < end)
+				if (range.End < end)
 				{
 					range.End = end;
 				}
