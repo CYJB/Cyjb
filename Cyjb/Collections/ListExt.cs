@@ -259,5 +259,40 @@ namespace Cyjb.Collections
 
 		#endregion // 二分查找
 
+		/// <summary>
+		/// 将指定集合的元素添加到当前列表中。
+		/// </summary>
+		/// <typeparam name="T">列表中元素的类型。</typeparam>
+		/// <param name="list">要添加到的列表。</param>
+		/// <param name="collection">要添加的元素集合。</param>
+		public static void AddRange<T>(this IList<T> list, IEnumerable<T> collection)
+		{
+			ExceptionHelper.CheckArgumentNull(list, "list");
+			ExceptionHelper.CheckArgumentNull(collection, "collection");
+			foreach (T item in collection)
+			{
+				list.Add(item);
+			}
+		}
+		/// <summary>
+		/// 将指定集合的元素插入到当前列表的指定索引处。
+		/// </summary>
+		/// <typeparam name="T">列表中元素的类型。</typeparam>
+		/// <param name="list">要插入到的列表。</param>
+		/// <param name="index">从零开始的索引，在此处开始插入新元素。</param>
+		/// <param name="collection">要插入的元素集合。</param>
+		public static void InsertRange<T>(this IList<T> list, int index, IEnumerable<T> collection)
+		{
+			if (index < 0 || index > list.Count)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("index");
+			}
+			ExceptionHelper.CheckArgumentNull(list, "list");
+			ExceptionHelper.CheckArgumentNull(collection, "collection");
+			foreach (T item in collection)
+			{
+				list.Insert(index++, item);
+			}
+		}
 	}
 }
