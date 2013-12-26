@@ -78,6 +78,7 @@
     <Compile Include="IO\SourceLocator.cs" />
     <Compile Include="IO\SourceRange.cs" />
     <Compile Include="IO\SourceReader.cs" />
+    <Compile Include="MemberAccessor`1.cs" />
     <Compile Include="MethodExt.cs" />
     <Compile Include="MethodSwitcher.cs" />
     <Compile Include="MethodSwitcherManual`1.cs" />
@@ -135,6 +136,7 @@
     <Compile Include="Utility\LruNodeNoSync`2.cs" />
     <Compile Include="Utility\CacheDefaultEventArgs.cs" />
     <Compile Include="Utility\SimplyCache`2.cs" />
+    <Compile Include="MemberAccessor`2.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CYJB_Code_Key.snk" />
