@@ -88,6 +88,23 @@ namespace Cyjb.Text
 		/// </summary>
 		/// <param name="id">标识符。</param>
 		/// <param name="text">文本。</param>
+		/// <param name="range">位置范围。</param>
+		public Token(T id, string text, ISourceLocatable range)
+		{
+			if (range.Start > range.End)
+			{
+				throw ExceptionHelper.ReversedArgument("range.Start", "range.End");
+			}
+			this.Id = id;
+			this.Text = text;
+			this.Start = range.Start;
+			this.End = range.End;
+		}
+		/// <summary>
+		/// 使用词法单元的相关信息初始化 <see cref="Token&lt;T&gt;"/> 类的新实例。
+		/// </summary>
+		/// <param name="id">标识符。</param>
+		/// <param name="text">文本。</param>
 		/// <param name="start">起始位置。</param>
 		/// <param name="end">结束位置。</param>
 		/// <param name="value">词法单元的值。</param>
@@ -101,6 +118,25 @@ namespace Cyjb.Text
 			this.Text = text;
 			this.Start = start;
 			this.End = end;
+			this.Value = value;
+		}
+		/// <summary>
+		/// 使用词法单元的相关信息初始化 <see cref="Token&lt;T&gt;"/> 类的新实例。
+		/// </summary>
+		/// <param name="id">标识符。</param>
+		/// <param name="text">文本。</param>
+		/// <param name="range">位置范围。</param>
+		/// <param name="value">词法单元的值。</param>
+		public Token(T id, string text, ISourceLocatable range, object value)
+		{
+			if (range.Start > range.End)
+			{
+				throw ExceptionHelper.ReversedArgument("range.Start", "range.End");
+			}
+			this.Id = id;
+			this.Text = text;
+			this.Start = range.Start;
+			this.End = range.End;
 			this.Value = value;
 		}
 		/// <summary>
