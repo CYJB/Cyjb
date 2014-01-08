@@ -11,7 +11,7 @@ namespace UnitTestCyjb.IO
 	public class UnitTestSourceReader
 	{
 		/// <summary>
-		/// 测试 <see cref="SourceReader"/> 的相关方法。
+		/// <see cref="SourceReader"/> 类的单元测试。
 		/// </summary>
 		[TestMethod]
 		public void TestSourceReader()

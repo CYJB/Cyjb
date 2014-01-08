@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace Cyjb.IO
 {
@@ -79,89 +79,111 @@ namespace Cyjb.IO
 			get { return this.Start != SourceLocation.Unknown; }
 		}
 		/// <summary>
-		/// 将当前范围与指定范围合并，并返回结果范围。
+		/// 将当前范围与指定的一个或多个范围合并，并返回结果范围。
 		/// </summary>
-		/// <param name="ranges">要合并的范围。</param>
+		/// <param name="ranges">要合并的范围集合。</param>
 		/// <returns>合并后的结果。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 将当前范围与指定的一个或多个范围合并，并返回结果范围。
+		/// </summary>
+		/// </overloads>
 		public SourceRange MergeWith(params ISourceLocatable[] ranges)
 		{
 			if (ranges == null || ranges.Length == 0)
 			{
 				return this;
 			}
-			SourceRange baseRange = new SourceRange(this);
-			int idx = -1;
-			if (!this.IsValid)
-			{
-				idx = ranges.FirstIndex(range => range != null &&
-					range.Start != SourceLocation.Unknown &&
-					range.End != SourceLocation.Unknown);
-				if (idx == -1)
-				{
-					return Unknown;
-				}
-				baseRange = new SourceRange(ranges[idx]);
-			}
-			return Merge(baseRange, ranges, idx + 1);
+			return Merge(new SourceRange(this), ranges);
 		}
 		/// <summary>
-		/// 返回将指定范围合并的结果范围。
+		/// 将当前范围与指定的一个或多个范围合并，并返回结果。
 		/// </summary>
-		/// <param name="ranges">要合并的范围。</param>
+		/// <param name="ranges">要合并的范围集合。</param>
 		/// <returns>合并后的结果。</returns>
+		public SourceRange MergeWith(IEnumerable<ISourceLocatable> ranges)
+		{
+			if (ranges == null)
+			{
+				return this;
+			}
+			return Merge(new SourceRange(this), ranges);
+		}
+		/// <summary>
+		/// 返回将指定的一个或多个范围合并的结果。
+		/// </summary>
+		/// <param name="ranges">要进行合并的范围集合。</param>
+		/// <returns>合并后的结果。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回将指定的一个或多个范围合并的结果。
+		/// </summary>
+		/// </overloads>
 		public static SourceRange Merge(params ISourceLocatable[] ranges)
 		{
 			if (ranges == null || ranges.Length == 0)
 			{
 				return Unknown;
 			}
-			int idx = ranges.FirstIndex(range => range != null &&
-				range.Start != SourceLocation.Unknown &&
-				range.End != SourceLocation.Unknown);
-			if (idx == -1)
+			return Merge(new SourceRange(SourceLocation.Unknown), ranges);
+		}
+		/// <summary>
+		/// 返回将指定的一个或多个范围合并的结果。
+		/// </summary>
+		/// <param name="ranges">要进行合并的范围集合。</param>
+		/// <returns>合并后的结果。</returns>
+		public static SourceRange Merge(IEnumerable<ISourceLocatable> ranges)
+		{
+			if (ranges == null)
 			{
 				return Unknown;
 			}
-			return Merge(new SourceRange(ranges[idx]), ranges, idx + 1);
+			return Merge(new SourceRange(SourceLocation.Unknown), ranges);
 		}
 		/// <summary>
-		/// 返回将指定范围合并的结果范围。
+		/// 返回将指定的基础范围与一个或多个范围合并的结果。
 		/// </summary>
-		/// <param name="range">合并的基础范围。</param>
-		/// <param name="ranges">要合并的范围。</param>
-		/// <param name="idx">要合并的起始索引。</param>
+		/// <param name="range">要进行合并的基础范围。</param>
+		/// <param name="ranges">要进行合并的范围集合。</param>
 		/// <returns>合并后的结果。</returns>
-		private static SourceRange Merge(SourceRange range, ISourceLocatable[] ranges, int idx)
+		private static SourceRange Merge(SourceRange range, IEnumerable<ISourceLocatable> ranges)
 		{
-			Debug.Assert(range.IsValid);
-			for (int i = idx; i < ranges.Length; i++)
+			foreach (ISourceLocatable loc in ranges)
 			{
-				if (ranges[i] == null)
+				if (loc == null)
 				{
 					continue;
 				}
-				SourceLocation start = ranges[i].Start;
-				SourceLocation end = ranges[i].End;
+				SourceLocation start = loc.Start;
+				SourceLocation end = loc.End;
 				// 防止 ranges 中范围的 Start 和 End 颠倒。
 				if (start > end)
 				{
-					start = ranges[i].End;
-					end = ranges[i].Start;
+					start = loc.End;
+					end = loc.Start;
 				}
 				if (start == SourceLocation.Unknown)
 				{
 					continue;
 				}
-				if (range.Start > start)
+				if (range.IsValid)
+				{
+					if (range.Start > start)
+					{
+						range.Start = start;
+					}
+					if (range.End < end)
+					{
+						range.End = end;
+					}
+				}
+				else
 				{
 					range.Start = start;
-				}
-				if (range.End < end)
-				{
 					range.End = end;
 				}
 			}
-			return range;
+			return range.IsValid ? range : Unknown;
 		}
 		/// <summary>
 		/// 返回当前对象的字符串表示形式。
