@@ -110,7 +110,7 @@ namespace Cyjb
 		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
 		public static ArgumentException StringEmpty(string paramName)
 		{
-			return GetArgumentException("StringEmpty", paramName);
+			return GetArgumentException(paramName, "StringEmpty", paramName);
 		}
 		/// <summary>
 		/// 返回字符串只包含空白的异常。
@@ -119,7 +119,7 @@ namespace Cyjb
 		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
 		public static ArgumentException StringWhiteSpace(string paramName)
 		{
-			return GetArgumentException("StringWhiteSpace", paramName);
+			return GetArgumentException(paramName, "StringWhiteSpace", paramName);
 		}
 		/// <summary>
 		/// 检查字符串是否为 <c>null</c> 或空字符串，如果是则抛出异常。
