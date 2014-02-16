@@ -174,7 +174,21 @@ namespace Cyjb
 			return GetArgumentException(paramName, "ArgumentImplementIComparable");
 		}
 		/// <summary>
-		/// 返回泛型集合的参数类型错误的异常。
+		/// 返回参数类型错误的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回参数类型错误的异常。
+		/// </summary>
+		/// </overloads>
+		public static ArgumentException ArgumentWrongType(string paramName)
+		{
+			return GetArgumentException(paramName, "ArgumentWrongType", paramName);
+		}
+		/// <summary>
+		/// 返回参数类型错误的异常。
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <param name="value">错误的参数值。</param>
@@ -182,7 +196,7 @@ namespace Cyjb
 		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
 		public static ArgumentException ArgumentWrongType(string paramName, object value, Type targetType)
 		{
-			return GetArgumentException(paramName, "ArgumentWrongType", value, targetType);
+			return GetArgumentException(paramName, "ArgumentWrongType_Specific", paramName, value, targetType);
 		}
 		/// <summary>
 		/// 返回未能推导类型参数的异常。

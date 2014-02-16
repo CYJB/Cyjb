@@ -158,8 +158,12 @@
     <comment>参数超出范围。</comment>
   </data>
   <data name="ArgumentWrongType" xml:space="preserve">
-    <value>值 '{0}' 不是 '{1}' 类型。</value>
-    <comment>值不是特定类型。</comment>
+    <value>参数 '{0}' 的值 '{1}' 不是 '{2}' 类型。</value>
+    <comment>参数值不是特定类型。</comment>
+  </data>
+  <data name="ArgumentWrongType_Specific" xml:space="preserve">
+    <value>参数 '{0}' 的值不是有效的类型。</value>
+    <comment>参数值不是有效类型。</comment>
   </data>
   <data name="ArrayEmpty" xml:space="preserve">
     <value>数组不得为空。</value>
