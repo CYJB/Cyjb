@@ -70,6 +70,24 @@ namespace Cyjb.IO
 		/// <value>源文件中的结束位置。</value>
 		public SourceLocation End { get; private set; }
 		/// <summary>
+		/// 获取当前范围在源文件中的字符长度。
+		/// </summary>
+		/// <value>当前范围在源文件中的字符长度。</value>
+		public int Length
+		{
+			get
+			{
+				if (Start == SourceLocation.Unknown || End == SourceLocation.Unknown)
+				{
+					return 0;
+				}
+				else
+				{
+					return End.Index - Start.Index + 1;
+				}
+			}
+		}
+		/// <summary>
 		/// 获取当前范围是否是有效的范围。
 		/// </summary>
 		/// <value>如果起始和结束位置都不是 <see cref="SourceLocation.Unknown"/>，则为 <c>true</c>；
