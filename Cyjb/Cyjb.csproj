@@ -67,6 +67,7 @@
     <Compile Include="ConversionMethod.cs" />
     <Compile Include="DelegateBuilder.cs" />
     <Compile Include="ExpressionHelper.cs" />
+    <Compile Include="DoubleComparer.cs" />
     <Compile Include="IO\AggregateSourceException.cs" />
     <Compile Include="IO\DirectoryExt.cs" />
     <Compile Include="IO\DriectoryInfoExt.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="Utility\CacheDefaultEventArgs.cs" />
     <Compile Include="Utility\SimplyCache`2.cs" />
     <Compile Include="MemberAccessor`2.cs" />
+    <Compile Include="FloatComparer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CYJB_Code_Key.snk" />

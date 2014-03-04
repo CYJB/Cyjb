@@ -69,6 +69,8 @@
     <Compile Include="UnitTestConvertExt.cs" />
     <Compile Include="UnitTestStringExt.cs" />
     <Compile Include="UnitTestEnumerableExt.cs" />
+    <Compile Include="UnitTestDoubleComparer.cs" />
+    <Compile Include="UnitTestFloatComparer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cyjb\Cyjb.csproj">
