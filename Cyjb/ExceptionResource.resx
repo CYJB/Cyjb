@@ -221,6 +221,14 @@
     <value>Can not infer type argument of {0} from parameters.</value>
     <comment>无效的泛型参数推断。</comment>
   </data>
+  <data name="ConflictingAcceptAction" xml:space="preserve">
+    <value>Accept action is conflicted with Reject action.</value>
+    <comment>冲突的接受动作。</comment>
+  </data>
+  <data name="ConflictingRejectAction" xml:space="preserve">
+    <value>Reject action is conflicted with Accept action.</value>
+    <comment>冲突的拒绝动作。</comment>
+  </data>
   <data name="ConvertInvalidValue" xml:space="preserve">
     <value>'{0}' is not a valid value for '{1}'.</value>
     <comment>转换无效。</comment>
@@ -276,6 +284,10 @@
   <data name="InvalidDictionaryThreshold" xml:space="preserve">
     <value>The specified threshold for creating dictionary is out of range.</value>
     <comment>用于创建字典的阈值超出范围。</comment>
+  </data>
+  <data name="InvalidLexerContext" xml:space="preserve">
+    <value>Invalid lexer context '{0}'.</value>
+    <comment>无效的词法分析上下文。</comment>
   </data>
   <data name="InvalidOffsetLength" xml:space="preserve">
     <value>Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection.</value>
@@ -396,5 +408,9 @@
   <data name="UnboundGenParam" xml:space="preserve">
     <value>Late bound operations cannot be performed on types or methods for which ContainsGenericParameters is true.</value>
     <comment>不能是开放式泛型类型。</comment>
+  </data>
+  <data name="UnrecognizedToken" xml:space="preserve">
+    <value>Unrecognized token "{0}".</value>
+    <comment>未识别的词法单元异常。</comment>
   </data>
 </root>

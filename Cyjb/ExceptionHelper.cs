@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Cyjb.IO;
 using Cyjb.Utility;
 
 namespace Cyjb
@@ -1076,6 +1077,48 @@ namespace Cyjb
 		}
 
 		#endregion // MethodSwitcher 异常
+
+		#region 词法单元的读取器异常
+
+		/// <summary>
+		/// 返回冲突的接受动作的异常。
+		/// </summary>
+		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
+		public static InvalidOperationException ConflictingAcceptAction()
+		{
+			return GetInvalidOperation("ConflictingAcceptAction");
+		}
+		/// <summary>
+		/// 返回冲突的拒绝动作的异常。
+		/// </summary>
+		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
+		public static InvalidOperationException ConflictingRejectAction()
+		{
+			return GetInvalidOperation("ConflictingRejectAction");
+		}
+		/// <summary>
+		/// 返回词法分析器的上下文无效的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <param name="context">发生异常的上下文。</param>
+		/// <returns><see cref="System.ArgumentException"/> 对象。</returns>
+		public static ArgumentException InvalidLexerContext(string paramName, string context)
+		{
+			return GetArgumentException(paramName, "InvalidLexerContext", context);
+		}
+		/// <summary>
+		/// 返回未识别的词法单元的异常。
+		/// </summary>
+		/// <param name="text">未被识别的词法单元的文本。</param>
+		/// <param name="start">词法单元的起始位置。</param>
+		/// <param name="end">词法单元的结束位置。</param>
+		/// <returns><see cref="Cyjb.IO.SourceException"/> 对象。</returns>
+		public static SourceException UnrecognizedToken(string text, SourceLocation start, SourceLocation end)
+		{
+			return new SourceException(ExceptionResources.GetString("UnrecognizedToken", text), start, end);
+		}
+
+		#endregion // 词法单元的读取器异常
 
 	}
 }

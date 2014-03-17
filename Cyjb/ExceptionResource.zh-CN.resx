@@ -221,6 +221,14 @@
     <value>无法从参数中推导出方法 {0} 的类型实参。</value>
     <comment>无效的泛型参数推断。</comment>
   </data>
+  <data name="ConflictingAcceptAction" xml:space="preserve">
+    <value>接受动作与拒绝动作冲突。</value>
+    <comment>冲突的接受动作。</comment>
+  </data>
+  <data name="ConflictingRejectAction" xml:space="preserve">
+    <value>拒绝动作与接受动作冲突。</value>
+    <comment>冲突的拒绝动作。</comment>
+  </data>
   <data name="ConvertInvalidValue" xml:space="preserve">
     <value>'{0}' 不是 '{1}' 的有效值。</value>
     <comment>转换无效。</comment>
@@ -276,6 +284,10 @@
   <data name="InvalidDictionaryThreshold" xml:space="preserve">
     <value>指定的用于创建字典的阈值超出范围。</value>
     <comment>用于创建字典的阈值超出范围。</comment>
+  </data>
+  <data name="InvalidLexerContext" xml:space="preserve">
+    <value>无效的词法分析上下文 '{0}'。</value>
+    <comment>无效的词法分析上下文。</comment>
   </data>
   <data name="InvalidOffsetLength" xml:space="preserve">
     <value>偏移量和长度超出数组的界限，或者计数大于从索引到源集合结尾处的元素数量。</value>
@@ -396,5 +408,9 @@
   <data name="UnboundGenParam" xml:space="preserve">
     <value>不能对 ContainsGenericParameters 为 True 的类型或方法执行后期绑定操作。</value>
     <comment>不能是开放式泛型类型。</comment>
+  </data>
+  <data name="UnrecognizedToken" xml:space="preserve">
+    <value>未识别的词法单元 "{0}"。</value>
+    <comment>未识别的词法单元异常。</comment>
   </data>
 </root>
