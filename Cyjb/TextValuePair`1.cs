@@ -41,19 +41,18 @@ namespace Cyjb
 		/// <summary>
 		/// 初始化 <see cref="Cyjb.TextValuePair"/> 类的新实例。
 		/// </summary>
-		public TextValuePair()
-		{ }
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="Cyjb.TextValuePair"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
+		public TextValuePair() { }
 		/// <summary>
 		/// 使用指定的文本和值初始化 <see cref="Cyjb.TextValuePair"/> 
 		/// 类的新实例。
 		/// </summary>
 		/// <param name="text">文本。</param>
 		/// <param name="value">文本对应的值。</param>
-		/// <overloads>
-		/// <summary>
-		/// 初始化 <see cref="Cyjb.TextValuePair"/> 类的新实例。
-		/// </summary>
-		/// </overloads>
 		public TextValuePair(string text, TValue value)
 		{
 			this.text = text;
@@ -312,6 +311,35 @@ namespace Cyjb
 		public static bool operator !=(TextValuePair<TValue> obj1, TextValuePair<TValue> obj2)
 		{
 			return !(obj1 == obj2);
+		}
+		/// <summary>
+		/// 到 <see cref="TextValuePair"/> 类型的隐式类型转换。
+		/// </summary>
+		/// <param name="token">要转换类型的 <see cref="TextValuePair&lt;TValue&gt;"/> 实例。</param>
+		/// <returns>类型转换的结果。</returns>
+		public static implicit operator TextValuePair(TextValuePair<TValue> pair)
+		{
+			return new TextValuePair(pair.text, pair.pairValue);
+		}
+		/// <summary>
+		/// 从 <see cref="TextValuePair"/> 类型的显式类型转换。
+		/// </summary>
+		/// <param name="token">要转换类型的 <see cref="TextValuePair"/> 实例。</param>
+		/// <returns>类型转换的结果。</returns>
+		public static explicit operator TextValuePair<TValue>(TextValuePair pair)
+		{
+			if (pair.Value == null)
+			{
+				return new TextValuePair<TValue>(pair.Text, default(TValue));
+			}
+			else if (pair.Value is TValue)
+			{
+				return new TextValuePair<TValue>(pair.Text, (TValue)pair.Value);
+			}
+			else
+			{
+				throw ExceptionHelper.ArgumentWrongType("pair");
+			}
 		}
 
 		#endregion // 运算符重载
