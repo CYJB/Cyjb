@@ -49,7 +49,7 @@ namespace Cyjb.Text
 		}
 		/// <summary>
 		/// 使用词法单元的相关信息初始化 <see cref="Token&lt;T&gt;"/> 类的新实例。
-		/// 结束位置会被置为无效位置。
+		/// 起始位置和结束位置都会被设置为 <paramref name="loc"/>。
 		/// </summary>
 		/// <param name="id">标识符。</param>
 		/// <param name="text">文本。</param>
@@ -91,14 +91,17 @@ namespace Cyjb.Text
 		/// <param name="range">位置范围。</param>
 		public Token(T id, string text, ISourceLocatable range)
 		{
-			if (range.Start > range.End)
+			if (range != null)
 			{
-				throw ExceptionHelper.ReversedArgument("range.Start", "range.End");
+				if (range.Start > range.End)
+				{
+					throw ExceptionHelper.ReversedArgument("range.Start", "range.End");
+				}
+				this.Start = range.Start;
+				this.End = range.End;
 			}
 			this.Id = id;
 			this.Text = text;
-			this.Start = range.Start;
-			this.End = range.End;
 		}
 		/// <summary>
 		/// 使用词法单元的相关信息初始化 <see cref="Token&lt;T&gt;"/> 类的新实例。
@@ -129,14 +132,17 @@ namespace Cyjb.Text
 		/// <param name="value">词法单元的值。</param>
 		public Token(T id, string text, ISourceLocatable range, object value)
 		{
-			if (range.Start > range.End)
+			if (range != null)
 			{
-				throw ExceptionHelper.ReversedArgument("range.Start", "range.End");
+				if (range.Start > range.End)
+				{
+					throw ExceptionHelper.ReversedArgument("range.Start", "range.End");
+				}
+				this.Start = range.Start;
+				this.End = range.End;
 			}
 			this.Id = id;
 			this.Text = text;
-			this.Start = range.Start;
-			this.End = range.End;
 			this.Value = value;
 		}
 		/// <summary>
