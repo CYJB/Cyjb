@@ -1,5 +1,5 @@
-﻿using System.Text;
-
+﻿
+using System.Collections.Generic;
 namespace Cyjb
 {
 	/// <summary>
@@ -58,55 +58,79 @@ namespace Cyjb
 
 		#endregion // IsHex
 
+		#region Escape
+
 		/// <summary>
-		/// 返回当前字符的可打印字符串形式。不可打印的字符将返回相应的转义字符串。
+		/// 返回当前字符的转义字符串。
 		/// </summary>
-		/// <param name="ch">要获取可打印字符串形式的字符。</param>
-		/// <returns>字符的可打印字符串形式。</returns>
+		/// <param name="ch">要获取转义字符串的字符。</param>
+		/// <returns>字符的转义字符串，如果无需转义则返回原始字符。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回当前字符的转义字符串。
+		/// </summary>
+		/// </overloads>
 		/// <remarks>
 		/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），会返回原始字符。</para>
-		/// <para>对于某些特殊字符（\, \a, \b, \e, \f, \n, \r, \t, \v），会返回其转义形式。</para>
-		/// <para>对于其它字符，会返回其十六进制表示形式（\x00 或 \u0000）。</para>
+		/// <para>对于某些特殊字符（\0, \, \a, \b, \f, \n, \r, \t, \v），会返回其转义形式。</para>
+		/// <para>对于其它字符，会返回其十六进制转义形式（\u0000）。</para>
 		/// </remarks>
-		public static string ToPrintableString(this char ch)
+		public static string Escape(this char ch)
+		{
+			return Escape(ch, null);
+		}
+		/// <summary>
+		/// 返回当前字符的转义字符串。
+		/// </summary>
+		/// <param name="ch">要获取转义字符串的字符。</param>
+		/// <param name="customEscape">自定义的需要转义的字符。</param>
+		/// <returns>字符的转义字符串，如果无需转义则返回原始字符。</returns>
+		/// <remarks>
+		/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），会返回原始字符。</para>
+		/// <para>对于某些特殊字符（\0, \, \a, \b, \f, \n, \r, \t, \v）以及自定义的字符，会返回其转义形式。</para>
+		/// <para>对于其它字符，会返回其十六进制转义形式（\u0000）。</para>
+		/// </remarks>
+		public static string Escape(this char ch, ISet<char> customEscape)
 		{
 			// 转换字符转义。
 			switch (ch)
 			{
+				case '\0': return "\\0";
 				case '\\': return "\\\\";
 				case '\a': return "\\a";
 				case '\b': return "\\b";
-				case '\u001B': return "\\e";
 				case '\f': return "\\f";
 				case '\n': return "\\n";
 				case '\r': return "\\r";
 				case '\t': return "\\t";
 				case '\v': return "\\v";
 			}
-			// ASCII 可见字符。
+			if (customEscape != null && customEscape.Contains(ch))
+			{
+				return "\\" + ch;
+			}
+			return EscapeUnicode(ch);
+		}
+		/// <summary>
+		/// 返回当前字符的 Unicode 转义字符串。
+		/// </summary>
+		/// <param name="ch">要获取转义字符串的字符。</param>
+		/// <returns>字符的转义字符串，如果无需转义则返回原始字符。</returns>
+		/// <remarks>
+		/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），会返回原始字符。</para>
+		/// <para>对于其它字符，会返回其十六进制转义形式（\u0000）。</para>
+		/// </remarks>
+		public static string EscapeUnicode(this char ch)
+		{
 			if (ch >= ' ' && ch <= '~')
 			{
 				return ch.ToString();
 			}
-			StringBuilder builder = new StringBuilder();
-			int shift;
-			// 十六进制字符，较短的使用 \x 表示，较长的使用 \u 表示。
-			if (ch < 256)
-			{
-				builder.Append("\\x");
-				shift = 8;
-			}
-			else
-			{
-				builder.Append("\\u");
-				shift = 16;
-			}
-			while (shift > 0)
-			{
-				shift -= 4;
-				builder.Append(BaseDigits[(ch >> shift) & 0xF]);
-			}
-			return builder.ToString();
+			return string.Concat("\\u", BaseDigits[ch >> 12], BaseDigits[(ch >> 8) & 0xF],
+				BaseDigits[(ch >> 4) & 0xF], BaseDigits[ch & 0xF]);
 		}
+
+		#endregion // Escape
+
 	}
 }

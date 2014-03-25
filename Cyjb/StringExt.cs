@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Cyjb
@@ -9,19 +10,129 @@ namespace Cyjb
 	public static class StringExt
 	{
 
-		#region Unicode 操作
+		#region Escape
 
+		/// <summary>
+		/// 返回当前字符串的转义字符串。
+		/// </summary>
+		/// <param name="str">要进行转义的字符串。</param>
+		/// <returns>转义后的字符串。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回当前字符串的转义字符串。
+		/// </summary>
+		/// </overloads>
+		/// <remarks>
+		/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），不会发生改变。</para>
+		/// <para>对于某些特殊字符（\0, \, \a, \b, \f, \n, \r, \t, \v），会替换为其转义形式。</para>
+		/// <para>对于其它字符，会替换为其十六进制转义形式（\u0000）。</para>
+		/// </remarks>
+		public static string Escape(this string str)
+		{
+			return Escape(str, null);
+		}
+		/// <summary>
+		/// 返回当前字符串的转义字符串。
+		/// </summary>
+		/// <param name="str">要进行转义的字符串。</param>
+		/// <param name="customEscape">自定义的需要转义的字符。</param>
+		/// <returns>转义后的字符串。</returns>
+		/// <remarks>
+		/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），不会发生改变。</para>
+		/// <para>对于某些特殊字符（\0, \, \a, \b, \f, \n, \r, \t, \v）以及自定义的字符，会替换为其转义形式。</para>
+		/// <para>对于其它字符，会替换为其十六进制转义形式（\u0000）。</para>
+		/// </remarks>
+		public static string Escape(this string str, ISet<char> customEscape)
+		{
+			if (string.IsNullOrEmpty(str))
+			{
+				return str;
+			}
+			StringBuilder builder = new StringBuilder(str.Length * 2);
+			for (int i = 0; i < str.Length; i++)
+			{
+				builder.Append(str[i].Escape(customEscape));
+			}
+			return builder.ToString();
+		}
+		/// <summary>
+		/// 返回当前字符串的 Unicode 转义字符串。
+		/// </summary>
+		/// <param name="str">要进行转义的字符串。</param>
+		/// <returns>转义后的字符串。</returns>
+		/// <remarks>
+		/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），不会发生改变。</para>
+		/// <para>对于其它字符，会替换为其十六进制转义形式（\u0000）。</para>
+		/// </remarks>
+		public static string EscapeUnicode(this string str)
+		{
+			if (string.IsNullOrEmpty(str))
+			{
+				return str;
+			}
+			StringBuilder builder = new StringBuilder(str.Length * 2);
+			for (int i = 0; i < str.Length; i++)
+			{
+				builder.Append(str[i].EscapeUnicode());
+			}
+			return builder.ToString();
+		}
+		/// <summary>
+		/// 将字符串中的转义字符转换为原始的字符。
+		/// </summary>
+		/// <param name="str">要转换的字符串。</param>
+		/// <returns>转换后的字符串。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 将字符串中的转义字符转换为原始的字符。
+		/// </summary>
+		/// </overloads>
+		/// <remarks>
+		/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），不会发生改变。</para>
+		/// <para>对于特殊字符的转义（\0, \, \a, \b, \f, \n, \r, \t, \v），会替换为其原始字符。</para>
+		/// <para>对于 Unicode 转义（\u, \U 和 \x），会替换为相应字符。</para>
+		/// </remarks>
+		public static string Unescape(this string str)
+		{
+			return Unescape(str, false, null);
+		}
+		/// <summary>
+		/// 将字符串中的转义字符转换为原始的字符。
+		/// </summary>
+		/// <param name="str">要转换的字符串。</param>
+		/// <param name="customEscape">自定义的转义字符。</param>
+		/// <returns>转换后的字符串。</returns>
+		/// <remarks>
+		/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），不会发生改变。</para>
+		/// <para>对于特殊字符的转义（\0, \, \a, \b, \f, \n, \r, \t, \v）以及自定义的字符，会替换为其原始字符。</para>
+		/// <para>对于 Unicode 转义（\u, \U 和 \x），会替换为相应字符。</para>
+		/// </remarks>
+		public static string Unescape(this string str, ISet<char> customEscape)
+		{
+			return Unescape(str, false, customEscape);
+		}
 		/// <summary>
 		/// 将字符串中的 \u,\U 和 \x 转义转换为对应的字符。
 		/// </summary>
 		/// <param name="str">要转换的字符串。</param>
 		/// <returns>转换后的字符串。</returns>
 		/// <remarks>
-		/// <para>解码方法支持 \x，\u 和 \U 转义，其中 \x 之后可跟 1~4 个十六进制字符，
+		/// <para>解码方法支持 \x，\u 和 \U 转义，其中 \x 后面是 2 个十六进制字符，
 		/// \u 后面是 4 个十六进制字符，\U 后面则是 8 个十六进制字符。
 		/// 使用 \U 转义时，大于 0x10FFFF 的值不被支持，会被舍弃。</para>
 		/// <para>如果不满足上面的情况，则不会进行转义，也不会报错。</para></remarks>
-		public static string DecodeUnicode(this string str)
+		public static string UnescapeUnicode(this string str)
+		{
+			return Unescape(str, true, null);
+		}
+		/// <summary>
+		/// 将字符串中的转义字符转换为原始的字符。
+		/// </summary>
+		/// <param name="str">要转换的字符串。</param>
+		/// <param name="unicodeOnly">是否只处理 Unicode 转义。</param>
+		/// <param name="customEscape">自定义的转义字符。</param>
+		/// <returns>转换后的字符串。</returns>
+		private static string Unescape(this string str, bool unicodeOnly, ISet<char> customEscape)
 		{
 			if (string.IsNullOrEmpty(str))
 			{
@@ -44,59 +155,57 @@ namespace Cyjb
 				}
 				// 跳过 '\' 字符。
 				idx++;
-				// '\' 字符后的字符数小于 2，不可能是转义字符，直接返回。
-				if (idx + 1 >= len)
+				if (idx >= len)
 				{
 					break;
 				}
-				// 十六进制字符的长度。
+				// Unicode 转义需要的十六进制字符的长度。
 				int hexLen = 0;
-				// 处理 Unicode 转义。
-				switch (str[idx])
+				char ch = str[idx];
+				switch (ch)
 				{
 					case 'x':
-						// \x 后面可以是 1 至 4 位。
-						hexLen = GetHexLength(str, idx + 1, 4);
+						// \x 后面必须是 2 位。
+						hexLen = 2;
 						break;
 					case 'u':
 						// \u 后面必须是 4 位。
-						if (idx + 4 < len && GetHexLength(str, idx + 1, 4) == 4)
-						{
-							hexLen = 4;
-						}
-						else
-						{
-							hexLen = 0;
-						}
+						hexLen = 4;
 						break;
 					case 'U':
 						// \U 后面必须是 8 位。
-						if (idx + 8 < len && GetHexLength(str, idx + 1, 8) == 8)
-						{
-							hexLen = 8;
-						}
-						else
-						{
-							hexLen = 0;
-						}
+						hexLen = 8;
 						break;
 				}
 				if (hexLen > 0)
 				{
-					idx++;
-					int charNum = int.Parse(str.Substring(idx, hexLen), NumberStyles.HexNumber,
-						CultureInfo.InvariantCulture);
-					if (charNum < 0xFFFF)
+					// Unicode 反转义。
+					if (CheckHexLength(str, idx + 1, hexLen))
 					{
-						// 单个字符。
-						builder.Append((char)charNum);
+						idx++;
+						int charNum = ConvertExt.ToInt32(str.Substring(idx, hexLen), 16);
+						if (charNum < 0xFFFF)
+						{
+							// 单个字符。
+							builder.Append((char)charNum);
+						}
+						else
+						{
+							// 代理项对的字符。
+							builder.Append(char.ConvertFromUtf32(charNum & 0x1FFFFF));
+						}
+						idx = start = idx + hexLen;
 					}
-					else
+				}
+				else if (!unicodeOnly)
+				{
+					// 其它反转义。
+					char result;
+					if (TryUnescape(str[idx], customEscape, out result))
 					{
-						// 代理项对的字符。
-						builder.Append(char.ConvertFromUtf32(charNum & 0x1FFFFF));
+						builder.Append(result);
+						idx = start = idx + 1;
 					}
-					idx = start = idx + hexLen;
 				}
 				idx = str.IndexOf('\\', idx);
 			}
@@ -108,75 +217,78 @@ namespace Cyjb
 			return builder.ToString();
 		}
 		/// <summary>
-		/// 返回字符串指定索引位置之后的十六进制字符的个数。
+		/// 检查字符串指定索引位置之后是否包含指定个数的十六进制字符。
 		/// </summary>
-		/// <param name="str">要获取十六进制字符个数的字符串。</param>
-		/// <param name="index">要开始计算十六进制字符个数的其实索引。</param>
-		/// <param name="maxLength">需要的最长的十六进制字符个数。</param>
-		/// <returns>实际的十六进制字符的个数。</returns>
-		internal static int GetHexLength(string str, int index, int maxLength)
+		/// <param name="str">要检查十六进制字符个数的字符串。</param>
+		/// <param name="index">要开始计算十六进制字符个数的起始索引。</param>
+		/// <param name="maxLength">需要的十六进制字符个数。</param>
+		/// <returns>如果包含指定个数的十六进制字符，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		private static bool CheckHexLength(string str, int index, int maxLength)
 		{
 			if (index + maxLength > str.Length)
 			{
-				maxLength = str.Length - index;
+				return false;
 			}
 			for (int i = 0; i < maxLength; i++, index++)
 			{
 				if (!CharExt.IsHex(str, index))
 				{
-					return i;
+					return false;
 				}
 			}
-			return maxLength;
+			return true;
 		}
 		/// <summary>
-		/// 将字符串中不可显示字符（0x00~0x1F, 0x7F之后）转义为 \\u 形式，
-		/// 其中十六进制以大写字母形式输出。
+		/// 尝试返回与转义字符 <paramref name="ch"/> 对应的原始字符。
 		/// </summary>
-		/// <param name="str">要转换的字符串。</param>
-		/// <returns>转换后的字符串。</returns>
-		public static string EncodeUnicode(this string str)
+		/// <param name="ch">转义字符。</param>
+		/// <param name="customEscape">自定义的转义字符。</param>
+		/// <param name="result">原始字符。</param>
+		/// <returns>如果存在对应的原始字符，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		private static bool TryUnescape(char ch, ISet<char> customEscape, out char result)
 		{
-			return EncodeUnicode(str, true);
-		}
-		/// <summary>
-		/// 将字符串中不可显示字符（0x00~0x1F, 0x7F之后）转义为 \\u 形式。
-		/// </summary>
-		/// <param name="str">要转换的字符串。</param>
-		/// <param name="upperCase">是否以大写字母形式输出十六进制。
-		/// 如果为 <c>true</c> 则是以大写字母形式输出十六进制，否则以小写字母形式输出。</param>
-		/// <returns>转换后的字符串。</returns>
-		/// <overloads>
-		/// <summary>
-		/// 将字符串中不可显示字符（0x00~0x1F, 0x7F之后）转义为 \\u 形式。
-		/// </summary>
-		/// </overloads>
-		public static string EncodeUnicode(this string str, bool upperCase)
-		{
-			if (string.IsNullOrEmpty(str))
+			switch (ch)
 			{
-				return str;
+				case '0':
+					result = '\0';
+					return true;
+				case '\\':
+					result = '\\';
+					return true;
+				case 'a':
+					result = '\a';
+					return true;
+				case 'b':
+					result = '\b';
+					return true;
+				case 'f':
+					result = '\f';
+					return true;
+				case 'n':
+					result = '\n';
+					return true;
+				case 'r':
+					result = '\r';
+					return true;
+				case 't':
+					result = '\t';
+					return true;
+				case 'v':
+					result = '\v';
+					return true;
+				default:
+					if (customEscape != null && customEscape.Contains(ch))
+					{
+						result = ch;
+						return true;
+					}
+					break;
 			}
-			string format = upperCase ? "X4" : "x4";
-			StringBuilder builder = new StringBuilder(str.Length * 2);
-			for (int i = 0; i < str.Length; i++)
-			{
-				char c = str[i];
-				if (c >= ' ' && c <= '~')
-				{
-					// 可显示字符。
-					builder.Append(c);
-				}
-				else
-				{
-					builder.Append("\\u");
-					builder.Append(((int)c).ToString(format, CultureInfo.InvariantCulture));
-				}
-			}
-			return builder.ToString();
+			result = '\0';
+			return false;
 		}
 
-		#endregion
+		#endregion // Escape
 
 		#region 截取
 
