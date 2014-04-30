@@ -30,7 +30,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (empty == null)
 				{
-					Interlocked.CompareExchange(ref empty, new ReadOnlyList<T>(new T[0]), null);
+					Interlocked.CompareExchange(ref empty, new ReadOnlyList<T>(ArrayExt.Empty<T>()), null);
 				}
 				return empty;
 			}
@@ -62,7 +62,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="array"/> 为 <c>null</c>。</exception>
 		public ReadOnlyList(params T[] array)
-			: base((IList<T>)array, true)
+			: base(array, true)
 		{ }
 		/// <summary>
 		/// 将 <see cref="ReadOnlyList&lt;T&gt;"/> 类的新实例初始化为指定迭代器中数据的包装。
@@ -71,7 +71,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="enumerable"/> 为 <c>null</c>。</exception>
 		public ReadOnlyList(IEnumerable<T> enumerable)
-			: base((IList<T>)enumerable.ToArray(), true)
+			: base(enumerable.ToArray(), true)
 		{ }
 	}
 }

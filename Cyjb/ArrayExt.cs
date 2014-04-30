@@ -28,10 +28,6 @@ namespace Cyjb
 		/// </overloads>
 		public static Array Fill(this Array array, object value)
 		{
-			if (array == null)
-			{
-				return array;
-			}
 			return Fill(array, value, 0, array.Length);
 		}
 		/// <summary>
@@ -45,10 +41,6 @@ namespace Cyjb
 		/// 小于零或大于等于数组的长度。</exception>
 		public static Array Fill(this Array array, object value, int startIndex)
 		{
-			if (array == null)
-			{
-				return array;
-			}
 			return Fill(array, value, startIndex, array.Length - startIndex);
 		}
 		/// <summary>
@@ -65,21 +57,22 @@ namespace Cyjb
 		/// 或 <paramref name="length"/> 小于零。</exception>
 		public static Array Fill(this Array array, object value, int startIndex, int length)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				if (startIndex < 0 || startIndex >= array.Length)
-				{
-					throw ExceptionHelper.ArgumentOutOfRange("startIndex");
-				}
-				int len = startIndex + length;
-				if (length < 0 || len > array.Length)
-				{
-					throw ExceptionHelper.ArgumentOutOfRange("length");
-				}
-				for (int i = startIndex; i < len; i++)
-				{
-					array.SetValue(value, i);
-				}
+				return null;
+			}
+			if (startIndex < 0 || startIndex >= array.Length)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+			}
+			int len = startIndex + length;
+			if (length < 0 || len > array.Length)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("length");
+			}
+			for (int i = startIndex; i < len; i++)
+			{
+				array.SetValue(value, i);
 			}
 			return array;
 		}
@@ -91,10 +84,6 @@ namespace Cyjb
 		/// <returns>填充完毕的数组。</returns>
 		public static Array Fill(this Array array, Func<object> value)
 		{
-			if (array == null)
-			{
-				return array;
-			}
 			return Fill(array, value, 0, array.Length);
 		}
 		/// <summary>
@@ -108,10 +97,6 @@ namespace Cyjb
 		/// 小于零或大于等于数组的长度。</exception>
 		public static Array Fill(this Array array, Func<object> value, int startIndex)
 		{
-			if (array == null)
-			{
-				return array;
-			}
 			return Fill(array, value, startIndex, array.Length - startIndex);
 		}
 		/// <summary>
@@ -128,21 +113,22 @@ namespace Cyjb
 		/// 或 <paramref name="length"/> 小于零。</exception>
 		public static Array Fill(this Array array, Func<object> value, int startIndex, int length)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				if (startIndex < 0 || startIndex >= array.Length)
-				{
-					throw ExceptionHelper.ArgumentOutOfRange("startIndex");
-				}
-				int len = startIndex + length;
-				if (length < 0 || len > array.Length)
-				{
-					throw ExceptionHelper.ArgumentOutOfRange("length");
-				}
-				for (int i = startIndex; i < len; i++)
-				{
-					array.SetValue(value(), i);
-				}
+				return null;
+			}
+			if (startIndex < 0 || startIndex >= array.Length)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+			}
+			int len = startIndex + length;
+			if (length < 0 || len > array.Length)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("length");
+			}
+			for (int i = startIndex; i < len; i++)
+			{
+				array.SetValue(value(), i);
 			}
 			return array;
 		}
@@ -154,10 +140,6 @@ namespace Cyjb
 		/// <returns>填充完毕的数组。</returns>
 		public static Array Fill(this Array array, Func<int, object> value)
 		{
-			if (array == null)
-			{
-				return array;
-			}
 			return Fill(array, value, 0, array.Length);
 		}
 		/// <summary>
@@ -171,10 +153,6 @@ namespace Cyjb
 		/// 小于零或大于等于数组的长度。</exception>
 		public static Array Fill(this Array array, Func<int, object> value, int startIndex)
 		{
-			if (array == null)
-			{
-				return array;
-			}
 			return Fill(array, value, startIndex, array.Length - startIndex);
 		}
 		/// <summary>
@@ -191,6 +169,10 @@ namespace Cyjb
 		/// 或 <paramref name="length"/> 小于零。</exception>
 		public static Array Fill(this Array array, Func<int, object> value, int startIndex, int length)
 		{
+			if (array == null)
+			{
+				return null;
+			}
 			if (startIndex < 0 || startIndex >= array.Length)
 			{
 				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
@@ -220,10 +202,6 @@ namespace Cyjb
 		/// <returns>填充完毕的数组。</returns>
 		public static T[] Fill<T>(this T[] array, T value)
 		{
-			if (array == null)
-			{
-				return array;
-			}
 			return Fill(array, value, 0, array.Length);
 		}
 		/// <summary>
@@ -238,10 +216,6 @@ namespace Cyjb
 		/// 小于零或大于等于数组的长度。</exception>
 		public static T[] Fill<T>(this T[] array, T value, int startIndex)
 		{
-			if (array == null)
-			{
-				return array;
-			}
 			return Fill(array, value, startIndex, array.Length - startIndex);
 		}
 		/// <summary>
@@ -259,21 +233,22 @@ namespace Cyjb
 		/// 或 <paramref name="length"/> 小于零。</exception>
 		public static T[] Fill<T>(this T[] array, T value, int startIndex, int length)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				if (startIndex < 0 || startIndex >= array.Length)
-				{
-					throw ExceptionHelper.ArgumentOutOfRange("startIndex");
-				}
-				int len = startIndex + length;
-				if (length < 0 || len > array.Length)
-				{
-					throw ExceptionHelper.ArgumentOutOfRange("length");
-				}
-				for (int i = startIndex; i < len; i++)
-				{
-					array[i] = value;
-				}
+				return null;
+			}
+			if (startIndex < 0 || startIndex >= array.Length)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+			}
+			int len = startIndex + length;
+			if (length < 0 || len > array.Length)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("length");
+			}
+			for (int i = startIndex; i < len; i++)
+			{
+				array[i] = value;
 			}
 			return array;
 		}
@@ -286,10 +261,6 @@ namespace Cyjb
 		/// <returns>填充完毕的数组。</returns>
 		public static T[] Fill<T>(this T[] array, Func<T> value)
 		{
-			if (array == null)
-			{
-				return array;
-			}
 			return Fill(array, value, 0, array.Length);
 		}
 		/// <summary>
@@ -304,10 +275,6 @@ namespace Cyjb
 		/// 小于零或大于等于数组的长度。</exception>
 		public static T[] Fill<T>(this T[] array, Func<T> value, int startIndex)
 		{
-			if (array == null)
-			{
-				return array;
-			}
 			return Fill(array, value, startIndex, array.Length - startIndex);
 		}
 		/// <summary>
@@ -325,21 +292,22 @@ namespace Cyjb
 		/// 或 <paramref name="length"/> 小于零。</exception>
 		public static T[] Fill<T>(this T[] array, Func<T> value, int startIndex, int length)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				if (startIndex < 0 || startIndex >= array.Length)
-				{
-					throw ExceptionHelper.ArgumentOutOfRange("startIndex");
-				}
-				int len = startIndex + length;
-				if (length < 0 || len > array.Length)
-				{
-					throw ExceptionHelper.ArgumentOutOfRange("length");
-				}
-				for (int i = startIndex; i < len; i++)
-				{
-					array[i] = value();
-				}
+				return null;
+			}
+			if (startIndex < 0 || startIndex >= array.Length)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+			}
+			int len = startIndex + length;
+			if (length < 0 || len > array.Length)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("length");
+			}
+			for (int i = startIndex; i < len; i++)
+			{
+				array[i] = value();
 			}
 			return array;
 		}
@@ -352,10 +320,6 @@ namespace Cyjb
 		/// <returns>填充完毕的数组。</returns>
 		public static T[] Fill<T>(this T[] array, Func<int, T> value)
 		{
-			if (array == null)
-			{
-				return array;
-			}
 			return Fill(array, value, 0, array.Length);
 		}
 		/// <summary>
@@ -370,10 +334,6 @@ namespace Cyjb
 		/// 小于零或大于等于数组的长度。</exception>
 		public static T[] Fill<T>(this T[] array, Func<int, T> value, int startIndex)
 		{
-			if (array == null)
-			{
-				return array;
-			}
 			return Fill(array, value, startIndex, array.Length - startIndex);
 		}
 		/// <summary>
@@ -391,6 +351,10 @@ namespace Cyjb
 		/// 或 <paramref name="length"/> 小于零。</exception>
 		public static T[] Fill<T>(this T[] array, Func<int, T> value, int startIndex, int length)
 		{
+			if (array == null)
+			{
+				return null;
+			}
 			if (startIndex < 0 || startIndex >= array.Length)
 			{
 				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
@@ -422,14 +386,15 @@ namespace Cyjb
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[,] Fill<T>(this T[,] array, T value)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				for (int i = 0; i < array.GetLength(0); i++)
+				return null;
+			}
+			for (int i = 0; i < array.GetLength(0); i++)
+			{
+				for (int j = 0; j < array.GetLength(1); j++)
 				{
-					for (int j = 0; j < array.GetLength(1); j++)
-					{
-						array[i, j] = value;
-					}
+					array[i, j] = value;
 				}
 			}
 			return array;
@@ -445,14 +410,15 @@ namespace Cyjb
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[,] Fill<T>(this T[,] array, Func<T> value)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				for (int i = 0; i < array.GetLength(0); i++)
+				return null;
+			}
+			for (int i = 0; i < array.GetLength(0); i++)
+			{
+				for (int j = 0; j < array.GetLength(1); j++)
 				{
-					for (int j = 0; j < array.GetLength(1); j++)
-					{
-						array[i, j] = value();
-					}
+					array[i, j] = value();
 				}
 			}
 			return array;
@@ -468,14 +434,15 @@ namespace Cyjb
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[,] Fill<T>(this T[,] array, Func<int, int, T> value)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				for (int i = 0; i < array.GetLength(0); i++)
+				return null;
+			}
+			for (int i = 0; i < array.GetLength(0); i++)
+			{
+				for (int j = 0; j < array.GetLength(1); j++)
 				{
-					for (int j = 0; j < array.GetLength(1); j++)
-					{
-						array[i, j] = value(i, j);
-					}
+					array[i, j] = value(i, j);
 				}
 			}
 			return array;
@@ -494,14 +461,15 @@ namespace Cyjb
 		/// <returns>填充完毕的数组。</returns>
 		public static T[][] Fill<T>(this T[][] array, T value)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				for (int i = 0; i < array.Length; i++)
+				return null;
+			}
+			for (int i = 0; i < array.Length; i++)
+			{
+				for (int j = 0; j < array[i].Length; j++)
 				{
-					for (int j = 0; j < array[i].Length; j++)
-					{
-						array[i][j] = value;
-					}
+					array[i][j] = value;
 				}
 			}
 			return array;
@@ -515,14 +483,15 @@ namespace Cyjb
 		/// <returns>填充完毕的数组。</returns>
 		public static T[][] Fill<T>(this T[][] array, Func<T> value)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				for (int i = 0; i < array.Length; i++)
+				return null;
+			}
+			for (int i = 0; i < array.Length; i++)
+			{
+				for (int j = 0; j < array[i].Length; j++)
 				{
-					for (int j = 0; j < array[i].Length; j++)
-					{
-						array[i][j] = value();
-					}
+					array[i][j] = value();
 				}
 			}
 			return array;
@@ -536,14 +505,15 @@ namespace Cyjb
 		/// <returns>填充完毕的数组。</returns>
 		public static T[][] Fill<T>(this T[][] array, Func<int, int, T> value)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				for (int i = 0; i < array.Length; i++)
+				return null;
+			}
+			for (int i = 0; i < array.Length; i++)
+			{
+				for (int j = 0; j < array[i].Length; j++)
 				{
-					for (int j = 0; j < array[i].Length; j++)
-					{
-						array[i][j] = value(i, j);
-					}
+					array[i][j] = value(i, j);
 				}
 			}
 			return array;
@@ -564,16 +534,17 @@ namespace Cyjb
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[, ,] Fill<T>(this T[, ,] array, T value)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				for (int i = 0; i < array.GetLength(0); i++)
+				return null;
+			}
+			for (int i = 0; i < array.GetLength(0); i++)
+			{
+				for (int j = 0; j < array.GetLength(1); j++)
 				{
-					for (int j = 0; j < array.GetLength(1); j++)
+					for (int k = 0; k < array.GetLength(2); k++)
 					{
-						for (int k = 0; k < array.GetLength(2); k++)
-						{
-							array[i, j, k] = value;
-						}
+						array[i, j, k] = value;
 					}
 				}
 			}
@@ -590,16 +561,17 @@ namespace Cyjb
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[, ,] Fill<T>(this T[, ,] array, Func<T> value)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				for (int i = 0; i < array.GetLength(0); i++)
+				return null;
+			}
+			for (int i = 0; i < array.GetLength(0); i++)
+			{
+				for (int j = 0; j < array.GetLength(1); j++)
 				{
-					for (int j = 0; j < array.GetLength(1); j++)
+					for (int k = 0; k < array.GetLength(2); k++)
 					{
-						for (int k = 0; k < array.GetLength(2); k++)
-						{
-							array[i, j, k] = value();
-						}
+						array[i, j, k] = value();
 					}
 				}
 			}
@@ -616,16 +588,17 @@ namespace Cyjb
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[, ,] Fill<T>(this T[, ,] array, Func<int, int, int, T> value)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				for (int i = 0; i < array.GetLength(0); i++)
+				return null;
+			}
+			for (int i = 0; i < array.GetLength(0); i++)
+			{
+				for (int j = 0; j < array.GetLength(1); j++)
 				{
-					for (int j = 0; j < array.GetLength(1); j++)
+					for (int k = 0; k < array.GetLength(2); k++)
 					{
-						for (int k = 0; k < array.GetLength(2); k++)
-						{
-							array[i, j, k] = value(i, j, k);
-						}
+						array[i, j, k] = value(i, j, k);
 					}
 				}
 			}
@@ -645,16 +618,17 @@ namespace Cyjb
 		/// <returns>填充完毕的数组。</returns>
 		public static T[][][] Fill<T>(this T[][][] array, T value)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				for (int i = 0; i < array.Length; i++)
+				return null;
+			}
+			for (int i = 0; i < array.Length; i++)
+			{
+				for (int j = 0; j < array[j].Length; j++)
 				{
-					for (int j = 0; j < array[j].Length; j++)
+					for (int k = 0; k < array[j][k].Length; k++)
 					{
-						for (int k = 0; k < array[j][k].Length; k++)
-						{
-							array[i][j][k] = value;
-						}
+						array[i][j][k] = value;
 					}
 				}
 			}
@@ -669,16 +643,17 @@ namespace Cyjb
 		/// <returns>填充完毕的数组。</returns>
 		public static T[][][] Fill<T>(this T[][][] array, Func<T> value)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				for (int i = 0; i < array.Length; i++)
+				return null;
+			}
+			for (int i = 0; i < array.Length; i++)
+			{
+				for (int j = 0; j < array[j].Length; j++)
 				{
-					for (int j = 0; j < array[j].Length; j++)
+					for (int k = 0; k < array[j][k].Length; k++)
 					{
-						for (int k = 0; k < array[j][k].Length; k++)
-						{
-							array[i][j][k] = value();
-						}
+						array[i][j][k] = value();
 					}
 				}
 			}
@@ -693,16 +668,17 @@ namespace Cyjb
 		/// <returns>填充完毕的数组。</returns>
 		public static T[][][] Fill<T>(this T[][][] array, Func<int, int, int, T> value)
 		{
-			if (array != null)
+			if (array == null)
 			{
-				for (int i = 0; i < array.Length; i++)
+				return null;
+			}
+			for (int i = 0; i < array.Length; i++)
+			{
+				for (int j = 0; j < array[j].Length; j++)
 				{
-					for (int j = 0; j < array[j].Length; j++)
+					for (int k = 0; k < array[j][k].Length; k++)
 					{
-						for (int k = 0; k < array[j][k].Length; k++)
-						{
-							array[i][j][k] = value(i, j, k);
-						}
+						array[i][j][k] = value(i, j, k);
 					}
 				}
 			}
@@ -883,7 +859,7 @@ namespace Cyjb
 			}
 			if (array == null || length == 0)
 			{
-				return new T[0];
+				return Empty<T>();
 			}
 			if (length > array.Length)
 			{
@@ -910,7 +886,7 @@ namespace Cyjb
 			}
 			if (array == null || length == 0)
 			{
-				return new T[0];
+				return Empty<T>();
 			}
 			if (length > array.Length)
 			{
@@ -940,7 +916,7 @@ namespace Cyjb
 		{
 			if (array == null || startIndex == array.Length)
 			{
-				return new T[0];
+				return Empty<T>();
 			}
 			return Subarray(array, startIndex, array.Length - startIndex);
 		}
@@ -965,7 +941,7 @@ namespace Cyjb
 		{
 			if (array == null || length == 0)
 			{
-				return new T[0];
+				return Empty<T>();
 			}
 			if (startIndex < 0)
 			{
@@ -1001,7 +977,7 @@ namespace Cyjb
 		{
 			if (array == null || startIndex == array.Length)
 			{
-				return new T[0];
+				return Empty<T>();
 			}
 			if (startIndex < 0)
 			{
@@ -1031,7 +1007,7 @@ namespace Cyjb
 		{
 			if (array == null || startIndex == endIndex)
 			{
-				return new T[0];
+				return Empty<T>();
 			}
 			if (startIndex < 0)
 			{
@@ -1053,10 +1029,7 @@ namespace Cyjb
 			{
 				return SubarrayInternal(array, startIndex, endIndex);
 			}
-			else
-			{
-				return new T[0];
-			}
+			return Empty<T>();
 		}
 		/// <summary>
 		/// 从当前数组的指定索引开始截取指定长度的一部分。
@@ -1350,7 +1323,7 @@ namespace Cyjb
 					{
 						return mid;
 					}
-					else if (cmp < 0)
+					if (cmp < 0)
 					{
 						low = mid + 1;
 					}
@@ -1370,6 +1343,31 @@ namespace Cyjb
 		#endregion // 键值搜索
 
 		#endregion // 二分查找
+
+		#region 零长数组
+
+		/// <summary>
+		/// 返回长度为 <c>0</c> 的数组。
+		/// </summary>
+		/// <typeparam name="T">数组元素的类型。</typeparam>
+		/// <returns><typeparamref name="T"/> 类型的长度为 <c>0</c> 的数组。</returns>
+		public static T[] Empty<T>()
+		{
+			return EmptyArray<T>.Array;
+		}
+		/// <summary>
+		/// 保存长度为 <c>0</c> 的数组的辅助类。
+		/// </summary>
+		/// <typeparam name="T">数组元素的类型。</typeparam>
+		private static class EmptyArray<T>
+		{
+			/// <summary>
+			/// 长度为 <c>0</c> 的数组。
+			/// </summary>
+			public static readonly T[] Array = new T[0];
+		}
+
+		#endregion // 零长数组
 
 	}
 }

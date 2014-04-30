@@ -17,17 +17,17 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 被包装的数组。
 		/// </summary>
-		private T[] items;
+		private readonly T[] items;
 		/// <summary>
 		/// 获取由数组段分隔的范围中的第一个元素的位置（相对于原始数组的开始位置）。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private int offset;
+		private readonly int offset;
 		/// <summary>
 		/// 获取由数组段分隔的范围中的元素个数。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private int count;
+		private readonly int count;
 		/// <summary>
 		/// 初始化 <see cref="Cyjb.Collections.ArrayAdapter&lt;T&gt;"/> 类的新实例。
 		/// </summary>
@@ -38,7 +38,7 @@ namespace Cyjb.Collections
 		/// </overloads>
 		public ArrayAdapter()
 		{
-			items = new T[0];
+			items = ArrayExt.Empty<T>();
 		}
 		/// <summary>
 		/// 使用给定的数组初始化 <see cref="Cyjb.Collections.ArrayAdapter&lt;T&gt;"/> 类的新实例。
