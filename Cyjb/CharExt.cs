@@ -33,15 +33,12 @@ namespace Cyjb
 		/// </overloads>
 		public static bool IsHex(this char ch)
 		{
-			if (ch <= 'f')
+			if (ch > 'f' || ch < '0') { return false; }
+			if (ch > 'F')
 			{
-				if (ch >= 'A')
-				{
-					return ch <= 'F' || ch >= 'a';
-				}
-				return ch >= '0' && ch <= '9';
+				return ch >= 'a';
 			}
-			return false;
+			return ch <= '9' || ch >= 'A';
 		}
 		/// <summary>
 		/// 指示指定字符串中位于指定位置处的字符是否属于十六进制数字类别。
