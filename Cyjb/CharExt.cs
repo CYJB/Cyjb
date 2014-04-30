@@ -1,5 +1,6 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Globalization;
+
 namespace Cyjb
 {
 	/// <summary>
@@ -10,10 +11,12 @@ namespace Cyjb
 		/// <summary>
 		/// 所有用于不同进制的字符。
 		/// </summary>
-		internal static readonly char[] BaseDigits = new char[] {
+		internal static readonly char[] BaseDigits =
+		{
 			'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
 			'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 
-			'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+			'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+		};
 
 		#region IsHex
 
@@ -36,10 +39,7 @@ namespace Cyjb
 				{
 					return ch <= 'F' || ch >= 'a';
 				}
-				else
-				{
-					return ch >= '0' && ch <= '9';
-				}
+				return ch >= '0' && ch <= '9';
 			}
 			return false;
 		}
@@ -124,7 +124,7 @@ namespace Cyjb
 		{
 			if (ch >= ' ' && ch <= '~')
 			{
-				return ch.ToString();
+				return ch.ToString(CultureInfo.InvariantCulture);
 			}
 			return string.Concat("\\u", BaseDigits[ch >> 12], BaseDigits[(ch >> 8) & 0xF],
 				BaseDigits[(ch >> 4) & 0xF], BaseDigits[ch & 0xF]);

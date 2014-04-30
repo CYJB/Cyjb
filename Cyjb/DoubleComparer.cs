@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 namespace Cyjb
@@ -11,6 +12,7 @@ namespace Cyjb
 		/// <summary>
 		/// 默认的双精度浮点数比较器。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private static DoubleComparer defaultComparer;
 		/// <summary>
 		/// 比较时使用的默认精度。
@@ -34,7 +36,7 @@ namespace Cyjb
 		/// <summary>
 		/// 比较时使用的精度。
 		/// </summary>
-		private double epsilon;
+		private readonly double epsilon;
 		/// <summary>
 		/// 使用比较时要使用的精度，初始化 <see cref="DoubleComparer"/> 类的新实例。
 		/// </summary>
@@ -67,7 +69,7 @@ namespace Cyjb
 				}
 				return (x - y) < eps * this.epsilon ? 0 : 1;
 			}
-			else if (x < y)
+			if (x < y)
 			{
 				double eps = y;
 				if (y < 0 || (x < 0 && x + y < 0))
@@ -78,20 +80,9 @@ namespace Cyjb
 			}
 			if (double.IsNaN(x))
 			{
-				if (double.IsNaN(y))
-				{
-					return 0;
-				}
-				else
-				{
-					return -1;
-				}
+				return double.IsNaN(y) ? 0 : -1;
 			}
-			else if (double.IsNaN(y))
-			{
-				return 1;
-			}
-			return 0;
+			return double.IsNaN(y) ? 1 : 0;
 		}
 
 		#endregion
