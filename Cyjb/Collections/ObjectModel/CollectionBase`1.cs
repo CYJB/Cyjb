@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Threading;
 
 namespace Cyjb.Collections.ObjectModel
@@ -56,11 +55,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <value>被 <see cref="CollectionBase{T}"/> 包装的内部 <see cref="ICollection{T}"/>。</value>
 		protected ICollection<T> Items
 		{
-			get
-			{
-				Contract.Ensures(Contract.Result<ICollection<T>>() != null);
-				return items;
-			}
+			get { return items; }
 		}
 
 		#region ICollection<T> 成员

@@ -6,12 +6,12 @@ using System.Diagnostics.Contracts;
 namespace Cyjb.Collections.ObjectModel
 {
 	/// <summary>
-	/// 提供集合键嵌入在值中的集合的抽象基类。
+	/// 提供集合键嵌入在值中的只读集合的抽象基类。
 	/// </summary>
 	/// <typeparam name="TKey">集合中键的类型。</typeparam>
 	/// <typeparam name="TItem">集合中的元素的类型。</typeparam>
 	[Serializable]
-	public abstract class KeyedCollectionBase<TKey, TItem> : CollectionBase<TItem>
+	public abstract class ReadOnlyKeyedCollectionBase<TKey, TItem> : ReadOnlyCollection<TItem>
 	{
 		/// <summary>
 		/// 用于保存元素的字典。
@@ -19,40 +19,40 @@ namespace Cyjb.Collections.ObjectModel
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private readonly IDictionary<TKey, TItem> dict;
 		/// <summary>
-		/// 初始化使用默认相等比较器的 <see cref="KeyedCollectionBase{TKey, TItem}"/> 类的新实例。
+		/// 初始化使用默认相等比较器的 <see cref="ReadOnlyKeyedCollectionBase{TKey, TItem}"/> 类的新实例。
 		/// </summary>
 		/// <overloads>
 		/// <summary>
-		/// 初始化 <see cref="KeyedCollectionBase{TKey, TItem}"/> 类的新实例。
+		/// 初始化 <see cref="ReadOnlyKeyedCollectionBase{TKey, TItem}"/> 类的新实例。
 		/// </summary>
 		/// </overloads>
-		protected KeyedCollectionBase()
+		protected ReadOnlyKeyedCollectionBase()
 			: this(new Dictionary<TKey, TItem>())
 		{ }
 		/// <summary>
-		/// 使用指定的相等比较器初始化 <see cref="KeyedCollectionBase{TKey, TItem}"/> 类的新实例。
+		/// 使用指定的相等比较器初始化 <see cref="ReadOnlyKeyedCollectionBase{TKey, TItem}"/> 类的新实例。
 		/// </summary>
 		/// <param name="comparer">比较键时要使用的 <see cref="IEqualityComparer{T}"/> 泛型接口的实现，
 		/// 如果为 <c>null</c>，则使用从 <see cref="EqualityComparer{T}.Default"/> 
 		/// 获取的该类型的键的默认相等比较器。</param>
-		protected KeyedCollectionBase(IEqualityComparer<TKey> comparer) :
+		protected ReadOnlyKeyedCollectionBase(IEqualityComparer<TKey> comparer) :
 			this(new Dictionary<TKey, TItem>(comparer))
 		{ }
 		/// <summary>
-		/// 使用指定的字典初始化 <see cref="KeyedCollectionBase{TKey, TItem}"/> 类的新实例。
+		/// 使用指定的字典初始化 <see cref="ReadOnlyKeyedCollectionBase{TKey, TItem}"/> 类的新实例。
 		/// </summary>
 		/// <param name="dict">用于保存项的字典。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="dict"/> 为 <c>null</c>。</exception>
-		protected KeyedCollectionBase(IDictionary<TKey, TItem> dict)
+		protected ReadOnlyKeyedCollectionBase(IDictionary<TKey, TItem> dict)
 			: base(CollectionHelper.GetDictValues(dict))
 		{
 			Contract.Requires(dict != null);
 			this.dict = dict;
 		}
 		/// <summary>
-		/// 获取 <see cref="KeyedCollectionBase{TKey,TItem}"/> 的查找字典。
+		/// 获取 <see cref="ReadOnlyKeyedCollectionBase{TKey,TItem}"/> 的查找字典。
 		/// </summary>
-		/// <value><see cref="KeyedCollectionBase{TKey,TItem}"/> 的查找字典。</value>
+		/// <value><see cref="ReadOnlyKeyedCollectionBase{TKey,TItem}"/> 的查找字典。</value>
 		/// <remarks>集合元素直接储存在查找字典中，<see cref="CollectionBase{T}.Items"/> 
 		/// 是值的只读集合。</remarks>
 		protected IDictionary<TKey, TItem> Dictionary
@@ -84,10 +84,10 @@ namespace Cyjb.Collections.ObjectModel
 			}
 		}
 		/// <summary>
-		/// 确定某元素的键是否在 <see cref="KeyedCollectionBase{TKey,TItem}"/> 中。
+		/// 确定某元素的键是否在 <see cref="ReadOnlyKeyedCollectionBase{TKey,TItem}"/> 中。
 		/// </summary>
 		/// <param name="key">要定位的元素的键。</param>
-		/// <returns>如果在 <see cref="KeyedCollectionBase{TKey,TItem}"/> 
+		/// <returns>如果在 <see cref="ReadOnlyKeyedCollectionBase{TKey,TItem}"/> 
 		/// 中找到具有指定键的元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		[Pure]
@@ -99,23 +99,6 @@ namespace Cyjb.Collections.ObjectModel
 			}
 			Contract.EndContractBlock();
 			return this.dict.ContainsKey(key);
-		}
-		/// <summary>
-		/// 从 <see cref="KeyedCollectionBase{TKey,TItem}"/> 中移除具有指定键的元素。
-		/// </summary>
-		/// <param name="key">要移除的元素的键。</param>
-		/// <returns>如果已从 <see cref="KeyedCollectionBase{TKey,TItem}"/> 中成功移除元素，
-		/// 则为 <c>true</c>；否则为 <c>false</c>。如果在原始 <see cref="KeyedCollectionBase{TKey,TItem}"/> 
-		/// 中没有找到指定的键，该方法也会返回 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
-		public bool RemoveByKey(TKey key)
-		{
-			if (key == null)
-			{
-				throw ExceptionHelper.ArgumentNull("key");
-			}
-			Contract.EndContractBlock();
-			return this.dict.Remove(key);
 		}
 		/// <summary>
 		/// 获取具有指定的键的元素。
@@ -146,34 +129,10 @@ namespace Cyjb.Collections.ObjectModel
 		#region ICollection<TItem> 成员
 
 		/// <summary>
-		/// 将指定对象添加到 <see cref="KeyedCollectionBase{TKey,TItem}"/> 中。
+		/// 确定 <see cref="ReadOnlyKeyedCollectionBase{TKey,TItem}"/> 是否包含指定对象。
 		/// </summary>
-		/// <param name="item">要添加到 <see cref="KeyedCollectionBase{TKey,TItem}"/> 的对象。</param>
-		/// <exception cref="ArgumentNullException"><paramref name="item"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentException">集合中已存在具有相同键的元素。</exception>
-		public override void Add(TItem item)
-		{
-			if (item == null)
-			{
-				throw ExceptionHelper.ArgumentNull("item");
-			}
-			Contract.EndContractBlock();
-			TKey key = this.GetKeyForItem(item);
-			Contract.Assert(key != null);
-			this.dict.Add(key, item);
-		}
-		/// <summary>
-		/// 从 <see cref="KeyedCollectionBase{TKey,TItem}"/> 中移除所有元素。
-		/// </summary>
-		public override void Clear()
-		{
-			this.dict.Clear();
-		}
-		/// <summary>
-		/// 确定 <see cref="KeyedCollectionBase{TKey,TItem}"/> 是否包含指定对象。
-		/// </summary>
-		/// <param name="item">要在 <see cref="KeyedCollectionBase{TKey,TItem}"/> 中定位的对象。</param>
-		/// <returns>如果在 <see cref="KeyedCollectionBase{TKey,TItem}"/> 中找到 <paramref name="item"/>，
+		/// <param name="item">要在 <see cref="ReadOnlyKeyedCollectionBase{TKey,TItem}"/> 中定位的对象。</param>
+		/// <returns>如果在 <see cref="ReadOnlyKeyedCollectionBase{TKey,TItem}"/> 中找到 <paramref name="item"/>，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public override bool Contains(TItem item)
 		{
@@ -186,25 +145,6 @@ namespace Cyjb.Collections.ObjectModel
 			TItem newItem;
 			return this.dict.TryGetValue(key, out newItem) &&
 				EqualityComparer<TItem>.Default.Equals(newItem, item);
-		}
-		/// <summary>
-		/// 从 <see cref="KeyedCollectionBase{TKey,TItem}"/> 中移除特定对象的第一个匹配项。
-		/// </summary>
-		/// <param name="item">要从 <see cref="KeyedCollectionBase{TKey,TItem}"/> 中移除的对象。</param>
-		/// <returns>如果已从 <see cref="KeyedCollectionBase{TKey,TItem}"/> 中成功移除 <paramref name="item"/>，
-		/// 则为 <c>true</c>；否则为 <c>false</c>。如果在原始 <see cref="KeyedCollectionBase{TKey,TItem}"/> 
-		/// 中没有找到 <paramref name="item"/>，该方法也会返回 <c>false</c>。</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="item"/> 为 <c>null</c>。</exception>
-		public override bool Remove(TItem item)
-		{
-			if (item == null)
-			{
-				throw ExceptionHelper.ArgumentNull("item");
-			}
-			Contract.EndContractBlock();
-			TKey key = this.GetKeyForItem(item);
-			Contract.Assert(key != null);
-			return this.dict.Remove(key);
 		}
 
 		#endregion // ICollection<TItem> 成员

@@ -59,11 +59,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <value>被 <see cref="ReadOnlyCollection{T}"/> 包装的内部 <see cref="ICollection{T}"/>。</value>
 		protected ICollection<T> Items
 		{
-			get
-			{
-				Contract.Ensures(Contract.Result<ICollection<T>>() != null);
-				return items;
-			}
+			get { return items; }
 		}
 
 		#region ICollection<T> 成员

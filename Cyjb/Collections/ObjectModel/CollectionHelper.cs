@@ -83,5 +83,19 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			return (value is T) || (value == null && default(T) == null);
 		}
+		/// <summary>
+		/// 获取指定字典的值集合。
+		/// </summary>
+		/// <param name="dict">要获取值集合的字典。</param>
+		/// <returns>指定字典的值集合。</returns>
+		public static IEnumerable<TItem> GetDictValues<TKey, TItem>(IDictionary<TKey, TItem> dict)
+		{
+			if (dict == null)
+			{
+				throw ExceptionHelper.ArgumentNull("dict");
+			}
+			Contract.Ensures(Contract.Result<IEnumerable<TItem>>() != null);
+			return dict.Values;
+		}
 	}
 }
