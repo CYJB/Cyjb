@@ -10,6 +10,7 @@ namespace Cyjb.Collections.ObjectModel
 	/// </summary>
 	/// <typeparam name="TKey">集合中键的类型。</typeparam>
 	/// <typeparam name="TItem">集合中的元素的类型。</typeparam>
+	/// <remarks>集合中存储的元素都不能为 <c>null</c>，相应的键也不能为 <c>null</c>。</remarks>
 	[Serializable]
 	public abstract class ReadOnlyKeyedCollectionBase<TKey, TItem> : ReadOnlyCollection<TItem>
 	{
@@ -63,12 +64,15 @@ namespace Cyjb.Collections.ObjectModel
 				return this.dict;
 			}
 		}
+
+		#region 键操作
+
 		/// <summary>
 		/// 获取具有指定键的元素。
 		/// </summary>
 		/// <param name="key">要获取的元素的键。</param>
 		/// <returns>带有指定键的元素。如果未找到具有指定键的元素，则引发异常。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		/// <exception cref="KeyNotFoundException">在集合中不存在 <paramref name="key"/>。</exception>
 		[Pure]
 		public TItem this[TKey key]
@@ -89,16 +93,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// <param name="key">要定位的元素的键。</param>
 		/// <returns>如果在 <see cref="ReadOnlyKeyedCollectionBase{TKey,TItem}"/> 
 		/// 中找到具有指定键的元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		[Pure]
 		public bool ContainsKey(TKey key)
 		{
-			if (key == null)
-			{
-				throw ExceptionHelper.ArgumentNull("key");
-			}
-			Contract.EndContractBlock();
-			return this.dict.ContainsKey(key);
+			return key != null && this.dict.ContainsKey(key);
 		}
 		/// <summary>
 		/// 获取具有指定的键的元素。
@@ -107,7 +106,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <param name="item">当此方法返回值时，如果找到该键，便会返回与指定的键相关联的值；
 		/// 否则，则会返回 <paramref name="item"/> 参数的类型默认值。 该参数未经初始化即被传递。</param>
 		/// <returns>如果包含具有指定键的元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		[Pure]
 		public bool TryGetValue(TKey key, out TItem item)
 		{
@@ -115,7 +114,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				throw ExceptionHelper.ArgumentNull("key");
 			}
-			Contract.Ensures(Contract.ValueAtReturn(out item) != null);
+			Contract.EndContractBlock();
 			return this.dict.TryGetValue(key, out item);
 		}
 		/// <summary>
@@ -125,6 +124,8 @@ namespace Cyjb.Collections.ObjectModel
 		/// <returns>指定元素的键。</returns>
 		[Pure]
 		protected abstract TKey GetKeyForItem(TItem item);
+
+		#endregion // 键操作
 
 		#region ICollection<TItem> 成员
 
