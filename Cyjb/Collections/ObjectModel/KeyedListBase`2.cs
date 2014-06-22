@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
 
 namespace Cyjb.Collections.ObjectModel
 {
@@ -15,113 +16,110 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 默认的创建字典的阀值。
 		/// </summary>
-		private const int defaultThreshold = 0;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private const int DefaultThreshold = 3;
 		/// <summary>
 		/// 用于确定列表中的键是否相等的泛型相等比较器。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private readonly IEqualityComparer<TKey> comparer;
 		/// <summary>
 		/// 用于保存键的字典。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private Dictionary<TKey, TItem> dict;
-		/// <summary>
-		/// 键的数目。
-		/// </summary>
-		private int keyCount;
 		/// <summary>
 		/// 创建字典的阀值。
 		/// </summary>
 		private readonly int threshold;
+
+		#region 构造函数
+
 		/// <summary>
-		/// 初始化使用默认相等比较器的 <see cref="KeyedListBase&lt;TKey, TItem&gt;"/> 类的新实例。
+		/// 初始化使用默认相等比较器的 <see cref="KeyedListBase{TKey, TItem}"/> 类的新实例。
 		/// </summary>
 		/// <overloads>
 		/// <summary>
-		/// 初始化 <see cref="KeyedListBase&lt;TKey, TItem&gt;"/> 类的新实例。
+		/// 初始化 <see cref="KeyedListBase{TKey, TItem}"/> 类的新实例。
 		/// </summary>
 		/// </overloads>
 		protected KeyedListBase()
-			: this(null, 0, false)
+			: this(null, DefaultThreshold, new List<TItem>())
 		{ }
 		/// <summary>
-		/// 初始化使用默认相等比较器的 <see cref="KeyedListBase&lt;TKey, TItem&gt;"/> 类的新实例。
+		/// 使用指定的相等比较器初始化 <see cref="KeyedListBase{TKey, TItem}"/> 类的新实例。
 		/// </summary>
-		/// <param name="isReadOnly">集合是否是只读的。</param>
-		protected KeyedListBase(bool isReadOnly)
-			: this(null, 0, isReadOnly)
-		{ }
-		/// <summary>
-		/// 初始化使用指定相等比较器的 <see cref="KeyedListBase&lt;TKey, TItem&gt;"/> 类的新实例。
-		/// </summary>
-		/// <param name="comparer">比较键时要使用的 
-		/// <see cref="System.Collections.Generic.IEqualityComparer&lt;T&gt;"/> 泛型接口的实现，
-		/// 如果为 <c>null</c>，则使用从 
-		/// <see cref="System.Collections.Generic.EqualityComparer&lt;T&gt;.Default"/> 
+		/// <param name="comparer">比较键时要使用的 <see cref="IEqualityComparer{T}"/> 泛型接口的实现，
+		/// 如果为 <c>null</c>，则使用从 <see cref="EqualityComparer{T}.Default"/> 
 		/// 获取的该类型的键的默认相等比较器。</param>
 		protected KeyedListBase(IEqualityComparer<TKey> comparer)
-			: this(comparer, 0, false)
+			: this(comparer, DefaultThreshold, new List<TItem>())
 		{ }
 		/// <summary>
-		/// 初始化使用指定相等比较器的 <see cref="KeyedListBase&lt;TKey, TItem&gt;"/> 类的新实例。
+		/// 使用指定的相等比较器和被包装的列表初始化 
+		/// <see cref="KeyedListBase{TKey, TItem}"/> 类的新实例。
 		/// </summary>
-		/// <param name="comparer">比较键时要使用的 
-		/// <see cref="System.Collections.Generic.IEqualityComparer&lt;T&gt;"/> 泛型接口的实现，
-		/// 如果为 <c>null</c>，则使用从 
-		/// <see cref="System.Collections.Generic.EqualityComparer&lt;T&gt;.Default"/> 
+		/// <param name="comparer">比较键时要使用的 <see cref="IEqualityComparer{T}"/> 泛型接口的实现，
+		/// 如果为 <c>null</c>，则使用从 <see cref="EqualityComparer{T}.Default"/> 
 		/// 获取的该类型的键的默认相等比较器。</param>
-		/// <param name="isReadOnly">集合是否是只读的。</param>
-		protected KeyedListBase(IEqualityComparer<TKey> comparer, bool isReadOnly)
-			: this(comparer, 0, isReadOnly)
+		/// <param name="list">由新的列表包装的集合。</param>
+		/// <remarks>如果 <paramref name="list"/> 实现了 <see cref="IList{T}"/>
+		/// 接口，则使用 <paramref name="list"/> 作为内部集合；否则使用 
+		/// <see cref="List{T}"/> 作为内部集合。</remarks>
+		protected KeyedListBase(IEqualityComparer<TKey> comparer, IEnumerable<TItem> list)
+			: this(comparer, DefaultThreshold, list)
 		{ }
 		/// <summary>
-		/// 初始化 <see cref="KeyedListBase&lt;TKey, TItem&gt;"/> 类的新实例，
-		/// 该新实例使用指定的相等比较器并在超过指定阈值时创建一个查找字典。
+		/// 使用指定的相等比较器和创建查找字典的阈值初始化 
+		/// <see cref="KeyedListBase{TKey, TItem}"/> 类的新实例。
 		/// </summary>
-		/// <param name="comparer">比较键时要使用的 
-		/// <see cref="System.Collections.Generic.IEqualityComparer&lt;T&gt;"/> 泛型接口的实现，
-		/// 如果为 <c>null</c>，则使用从 
-		/// <see cref="System.Collections.Generic.EqualityComparer&lt;T&gt;.Default"/> 
+		/// <param name="comparer">比较键时要使用的 <see cref="IEqualityComparer{T}"/> 泛型接口的实现，
+		/// 如果为 <c>null</c>，则使用从 <see cref="EqualityComparer{T}.Default"/> 
 		/// 获取的该类型的键的默认相等比较器。</param>
 		/// <param name="dictionaryCreationThreshold">在不创建查找字典的情况下列表可容纳的元素的数目
 		/// （<c>0</c> 表示添加第一项时创建查找字典）；或者为 <c>-1</c>，表示指定永远不会创建查找字典。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="dictionaryCreationThreshold"/> 小于 <c>-1</c>。</exception>
 		protected KeyedListBase(IEqualityComparer<TKey> comparer, int dictionaryCreationThreshold)
-			: this(comparer, dictionaryCreationThreshold, false)
+			: this(comparer, dictionaryCreationThreshold, new List<TItem>())
 		{ }
 		/// <summary>
-		/// 初始化 <see cref="KeyedListBase&lt;TKey, TItem&gt;"/> 类的新实例，
-		/// 该新实例使用指定的相等比较器并在超过指定阈值时创建一个查找字典。
+		/// 使用指定的相等比较器、创建查找字典的阈值和被包装的列表，
+		/// 初始化 <see cref="KeyedListBase{TKey, TItem}"/> 类的新实例。
 		/// </summary>
-		/// <param name="comparer">比较键时要使用的 
-		/// <see cref="System.Collections.Generic.IEqualityComparer&lt;T&gt;"/> 泛型接口的实现，
-		/// 如果为 <c>null</c>，则使用从 
-		/// <see cref="System.Collections.Generic.EqualityComparer&lt;T&gt;.Default"/> 
+		/// <param name="comparer">比较键时要使用的 <see cref="IEqualityComparer{T}"/> 泛型接口的实现，
+		/// 如果为 <c>null</c>，则使用从 <see cref="EqualityComparer{T}.Default"/> 
 		/// 获取的该类型的键的默认相等比较器。</param>
 		/// <param name="dictionaryCreationThreshold">在不创建查找字典的情况下列表可容纳的元素的数目
 		/// （<c>0</c> 表示添加第一项时创建查找字典）；或者为 <c>-1</c>，表示指定永远不会创建查找字典。</param>
-		/// <param name="isReadOnly">集合是否是只读的。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <param name="list">由新的列表包装的集合。</param>
+		/// <remarks>如果 <paramref name="list"/> 实现了 <see cref="IList{T}"/>
+		/// 接口，则使用 <paramref name="list"/> 作为内部集合；否则使用 
+		/// <see cref="List{T}"/> 作为内部集合。</remarks>
+		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="dictionaryCreationThreshold"/> 小于 <c>-1</c>。</exception>
 		protected KeyedListBase(IEqualityComparer<TKey> comparer, int dictionaryCreationThreshold,
-			bool isReadOnly)
-			: base(isReadOnly)
+			IEnumerable<TItem> list)
+			: base(list)
 		{
-			if (comparer == null)
-			{
-				comparer = EqualityComparer<TKey>.Default;
-			}
-			if (dictionaryCreationThreshold == -1)
-			{
-				dictionaryCreationThreshold = int.MaxValue;
-			}
 			if (dictionaryCreationThreshold < -1)
 			{
-				ExceptionHelper.InvalidDictionaryThreshold("dictionaryCreationThreshold");
+				throw ExceptionHelper.InvalidDictionaryThreshold("dictionaryCreationThreshold");
 			}
-			this.comparer = comparer;
-			this.threshold = dictionaryCreationThreshold;
+			Contract.EndContractBlock();
+			this.comparer = comparer ?? EqualityComparer<TKey>.Default;
+			this.threshold = dictionaryCreationThreshold == -1 ? int.MaxValue : dictionaryCreationThreshold;
+			int cnt = this.Items.Count;
+			for (int i = 0; i < cnt; i++)
+			{
+				TKey key = this.GetKeyForItem(this.Items[i]);
+				Contract.Assert(key != null);
+				this.AddKey(key, this.Items[i]);
+			}
 		}
+
+		#endregion // 构造函数
+
 		/// <summary>
 		/// 获取用于确定列表中的键是否相等的泛型相等比较器。
 		/// </summary>
@@ -131,84 +129,80 @@ namespace Cyjb.Collections.ObjectModel
 			get { return this.comparer; }
 		}
 		/// <summary>
-		/// 获取 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 的查找字典。
+		/// 获取 <see cref="KeyedListBase{TKey,TItem}"/> 的查找字典。
 		/// </summary>
-		/// <value><see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 的查找字典。</value>
+		/// <value><see cref="KeyedListBase{TKey,TItem}"/> 的查找字典。</value>
 		protected IDictionary<TKey, TItem> Dictionary
 		{
 			get { return this.dict; }
 		}
+
+		#region 键操作
+
 		/// <summary>
 		/// 获取具有指定键的元素。
 		/// </summary>
 		/// <param name="key">要获取的元素的键。</param>
 		/// <returns>带有指定键的元素。如果未找到具有指定键的元素，则引发异常。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="KeyNotFoundException">在列表中不存在 <paramref name="key"/>。</exception>
 		/// <overloads>
 		/// <summary>
 		/// 获取指定的元素。
 		/// </summary>
 		/// </overloads>
-		[SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods")]
+		[Pure]
 		public TItem this[TKey key]
 		{
 			get
 			{
-				if (this.dict != null)
+				if (key == null)
 				{
-					return this.dict[key];
+					throw ExceptionHelper.ArgumentNull("key");
 				}
-				int cnt = base.Items.Count;
-				for (int i = 0; i < cnt; i++)
+				Contract.Ensures(Contract.Result<TItem>() != null);
+				TItem item;
+				if (this.TryGetValue(key, out item))
 				{
-					TItem item = base.Items[i];
-					if (this.comparer.Equals(this.GetKeyForItem(item), key))
-					{
-						return item;
-					}
+					return item;
 				}
 				throw ExceptionHelper.KeyNotFound(key);
 			}
 		}
 		/// <summary>
-		/// 确定某元素的键是否在 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中。
+		/// 确定某元素的键是否在 <see cref="KeyedListBase{TKey,TItem}"/> 中。
 		/// </summary>
 		/// <param name="key">要定位的元素的键。</param>
-		/// <returns>如果在 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 
+		/// <returns>如果在 <see cref="KeyedListBase{TKey,TItem}"/> 
 		/// 中找到具有指定键的元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <overloads>
-		/// <summary>
-		/// 确定特定元素是否在 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中。
-		/// </summary>
-		/// </overloads>
-		public bool Contains(TKey key)
+		[Pure]
+		public bool ContainsKey(TKey key)
 		{
-			if (this.dict != null)
+			if (key == null)
 			{
-				return this.dict.ContainsKey(key);
+				return false;
 			}
-			int cnt = base.Items.Count;
-			for (int i = 0; i < cnt; i++)
-			{
-				if (this.comparer.Equals(this.GetKeyForItem(base.Items[i]), key))
-				{
-					return true;
-				}
-			}
-			return false;
+			TItem item;
+			return this.TryGetValue(key, out item);
 		}
 		/// <summary>
-		/// 确定 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中特定元素的键的索引。
+		/// 确定 <see cref="KeyedListBase{TKey,TItem}"/> 中具有特定键的元素的索引。
 		/// </summary>
-		/// <param name="key">要在 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中定位的元素的键。</param>
-		/// <returns>如果在 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中找到 <paramref name="key"/>，
+		/// <param name="key">要在 <see cref="KeyedListBase{TKey,TItem}"/> 中定位的元素的键。</param>
+		/// <returns>如果在 <see cref="KeyedListBase{TKey,TItem}"/> 中找到 <paramref name="key"/>，
 		/// 则为该项的索引；否则为 <c>-1</c>。</returns>
 		/// <overloads>
 		/// <summary>
-		/// 确定 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中特定元素的索引。
+		/// 确定 <see cref="KeyedListBase{TKey,TItem}"/> 中特定元素的索引。
 		/// </summary>
 		/// </overloads>
+		[Pure]
 		public int IndexOf(TKey key)
 		{
+			if (key == null)
+			{
+				return -1;
+			}
 			if (this.dict != null)
 			{
 				TItem item;
@@ -218,10 +212,12 @@ namespace Cyjb.Collections.ObjectModel
 				}
 				return -1;
 			}
-			int cnt = base.Items.Count;
+			int cnt = this.Count;
 			for (int i = 0; i < cnt; i++)
 			{
-				if (this.comparer.Equals(this.GetKeyForItem(base.Items[i]), key))
+				TKey itemKey = this.GetKeyForItem(this.GetItemAt(i));
+				Contract.Assert(itemKey != null);
+				if (this.comparer.Equals(itemKey, key))
 				{
 					return i;
 				}
@@ -229,46 +225,58 @@ namespace Cyjb.Collections.ObjectModel
 			return -1;
 		}
 		/// <summary>
-		/// 从 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中移除具有指定键的元素。
+		/// 从 <see cref="KeyedListBase{TKey,TItem}"/> 中移除具有指定键的元素。
 		/// </summary>
 		/// <param name="key">要移除的元素的键。</param>
-		/// <returns>如果已从 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中成功移除元素，
-		/// 则为 <c>true</c>；否则为 <c>false</c>。如果在原始 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 
+		/// <returns>如果已从 <see cref="KeyedListBase{TKey,TItem}"/> 中成功移除元素，
+		/// 则为 <c>true</c>；否则为 <c>false</c>。如果在原始 <see cref="KeyedListBase{TKey,TItem}"/> 
 		/// 中没有找到指定的键，该方法也会返回 <c>false</c>。</returns>
 		/// <overloads>
 		/// <summary>
-		/// 从 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中移除特定元素。
+		/// 从 <see cref="KeyedListBase{TKey,TItem}"/> 中移除特定元素。
 		/// </summary>
 		/// </overloads>
 		public bool Remove(TKey key)
 		{
-			int index = IndexOf(key);
-			if (index >= 0)
+			if (key == null)
 			{
-				this.RemoveItem(index);
-				return true;
+				throw ExceptionHelper.ArgumentNull("key");
 			}
-			return false;
+			Contract.EndContractBlock();
+			int index = this.IndexOf(key);
+			if (index < 0)
+			{
+				return false;
+			}
+			this.RemoveItem(index);
+			return true;
 		}
 		/// <summary>
 		/// 获取具有指定的键的元素。
 		/// </summary>
 		/// <param name="key">要获取的值的键。</param>
 		/// <param name="item">当此方法返回值时，如果找到该键，便会返回与指定的键相关联的值；
-		/// 否则，则会返回 <paramref name="item"/> 参数的类型默认值。 该参数未经初始化即被传递。</param>
+		/// 否则，则会返回 <paramref name="item"/> 参数的类型默认值。</param>
 		/// <returns>如果包含具有指定键的元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		public bool TryGetItem(TKey key, out TItem item)
+		[Pure]
+		public bool TryGetValue(TKey key, out TItem item)
 		{
-			ExceptionHelper.CheckArgumentNull(key, "key");
+			if (key == null)
+			{
+				throw ExceptionHelper.ArgumentNull("key");
+			}
+			Contract.EndContractBlock();
 			if (this.dict != null)
 			{
 				return this.dict.TryGetValue(key, out item);
 			}
-			int cnt = base.Items.Count;
+			int cnt = this.Count;
 			for (int i = 0; i < cnt; i++)
 			{
-				item = base.Items[i];
-				if (this.comparer.Equals(this.GetKeyForItem(item), key))
+				item = this.GetItemAt(i);
+				TKey itemKey = this.GetKeyForItem(item);
+				Contract.Assert(itemKey != null);
+				if (this.comparer.Equals(itemKey, key))
 				{
 					return true;
 				}
@@ -277,88 +285,98 @@ namespace Cyjb.Collections.ObjectModel
 			return false;
 		}
 		/// <summary>
-		/// 更改与查找字典中指定元素相关联的键。
-		/// </summary>
-		/// <param name="item">要更改其键的元素。</param>
-		/// <param name="newKey"><paramref name="item"/> 的新键。</param>
-		/// <exception cref="System.ArgumentException"><paramref name="item"/> 未找到。</exception>
-		/// <exception cref="System.ArgumentException">
-		/// <paramref name="newKey"/> 在列表中已存在。</exception>
-		protected void ChangeItemKey(TItem item, TKey newKey)
-		{
-			if (!this.Contains(item))
-			{
-				throw ExceptionHelper.ItemNotExist("item");
-			}
-			TKey key = this.GetKeyForItem(item);
-			if (!this.comparer.Equals(key, newKey))
-			{
-				this.RemoveKey(key);
-				this.AddKey(newKey, item);
-			}
-		}
-		/// <summary>
 		/// 在派生类中实现时，将从指定元素提取键。
 		/// </summary>
 		/// <param name="item">从中提取键的元素。</param>
 		/// <returns>指定元素的键。</returns>
+		[Pure]
 		protected abstract TKey GetKeyForItem(TItem item);
+		/// <summary>
+		/// 更改与查找字典中指定元素相关联的键。
+		/// </summary>
+		/// <param name="item">要更改其键的元素。</param>
+		/// <param name="newKey"><paramref name="item"/> 的新键。</param>
+		/// <exception cref="ArgumentException"><paramref name="newKey"/> 在字典中已存在。</exception>
+		protected void ChangeItemKey(TItem item, TKey newKey)
+		{
+			Contract.Requires(this.Contains(item));
+			if (this.dict == null)
+			{
+				return;
+			}
+			TKey key = this.GetKeyForItem(item);
+			Contract.Assert(key != null);
+			if (this.comparer.Equals(key, newKey))
+			{
+				return;
+			}
+			this.dict.Remove(key);
+			this.dict.Add(newKey, item);
+		}
+
+		#endregion // 键操作
 
 		#region ListBase<TItem> 成员
 
 		/// <summary>
-		/// 从 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中移除所有元素。
-		/// </summary>
-		protected override void ClearItems()
-		{
-			base.ClearItems();
-			if (this.dict != null)
-			{
-				this.dict.Clear();
-			}
-			this.keyCount = 0;
-		}
-		/// <summary>
-		/// 将元素插入 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 的指定索引处。
+		/// 将元素插入 <see cref="KeyedListBase{TKey,TItem}"/> 的指定索引处。
 		/// </summary>
 		/// <param name="index">从零开始的索引，应在该位置插入 <paramref name="item"/>。</param>
 		/// <param name="item">要插入的对象。对于引用类型，该值可以为 <c>null</c>。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="item"/> 为 <c>null</c>。</exception>
 		protected override void InsertItem(int index, TItem item)
 		{
-			this.AddKey(this.GetKeyForItem(item), item);
+			if (item == null)
+			{
+				throw ExceptionHelper.ArgumentNull("item");
+			}
+			Contract.EndContractBlock();
+			TKey key = this.GetKeyForItem(item);
+			Contract.Assert(key != null);
+			this.AddKey(key, item);
 			base.InsertItem(index, item);
+		}
+		/// <summary>
+		/// 移除 <see cref="KeyedListBase{TKey,TItem}"/> 的指定索引处的元素。
+		/// </summary>
+		/// <param name="index">要移除的元素的从零开始的索引。</param>
+		protected override void RemoveItem(int index)
+		{
+			TKey key = this.GetKeyForItem(this.GetItemAt(index));
+			Contract.Assert(key != null);
+			this.RemoveKey(key);
+			base.RemoveItem(index);
 		}
 		/// <summary>
 		/// 替换指定索引处的元素。
 		/// </summary>
 		/// <param name="index">待替换元素的从零开始的索引。</param>
-		/// <param name="item">位于指定索引处的元素的新值。对于引用类型，该值可以为 <c>null</c>。</param>
-		protected override void SetItem(int index, TItem item)
+		/// <param name="item">位于指定索引处的元素的新值。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="item"/> 为 <c>null</c>。</exception>
+		protected override void SetItemAt(int index, TItem item)
 		{
-			TKey key = this.GetKeyForItem(item);
-			TKey okdKey = this.GetKeyForItem(base.Items[index]);
-			if (this.comparer.Equals(okdKey, key))
+			if (item == null)
 			{
-				if (this.dict != null)
+				throw ExceptionHelper.ArgumentNull("item");
+			}
+			Contract.EndContractBlock();
+			TKey oldKey = this.GetKeyForItem(this.GetItemAt(index));
+			Contract.Assert(oldKey != null);
+			TKey key = this.GetKeyForItem(item);
+			Contract.Assert(key != null);
+			if (this.dict != null)
+			{
+				if (this.comparer.Equals(oldKey, key))
 				{
 					this.dict[key] = item;
 				}
+				else
+				{
+					this.dict.Remove(oldKey);
+					this.dict.Add(key, item);
+				}
 			}
-			else
-			{
-				this.RemoveKey(okdKey);
-				this.AddKey(key, item);
-			}
-			base.SetItem(index, item);
-		}
-		/// <summary>
-		/// 移除 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 的指定索引处的元素。
-		/// </summary>
-		/// <param name="index">要移除的元素的从零开始的索引。</param>
-		protected override void RemoveItem(int index)
-		{
-			this.RemoveKey(this.GetKeyForItem(base.Items[index]));
-			base.RemoveItem(index);
+			base.SetItemAt(index, item);
 		}
 
 		#endregion // ListBase<TItem> 成员
@@ -366,67 +384,74 @@ namespace Cyjb.Collections.ObjectModel
 		#region ICollection<TItem> 成员
 
 		/// <summary>
-		/// 确定某元素是否在 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 中。
+		/// 从 <see cref="KeyedListBase{TKey,TItem}"/> 中移除所有元素。
 		/// </summary>
-		/// <param name="item">要定位的元素。</param>
-		/// <returns>如果在 <see cref="KeyedListBase&lt;TKey,TItem&gt;"/> 
-		/// 中找到指定的元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		public override void Clear()
+		{
+			base.Clear();
+			if (this.dict != null)
+			{
+				this.dict.Clear();
+			}
+		}
+		/// <summary>
+		/// 确定 <see cref="KeyedListBase{TKey,TItem}"/> 是否包含指定对象。
+		/// </summary>
+		/// <param name="item">要在 <see cref="KeyedListBase{TKey,TItem}"/> 中定位的对象。</param>
+		/// <returns>如果在 <see cref="KeyedListBase{TKey,TItem}"/> 中找到 <paramref name="item"/>，
+		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public override bool Contains(TItem item)
 		{
+			if (item == null)
+			{
+				return false;
+			}
 			if (this.dict == null)
 			{
-				return base.Items.Contains(item);
+				return this.IndexOf(item) >= 0;
 			}
+			TKey key = this.GetKeyForItem(item);
+			Contract.Assert(key != null);
 			TItem newItem;
-			if (this.dict.TryGetValue(this.GetKeyForItem(item), out newItem))
-			{
-				return EqualityComparer<TItem>.Default.Equals(newItem, item);
-			}
-			return false;
+			return this.dict.TryGetValue(key, out newItem) &&
+				EqualityComparer<TItem>.Default.Equals(newItem, item);
 		}
 
 		#endregion // ICollection<TItem> 成员
 
+		#region 字典操作
+
 		/// <summary>
-		/// 将元素的键和值添加到字典中。
+		/// 将指定的键和值添加到字典中。
 		/// </summary>
 		/// <param name="key">要添加的键。</param>
 		/// <param name="item">要添加的值。</param>
-		/// <exception cref="System.ArgumentException">
-		/// <paramref name="key"/> 在列表中已存在。</exception>
-		private void AddKey(TKey key, TItem item)
+		/// <exception cref="ArgumentException"><paramref name="key"/> 在列表中已存在。</exception>
+		protected void AddKey(TKey key, TItem item)
 		{
 			if (this.dict != null)
 			{
 				this.dict.Add(key, item);
 			}
-			else if (this.keyCount == this.threshold)
+			else if (this.Count >= this.threshold)
 			{
 				this.CreateDictionary();
 				this.dict.Add(key, item);
 			}
-			else
+			else if (this.ContainsKey(key))
 			{
-				if (this.Contains(key))
-				{
-					throw ExceptionHelper.KeyDuplicate("key");
-				}
-				this.keyCount++;
+				throw ExceptionHelper.KeyDuplicate("key");
 			}
 		}
 		/// <summary>
 		/// 从字典中移除指定的键。
 		/// </summary>
 		/// <param name="key">要移除的键。</param>
-		private void RemoveKey(TKey key)
+		protected void RemoveKey(TKey key)
 		{
 			if (this.dict != null)
 			{
 				this.dict.Remove(key);
-			}
-			else
-			{
-				this.keyCount--;
 			}
 		}
 		/// <summary>
@@ -435,12 +460,17 @@ namespace Cyjb.Collections.ObjectModel
 		private void CreateDictionary()
 		{
 			this.dict = new Dictionary<TKey, TItem>(this.comparer);
-			int cnt = base.Items.Count;
+			int cnt = this.Count;
 			for (int i = 0; i < cnt; i++)
 			{
-				TItem item = base.Items[i];
-				this.dict.Add(this.GetKeyForItem(item), item);
+				TItem item = this.GetItemAt(i);
+				TKey key = this.GetKeyForItem(item);
+				Contract.Assert(key != null);
+				this.dict.Add(key, item);
 			}
 		}
+
+		#endregion // 字典操作
+
 	}
 }

@@ -1,65 +1,69 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using Cyjb.Collections.ObjectModel;
 
 namespace Cyjb.Collections
 {
 	/// <summary>
-	/// 表示数组的一部分的列表。与 <see cref="System.ArraySegment&lt;T&gt;"/> 
-	/// 的区别就是 <see cref="ArrayAdapter&lt;T&gt;"/> 实现了 <see cref="IList&lt;T&gt;"/> 接口，
+	/// 表示数组的一部分的列表。与 <see cref="ArraySegment{T}"/> 
+	/// 的区别就是 <see cref="ArrayAdapter{T}"/> 实现了 <see cref="IList{T}"/> 接口，
 	/// 访问方式与普通的列表相同。
 	/// </summary>
 	/// <typeparam name="T">元素的类型。</typeparam>
 	public sealed class ArrayAdapter<T> : ListBase<T>, IList
 	{
 		/// <summary>
-		/// 被包装的数组。
+		/// 原数组。
 		/// </summary>
-		private readonly T[] items;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private readonly T[] array;
 		/// <summary>
-		/// 获取由数组段分隔的范围中的第一个元素的位置（相对于原始数组的开始位置）。
+		/// 范围中的第一个元素的位置。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private readonly int offset;
 		/// <summary>
-		/// 获取由数组段分隔的范围中的元素个数。
+		/// 范围中的元素个数。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private readonly int count;
 		/// <summary>
-		/// 初始化 <see cref="Cyjb.Collections.ArrayAdapter&lt;T&gt;"/> 类的新实例。
-		/// </summary>
-		/// <overloads>
-		/// <summary>
-		/// 初始化 <see cref="Cyjb.Collections.ArrayAdapter&lt;T&gt;"/> 类的新实例。
-		/// </summary>
-		/// </overloads>
-		public ArrayAdapter()
-		{
-			items = ArrayExt.Empty<T>();
-		}
-		/// <summary>
-		/// 使用给定的数组初始化 <see cref="Cyjb.Collections.ArrayAdapter&lt;T&gt;"/> 类的新实例。
+		/// 使用给定的数组初始化 <see cref="Cyjb.Collections.ArrayAdapter{T}"/> 类的新实例。
 		/// </summary>
 		/// <param name="array">初始化使用的数组。</param>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="Cyjb.Collections.ArrayAdapter{T}"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		public ArrayAdapter(params T[] array)
+			: base(array)
 		{
-			ExceptionHelper.CheckArgumentNull(array, "array");
-			this.items = array;
-			count = this.items.Length;
+			if (array == null)
+			{
+				throw ExceptionHelper.ArgumentNull("array");
+			}
+			Contract.EndContractBlock();
+			this.array = array;
+			this.count = array.Length;
 		}
 		/// <summary>
-		/// 使用给定的数组初始化 <see cref="Cyjb.Collections.ArrayAdapter&lt;T&gt;"/> 类的新实例。
+		/// 使用给定的数组初始化 <see cref="Cyjb.Collections.ArrayAdapter{T}"/> 类的新实例。
 		/// 它分割指定数组中指定的元素范围。
 		/// </summary>
 		/// <param name="array">初始化使用的数组。</param>
 		/// <param name="offset">相应范围中第一个元素的从零开始的索引。</param>
 		/// <param name="count">范围中的元素数。</param>
 		public ArrayAdapter(T[] array, int offset, int count)
+			: base(array)
 		{
-			ExceptionHelper.CheckArgumentNull(array, "array");
+			if (array == null)
+			{
+				throw ExceptionHelper.ArgumentNull("array");
+			}
 			if (offset < 0)
 			{
 				throw ExceptionHelper.ArgumentNegative("offset");
@@ -72,7 +76,8 @@ namespace Cyjb.Collections
 			{
 				throw ExceptionHelper.InvalidOffsetLength();
 			}
-			this.items = array;
+			Contract.EndContractBlock();
+			this.array = array;
 			this.offset = offset;
 			this.count = count;
 		}
@@ -80,28 +85,28 @@ namespace Cyjb.Collections
 		/// 获取由数组段分隔的范围中的第一个元素的位置（相对于原始数组的开始位置）。
 		/// </summary>
 		/// <value>由数组段分隔的范围中的第一个元素的位置（相对于原始数组的开始位置）。</value>
-		public int Offset { get { return offset; } }
+		public int Offset
+		{
+			get
+			{
+				Contract.Ensures(Contract.Result<int>() >= 0);
+				return offset;
+			}
+		}
 
 		#region ListBase<T> 成员
 
 		/// <summary>
-		/// 从 <see cref="ListBase&lt;T&gt;"/> 中移除所有元素。
-		/// </summary>
-		protected override void ClearItems()
-		{
-			throw ExceptionHelper.FixedSizeCollection();
-		}
-		/// <summary>
-		/// 将元素插入 <see cref="ListBase&lt;T&gt;"/> 的指定索引处。
+		/// 将元素插入 <see cref="ArrayAdapter{T}"/> 的指定索引处。
 		/// </summary>
 		/// <param name="index">从零开始的索引，应在该位置插入 <paramref name="item"/>。</param>
-		/// <param name="item">要插入的对象。对于引用类型，该值可以为 <c>null</c>。</param>
+		/// <param name="item">要插入的对象。</param>
 		protected override void InsertItem(int index, T item)
 		{
 			throw ExceptionHelper.FixedSizeCollection();
 		}
 		/// <summary>
-		/// 移除 <see cref="ListBase&lt;T&gt;"/> 的指定索引处的元素。
+		/// 移除 <see cref="ArrayAdapter{T}"/> 的指定索引处的元素。
 		/// </summary>
 		/// <param name="index">要移除的元素的从零开始的索引。</param>
 		protected override void RemoveItem(int index)
@@ -113,18 +118,18 @@ namespace Cyjb.Collections
 		/// </summary>
 		/// <param name="index">待替换元素的从零开始的索引。</param>
 		/// <param name="item">位于指定索引处的元素的新值。对于引用类型，该值可以为 <c>null</c>。</param>
-		protected override void SetItem(int index, T item)
+		protected override void SetItemAt(int index, T item)
 		{
-			this.items[index] = item;
+			this.array[index] = item;
 		}
 		/// <summary>
 		/// 返回指定索引处的元素。
 		/// </summary>
 		/// <param name="index">要返回元素的从零开始的索引。</param>
 		/// <returns>位于指定索引处的元素。</returns>
-		protected override T GetItem(int index)
+		protected override T GetItemAt(int index)
 		{
-			return this.items[index + offset];
+			return this.array[index + offset];
 		}
 
 		#endregion // ListBase<T> 成员
@@ -132,22 +137,14 @@ namespace Cyjb.Collections
 		#region IList<T> 成员
 
 		/// <summary>
-		/// 确定 <see cref="ArrayAdapter&lt;T&gt;"/> 中特定项的索引。
+		/// 确定 <see cref="ArrayAdapter{T}"/> 中指定对象的索引。
 		/// </summary>
-		/// <param name="item">要在 <see cref="ArrayAdapter&lt;T&gt;"/> 中定位的对象。</param>
-		/// <returns>如果在 <see cref="ArrayAdapter&lt;T&gt;"/> 中找到 <paramref name="item"/>，
-		/// 则为该项的索引；否则为 <c>-1</c>。</returns>
+		/// <param name="item">要在 <see cref="ArrayAdapter{T}"/> 中定位的对象。</param>
+		/// <returns>如果在 <see cref="ArrayAdapter{T}"/> 中找到 <paramref name="item"/>，
+		/// 则为该对象的索引；否则为 <c>-1</c>。</returns>
 		public override int IndexOf(T item)
 		{
-			IEqualityComparer<T> comparer = EqualityComparer<T>.Default;
-			for (int i = offset; i < offset + count; i++)
-			{
-				if (comparer.Equals(items[i], item))
-				{
-					return i;
-				}
-			}
-			return -1;
+			return Array.IndexOf(this.array, item, this.offset, this.count);
 		}
 
 		#endregion // IList<T> 成员
@@ -155,9 +152,9 @@ namespace Cyjb.Collections
 		#region IList 成员
 
 		/// <summary>
-		/// 获取一个值，该值指示 <see cref="ArrayAdapter&lt;T&gt;"/> 是否具有固定大小。
+		/// 获取一个值，该值指示 <see cref="ArrayAdapter{T}"/> 是否具有固定大小。
 		/// </summary>
-		/// <value>如果 <see cref="ArrayAdapter&lt;T&gt;"/> 具有固定大小，则为 <c>true</c>；
+		/// <value>如果 <see cref="ArrayAdapter{T}"/> 具有固定大小，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</value>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		bool IList.IsFixedSize
@@ -170,37 +167,21 @@ namespace Cyjb.Collections
 		#region ICollection<T> 成员
 
 		/// <summary>
-		/// 获取 <see cref="ArrayAdapter&lt;T&gt;"/> 中包含的元素数。
+		/// 获取 <see cref="ArrayAdapter{T}"/> 中包含的元素数。
 		/// </summary>
-		/// <value><see cref="ArrayAdapter&lt;T&gt;"/> 中包含的元素数。</value>
+		/// <value><see cref="ArrayAdapter{T}"/> 中包含的元素数。</value>
 		public override int Count
 		{
 			get { return this.count; }
 		}
-
 		/// <summary>
-		/// 从特定的 <see cref="System.Array"/> 索引处开始，将 
-		/// <see cref="ArrayAdapter&lt;T&gt;"/> 的元素复制到一个 <see cref="System.Array"/> 中。
+		/// 从 <see cref="ArrayAdapter{T}"/> 中移除所有元素。
+		/// 此实现总是引发 <see cref="NotSupportedException"/>。
 		/// </summary>
-		/// <param name="array">作为从 <see cref="ArrayAdapter&lt;T&gt;"/> 
-		/// 复制的元素的目标位置的一维 <see cref="System.Array"/>。
-		/// <see cref="System.Array"/> 必须具有从零开始的索引。</param>
-		/// <param name="arrayIndex"><paramref name="array"/> 中从零开始的索引，在此处开始复制。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="array"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="arrayIndex"/> 小于 <paramref name="array"/> 的下限。</exception>
-		/// <exception cref="System.ArgumentException">
-		/// <paramref name="array"/> 是多维的。</exception>
-		/// <exception cref="System.ArgumentException">源 
-		/// <see cref="ArrayAdapter&lt;T&gt;"/> 中的元素数目大于从 
-		/// <paramref name="arrayIndex"/> 到目标 <paramref name="array"/> 末尾之间的可用空间。</exception>
-		/// <exception cref="System.InvalidCastException">源 
-		/// <see cref="ArrayAdapter&lt;T&gt;"/> 的类型无法自动转换为目标 
-		/// <paramref name="array"/> 的类型。</exception>
-		public override void CopyTo(T[] array, int arrayIndex)
+		/// <exception cref="NotSupportedException">总是引发。</exception>
+		public override void Clear()
 		{
-			Array.Copy(this.items, offset, array, arrayIndex, count);
+			throw ExceptionHelper.FixedSizeCollection();
 		}
 
 		#endregion // ICollection<T> 成员
@@ -210,12 +191,13 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 返回一个循环访问集合的枚举器。
 		/// </summary>
-		/// <returns>可用于循环访问集合的 <see cref="System.Collections.Generic.IEnumerator&lt;T&gt;"/>。</returns>
+		/// <returns>可用于循环访问集合的 <see cref="System.Collections.Generic.IEnumerator{T}"/>。</returns>
 		public override IEnumerator<T> GetEnumerator()
 		{
-			for (int i = offset; i < offset + count; i++)
+			int len = offset + count;
+			for (int i = offset; i < len; i++)
 			{
-				yield return this.items[i];
+				yield return this.array[i];
 			}
 		}
 

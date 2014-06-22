@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
+using System.Threading;
 
 namespace Cyjb.Collections
 {
@@ -10,6 +13,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 默认的比较器。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private static BitListEqualityComparer defaultValue;
 		/// <summary>
 		/// 返回一个默认的相等比较器。
@@ -21,7 +25,7 @@ namespace Cyjb.Collections
 			{
 				if (defaultValue == null)
 				{
-					defaultValue = new BitListEqualityComparer();
+					Interlocked.CompareExchange(ref defaultValue, new BitListEqualityComparer(), null);
 				}
 				return defaultValue;
 			}
@@ -56,11 +60,7 @@ namespace Cyjb.Collections
 			{
 				return false;
 			}
-			if (x == y)
-			{
-				return true;
-			}
-			return x.ContentEquals(y);
+			return x == y || x.ContentEquals(y);
 		}
 		/// <summary>
 		/// 返回指定对象的哈希代码。
@@ -76,7 +76,11 @@ namespace Cyjb.Collections
 		/// </overloads>
 		public override int GetHashCode(BitList obj)
 		{
-			ExceptionHelper.CheckArgumentNull(obj, "obj");
+			if (obj == null)
+			{
+				throw ExceptionHelper.ArgumentNull("obj");
+			}
+			Contract.EndContractBlock();
 			return obj.GetContentHashCode();
 		}
 
