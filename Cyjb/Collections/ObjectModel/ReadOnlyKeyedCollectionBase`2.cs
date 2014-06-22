@@ -124,6 +124,24 @@ namespace Cyjb.Collections.ObjectModel
 		/// <returns>指定元素的键。</returns>
 		[Pure]
 		protected abstract TKey GetKeyForItem(TItem item);
+		/// <summary>
+		/// 更改与指定元素相关联的键。
+		/// </summary>
+		/// <param name="item">要更改其键的元素。</param>
+		/// <param name="newKey"><paramref name="item"/> 的新键。</param>
+		/// <exception cref="ArgumentException"><paramref name="newKey"/> 在字典中已存在。</exception>
+		protected void ChangeItemKey(TItem item, TKey newKey)
+		{
+			Contract.Requires(this.Contains(item));
+			TKey key = this.GetKeyForItem(item);
+			Contract.Assert(key != null);
+			if (EqualityComparer<TKey>.Default.Equals(key, newKey))
+			{
+				return;
+			}
+			this.dict.Remove(key);
+			this.dict.Add(newKey, item);
+		}
 
 		#endregion // 键操作
 
