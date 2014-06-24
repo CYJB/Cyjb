@@ -1,5 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
+using System.Linq;
+using System.Threading;
 
 namespace Cyjb.Collections
 {
@@ -12,6 +16,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 默认的相等比较器。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private static SetEqualityComparer<T> defaultValue;
 		/// <summary>
 		/// 获取默认的相等比较器。
@@ -24,7 +29,7 @@ namespace Cyjb.Collections
 			{
 				if (defaultValue == null)
 				{
-					defaultValue = new SetEqualityComparer<T>();
+					Interlocked.CompareExchange(ref defaultValue, new SetEqualityComparer<T>(), null);
 				}
 				return defaultValue;
 			}
@@ -59,11 +64,7 @@ namespace Cyjb.Collections
 			{
 				return false;
 			}
-			if (x == y)
-			{
-				return true;
-			}
-			return x.SetEquals(y);
+			return x == y || x.SetEquals(y);
 		}
 		/// <summary>
 		/// 返回指定对象的哈希代码。
@@ -79,14 +80,13 @@ namespace Cyjb.Collections
 		/// </overloads>
 		public override int GetHashCode(ISet<T> obj)
 		{
-			ExceptionHelper.CheckArgumentNull(obj, "obj");
-			// 使用与位置无关的弱哈希。
-			int hashCode = obj.Count;
-			foreach (T item in obj)
+			if (obj == null)
 			{
-				hashCode ^= item.GetHashCode();
+				throw ExceptionHelper.ArgumentNull("obj");
 			}
-			return hashCode;
+			Contract.EndContractBlock();
+			// 使用与位置无关的弱哈希。
+			return obj.Count ^ obj.Select(o => o.GetHashCode()).Aggregate((x, y) => x ^ y);
 		}
 
 		#endregion // EqualityComparer<ISet<T>> 成员

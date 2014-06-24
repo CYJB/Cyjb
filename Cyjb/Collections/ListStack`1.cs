@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace Cyjb.Collections
 {
@@ -9,8 +10,14 @@ namespace Cyjb.Collections
 	/// </summary>
 	/// <typeparam name="T">指定堆栈中的元素的类型。</typeparam>
 	/// <seealso cref="System.Collections.Generic.Stack&lt;T&gt;"/>
-	public sealed class ListStack<T> : Stack<T>
+	[Serializable]
+	public class ListStack<T> : Stack<T>
 	{
+		/// <summary>
+		/// 获取 <see cref="Stack&lt;T&gt;"/> 实例的 <c>_array</c> 字段。
+		/// </summary>
+		private static readonly Func<Stack<T>, T[]> getArrayField =
+			typeof(Stack<T>).CreateDelegate<Func<Stack<T>, T[]>>("_array");
 		/// <summary>
 		/// 初始化 <see cref="ListStack&lt;T&gt;"/> 类的新实例，该实例为空并且具有默认初始容量。
 		/// </summary>
@@ -33,11 +40,6 @@ namespace Cyjb.Collections
 		/// <param name="capacity"><see cref="ListStack&lt;T&gt;"/> 可包含的初始元素数。</param>
 		public ListStack(int capacity) : base(capacity) { }
 		/// <summary>
-		/// 获取 Stack&lt;T&gt; 实例的 _array 字段。
-		/// </summary>
-		private static readonly Func<Stack<T>, T[]> GetArrayField =
-			typeof(Stack<T>).CreateDelegate<Func<Stack<T>, T[]>>("_array");
-		/// <summary>
 		/// 获取指定索引处的元素。
 		/// </summary>
 		/// <param name="index">要获取的元素从零开始的索引。</param>
@@ -54,7 +56,8 @@ namespace Cyjb.Collections
 				{
 					throw ExceptionHelper.ArgumentOutOfRange("index");
 				}
-				return GetArrayField(this)[index];
+				Contract.EndContractBlock();
+				return getArrayField(this)[index];
 			}
 		}
 	}

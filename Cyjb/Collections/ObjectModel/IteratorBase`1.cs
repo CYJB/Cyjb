@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 namespace Cyjb.Collections.ObjectModel
@@ -19,9 +20,9 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 当前迭代器对应的线程 Id。
 		/// </summary>
-		private int threadId;
+		private readonly int threadId;
 		/// <summary>
-		/// 初始化 <see cref="IteratorBase&lt;T&gt;"/> 类的新实例。
+		/// 初始化 <see cref="IteratorBase{T}"/> 类的新实例。
 		/// </summary>
 		protected IteratorBase()
 		{
@@ -44,15 +45,17 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 返回一个循环访问集合的枚举器。
 		/// </summary>
-		/// <returns>可用于循环访问集合的 <see cref="System.Collections.Generic.IEnumerator&lt;T&gt;"/>。</returns>
+		/// <returns>可用于循环访问集合的 <see cref="IEnumerator{T}"/>。</returns>
 		public IEnumerator<T> GetEnumerator()
 		{
-			if (this.threadId == Thread.CurrentThread.ManagedThreadId && this.state == IteratorState.Default)
+			if (this.threadId == Thread.CurrentThread.ManagedThreadId &&
+				this.state == IteratorState.Default)
 			{
 				this.state = IteratorState.Ready;
 				return this;
 			}
 			IteratorBase<T> iterator = Clone();
+			Debug.Assert(iterator != null);
 			iterator.state = IteratorState.Ready;
 			return iterator;
 		}
@@ -64,7 +67,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 返回一个循环访问集合的枚举器。
 		/// </summary>
-		/// <returns>可用于循环访问集合的 <see cref="System.Collections.IEnumerator"/>。</returns>
+		/// <returns>可用于循环访问集合的 <see cref="IEnumerator"/>。</returns>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return this.GetEnumerator();
@@ -99,18 +102,14 @@ namespace Cyjb.Collections.ObjectModel
 		/// 如果枚举数越过集合的结尾，则为 <c>false</c>。</returns>
 		public bool MoveNext()
 		{
-			if (this.state == IteratorState.Ready)
-			{
-				return MoveNextInternal();
-			}
-			return false;
+			return this.state == IteratorState.Ready && MoveNextInternal();
 		}
 		/// <summary>
 		/// 将枚举数设置为其初始位置，该位置位于集合中第一个元素之前。
 		/// </summary>
 		public virtual void Reset()
 		{
-			throw new NotImplementedException();
+			throw ExceptionHelper.MethodNotSupported();
 		}
 
 		#endregion // IEnumerator 成员
@@ -127,11 +126,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// </overloads>
 		public void Dispose()
 		{
-			if (this.state != IteratorState.Disposed)
-			{
-				this.state = IteratorState.Disposed;
-				this.Dispose(true);
-			}
+			this.Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 		/// <summary>
@@ -140,6 +135,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// <param name="disposing">是否释放托管资源。</param>
 		protected virtual void Dispose(bool disposing)
 		{
+			if (this.state == IteratorState.Disposed || !disposing)
+			{
+				return;
+			}
+			this.state = IteratorState.Disposed;
 			this.Current = default(T);
 		}
 

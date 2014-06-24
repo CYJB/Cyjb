@@ -13,7 +13,6 @@ namespace Cyjb.Collections
 		/// 调试视图的源集合。
 		/// </summary>
 		private readonly ICollection<T> source;
-
 		/// <summary>
 		/// 使用指定的源集合初始化 <see cref="CollectionDebugView&lt;T&gt;"/> 类的实例。
 		/// </summary>
@@ -22,7 +21,6 @@ namespace Cyjb.Collections
 		{
 			this.source = sourceCollection;
 		}
-
 		/// <summary>
 		/// 获取源集合中的所有项。
 		/// </summary>

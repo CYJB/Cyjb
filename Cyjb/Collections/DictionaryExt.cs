@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace Cyjb.Collections
 {
 	/// <summary>
-	/// 提供对 <see cref="System.Collections.Generic.IDictionary&lt;TKey,TValue&gt;"/> 的扩展方法。
+	/// 提供对 <see cref="System.Collections.Generic.IDictionary{TKey,TValue}"/> 的扩展方法。
 	/// </summary>
 	public static class DictionaryExt
 	{
@@ -18,12 +19,13 @@ namespace Cyjb.Collections
 		/// 否则，将返回 <typeparamref name="TValue"/> 类型的默认值。</returns>
 		public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
 		{
-			TValue value;
-			if (dict.TryGetValue(key, out value))
+			if (dict == null)
 			{
-				return value;
+				throw ExceptionHelper.ArgumentNull("dict");
 			}
-			return default(TValue);
+			Contract.EndContractBlock();
+			TValue value;
+			return dict.TryGetValue(key, out value) ? value : default(TValue);
 		}
 	}
 }

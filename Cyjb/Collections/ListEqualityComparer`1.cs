@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
+using System.Threading;
 
 namespace Cyjb.Collections
 {
@@ -12,6 +15,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 默认的比较器。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private static ListEqualityComparer<T> defaultValue;
 		/// <summary>
 		/// 获取默认的相等比较器。
@@ -24,7 +28,7 @@ namespace Cyjb.Collections
 			{
 				if (defaultValue == null)
 				{
-					defaultValue = new ListEqualityComparer<T>();
+					Interlocked.CompareExchange(ref defaultValue, new ListEqualityComparer<T>(), null);
 				}
 				return defaultValue;
 			}
@@ -51,14 +55,7 @@ namespace Cyjb.Collections
 		/// <param name="comparer">元素比较器。</param>
 		public ListEqualityComparer(IEqualityComparer<T> comparer)
 		{
-			if (comparer == null)
-			{
-				this.comparer = EqualityComparer<T>.Default;
-			}
-			else
-			{
-				this.comparer = comparer;
-			}
+			this.comparer = comparer ?? EqualityComparer<T>.Default;
 		}
 
 		#region EqualityComparer<IList<T>> 成员
@@ -97,13 +94,17 @@ namespace Cyjb.Collections
 			}
 			for (int i = 0; i < cnt; i++)
 			{
-				if (!comparer.Equals(x[i], y[i])) { return false; }
+				if (!comparer.Equals(x[i], y[i]))
+				{
+					return false;
+				}
 			}
 			return true;
 		}
 		/// <summary>
 		/// Hash 的魔数。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private const int MagicCode = unchecked((int)0x9E3779B9);
 		/// <summary>
 		/// 返回指定对象的哈希代码。
@@ -119,7 +120,11 @@ namespace Cyjb.Collections
 		/// </overloads>
 		public override int GetHashCode(IList<T> obj)
 		{
-			ExceptionHelper.CheckArgumentNull(obj, "obj");
+			if (obj == null)
+			{
+				throw ExceptionHelper.ArgumentNull("obj");
+			}
+			Contract.EndContractBlock();
 			// 算法来自 boost::hash_range。
 			int cnt = obj.Count;
 			int hashCode = cnt;
