@@ -617,9 +617,9 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="innerException">导致当前异常的异常。</param>
 		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
-		public static InvalidOperationException IComparerFailed(Exception innerException)
+		public static InvalidOperationException ComparerFailed(Exception innerException)
 		{
-			return GetInvalidOperation("IComparerFailed", innerException);
+			return GetInvalidOperation("ComparerFailed", innerException);
 		}
 		/// <summary>
 		/// 返回不表示泛型方法定义的异常。

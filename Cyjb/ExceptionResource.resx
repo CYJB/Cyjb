@@ -221,6 +221,10 @@
     <value>Can not infer type argument of {0} from parameters.</value>
     <comment>无效的泛型参数推断。</comment>
   </data>
+  <data name="ComparerFailed" xml:space="preserve">
+    <value>Failed to compare two elements in the array.</value>
+    <comment>比较数组元素失败。</comment>
+  </data>
   <data name="ConflictingAcceptAction" xml:space="preserve">
     <value>Accept action is conflicted with Reject action.</value>
     <comment>冲突的接受动作。</comment>
@@ -256,10 +260,6 @@
   <data name="FixedSizeCollection" xml:space="preserve">
     <value>Collection was of a fixed size.</value>
     <comment>集合是固定大小的。</comment>
-  </data>
-  <data name="IComparerFailed" xml:space="preserve">
-    <value>Failed to compare two elements in the array.</value>
-    <comment>比较数组元素失败。</comment>
   </data>
   <data name="InnerExceptionNull" xml:space="preserve">
     <value>An element of innerExceptions was null.</value>

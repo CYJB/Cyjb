@@ -1,11 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 
 namespace Cyjb.ComponentModel
 {
 	/// <summary>
-	/// 提供将 <see cref="System.Enum"/> 对象与其他各种表示形式相互转换的类型转换器。
+	/// 提供将 <see cref="Enum"/> 对象与其他各种表示形式相互转换的类型转换器。
 	/// 支持枚举值的描述信息。
 	/// </summary>
 	public class EnumDescConverter : EnumConverter
@@ -20,12 +21,11 @@ namespace Cyjb.ComponentModel
 		/// <summary>
 		/// 将指定的值对象转换为枚举对象。
 		/// </summary>
-		/// <param name="context"><see cref="System.ComponentModel.ITypeDescriptorContext"/>，
-		/// 提供格式上下文。</param>
-		/// <param name="culture">一个可选的 <see cref="System.Globalization.CultureInfo"/>。
+		/// <param name="context"><see cref="ITypeDescriptorContext"/>，提供格式上下文。</param>
+		/// <param name="culture">一个可选的 <see cref="CultureInfo"/>。
 		/// 如果未提供区域性设置，则使用当前区域性。</param>
-		/// <param name="value">要转换的 <see cref="System.Object"/>。</param>
-		/// <returns>表示转换的 <paramref name="value"/> 的 <see cref="System.Object"/>。</returns>
+		/// <param name="value">要转换的 <see cref="Object"/>。</param>
+		/// <returns>表示转换的 <paramref name="value"/> 的 <see cref="Object"/>。</returns>
 		/// <overloads>
 		/// <summary>
 		/// 将给定值转换为此转换器的类型。
@@ -43,13 +43,12 @@ namespace Cyjb.ComponentModel
 		/// <summary>
 		/// 将给定的值对象转换为指定的目标类型。
 		/// </summary>
-		/// <param name="context"><see cref="System.ComponentModel.ITypeDescriptorContext"/>，
-		/// 提供格式上下文。</param>
-		/// <param name="culture">一个可选的 <see cref="System.Globalization.CultureInfo"/>。
+		/// <param name="context"><see cref="ITypeDescriptorContext"/>，提供格式上下文。</param>
+		/// <param name="culture">一个可选的 <see cref="CultureInfo"/>。
 		/// 如果未提供区域性设置，则使用当前区域性。</param>
-		/// <param name="value">要转换的 <see cref="System.Object"/>。</param>
-		/// <param name="destinationType">要将值转换成的 <see cref="System.Type"/>。</param>
-		/// <returns>表示转换的 <paramref name="value"/> 的 <see cref="System.Object"/>。</returns>
+		/// <param name="value">要转换的 <see cref="Object"/>。</param>
+		/// <param name="destinationType">要将值转换成的 <see cref="Type"/>。</param>
+		/// <returns>表示转换的 <paramref name="value"/> 的 <see cref="Object"/>。</returns>
 		/// <overloads>
 		/// <summary>
 		/// 将给定值对象转换为指定的类型。
@@ -58,10 +57,14 @@ namespace Cyjb.ComponentModel
 		public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture,
 			object value, Type destinationType)
 		{
-			ExceptionHelper.CheckArgumentNull(destinationType, "destinationType");
-			if (value != null && destinationType.TypeHandle.Equals(typeof(string).TypeHandle))
+			if (destinationType == null)
 			{
-				return EnumExt.GetDescription((Enum)value);
+				throw ExceptionHelper.ArgumentNull("destinationType");
+			}
+			Contract.EndContractBlock();
+			if (value != null && destinationType == typeof(string))
+			{
+				return ((Enum)value).GetDescription();
 			}
 			return base.ConvertTo(context, culture, value, destinationType);
 		}
