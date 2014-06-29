@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using System.Diagnostics.Contracts;
 
 namespace Cyjb.Configurations
 {
@@ -26,7 +27,7 @@ namespace Cyjb.Configurations
 		/// </overloads>
 		public void Remove(TKey key)
 		{
-			base.BaseRemove(key);
+			BaseRemove(key);
 		}
 		/// <summary>
 		/// 基于所提供的参数，获取或设置子配置元素。
@@ -40,14 +41,18 @@ namespace Cyjb.Configurations
 		/// </overloads>
 		public TElement this[TKey key]
 		{
-			get { return base.BaseGet(key as object) as TElement; }
+			get { return BaseGet(key) as TElement; }
 			set
 			{
-				object objKey = key;
-				ConfigurationElement item = base.BaseGet(objKey);
+				if (value == null)
+				{
+					throw ExceptionHelper.ArgumentNull("value");
+				}
+				Contract.EndContractBlock();
+				ConfigurationElement item = BaseGet(key);
 				if (item != null)
 				{
-					base.BaseRemove(objKey);
+					BaseRemove(key);
 				}
 				try
 				{

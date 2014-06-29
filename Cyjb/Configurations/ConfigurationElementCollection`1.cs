@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics.Contracts;
+using Cyjb.Collections.ObjectModel;
 
 namespace Cyjb.Configurations
 {
@@ -9,7 +11,7 @@ namespace Cyjb.Configurations
 	/// </summary>
 	/// <typeparam name="TElement">子配置元素的类型。</typeparam>
 	public abstract class ConfigurationElementCollection<TElement> :
-		ConfigurationElementCollection, IList<TElement>, IList, ICollection<TElement>, ICollection
+		ConfigurationElementCollection, IList<TElement>, IList
 		where TElement : ConfigurationElement
 	{
 		/// <summary>
@@ -31,15 +33,14 @@ namespace Cyjb.Configurations
 		/// </overloads>
 		public TElement this[int index]
 		{
-			get { return base.BaseGet(index) as TElement; }
+			get { return BaseGet(index) as TElement; }
 			set
 			{
 				// 先添加后删除，如果添加失败，不会导致配置元素被删除。
 				this.BaseAdd(index, value);
-				base.BaseRemoveAt(index + 1);
+				BaseRemoveAt(index + 1);
 			}
 		}
-
 		/// <summary>
 		/// 确定 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中特定项的索引。
 		/// </summary>
@@ -49,9 +50,8 @@ namespace Cyjb.Configurations
 		/// 中找到 <paramref name="item"/>，则为该项的索引；否则为 <c>-1</c>。</returns>
 		public int IndexOf(TElement item)
 		{
-			return base.BaseIndexOf(item);
+			return BaseIndexOf(item);
 		}
-
 		/// <summary>
 		/// 在 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中的指定索引处插入项。
 		/// </summary>
@@ -63,7 +63,6 @@ namespace Cyjb.Configurations
 		{
 			this.BaseAdd(index, item);
 		}
-
 		/// <summary>
 		/// 移除指定索引处的 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 项。
 		/// </summary>
@@ -72,7 +71,7 @@ namespace Cyjb.Configurations
 		/// 不是 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中的有效索引。</exception>
 		public void RemoveAt(int index)
 		{
-			base.BaseRemoveAt(index);
+			BaseRemoveAt(index);
 		}
 
 		#endregion // IList<TElement> 成员
@@ -88,7 +87,6 @@ namespace Cyjb.Configurations
 		{
 			get { return false; }
 		}
-
 		/// <summary>
 		/// 获取一个值，该值指示 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 是否为只读。
 		/// </summary>
@@ -98,7 +96,6 @@ namespace Cyjb.Configurations
 		{
 			get { return base.IsReadOnly(); }
 		}
-
 		/// <summary>
 		/// 获取或设置指定索引处的元素。
 		/// </summary>
@@ -108,23 +105,19 @@ namespace Cyjb.Configurations
 		/// 不是 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中的有效索引。</exception>
 		object IList.this[int index]
 		{
-			get { return base.BaseGet(index); }
+			get { return BaseGet(index); }
 			set
 			{
-				TElement item = value as TElement;
-				if (item != null)
-				{
-					// 先添加后删除，如果添加失败，不会导致配置元素被删除。
-					this.BaseAdd(index, item);
-					base.BaseRemoveAt(index + 1);
-				}
-				else
+				if (!(value is TElement))
 				{
 					throw ExceptionHelper.ArgumentWrongType("value", value, typeof(TElement));
 				}
+				Contract.EndContractBlock();
+				// 先添加后删除，如果添加失败，不会导致配置元素被删除。
+				this.BaseAdd(index, (TElement)value);
+				BaseRemoveAt(index + 1);
 			}
 		}
-
 		/// <summary>
 		/// 向 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中添加项。
 		/// </summary>
@@ -138,21 +131,16 @@ namespace Cyjb.Configurations
 			{
 				throw ExceptionHelper.ArgumentWrongType("value", value, typeof(TElement));
 			}
-			else
-			{
-				this.BaseAdd(idx, item);
-			}
+			this.BaseAdd(idx, item);
 			return idx;
 		}
-
 		/// <summary>
 		/// 从 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中移除所有项。
 		/// </summary>
 		void IList.Clear()
 		{
-			base.BaseClear();
+			BaseClear();
 		}
-
 		/// <summary>
 		/// 确定 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 是否包含特定值。
 		/// </summary>
@@ -162,13 +150,8 @@ namespace Cyjb.Configurations
 		bool IList.Contains(object value)
 		{
 			TElement item = value as TElement;
-			if (item != null)
-			{
-				return this.Contains(item);
-			}
-			return false;
+			return item != null && this.Contains(item);
 		}
-
 		/// <summary>
 		/// 确定 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中特定项的索引。
 		/// </summary>
@@ -180,11 +163,10 @@ namespace Cyjb.Configurations
 			TElement item = value as TElement;
 			if (item != null)
 			{
-				return base.BaseIndexOf(item);
+				return BaseIndexOf(item);
 			}
 			return -1;
 		}
-
 		/// <summary>
 		/// 在 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中的指定索引处插入项。
 		/// </summary>
@@ -194,17 +176,13 @@ namespace Cyjb.Configurations
 		/// 不是 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中的有效索引。</exception>
 		void IList.Insert(int index, object value)
 		{
-			TElement item = value as TElement;
-			if (item == null)
+			if (!(value is TElement))
 			{
 				throw ExceptionHelper.ArgumentWrongType("value", value, typeof(TElement));
 			}
-			else
-			{
-				this.BaseAdd(index, item);
-			}
+			Contract.EndContractBlock();
+			this.BaseAdd(index, (TElement)value);
 		}
-
 		/// <summary>
 		/// 从 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中移除特定对象的第一个匹配项。
 		/// </summary>
@@ -217,7 +195,6 @@ namespace Cyjb.Configurations
 				this.Remove(item);
 			}
 		}
-
 		/// <summary>
 		/// 移除指定索引处的 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 项。
 		/// </summary>
@@ -242,7 +219,6 @@ namespace Cyjb.Configurations
 		{
 			get { return base.IsReadOnly(); }
 		}
-
 		/// <summary>
 		/// 将某项添加到 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中。
 		/// </summary>
@@ -251,15 +227,13 @@ namespace Cyjb.Configurations
 		{
 			this.BaseAdd(item);
 		}
-
 		/// <summary>
 		/// 从 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中移除所有项。
 		/// </summary>
 		public void Clear()
 		{
-			base.BaseClear();
+			BaseClear();
 		}
-
 		/// <summary>
 		/// 确定 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 是否包含特定值。
 		/// </summary>
@@ -267,35 +241,36 @@ namespace Cyjb.Configurations
 		/// <returns>如果包含特定值，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public bool Contains(TElement item)
 		{
-			return base.BaseIndexOf(item) >= 0;
+			return BaseIndexOf(item) >= 0;
 		}
-
 		/// <summary>
-		/// 从特定的 <see cref="System.Array"/> 索引处开始，将 
-		/// <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 的元素复制到一个 
+		/// 从特定的 <see cref="System.Array"/> 索引处开始，
+		/// 将 <see cref="ConfigurationElementCollection{TElement}"/> 的元素复制到一个 
 		/// <see cref="System.Array"/> 中。
 		/// </summary>
-		/// <param name="array">作为从 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 
-		/// 复制的元素的目标位置的一维 <see cref="System.Array"/>。<see cref="System.Array"/> 
-		/// 必须具有从零开始的索引。</param>
+		/// <param name="array">从 <see cref="ConfigurationElementCollection{TElement}"/>
+		/// 复制的元素的目标位置的一维 <see cref="System.Array"/>。
+		/// <paramref name="array"/> 必须具有从零开始的索引。</param>
 		/// <param name="arrayIndex"><paramref name="array"/> 中从零开始的索引，在此处开始复制。</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="arrayIndex"/> 小于零。</exception>
-		/// <exception cref="System.ArgumentException"><paramref name="array"/> 是多维的。</exception>
-		/// <exception cref="System.ArgumentException">源 
-		/// <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中的元素数目大于从 
-		/// <paramref name="arrayIndex"/> 到目标 <paramref name="array"/> 末尾之间的可用空间。</exception>
+		/// <exception cref="System.ArgumentNullException">
+		/// <paramref name="array"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <paramref name="arrayIndex"/> 小于零。</exception>
+		/// <exception cref="System.ArgumentException">
+		/// <paramref name="array"/> 是多维的。</exception>
+		/// <exception cref="System.ArgumentException"><see cref="ConfigurationElementCollection{TElement}"/>
+		/// 中的元素数目大于从 <paramref name="arrayIndex"/> 到目标 <paramref name="array"/> 
+		/// 末尾之间的可用空间。</exception>
 		/// <overloads>
 		/// <summary>
-		/// 将 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 的元素复制到一个 
+		/// 将 <see cref="ConfigurationElementCollection{TElement}"/> 的元素复制到一个 
 		/// <see cref="System.Array"/> 中。
 		/// </summary>
 		/// </overloads>
 		public void CopyTo(TElement[] array, int arrayIndex)
 		{
-			base.CopyTo(array, arrayIndex);
+			CollectionHelper.CopyTo(this, array, arrayIndex);
 		}
-
 		/// <summary>
 		/// 从 <see cref="ConfigurationElementCollection&lt;TElement&gt;"/> 中移除特定对象的第一个匹配项。
 		/// </summary>
@@ -306,13 +281,13 @@ namespace Cyjb.Configurations
 		/// <paramref name="item"/>，该方法也会返回 <c>false</c>。</returns>
 		public bool Remove(TElement item)
 		{
-			int idx = base.BaseIndexOf(item);
-			if (idx >= 0)
+			int idx = BaseIndexOf(item);
+			if (idx < 0)
 			{
-				base.BaseRemoveAt(idx);
-				return true;
+				return false;
 			}
-			return false;
+			BaseRemoveAt(idx);
+			return true;
 		}
 
 		#endregion // ICollection<TElement> 成员
