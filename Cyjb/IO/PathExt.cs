@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Cyjb.Collections;
@@ -14,11 +15,13 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 在路径中无效的字符集合。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private readonly static ISet<char> invalidPathChars = new ReadOnlySet<char>(
 			new CharSet(Path.GetInvalidPathChars()));
 		/// <summary>
 		/// 在文件名中无效的字符集合。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private readonly static ISet<char> invalidFileNameChars = new ReadOnlySet<char>(
 			new CharSet(Path.GetInvalidFileNameChars()));
 		/// <summary>
@@ -59,7 +62,7 @@ namespace Cyjb.IO
 		/// <returns>得到的有效路径。</returns>
 		public static string GetValidPath(string path, string replaceStr)
 		{
-			StringBuilder builder = new StringBuilder();
+			StringBuilder builder = new StringBuilder(path.Length);
 			int len = path.Length;
 			for (int i = 0; i < len; i++)
 			{
@@ -96,7 +99,7 @@ namespace Cyjb.IO
 		/// <returns>得到的有效文件名。</returns>
 		public static string GetValidFileName(string fileName, string replaceStr)
 		{
-			StringBuilder builder = new StringBuilder();
+			StringBuilder builder = new StringBuilder(fileName.Length);
 			int len = fileName.Length;
 			for (int i = 0; i < len; i++)
 			{
