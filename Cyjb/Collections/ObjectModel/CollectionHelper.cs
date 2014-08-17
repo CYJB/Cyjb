@@ -18,7 +18,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <see cref="Array"/>。<paramref name="array"/> 必须具有从零开始的索引。</param>
 		/// <param name="index"><paramref name="array"/> 中从零开始的索引，在此处开始复制。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于零。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="array"/> 是多维的。</exception>
 		/// <exception cref="ArgumentException"><paramref name="source"/>
 		/// 中的元素数目大于从 <paramref name="index"/> 到目标 <paramref name="array"/> 
@@ -30,7 +30,7 @@ namespace Cyjb.Collections.ObjectModel
 			Contract.Requires(source != null);
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("source");
+				throw ExceptionHelper.ArgumentNull("array");
 			}
 			if (array.Rank != 1)
 			{
@@ -42,7 +42,7 @@ namespace Cyjb.Collections.ObjectModel
 			}
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("arrayIndex");
+				throw ExceptionHelper.ArgumentNegative("index", index);
 			}
 			if (array.Length - index < source.Count)
 			{
@@ -68,7 +68,7 @@ namespace Cyjb.Collections.ObjectModel
 				}
 				catch (InvalidCastException ex)
 				{
-					throw ExceptionHelper.ArrayTypeInvalid(ex);
+					throw ExceptionHelper.InvalidArrayType(ex);
 				}
 			}
 		}

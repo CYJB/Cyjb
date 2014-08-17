@@ -75,7 +75,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (index < 0 || index >= this.Count)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("index");
+					throw ExceptionHelper.ArgumentOutOfRange("index", index);
 				}
 				Contract.EndContractBlock();
 				return this.GetItemAt(index);
@@ -105,16 +105,20 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		/// <param name="index">要获取或设置的元素从零开始的索引。</param>
 		/// <value>指定索引处的元素。</value>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 不是 <see cref="ReadOnlyList{T}"/> 中的有效索引。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 不是 
+		/// <see cref="ReadOnlyList{T}"/> 中的有效索引。</exception>
 		/// <exception cref="NotSupportedException">设置指定索引处的元素。</exception>
 		T IList<T>.this[int index]
 		{
 			get
 			{
-				if (index < 0 || index >= this.Count)
+				if (index < 0)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("index");
+					throw ExceptionHelper.ArgumentNegative("index", index);
+				}
+				if (index > this.Count)
+				{
+					throw ExceptionHelper.ArgumentOutOfRange("index", index);
 				}
 				Contract.EndContractBlock();
 				return this.GetItemAt(index);
@@ -137,8 +141,6 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		/// <param name="index">从零开始的索引，应在该位置插入 <paramref name="item"/>。</param>
 		/// <param name="item">要插入到 <see cref="ReadOnlyList{T}"/> 中的对象。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 不是 <see cref="ReadOnlyList{T}"/> 中的有效索引。</exception>
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void IList<T>.Insert(int index, T item)
 		{
@@ -149,8 +151,6 @@ namespace Cyjb.Collections.ObjectModel
 		/// 此实现总是引发 <see cref="NotSupportedException"/>。
 		/// </summary>
 		/// <param name="index">要移除的元素的从零开始的索引。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 不是 <see cref="ReadOnlyList{T}"/> 中的有效索引。</exception>
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void IList<T>.RemoveAt(int index)
 		{
@@ -186,16 +186,20 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		/// <param name="index">要获得或设置的元素从零开始的索引。</param>
 		/// <value>指定索引处的元素。</value>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 不是 <see cref="ReadOnlyList{T}"/> 中的有效索引。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 不是 
+		/// <see cref="ReadOnlyList{T}"/> 中的有效索引。</exception>
 		/// <exception cref="NotSupportedException">设置指定索引处的元素。</exception>
 		object IList.this[int index]
 		{
 			get
 			{
-				if (index < 0 || index >= this.Count)
+				if (index < 0)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("index");
+					throw ExceptionHelper.ArgumentNegative("index", index);
+				}
+				if (index > this.Count)
+				{
+					throw ExceptionHelper.ArgumentOutOfRange("index", index);
 				}
 				Contract.EndContractBlock();
 				return this.GetItemAt(index);

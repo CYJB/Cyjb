@@ -155,8 +155,8 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				return;
 			}
-			this.dict.Remove(key);
 			this.dict.Add(newKey, item);
+			this.dict.Remove(key);
 		}
 
 		#endregion // 键操作

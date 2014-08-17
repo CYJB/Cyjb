@@ -104,7 +104,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (dictionaryCreationThreshold < -1)
 			{
-				throw ExceptionHelper.InvalidDictionaryThreshold("dictionaryCreationThreshold");
+				throw ExceptionHelper.InvalidDictionaryThreshold("dictionaryCreationThreshold", dictionaryCreationThreshold);
 			}
 			Contract.EndContractBlock();
 			this.comparer = comparer ?? EqualityComparer<TKey>.Default;
@@ -231,6 +231,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <returns>如果已从 <see cref="KeyedListBase{TKey,TItem}"/> 中成功移除元素，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。如果在原始 <see cref="KeyedListBase{TKey,TItem}"/> 
 		/// 中没有找到指定的键，该方法也会返回 <c>false</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		/// <overloads>
 		/// <summary>
 		/// 从 <see cref="KeyedListBase{TKey,TItem}"/> 中移除特定元素。
@@ -258,6 +259,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <param name="item">当此方法返回值时，如果找到该键，便会返回与指定的键相关联的值；
 		/// 否则，则会返回 <paramref name="item"/> 参数的类型默认值。</param>
 		/// <returns>如果包含具有指定键的元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="item"/> 为 <c>null</c>。</exception>
 		[Pure]
 		public bool TryGetValue(TKey key, out TItem item)
 		{
@@ -400,6 +402,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <param name="item">要在 <see cref="KeyedListBase{TKey,TItem}"/> 中定位的对象。</param>
 		/// <returns>如果在 <see cref="KeyedListBase{TKey,TItem}"/> 中找到 <paramref name="item"/>，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="item"/> 为 <c>null</c>。</exception>
 		public override bool Contains(TItem item)
 		{
 			if (item == null)

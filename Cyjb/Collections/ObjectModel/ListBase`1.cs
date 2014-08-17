@@ -111,24 +111,32 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		/// <param name="index">要获取或设置的元素从零开始的索引。</param>
 		/// <value>指定索引处的元素。</value>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 不是 <see cref="ListBase{T}"/> 中的有效索引。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 不是 
+		/// <see cref="ListBase{T}"/> 中的有效索引。</exception>
 		public T this[int index]
 		{
 			get
 			{
-				if (index < 0 || index >= this.Count)
+				if (index < 0)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("index");
+					throw ExceptionHelper.ArgumentNegative("index", index);
+				}
+				if (index > this.Count)
+				{
+					throw ExceptionHelper.ArgumentOutOfRange("index", index);
 				}
 				Contract.EndContractBlock();
 				return GetItemAt(index);
 			}
 			set
 			{
-				if (index < 0 || index >= this.Count)
+				if (index < 0)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("index");
+					throw ExceptionHelper.ArgumentNegative("index", index);
+				}
+				if (index > this.Count)
+				{
+					throw ExceptionHelper.ArgumentOutOfRange("index", index);
 				}
 				Contract.EndContractBlock();
 				this.SetItemAt(index, value);
@@ -149,13 +157,17 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		/// <param name="index">从零开始的索引，应在该位置插入 <paramref name="item"/>。</param>
 		/// <param name="item">要插入到 <see cref="ListBase{T}"/> 中的对象。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 不是 <see cref="ListBase{T}"/> 中的有效索引。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 不是 
+		/// <see cref="ListBase{T}"/> 中的有效索引。</exception>
 		public void Insert(int index, T item)
 		{
-			if (index < 0 || index > this.Count)
+			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
+				throw ExceptionHelper.ArgumentNegative("index", index);
+			}
+			if (index > this.Count)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			this.InsertItem(index, item);
@@ -164,13 +176,17 @@ namespace Cyjb.Collections.ObjectModel
 		/// 移除 <see cref="ListBase{T}"/> 的指定索引处的元素。
 		/// </summary>
 		/// <param name="index">要移除的元素的从零开始的索引。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 不是 <see cref="ListBase{T}"/> 中的有效索引。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 不是 
+		/// <see cref="ListBase{T}"/> 中的有效索引。</exception>
 		public void RemoveAt(int index)
 		{
-			if (index < 0 || index >= this.Count)
+			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
+				throw ExceptionHelper.ArgumentNegative("index", index);
+			}
+			if (index > this.Count)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			this.RemoveItem(index);
@@ -205,26 +221,34 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		/// <param name="index">要获得或设置的元素从零开始的索引。</param>
 		/// <value>指定索引处的元素。</value>
-		/// <exception cref="ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 不是 <see cref="ListBase{T}"/> 中的有效索引。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 不是 
+		/// <see cref="ListBase{T}"/> 中的有效索引。</exception>
 		/// <exception cref="ArgumentException">设置属性，且 <paramref name="value"/> 不能赋值给
 		/// <typeparamref name="T"/> 类型。</exception>
 		object IList.this[int index]
 		{
 			get
 			{
-				if (index < 0 || index >= this.Count)
+				if (index < 0)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("index");
+					throw ExceptionHelper.ArgumentNegative("index", index);
+				}
+				if (index > this.Count)
+				{
+					throw ExceptionHelper.ArgumentOutOfRange("index", index);
 				}
 				Contract.EndContractBlock();
 				return this.GetItemAt(index);
 			}
 			set
 			{
-				if (index < 0 || index >= this.Count)
+				if (index < 0)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("index");
+					throw ExceptionHelper.ArgumentNegative("index", index);
+				}
+				if (index > this.Count)
+				{
+					throw ExceptionHelper.ArgumentOutOfRange("index", index);
 				}
 				Contract.EndContractBlock();
 				try
@@ -288,15 +312,19 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		/// <param name="index">从零开始的索引，应在该位置插入 <paramref name="value"/>。</param>
 		/// <param name="value">要插入到 <see cref="ListBase{T}"/> 中的对象。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 不是 <see cref="ListBase{T}"/> 中的有效索引。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 不是 
+		/// <see cref="ListBase{T}"/> 中的有效索引。</exception>
 		/// <exception cref="ArgumentException"><paramref name="value"/> 不能赋值给
 		/// <typeparamref name="T"/> 类型。</exception>
 		void IList.Insert(int index, object value)
 		{
-			if (index < 0 || index >= this.Count)
+			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
+				throw ExceptionHelper.ArgumentNegative("index", index);
+			}
+			if (index > this.Count)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			try
@@ -323,13 +351,17 @@ namespace Cyjb.Collections.ObjectModel
 		/// 移除 <see cref="ListBase{T}"/> 的指定索引处的元素。
 		/// </summary>
 		/// <param name="index">要移除的元素的从零开始的索引。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 不是 <see cref="ListBase{T}"/> 中的有效索引。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 不是 
+		/// <see cref="ListBase{T}"/> 中的有效索引。</exception>
 		void IList.RemoveAt(int index)
 		{
-			if (index < 0 || index >= this.Count)
+			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
+				throw ExceptionHelper.ArgumentNegative("index", index);
+			}
+			if (index > this.Count)
+			{
+				throw ExceptionHelper.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			this.RemoveItem(index);
@@ -392,7 +424,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <param name="arrayIndex"><paramref name="array"/> 中从零开始的索引，在此处开始复制。</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="array"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="arrayIndex"/> 小于零。</exception>
 		/// <exception cref="System.ArgumentException">
 		/// <paramref name="array"/> 是多维的。</exception>
