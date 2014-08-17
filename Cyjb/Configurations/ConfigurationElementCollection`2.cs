@@ -12,17 +12,17 @@ namespace Cyjb.Configurations
 		where TElement : ConfigurationElement
 	{
 		/// <summary>
-		/// 初始化 <see cref="ConfigurationElementCollection&lt;TKey,TElement&gt;"/> 类的新实例。
+		/// 初始化 <see cref="ConfigurationElementCollection{TKey,TElement}"/> 类的新实例。
 		/// </summary>
 		protected ConfigurationElementCollection() { }
 		/// <summary>
-		/// 基于所提供的键，从集合中移除 <see cref="System.Configuration.ConfigurationElement"/> 对象。
+		/// 基于所提供的键，从集合中移除 <see cref="ConfigurationElement"/> 对象。
 		/// </summary>
-		/// <param name="key">要移除的 <see cref="System.Configuration.ConfigurationElement"/> 
+		/// <param name="key">要移除的 <see cref="ConfigurationElement"/> 
 		/// 对象的键。</param>
 		/// <overloads>
 		/// <summary>
-		/// 从集合中移除 <see cref="System.Configuration.ConfigurationElement"/> 对象。
+		/// 从集合中移除 <see cref="ConfigurationElement"/> 对象。
 		/// </summary>
 		/// </overloads>
 		public void Remove(TKey key)
@@ -36,7 +36,7 @@ namespace Cyjb.Configurations
 		/// <returns>子配置元素，如果不存在则返回 <c>null</c>。</returns>
 		/// <overloads>
 		/// <summary>
-		/// 获取或设置此 <see cref="ConfigurationElementCollection&lt;T&gt;"/> 对象的属性、特性或子元素。
+		/// 获取或设置此 <see cref="ConfigurationElementCollection{T}"/> 对象的属性、特性或子元素。
 		/// </summary>
 		/// </overloads>
 		public TElement this[TKey key]
@@ -58,16 +58,16 @@ namespace Cyjb.Configurations
 				{
 					this.BaseAdd(value);
 				}
-				finally
+				catch
 				{
 					// 出错了，撤销删除。
 					if (item != null)
 					{
 						this.BaseAdd(item);
 					}
+					throw;
 				}
 			}
 		}
-
 	}
 }

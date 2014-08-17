@@ -49,6 +49,7 @@ namespace Cyjb.ComponentModel
 		/// <param name="value">要转换的 <see cref="Object"/>。</param>
 		/// <param name="destinationType">要将值转换成的 <see cref="Type"/>。</param>
 		/// <returns>表示转换的 <paramref name="value"/> 的 <see cref="Object"/>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="destinationType"/> 为 <c>null</c>。</exception>
 		/// <overloads>
 		/// <summary>
 		/// 将给定值对象转换为指定的类型。
