@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 
 namespace Cyjb.Collections
 {
 	/// <summary>
-	/// 为 <see cref="ICollection&lt;T&gt;"/> 接口提供调试视图。
+	/// 为 <see cref="ICollection{T}"/> 接口提供调试视图。
 	/// </summary>
 	/// <typeparam name="T">集合中元素的类型。</typeparam>
 	internal sealed class CollectionDebugView<T>
@@ -14,11 +15,12 @@ namespace Cyjb.Collections
 		/// </summary>
 		private readonly ICollection<T> source;
 		/// <summary>
-		/// 使用指定的源集合初始化 <see cref="CollectionDebugView&lt;T&gt;"/> 类的实例。
+		/// 使用指定的源集合初始化 <see cref="CollectionDebugView{T}"/> 类的实例。
 		/// </summary>
 		/// <param name="sourceCollection">使用调试视图的源集合。</param>
 		public CollectionDebugView(ICollection<T> sourceCollection)
 		{
+			Contract.Requires(sourceCollection != null);
 			this.source = sourceCollection;
 		}
 		/// <summary>

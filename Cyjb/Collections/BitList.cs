@@ -37,6 +37,10 @@ namespace Cyjb.Collections
 		/// </summary>
 		private const int UnitSize = 32;
 		/// <summary>
+		/// 当前列表的容量。
+		/// </summary>
+		private int capacity;
+		/// <summary>
 		/// 保存位值的数组。
 		/// </summary>
 		private uint[] items;
@@ -50,37 +54,38 @@ namespace Cyjb.Collections
 		#region 构造函数
 
 		/// <summary>
-		/// 初始化 <see cref="Cyjb.Collections.BitList "/> 类的新实例。
+		/// 初始化 <see cref="BitList"/> 类的新实例。
 		/// </summary>
 		/// <overloads>
 		/// <summary>
-		/// 初始化 <see cref="Cyjb.Collections.BitList "/> 类的新实例。
+		/// 初始化 <see cref="BitList"/> 类的新实例。
 		/// </summary>
 		/// </overloads>
 		public BitList()
 			: this(0)
 		{ }
 		/// <summary>
-		/// 初始化 <see cref="Cyjb.Collections.BitList "/> 类的新实例，
-		/// 该实例可拥有指定的初始容量。
+		/// 初始化 <see cref="BitList"/> 类的新实例，该实例可拥有指定的初始容量。
 		/// </summary>
-		/// <param name="capacity">新 <see cref="Cyjb.Collections.BitList "/> 最初可以存储的元素数。</param>
+		/// <param name="capacity">新 <see cref="BitList"/> 最初可以存储的元素数。</param>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> 小于 <c>0</c>。</exception>
 		public BitList(int capacity)
 			: base(null)
 		{
 			if (capacity < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("capacity");
+				throw ExceptionHelper.ArgumentNegative("capacity", capacity);
 			}
 			Contract.EndContractBlock();
 			this.items = new uint[(capacity >> IndexShift) + 1];
+			this.capacity = this.items.Length << IndexShift;
 		}
 		/// <summary>
-		/// 初始化 <see cref="Cyjb.Collections.BitList "/> 类的新实例，
-		/// 该实例包含从指定集合复制的元素。
+		/// 初始化 <see cref="BitList"/> 类的新实例，该实例包含从指定集合复制的元素。
 		/// </summary>
 		/// <param name="collection">一个集合，其元素被复制到新列表中，
 		/// 其中每个整数表示 32 个连续位。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public BitList(IEnumerable<uint> collection)
 			: this(0)
 		{
@@ -92,11 +97,12 @@ namespace Cyjb.Collections
 			this.AddRange(collection);
 		}
 		/// <summary>
-		/// 初始化 <see cref="Cyjb.Collections.BitList "/> 类的新实例，
+		/// 初始化 <see cref="BitList"/> 类的新实例，
 		/// 该实例包含从指定集合复制的元素。
 		/// </summary>
 		/// <param name="collection">一个集合，其元素被复制到新列表中，
 		/// 其中每个整数表示 32 个连续位。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public BitList(IEnumerable<int> collection)
 			: this(0)
 		{
@@ -108,11 +114,12 @@ namespace Cyjb.Collections
 			this.AddRange(collection);
 		}
 		/// <summary>
-		/// 初始化 <see cref="Cyjb.Collections.BitList "/> 类的新实例，
+		/// 初始化 <see cref="BitList"/> 类的新实例，
 		/// 该实例包含从指定集合复制的元素。
 		/// </summary>
 		/// <param name="collection">一个集合，其元素被复制到新列表中，
 		/// 其中每个字节表示 8 个连续位。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public BitList(IEnumerable<byte> collection)
 			: this(0)
 		{
@@ -124,10 +131,11 @@ namespace Cyjb.Collections
 			this.AddRange(collection);
 		}
 		/// <summary>
-		/// 初始化 <see cref="Cyjb.Collections.BitList "/> 类的新实例，
+		/// 初始化 <see cref="BitList"/> 类的新实例，
 		/// 该实例包含从指定集合复制的元素。
 		/// </summary>
 		/// <param name="collection">一个集合，其元素被复制到新列表中。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public BitList(IEnumerable<bool> collection)
 			: this(0)
 		{
@@ -139,17 +147,18 @@ namespace Cyjb.Collections
 			this.AddRange(collection);
 		}
 		/// <summary>
-		/// 初始化 <see cref="Cyjb.Collections.BitList "/> 类的新实例，
+		/// 初始化 <see cref="BitList"/> 类的新实例，
 		/// 该实例包含指定数目的位值，并设定为指定的初始值。
 		/// </summary>
-		/// <param name="length">新 <see cref="Cyjb.Collections.BitList"/> 中的位值数目。</param>
+		/// <param name="length">新 <see cref="BitList"/> 中的位值数目。</param>
 		/// <param name="defaultValue">要分配给每个位值的布尔值。</param>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> 小于 <c>0</c>。</exception>
 		public BitList(int length, bool defaultValue)
 			: this(length)
 		{
 			if (length < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length");
+				throw ExceptionHelper.ArgumentOutOfRange("length", length);
 			}
 			Contract.EndContractBlock();
 			this.count = length;
@@ -162,32 +171,27 @@ namespace Cyjb.Collections
 		#endregion // 构造函数
 
 		/// <summary>
-		/// 获取或设置 <see cref="Cyjb.Collections.BitList"/> 
-		/// 在不调整大小的情况下能够容纳的元素总数。
+		/// 获取或设置 <see cref="BitList"/> 在不调整大小的情况下能够容纳的元素总数。
 		/// </summary>
-		/// <list>在需要调整大小之前 <see cref="Cyjb.Collections.BitList"/> 
-		/// 能够容纳的元素的数目。</list>
-		/// <exception cref="System.ArgumentOutOfRangeException"><c>Capacity</c>
+		/// <value>在需要调整大小之前 <see cref="BitList"/> 能够容纳的元素的数目。</value>
+		/// <exception cref="ArgumentOutOfRangeException"><c>Capacity</c>
 		/// 设置为小于 <see cref="Count"/> 的值。</exception>
 		public int Capacity
 		{
-			get { return this.items.Length << IndexShift; }
+			get { return this.capacity; }
 			set
 			{
-				if (value < 0)
-				{
-					throw ExceptionHelper.ArgumentNegative("Capacity");
-				}
 				if (value < this.count)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("Capacity");
+					throw ExceptionHelper.ArgumentOutOfRange("Capacity", value);
 				}
 				Contract.EndContractBlock();
 				int newLength = (value >> IndexShift) + 1;
-				if (newLength <= this.items.Length) { return; }
+				if (newLength == this.items.Length) { return; }
 				uint[] newData = new uint[newLength];
-				Array.Copy(this.items, newData, this.items.Length);
+				Array.Copy(this.items, newData, Math.Min(newLength, this.items.Length));
 				this.items = newData;
+				this.capacity = newLength << IndexShift;
 			}
 		}
 
@@ -196,15 +200,14 @@ namespace Cyjb.Collections
 		#region AddRange 操作
 
 		/// <summary>
-		/// 将指定集合的元素添加到 <see cref="Cyjb.Collections.BitList"/> 的末尾。
+		/// 将指定集合的元素添加到 <see cref="BitList"/> 的末尾。
 		/// </summary>
 		/// <param name="collection">一个集合，其元素应被添加到 
-		/// <see cref="Cyjb.Collections.BitList"/> 的末尾，其中每个整数表示 32 个连续位。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="collection"/> 为 <c>null</c>。</exception>
+		/// <see cref="BitList"/> 的末尾，其中每个整数表示 32 个连续位。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		/// <overloads>
 		/// <summary>
-		/// 将指定集合的元素添加到 <see cref="Cyjb.Collections.BitList"/> 的末尾。
+		/// 将指定集合的元素添加到 <see cref="BitList"/> 的末尾。
 		/// </summary>
 		/// </overloads>
 		public void AddRange(IEnumerable<uint> collection)
@@ -217,12 +220,11 @@ namespace Cyjb.Collections
 			this.InsertRange(this.count, collection);
 		}
 		/// <summary>
-		/// 将指定集合的元素添加到 <see cref="Cyjb.Collections.BitList"/> 的末尾。
+		/// 将指定集合的元素添加到 <see cref="BitList"/> 的末尾。
 		/// </summary>
 		/// <param name="collection">一个集合，其元素应被添加到 
-		/// <see cref="Cyjb.Collections.BitList"/> 的末尾，其中每个整数表示 32 个连续位。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="collection"/> 为 <c>null</c>。</exception>
+		/// <see cref="BitList"/> 的末尾，其中每个整数表示 32 个连续位。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public void AddRange(IEnumerable<int> collection)
 		{
 			if (collection == null)
@@ -233,12 +235,11 @@ namespace Cyjb.Collections
 			this.InsertRange(this.count, collection);
 		}
 		/// <summary>
-		/// 将指定集合的元素添加到 <see cref="Cyjb.Collections.BitList"/> 的末尾。
+		/// 将指定集合的元素添加到 <see cref="BitList"/> 的末尾。
 		/// </summary>
 		/// <param name="collection">一个集合，其元素应被添加到 
-		/// <see cref="Cyjb.Collections.BitList"/> 的末尾，其中每个字节表示 8 个连续位。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="collection"/> 为 <c>null</c>。</exception>
+		/// <see cref="BitList"/> 的末尾，其中每个字节表示 8 个连续位。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public void AddRange(IEnumerable<byte> collection)
 		{
 			if (collection == null)
@@ -249,12 +250,11 @@ namespace Cyjb.Collections
 			this.InsertRange(this.count, collection);
 		}
 		/// <summary>
-		/// 将指定集合的元素添加到 <see cref="Cyjb.Collections.BitList"/> 的末尾。
+		/// 将指定集合的元素添加到 <see cref="BitList"/> 的末尾。
 		/// </summary>
 		/// <param name="collection">一个集合，其元素应被添加到 
-		/// <see cref="Cyjb.Collections.BitList"/> 的末尾。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="collection"/> 为 <c>null</c>。</exception>
+		/// <see cref="BitList"/> 的末尾。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public void AddRange(IEnumerable<bool> collection)
 		{
 			if (collection == null)
@@ -265,17 +265,16 @@ namespace Cyjb.Collections
 			this.InsertRange(this.count, collection);
 		}
 		/// <summary>
-		/// 将指定长度的值添加到 <see cref="Cyjb.Collections.BitList"/> 的末尾。
+		/// 将指定长度的值添加到 <see cref="BitList"/> 的末尾。
 		/// </summary>
 		/// <param name="length">要添加的值的长度。</param>
 		/// <param name="value">要添加的值。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="length"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> 小于 <c>0</c>。</exception>
 		public void AddRange(int length, bool value)
 		{
 			if (length < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("length");
+				throw ExceptionHelper.ArgumentNegative("length", length);
 			}
 			Contract.EndContractBlock();
 			int cnt = this.count;
@@ -289,20 +288,17 @@ namespace Cyjb.Collections
 		#region InsertRange 操作
 
 		/// <summary>
-		/// 将指定集合中的元素插入 <see cref="Cyjb.Collections.BitList"/> 的指定索引处。
+		/// 将指定集合中的元素插入 <see cref="BitList"/> 的指定索引处。
 		/// </summary>
 		/// <param name="index">应在此处插入新元素的从零开始的索引。</param>
 		/// <param name="collection">一个集合，应将其元素插入到 
-		/// <see cref="Cyjb.Collections.BitList"/> 中，其中每个整数表示 32 个连续位。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="collection"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 小于 <c>0</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 大于 <see cref="Count"/>。</exception>
+		/// <see cref="BitList"/> 中，其中每个整数表示 32 个连续位。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 大于 <see cref="Count"/>。</exception>
 		/// <overloads>
 		/// <summary>
-		/// 将指定集合中的元素插入 <see cref="Cyjb.Collections.BitList"/> 的指定索引处。
+		/// 将指定集合中的元素插入 <see cref="BitList"/> 的指定索引处。
 		/// </summary>
 		/// </overloads>
 		public void InsertRange(int index, IEnumerable<int> collection)
@@ -313,28 +309,25 @@ namespace Cyjb.Collections
 			}
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index");
+				throw ExceptionHelper.ArgumentNegative("index", index);
 			}
 			if (index > this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
+				throw ExceptionHelper.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			IList<uint> uintList = collection.Select(i => unchecked((uint)i)).ToList();
 			this.InsertRange(index, uintList.Count << IndexShift, uintList);
 		}
 		/// <summary>
-		/// 将指定集合中的元素插入 <see cref="Cyjb.Collections.BitList"/> 的指定索引处。
+		/// 将指定集合中的元素插入 <see cref="BitList"/> 的指定索引处。
 		/// </summary>
 		/// <param name="index">应在此处插入新元素的从零开始的索引。</param>
 		/// <param name="collection">一个集合，应将其元素插入到 
-		/// <see cref="Cyjb.Collections.BitList"/> 中，其中每个整数表示 32 个连续位。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="collection"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 小于 <c>0</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 大于 <see cref="Count"/>。</exception>
+		/// <see cref="BitList"/> 中，其中每个整数表示 32 个连续位。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 大于 <see cref="Count"/>。</exception>
 		public void InsertRange(int index, IEnumerable<uint> collection)
 		{
 			if (collection == null)
@@ -343,28 +336,25 @@ namespace Cyjb.Collections
 			}
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index");
+				throw ExceptionHelper.ArgumentNegative("index", index);
 			}
 			if (index > this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
+				throw ExceptionHelper.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			IList<uint> uintList = collection as IList<uint> ?? new List<uint>(collection);
 			this.InsertRange(index, uintList.Count << IndexShift, uintList);
 		}
 		/// <summary>
-		/// 将指定集合中的元素插入 <see cref="Cyjb.Collections.BitList"/> 的指定索引处。
+		/// 将指定集合中的元素插入 <see cref="BitList"/> 的指定索引处。
 		/// </summary>
 		/// <param name="index">应在此处插入新元素的从零开始的索引。</param>
 		/// <param name="collection">一个集合，应将其元素插入到 
-		/// <see cref="Cyjb.Collections.BitList"/> 中，其中每个整数表示 8 个连续位。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="collection"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 小于 <c>0</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 大于 <see cref="Count"/>。</exception>
+		/// <see cref="BitList"/> 中，其中每个整数表示 8 个连续位。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 大于 <see cref="Count"/>。</exception>
 		public void InsertRange(int index, IEnumerable<byte> collection)
 		{
 			if (collection == null)
@@ -373,11 +363,11 @@ namespace Cyjb.Collections
 			}
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index");
+				throw ExceptionHelper.ArgumentNegative("index", index);
 			}
 			if (index > this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
+				throw ExceptionHelper.ArgumentOutOfRange("index", IndexMask);
 			}
 			Contract.EndContractBlock();
 			IList<uint> uintList = new List<uint>();
@@ -403,17 +393,14 @@ namespace Cyjb.Collections
 			this.InsertRange(index, length, uintList);
 		}
 		/// <summary>
-		/// 将指定集合中的元素插入 <see cref="Cyjb.Collections.BitList"/> 的指定索引处。
+		/// 将指定集合中的元素插入 <see cref="BitList"/> 的指定索引处。
 		/// </summary>
 		/// <param name="index">应在此处插入新元素的从零开始的索引。</param>
 		/// <param name="collection">一个集合，应将其元素插入到 
-		/// <see cref="Cyjb.Collections.BitList"/> 中。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="collection"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 小于 <c>0</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 大于 <see cref="Count"/>。</exception>
+		/// <see cref="BitList"/> 中。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 大于 <see cref="Count"/>。</exception>
 		public void InsertRange(int index, IEnumerable<bool> collection)
 		{
 			if (collection == null)
@@ -422,11 +409,11 @@ namespace Cyjb.Collections
 			}
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index");
+				throw ExceptionHelper.ArgumentNegative("index", index);
 			}
 			if (index > this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
+				throw ExceptionHelper.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			IList<uint> uintList;
@@ -465,30 +452,27 @@ namespace Cyjb.Collections
 			this.InsertRange(index, length, uintList);
 		}
 		/// <summary>
-		/// 将指定长度的值插入 <see cref="Cyjb.Collections.BitList"/> 的指定索引处。
+		/// 将指定长度的值插入 <see cref="BitList"/> 的指定索引处。
 		/// </summary>
 		/// <param name="index">应在此处插入值的从零开始的索引。</param>
 		/// <param name="length">要插入的值的长度。</param>
 		/// <param name="value">要插入的值。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 小于 <c>0</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="length"/> 小于 <c>0</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 大于 <see cref="Count"/>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 大于 <see cref="Count"/>。</exception>
 		public void InsertRange(int index, int length, bool value)
 		{
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index");
+				throw ExceptionHelper.ArgumentNegative("index", index);
 			}
 			if (length < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("length");
+				throw ExceptionHelper.ArgumentNegative("length", length);
 			}
 			if (index + length > this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length");
+				throw ExceptionHelper.ArgumentOutOfRange("length", length);
 			}
 			Contract.EndContractBlock();
 			int cnt = this.count + length;
@@ -501,12 +485,12 @@ namespace Cyjb.Collections
 			this.count = cnt;
 		}
 		/// <summary>
-		/// 将指定集合中的元素插入 <see cref="Cyjb.Collections.BitList"/> 的指定索引处。
+		/// 将指定集合中的元素插入 <see cref="BitList"/> 的指定索引处。
 		/// </summary>
 		/// <param name="index">应在此处插入新元素的从零开始的索引。</param>
 		/// <param name="length">要插入的位数。</param>
 		/// <param name="uintList">一个集合，应将其元素插入到 
-		/// <see cref="Cyjb.Collections.BitList"/> 中。</param>
+		/// <see cref="BitList"/> 中。</param>
 		private void InsertRange(int index, int length, IList<uint> uintList)
 		{
 			Contract.Requires(index >= 0);
@@ -545,30 +529,30 @@ namespace Cyjb.Collections
 		#endregion // InsertRange 操作
 
 		/// <summary>
-		/// 从 <see cref="Cyjb.Collections.BitList"/> 中移除一定范围的元素。
+		/// 从 <see cref="BitList"/> 中移除一定范围的元素。
 		/// </summary>
 		/// <param name="index">要移除的元素的范围从零开始的起始索引。</param>
 		/// <param name="length">要移除的元素数。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="index"/> 小于 <c>0</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="length"/> 小于 <c>0</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="index"/> 和 <paramref name="length"/> 不表示
-		/// <see cref="Cyjb.Collections.BitList"/> 中元素的有效范围。</exception>
+		/// <see cref="BitList"/> 中元素的有效范围。</exception>
 		public void RemoveRange(int index, int length)
 		{
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index");
+				throw ExceptionHelper.ArgumentNegative("index", index);
 			}
 			if (length < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("length");
+				throw ExceptionHelper.ArgumentNegative("length", length);
 			}
 			if (index + length > this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length");
+				throw ExceptionHelper.ArgumentOutOfRange("length", length);
 			}
 			Contract.EndContractBlock();
 			if (length <= 0)
@@ -634,26 +618,26 @@ namespace Cyjb.Collections
 		/// <param name="index">要填充的范围的从零开始的起始索引。</param>
 		/// <param name="length">要填充的范围内的元素数。</param>
 		/// <param name="value">要填充的值。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="index"/> 小于 <c>0</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="length"/> 小于 <c>0</c>。</exception>
 		/// <exception cref="System.ArgumentException">
 		/// <paramref name="index"/> 和 <paramref name="length"/>
-		/// 不表示 <see cref="Cyjb.Collections.BitList"/> 中元素的有效范围。</exception>
+		/// 不表示 <see cref="BitList"/> 中元素的有效范围。</exception>
 		public void Fill(int index, int length, bool value)
 		{
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index");
+				throw ExceptionHelper.ArgumentNegative("index", index);
 			}
 			if (length < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("length");
+				throw ExceptionHelper.ArgumentNegative("length", length);
 			}
 			if (index + length > this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length");
+				throw ExceptionHelper.ArgumentOutOfRange("length", length);
 			}
 			Contract.EndContractBlock();
 			this.FillInternal(index, length, value);
@@ -801,18 +785,18 @@ namespace Cyjb.Collections
 		#region 二进制操作
 
 		/// <summary>
-		/// 对当前 <see cref="Cyjb.Collections.BitList"/> 中的元素和指定的 
-		/// <see cref="Cyjb.Collections.BitList"/> 中的相应元素执行按位“与”运算。
+		/// 对当前 <see cref="BitList"/> 中的元素和指定的 
+		/// <see cref="BitList"/> 中的相应元素执行按位“与”运算。
 		/// </summary>
 		/// <param name="list">要对其执行按位“与”运算的 
-		/// <see cref="Cyjb.Collections.BitList"/>。</param>
-		/// <returns>当前实例，包含对当前 <see cref="Cyjb.Collections.BitList"/> 
-		/// 中的元素和指定的 <see cref="Cyjb.Collections.BitList"/> 
+		/// <see cref="BitList"/>。</param>
+		/// <returns>当前实例，包含对当前 <see cref="BitList"/> 
+		/// 中的元素和指定的 <see cref="BitList"/> 
 		/// 中的相应元素执行按位“与”运算的结果。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="list"/>
+		/// <exception cref="ArgumentNullException"><paramref name="list"/>
 		/// 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="list"/>
-		/// 和当前 <see cref="Cyjb.Collections.BitList"/> 的元素数不同。</exception>
+		/// 和当前 <see cref="BitList"/> 的元素数不同。</exception>
 		public BitList And(BitList list)
 		{
 			if (list == null)
@@ -832,18 +816,18 @@ namespace Cyjb.Collections
 			return this;
 		}
 		/// <summary>
-		/// 对当前 <see cref="Cyjb.Collections.BitList"/> 中的元素和指定的 
-		/// <see cref="Cyjb.Collections.BitList"/> 中的相应元素执行按位“或”运算。
+		/// 对当前 <see cref="BitList"/> 中的元素和指定的 
+		/// <see cref="BitList"/> 中的相应元素执行按位“或”运算。
 		/// </summary>
 		/// <param name="list">要对其执行按位“或”运算的 
-		/// <see cref="Cyjb.Collections.BitList"/>。</param>
-		/// <returns>当前实例，包含对当前 <see cref="Cyjb.Collections.BitList"/> 
-		/// 中的元素和指定的 <see cref="Cyjb.Collections.BitList"/> 
+		/// <see cref="BitList"/>。</param>
+		/// <returns>当前实例，包含对当前 <see cref="BitList"/> 
+		/// 中的元素和指定的 <see cref="BitList"/> 
 		/// 中的相应元素执行按位“或”运算的结果。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="list"/>
+		/// <exception cref="ArgumentNullException"><paramref name="list"/>
 		/// 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="list"/>
-		/// 和当前 <see cref="Cyjb.Collections.BitList"/> 的元素数不同。</exception>
+		/// 和当前 <see cref="BitList"/> 的元素数不同。</exception>
 		public BitList Or(BitList list)
 		{
 			if (list == null)
@@ -863,18 +847,18 @@ namespace Cyjb.Collections
 			return this;
 		}
 		/// <summary>
-		/// 对当前 <see cref="Cyjb.Collections.BitList"/> 中的元素和指定的 
-		/// <see cref="Cyjb.Collections.BitList"/> 中的相应元素执行按位“异或”运算。
+		/// 对当前 <see cref="BitList"/> 中的元素和指定的 
+		/// <see cref="BitList"/> 中的相应元素执行按位“异或”运算。
 		/// </summary>
 		/// <param name="list">要对其执行按位“异或”运算的 
-		/// <see cref="Cyjb.Collections.BitList"/>。</param>
-		/// <returns>当前实例，包含对当前 <see cref="Cyjb.Collections.BitList"/> 
-		/// 中的元素和指定的 <see cref="Cyjb.Collections.BitList"/> 
+		/// <see cref="BitList"/>。</param>
+		/// <returns>当前实例，包含对当前 <see cref="BitList"/> 
+		/// 中的元素和指定的 <see cref="BitList"/> 
 		/// 中的相应元素执行按位“异或”运算的结果。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="list"/>
+		/// <exception cref="ArgumentNullException"><paramref name="list"/>
 		/// 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="list"/>
-		/// 和当前 <see cref="Cyjb.Collections.BitList"/> 的元素数不同。</exception>
+		/// 和当前 <see cref="BitList"/> 的元素数不同。</exception>
 		public BitList Xor(BitList list)
 		{
 			if (list == null)
@@ -894,7 +878,7 @@ namespace Cyjb.Collections
 			return this;
 		}
 		/// <summary>
-		/// 反转当前 <see cref="Cyjb.Collections.BitList"/> 中的所有位值，
+		/// 反转当前 <see cref="BitList"/> 中的所有位值，
 		/// 以便将设置为 <c>true</c> 的元素更改为 <c>false</c>；
 		/// 将设置为 <c>false</c> 的元素更改为 <c>true</c>。
 		/// </summary>
@@ -909,7 +893,7 @@ namespace Cyjb.Collections
 			return this;
 		}
 		/// <summary>
-		/// 将当前 <see cref="Cyjb.Collections.BitList"/> 中的所有位值左移
+		/// 将当前 <see cref="BitList"/> 中的所有位值左移
 		/// <paramref name="offset"/> 位。这里的左移是向着索引增大的方向移动。
 		/// </summary>
 		/// <param name="offset">要左移的位数，
@@ -928,7 +912,7 @@ namespace Cyjb.Collections
 			return this;
 		}
 		/// <summary>
-		/// 将当前 <see cref="Cyjb.Collections.BitList"/> 中的所有位值右移
+		/// 将当前 <see cref="BitList"/> 中的所有位值右移
 		/// <paramref name="offset"/> 位。这里的右移是向着索引减小的方向移动。
 		/// </summary>
 		/// <param name="offset">要左移的位数，
@@ -964,14 +948,14 @@ namespace Cyjb.Collections
 		/// 将元素插入 <see cref="BitList"/> 的指定索引处。
 		/// </summary>
 		/// <param name="index">从零开始的索引，应在该位置插入 <paramref name="item"/>。</param>
-		/// <param name="item">要插入的对象。对于引用类型，该值可以为 <c>null</c>。</param>
+		/// <param name="item">要插入的对象。</param>
 		protected override void InsertItem(int index, bool item)
 		{
-			int cnt = (this.count >> IndexShift);
-			if (cnt + 1 > this.items.Length)
+			if(this.count + 1 > this.capacity)
 			{
 				EnsureCapacity(this.count + 1);
 			}
+			int cnt = this.count >> IndexShift;
 			int idx = index >> IndexShift;
 			for (int i = cnt; i > idx; i--)
 			{
@@ -1019,7 +1003,7 @@ namespace Cyjb.Collections
 		{
 			if (index < 0 || index >= this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
+				throw ExceptionHelper.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			if (item)
@@ -1040,7 +1024,7 @@ namespace Cyjb.Collections
 		{
 			if (index < 0 || index >= this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
+				throw ExceptionHelper.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			return (this.items[index >> IndexShift] & (1 << (index & IndexMask))) != 0U;
@@ -1051,10 +1035,10 @@ namespace Cyjb.Collections
 		#region IList<T> 成员
 
 		/// <summary>
-		/// 确定 <see cref="Cyjb.Collections.BitList"/> 中特定项的索引。
+		/// 确定 <see cref="BitList"/> 中特定项的索引。
 		/// </summary>
-		/// <param name="item">要在 <see cref="Cyjb.Collections.BitList"/> 中定位的对象。</param>
-		/// <returns>如果在 <see cref="Cyjb.Collections.BitList"/> 中找到 <paramref name="item"/>，
+		/// <param name="item">要在 <see cref="BitList"/> 中定位的对象。</param>
+		/// <returns>如果在 <see cref="BitList"/> 中找到 <paramref name="item"/>，
 		/// 则为该项的索引；否则为 <c>-1</c>。</returns>
 		public override int IndexOf(bool item)
 		{
@@ -1096,9 +1080,9 @@ namespace Cyjb.Collections
 		#region ICollection<bool> 成员
 
 		/// <summary>
-		/// 获取 <see cref="Cyjb.Collections.BitList"/> 中包含的元素数。
+		/// 获取 <see cref="BitList"/> 中包含的元素数。
 		/// </summary>
-		/// <list><see cref="Cyjb.Collections.BitList"/> 中包含的元素数。</list>
+		/// <list><see cref="BitList"/> 中包含的元素数。</list>
 		public override int Count
 		{
 			get { return this.count; }
@@ -1110,22 +1094,22 @@ namespace Cyjb.Collections
 
 		/// <summary>
 		/// 从特定的 <see cref="System.Array"/> 索引处开始，将 
-		/// <see cref="CollectionBase&lt;T&gt;"/> 的元素复制到一个 <see cref="System.Array"/> 中。
+		/// <see cref="CollectionBase{T}"/> 的元素复制到一个 <see cref="System.Array"/> 中。
 		/// </summary>
-		/// <param name="array">作为从 <see cref="CollectionBase&lt;T&gt;"/> 
+		/// <param name="array">作为从 <see cref="CollectionBase{T}"/> 
 		/// 复制的元素的目标位置的一维 <see cref="System.Array"/>。
 		/// <see cref="System.Array"/> 必须具有从零开始的索引。</param>
 		/// <param name="index"><paramref name="array"/> 中从零开始的索引，在此处开始复制。</param>
-		/// <exception cref="System.ArgumentNullException">
+		/// <exception cref="ArgumentNullException">
 		/// <paramref name="array"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="index"/> 小于零。</exception>
 		/// <exception cref="System.ArgumentException">
 		/// <paramref name="array"/> 是多维的。</exception>
-		/// <exception cref="System.ArgumentException">源 <see cref="CollectionBase&lt;T&gt;"/> 
+		/// <exception cref="System.ArgumentException">源 <see cref="CollectionBase{T}"/> 
 		/// 中的元素数目大于从 <paramref name="index"/> 到目标 
 		/// <paramref name="array"/> 末尾之间的可用空间。</exception>
-		/// <exception cref="System.ArgumentException">源 <see cref="CollectionBase&lt;T&gt;"/> 
+		/// <exception cref="System.ArgumentException">源 <see cref="CollectionBase{T}"/> 
 		/// 的类型无法自动转换为目标 <paramref name="array"/> 的类型。</exception>
 		void ICollection.CopyTo(Array array, int index)
 		{
@@ -1143,7 +1127,7 @@ namespace Cyjb.Collections
 			}
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index");
+				throw ExceptionHelper.ArgumentNegative("index", index);
 			}
 			Contract.EndContractBlock();
 			uint[] uarr = array as uint[];
@@ -1206,7 +1190,7 @@ namespace Cyjb.Collections
 				}
 				return;
 			}
-			throw ExceptionHelper.ArrayTypeInvalid();
+			throw ExceptionHelper.InvalidArrayType();
 		}
 
 		#endregion // ICollection 成员
@@ -1217,7 +1201,7 @@ namespace Cyjb.Collections
 		/// 返回一个循环访问集合的枚举器。
 		/// </summary>
 		/// <returns>可用于循环访问集合的 
-		/// <see cref="System.Collections.Generic.IEnumerator&lt;T&gt;"/>。</returns>
+		/// <see cref="System.Collections.Generic.IEnumerator{T}"/>。</returns>
 		public override IEnumerator<bool> GetEnumerator()
 		{
 			int end = this.count >> IndexShift;
@@ -1248,12 +1232,11 @@ namespace Cyjb.Collections
 		/// <param name="min">列表最少的长度。</param>
 		private void EnsureCapacity(int min)
 		{
-			int currentCap = this.Capacity;
-			if (currentCap >= min)
+			if (this.capacity >= min)
 			{
 				return;
 			}
-			int newCapacity = currentCap == 0 ? 1 : currentCap << 1;
+			int newCapacity = this.capacity << 1;
 			if (newCapacity < min)
 			{
 				newCapacity = min;
@@ -1271,10 +1254,10 @@ namespace Cyjb.Collections
 			return (1U << maskSize) - 1U;
 		}
 		/// <summary>
-		/// 将指定 uint 列表中的数据复制到当前 <see cref="Cyjb.Collections.BitList"/>
+		/// 将指定 uint 列表中的数据复制到当前 <see cref="BitList"/>
 		/// 从指定索引开始的位置。
 		/// </summary>
-		/// <param name="source">要复制到当前 <see cref="Cyjb.Collections.BitList"/> 的 uint 列表。</param>
+		/// <param name="source">要复制到当前 <see cref="BitList"/> 的 uint 列表。</param>
 		/// <param name="sourceIdx">源列表的起始索引。</param>
 		/// <param name="itemIdx">要复制到的索引。</param>
 		/// <param name="lowSize">要跳过的位数。</param>

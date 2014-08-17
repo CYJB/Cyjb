@@ -34,6 +34,7 @@ namespace Cyjb.Collections
 		/// 使用给定的数组初始化 <see cref="Cyjb.Collections.ArrayAdapter{T}"/> 类的新实例。
 		/// </summary>
 		/// <param name="array">初始化使用的数组。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
 		/// <overloads>
 		/// <summary>
 		/// 初始化 <see cref="Cyjb.Collections.ArrayAdapter{T}"/> 类的新实例。
@@ -57,6 +58,11 @@ namespace Cyjb.Collections
 		/// <param name="array">初始化使用的数组。</param>
 		/// <param name="offset">相应范围中第一个元素的从零开始的索引。</param>
 		/// <param name="count">范围中的元素数。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> 或 
+		/// <paramref name="count"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="offset"/> 和 <paramref name="count"/> 
+		/// 不指定 <paramref name="array"/> 中的有效范围。</exception>
 		public ArrayAdapter(T[] array, int offset, int count)
 			: base(array)
 		{
@@ -66,11 +72,11 @@ namespace Cyjb.Collections
 			}
 			if (offset < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("offset");
+				throw ExceptionHelper.ArgumentNegative("offset", offset);
 			}
 			if (count < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("count");
+				throw ExceptionHelper.ArgumentNegative("count", count);
 			}
 			if (offset + count > array.Length)
 			{
@@ -194,8 +200,7 @@ namespace Cyjb.Collections
 		/// <returns>可用于循环访问集合的 <see cref="System.Collections.Generic.IEnumerator{T}"/>。</returns>
 		public override IEnumerator<T> GetEnumerator()
 		{
-			int len = offset + count;
-			for (int i = offset; i < len; i++)
+			for (int i = offset, len = offset + count; i < len; i++)
 			{
 				yield return this.array[i];
 			}

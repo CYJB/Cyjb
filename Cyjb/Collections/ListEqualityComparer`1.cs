@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
@@ -7,7 +8,7 @@ using System.Threading;
 namespace Cyjb.Collections
 {
 	/// <summary>
-	/// 表示根据内容比较 <see cref="System.Collections.Generic.IList&lt;T&gt;"/> 集合的比较器。
+	/// 表示根据内容比较 <see cref="System.Collections.Generic.IList{T}"/> 集合的比较器。
 	/// </summary>
 	/// <typeparam name="T">要比较的列表元素的类型。</typeparam>
 	public sealed class ListEqualityComparer<T> : EqualityComparer<IList<T>>
@@ -20,7 +21,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 获取默认的相等比较器。
 		/// </summary>
-		/// <value>一个默认的 <see cref="ListEqualityComparer&lt;T&gt;"/> 比较器。</value>
+		/// <value>一个默认的 <see cref="ListEqualityComparer{T}"/> 比较器。</value>
 		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
 		public new static ListEqualityComparer<T> Default
 		{
@@ -38,11 +39,11 @@ namespace Cyjb.Collections
 		/// </summary>
 		private readonly IEqualityComparer<T> comparer;
 		/// <summary>
-		/// 初始化 <see cref="ListEqualityComparer&lt;T&gt;"/> 类的新实例。
+		/// 初始化 <see cref="ListEqualityComparer{T}"/> 类的新实例。
 		/// </summary>
 		/// <overloads>
 		/// <summary>
-		/// 初始化 <see cref="ListEqualityComparer&lt;T&gt;"/> 类的新实例。
+		/// 初始化 <see cref="ListEqualityComparer{T}"/> 类的新实例。
 		/// </summary>
 		/// </overloads>
 		public ListEqualityComparer()
@@ -50,7 +51,7 @@ namespace Cyjb.Collections
 			this.comparer = EqualityComparer<T>.Default;
 		}
 		/// <summary>
-		/// 使用指定的元素比较器初始化 <see cref="ListEqualityComparer&lt;T&gt;"/> 类的新实例。
+		/// 使用指定的元素比较器初始化 <see cref="ListEqualityComparer{T}"/> 类的新实例。
 		/// </summary>
 		/// <param name="comparer">元素比较器。</param>
 		public ListEqualityComparer(IEqualityComparer<T> comparer)
@@ -63,10 +64,8 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 确定指定的对象是否相等。
 		/// </summary>
-		/// <param name="x">要比较的第一个 
-		/// <see cref="System.Collections.Generic.IList&lt;T&gt;"/> 的对象。</param>
-		/// <param name="y">要比较的第二个 
-		/// <see cref="System.Collections.Generic.IList&lt;T&gt;"/> 的对象。</param>
+		/// <param name="x">要比较的第一个 <see cref="IList{T}"/> 的对象。</param>
+		/// <param name="y">要比较的第二个 <see cref="IList{T}"/> 的对象。</param>
 		/// <returns>如果指定的对象相等，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		/// <overloads>
 		/// <summary>
@@ -111,8 +110,7 @@ namespace Cyjb.Collections
 		/// </summary>
 		/// <param name="obj">将为其返回哈希代码。</param>
 		/// <returns>指定对象的哈希代码。</returns>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="obj"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="obj"/> 为 <c>null</c>。</exception>
 		/// <overloads>
 		/// <summary>
 		/// 返回指定对象的哈希代码。

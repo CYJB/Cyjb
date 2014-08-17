@@ -5,6 +5,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Security;
 using System.Security.Permissions;
 using Cyjb.Collections.ObjectModel;
 
@@ -95,15 +96,13 @@ namespace Cyjb.Collections
 			: this(false, null)
 		{ }
 		/// <summary>
-		/// 使用指定的是否区分大小写初始化 
-		/// <see cref="CharSet"/> 类的新实例。
+		/// 使用指定的是否区分大小写初始化 <see cref="CharSet"/> 类的新实例。
 		/// </summary>
 		public CharSet(bool ignoreCase)
 			: this(ignoreCase, null)
 		{ }
 		/// <summary>
-		/// 使用指定的是否区分大小写和区域信息初始化 
-		/// <see cref="CharSet"/> 类的新实例。
+		/// 使用指定的是否区分大小写和区域信息初始化 <see cref="CharSet"/> 类的新实例。
 		/// </summary>
 		/// <param name="ignoreCase">是否不区分字符的大小写。</param>
 		/// <param name="culture">不区分字符大小写时使用的区域信息。</param>
@@ -125,10 +124,10 @@ namespace Cyjb.Collections
 			}
 		}
 		/// <summary>
-		/// 初始化 <see cref="CharSet"/> 类的新实例，
-		/// 该实例包含从指定的集合复制的元素。
+		/// 初始化 <see cref="CharSet"/> 类的新实例，该实例包含从指定的集合复制的元素。
 		/// </summary>
 		/// <param name="collection">其元素被复制到新集中的集合。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public CharSet(IEnumerable<char> collection)
 			: this(false, null)
 		{
@@ -140,12 +139,12 @@ namespace Cyjb.Collections
 			this.UnionWith(collection);
 		}
 		/// <summary>
-		/// 使用指定的是否区分大小写初始化 
-		/// <see cref="CharSet"/> 类的新实例，
+		/// 使用指定的是否区分大小写初始化 <see cref="CharSet"/> 类的新实例，
 		/// 该实例包含从指定的集合复制的元素。
 		/// </summary>
 		/// <param name="collection">其元素被复制到新集中的集合。</param>
 		/// <param name="ignoreCase">是否不区分字符的大小写。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public CharSet(IEnumerable<char> collection, bool ignoreCase)
 			: this(ignoreCase, null)
 		{
@@ -164,6 +163,7 @@ namespace Cyjb.Collections
 		/// <param name="collection">其元素被复制到新集中的集合。</param>
 		/// <param name="ignoreCase">是否不区分字符的大小写。</param>
 		/// <param name="culture">不区分字符大小写时使用的区域信息。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public CharSet(IEnumerable<char> collection, bool ignoreCase, CultureInfo culture)
 			: this(ignoreCase, culture)
 		{
@@ -177,12 +177,11 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 用指定的序列化信息和上下文初始化 <see cref="CharSet"/> 类的新实例。
 		/// </summary>
-		/// <param name="info"><see cref="System.Runtime.Serialization.SerializationInfo"/> 
-		/// 对象，包含序列化 
+		/// <param name="info"><see cref="SerializationInfo"/> 对象，包含序列化 
 		/// <see cref="CharSet"/> 所需的信息。</param>
-		/// <param name="context"><see cref="System.Runtime.Serialization.StreamingContext"/> 对象，
+		/// <param name="context"><see cref="StreamingContext"/> 对象，
 		/// 该对象包含与 <see cref="CharSet"/> 相关联的序列化流的源和目标。</param>
-		/// <exception cref="System.ArgumentNullException">info 参数为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="info"/> 参数为 <c>null</c>。</exception>
 		private CharSet(SerializationInfo info, StreamingContext context)
 			: base(null)
 		{
@@ -281,7 +280,7 @@ namespace Cyjb.Collections
 		private static uint[] CopyChar(uint[] array, out int count)
 		{
 			Contract.Requires(array != null && array.Length >= BtmLen);
-			Contract.Ensures(Contract.Result<uint[]>() != null &&
+			Contract.Ensures(Contract.Result<uint[]>() != null && 
 				Contract.Result<uint[]>().Length == array.Length);
 			Contract.Ensures(Contract.ValueAtReturn(out count) >= 0);
 			uint[] newArr = new uint[array.Length];
@@ -483,8 +482,7 @@ namespace Cyjb.Collections
 		/// 从当前集内移除指定集合中的所有元素。
 		/// </summary>
 		/// <param name="other">要从集内移除的项的集合。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void ExceptWith(IEnumerable<char> other)
 		{
 			if (other == null)
@@ -557,8 +555,7 @@ namespace Cyjb.Collections
 		/// 修改当前集，使该集仅包含指定集合中也存在的元素。
 		/// </summary>
 		/// <param name="other">要与当前集进行比较的集合。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void IntersectWith(IEnumerable<char> other)
 		{
 			if (other == null)
@@ -630,8 +627,7 @@ namespace Cyjb.Collections
 		/// <param name="other">要与当前集进行比较的集合。</param>
 		/// <returns>如果当前集是 <paramref name="other"/> 的真子集，则为 
 		/// <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsProperSubsetOf(IEnumerable<char> other)
 		{
 			if (other == null)
@@ -665,8 +661,7 @@ namespace Cyjb.Collections
 		/// <param name="other">要与当前集进行比较的集合。</param>
 		/// <returns>如果当前集是 <paramref name="other"/> 的真超集，则为 
 		/// <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsProperSupersetOf(IEnumerable<char> other)
 		{
 			if (other == null)
@@ -700,8 +695,7 @@ namespace Cyjb.Collections
 		/// <param name="other">要与当前集进行比较的集合。</param>
 		/// <returns>如果当前集是 <paramref name="other"/> 的子集，则为 
 		/// <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsSubsetOf(IEnumerable<char> other)
 		{
 			if (other == null)
@@ -730,8 +724,7 @@ namespace Cyjb.Collections
 		/// <param name="other">要与当前集进行比较的集合。</param>
 		/// <returns>如果当前集是 <paramref name="other"/> 的超集，则为 
 		/// <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsSupersetOf(IEnumerable<char> other)
 		{
 			if (other == null)
@@ -766,8 +759,7 @@ namespace Cyjb.Collections
 		/// <param name="other">要与当前集进行比较的集合。</param>
 		/// <returns>如果当前集与 <paramref name="other"/> 
 		/// 至少共享一个通用元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool Overlaps(IEnumerable<char> other)
 		{
 			if (other == null)
@@ -826,8 +818,7 @@ namespace Cyjb.Collections
 		/// <param name="other">要与当前集进行比较的集合。</param>
 		/// <returns>如果当前集等于 <paramref name="other"/>，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool SetEquals(IEnumerable<char> other)
 		{
 			if (other == null)
@@ -862,8 +853,7 @@ namespace Cyjb.Collections
 		/// 修改当前集，使该集仅包含当前集或指定集合中存在的元素（但不可包含两者共有的元素）。
 		/// </summary>
 		/// <param name="other">要与当前集进行比较的集合。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void SymmetricExceptWith(IEnumerable<char> other)
 		{
 			if (other == null)
@@ -941,8 +931,7 @@ namespace Cyjb.Collections
 		/// 修改当前集，使该集包含当前集和指定集合中同时存在的所有元素。
 		/// </summary>
 		/// <param name="other">要与当前集进行比较的集合。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void UnionWith(IEnumerable<char> other)
 		{
 			if (other == null)
@@ -1081,8 +1070,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 返回一个循环访问集合的枚举器。
 		/// </summary>
-		/// <returns>可用于循环访问集合的 
-		/// <see cref="System.Collections.Generic.IEnumerator&lt;T&gt;"/>。</returns>
+		/// <returns>可用于循环访问集合的 <see cref="IEnumerator{T}"/>。</returns>
 		public override IEnumerator<char> GetEnumerator()
 		{
 			for (int i = 0; i < TopLen; i++)
@@ -1127,17 +1115,13 @@ namespace Cyjb.Collections
 		#region ISerializable 成员
 
 		/// <summary>
-		/// 使用将目标对象序列化所需的数据填充 
-		/// <see cref="System.Runtime.Serialization.SerializationInfo"/>。
+		/// 使用将目标对象序列化所需的数据填充 <see cref="SerializationInfo"/>。
 		/// </summary>
-		/// <param name="info">要填充数据的 
-		/// <see cref="System.Runtime.Serialization.SerializationInfo"/>。
+		/// <param name="info">要填充数据的 <see cref="SerializationInfo"/>。
 		/// </param>
 		/// <param name="context">此序列化的目标。</param>
-		/// <exception cref="System.Security.SecurityException">
-		/// 调用方没有所要求的权限。</exception>
-		/// <exception cref="System.ArgumentNullException">info 参数为 
-		/// <c>null</c>。</exception>
+		/// <exception cref="SecurityException">调用方没有所要求的权限。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="info"/> 参数为 <c>null</c>。</exception>
 		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
 		void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
 		{

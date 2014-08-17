@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 namespace Cyjb.Collections
 {
 	/// <summary>
-	/// 提供对 <see cref="System.Collections.Generic.IDictionary{TKey,TValue}"/> 的扩展方法。
+	/// 提供对 <see cref="IDictionary{TKey,TValue}"/> 的扩展方法。
 	/// </summary>
 	public static class DictionaryExt
 	{
@@ -17,6 +18,7 @@ namespace Cyjb.Collections
 		/// <param name="key">要获取其值的键。</param>
 		/// <returns>当此方法返回时，如果找到指定键，则返回与该键相关联的值；
 		/// 否则，将返回 <typeparamref name="TValue"/> 类型的默认值。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="dict"/> 为 <c>null</c>。</exception>
 		public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
 		{
 			if (dict == null)
