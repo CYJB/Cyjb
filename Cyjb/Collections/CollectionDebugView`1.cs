@@ -13,6 +13,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 调试视图的源集合。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private readonly ICollection<T> source;
 		/// <summary>
 		/// 使用指定的源集合初始化 <see cref="CollectionDebugView{T}"/> 类的实例。

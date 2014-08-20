@@ -27,14 +27,17 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// UInt32 索引的掩码。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private const int IndexMask = 0x1F;
 		/// <summary>
 		/// UInt32 索引的位移量。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private const int IndexShift = 5;
 		/// <summary>
 		/// 每个存储单元的大小。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private const int UnitSize = 32;
 		/// <summary>
 		/// 当前列表的容量。

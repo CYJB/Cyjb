@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 
 namespace Cyjb.Collections
@@ -16,6 +17,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 获取 <see cref="Stack{T}"/> 实例的 <c>_array</c> 字段。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private static readonly Func<Stack<T>, T[]> getArrayField =
 			typeof(Stack<T>).CreateDelegate<Func<Stack<T>, T[]>>("_array");
 		/// <summary>

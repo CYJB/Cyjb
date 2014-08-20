@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 
 namespace Cyjb.Collections
@@ -16,6 +17,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 获取 <see cref="Queue{T}"/> 实例的 <c>GetElement</c> 方法。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private static readonly Func<Queue<T>, int, T> getElement =
 			typeof(Queue<T>).CreateDelegate<Func<Queue<T>, int, T>>("GetElement");
 		/// <summary>

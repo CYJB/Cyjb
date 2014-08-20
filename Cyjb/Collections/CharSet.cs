@@ -29,26 +29,32 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 顶层数组的长度。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private const int TopLen = 64;
 		/// <summary>
 		/// 底层数组的长度。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private const int BtmLen = 32;
 		/// <summary>
 		/// 顶层数组索引的位移。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private const int TopShift = 10;
 		/// <summary>
 		/// 底层数组索引的位移。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private const int BtmShift = 5;
 		/// <summary>
 		/// 底间层数组索引的掩码。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private const int BtmMask = 0x1F;
 		/// <summary>
 		/// UInt32 索引的掩码。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private const int IndexMask = 0x1F;
 
 		#endregion // 常量定义
