@@ -64,7 +64,7 @@ namespace Cyjb
 			Type[] args = GenericArgumentsInferences(method, types);
 			if (args == null)
 			{
-				throw ExceptionHelper.CannotInferGenericArguments("types", method);
+				throw CommonExceptions.CannotInferGenericArguments("types", method);
 			}
 			return method.MakeGenericMethod(args);
 		}
@@ -113,8 +113,8 @@ namespace Cyjb
 		/// <exception cref="System.ArgumentNullException"><paramref name="types"/> 为 <c>null</c>。</exception>
 		public static Type[] GenericArgumentsInferences(this MethodBase method, params Type[] types)
 		{
-			ExceptionHelper.CheckArgumentNull(method, "method");
-			ExceptionHelper.CheckArgumentNull(types, "types");
+			CommonExceptions.CheckArgumentNull(method, "method");
+			CommonExceptions.CheckArgumentNull(types, "types");
 			if (method.IsGenericMethodDefinition)
 			{
 				ParameterInfo[] parameters = method.GetParameters();
@@ -122,7 +122,7 @@ namespace Cyjb
 			}
 			else
 			{
-				throw ExceptionHelper.NotGenericMethodDefinition(method, "GenericArgumentsInferences");
+				throw CommonExceptions.NotGenericMethodDefinition(method, "GenericArgumentsInferences");
 			}
 		}
 		/// <summary>

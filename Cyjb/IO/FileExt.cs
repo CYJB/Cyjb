@@ -16,6 +16,7 @@ namespace Cyjb.IO
 		/// <param name="path">文件的路径。</param>
 		/// <param name="fileName">文件的名称。</param>
 		/// <returns>与当前区域性相关的文件名，如果不存在则为 <c>null</c>。</returns>
+		/// <remarks>与特定区域性相关的文件名，其形式为 path/culture.Name/fileName。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="path"/> 或 <paramref name="fileName"/> 
 		/// 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="path"/> 或 <paramref name="fileName"/> 
@@ -36,12 +37,18 @@ namespace Cyjb.IO
 		/// <param name="fileName">文件的名称。</param>
 		/// <param name="culture">要获取的文件的区域性信息。</param>
 		/// <returns>与特定区域性相关的文件名，如果不存在则为 <c>null</c>。</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="path"/> 或 <paramref name="fileName"/> 
-		/// 为 <c>null</c>。</exception>
+		/// <remarks>与特定区域性相关的文件名，其形式为 path/culture.Name/fileName。</remarks>
+		/// <exception cref="ArgumentNullException"><paramref name="path"/>、<paramref name="fileName"/> 或 
+		/// <paramref name="culture"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="path"/> 或 <paramref name="fileName"/> 
 		/// 中包含一个或多个无效字符。</exception>
 		public static string GetCultureSpecifiedFile(string path, string fileName, CultureInfo culture)
 		{
+			if (culture == null)
+			{
+				throw CommonExceptions.ArgumentNull("culture");
+			}
+			Contract.EndContractBlock();
 			while (true)
 			{
 				string filePath = Path.Combine(path, culture.Name, fileName);

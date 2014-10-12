@@ -90,7 +90,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void ICollection<T>.Add(T item)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 		/// <summary>
 		/// 从 <see cref="ReadOnlyCollection{T}"/> 中移除所有元素。
@@ -99,7 +99,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void ICollection<T>.Clear()
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 		/// <summary>
 		/// 确定 <see cref="ReadOnlyCollection{T}"/> 是否包含指定对象。
@@ -141,7 +141,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		bool ICollection<T>.Remove(T item)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 
 		#endregion // ICollection<T> 成员
@@ -169,9 +169,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (this.syncRoot == null)
 				{
-					ICollection collection = this.items as ICollection;
-					object syncObj = collection == null ? new object() : collection.SyncRoot;
-					Interlocked.CompareExchange(ref this.syncRoot, syncObj, null);
+					CollectionHelper.CreateSyncRoot(this.items, ref this.syncRoot);
 				}
 				return this.syncRoot;
 			}

@@ -119,11 +119,11 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (index < 0)
 				{
-					throw ExceptionHelper.ArgumentNegative("index", index);
+					throw CommonExceptions.ArgumentNegative("index", index);
 				}
 				if (index > this.Count)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("index", index);
+					throw CommonExceptions.ArgumentOutOfRange("index", index);
 				}
 				Contract.EndContractBlock();
 				return GetItemAt(index);
@@ -132,11 +132,11 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (index < 0)
 				{
-					throw ExceptionHelper.ArgumentNegative("index", index);
+					throw CommonExceptions.ArgumentNegative("index", index);
 				}
 				if (index > this.Count)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("index", index);
+					throw CommonExceptions.ArgumentOutOfRange("index", index);
 				}
 				Contract.EndContractBlock();
 				this.SetItemAt(index, value);
@@ -163,11 +163,11 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index", index);
+				throw CommonExceptions.ArgumentNegative("index", index);
 			}
 			if (index > this.Count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index", index);
+				throw CommonExceptions.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			this.InsertItem(index, item);
@@ -182,11 +182,11 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index", index);
+				throw CommonExceptions.ArgumentNegative("index", index);
 			}
 			if (index > this.Count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index", index);
+				throw CommonExceptions.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			this.RemoveItem(index);
@@ -231,11 +231,11 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (index < 0)
 				{
-					throw ExceptionHelper.ArgumentNegative("index", index);
+					throw CommonExceptions.ArgumentNegative("index", index);
 				}
 				if (index > this.Count)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("index", index);
+					throw CommonExceptions.ArgumentOutOfRange("index", index);
 				}
 				Contract.EndContractBlock();
 				return this.GetItemAt(index);
@@ -244,11 +244,11 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (index < 0)
 				{
-					throw ExceptionHelper.ArgumentNegative("index", index);
+					throw CommonExceptions.ArgumentNegative("index", index);
 				}
 				if (index > this.Count)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("index", index);
+					throw CommonExceptions.ArgumentOutOfRange("index", index);
 				}
 				Contract.EndContractBlock();
 				try
@@ -257,7 +257,7 @@ namespace Cyjb.Collections.ObjectModel
 				}
 				catch (InvalidCastException)
 				{
-					throw ExceptionHelper.ArgumentWrongType("value", value, typeof(T));
+					throw CommonExceptions.ArgumentWrongType("value", value, typeof(T));
 				}
 			}
 		}
@@ -280,7 +280,7 @@ namespace Cyjb.Collections.ObjectModel
 			}
 			catch (InvalidCastException)
 			{
-				throw ExceptionHelper.ArgumentWrongType("value", value, typeof(T));
+				throw CommonExceptions.ArgumentWrongType("value", value, typeof(T));
 			}
 		}
 		/// <summary>
@@ -320,11 +320,11 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index", index);
+				throw CommonExceptions.ArgumentNegative("index", index);
 			}
 			if (index > this.Count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index", index);
+				throw CommonExceptions.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			try
@@ -333,7 +333,7 @@ namespace Cyjb.Collections.ObjectModel
 			}
 			catch (InvalidCastException)
 			{
-				throw ExceptionHelper.ArgumentWrongType("value", value, typeof(T));
+				throw CommonExceptions.ArgumentWrongType("value", value, typeof(T));
 			}
 		}
 		/// <summary>
@@ -357,11 +357,11 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index", index);
+				throw CommonExceptions.ArgumentNegative("index", index);
 			}
 			if (index > this.Count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index", index);
+				throw CommonExceptions.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			this.RemoveItem(index);
@@ -478,9 +478,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (this.syncRoot == null)
 				{
-					ICollection collection = this.items as ICollection;
-					object syncObj = collection == null ? new object() : collection.SyncRoot;
-					Interlocked.CompareExchange(ref this.syncRoot, syncObj, null);
+					CollectionHelper.CreateSyncRoot(this.items, ref this.syncRoot);
 				}
 				return this.syncRoot;
 			}

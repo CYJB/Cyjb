@@ -7,7 +7,7 @@ using Cyjb.Utility;
 namespace Cyjb.IO
 {
 	/// <summary>
-	/// 表示源文件中的指定范围。
+	/// 表示指定源文件中的指定范围。
 	/// </summary>
 	/// <remarks>
 	/// <para>表示从 <see cref="Start"/> 开始，到 <see cref="End"/> （包含）结束的范围，
@@ -16,15 +16,13 @@ namespace Cyjb.IO
 	/// 则表示未知的位置。</para>
 	/// </remarks>
 	[Serializable]
-	public class SourceRange : ISourceLocatable, IEquatable<SourceRange>, IComparable<SourceRange>
+	public class SourceFileRange : ISourceFileLocatable, IEquatable<SourceFileRange>, IComparable<SourceFileRange>
 	{
 		/// <summary>
-		/// 表示未知的范围信息。
+		/// 源文件名称。
 		/// </summary>
-		/// <remarks>
-		/// <see cref="Start"/> 属性和 <see cref="End"/> 属性都为 <see cref="SourcePosition.Unknown"/>。
-		/// </remarks>
-		public readonly static SourceRange Unknown = new SourceRange(SourcePosition.Unknown);
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private readonly string fileName;
 		/// <summary>
 		/// 起始位置。
 		/// </summary>
@@ -36,27 +34,30 @@ namespace Cyjb.IO
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private readonly SourcePosition end;
 		/// <summary>
-		/// 使用指定的位置初始化 <see cref="SourceRange"/> 类的新实例。
+		/// 使用指定的源文件名称和位置初始化 <see cref="SourceFileRange"/> 类的新实例。
 		/// 结束位置与起始位置相同。
 		/// </summary>
+		/// <param name="fileName">源文件的名称。</param>
 		/// <param name="loc">范围的位置。</param>
 		/// <overloads>
 		/// <summary>
-		/// 初始化 <see cref="SourceRange"/> 类的新实例。
+		/// 初始化 <see cref="SourceFileRange"/> 类的新实例。
 		/// </summary>
 		/// </overloads>
-		public SourceRange(SourcePosition loc)
+		public SourceFileRange(string fileName, SourcePosition loc)
 		{
+			this.fileName = fileName;
 			this.start = this.end = loc;
 		}
 		/// <summary>
-		/// 使用指定的范围初始化 <see cref="SourceRange"/> 类的新实例。
+		/// 使用指定的源文件名称和范围初始化 <see cref="SourceFileRange"/> 类的新实例。
 		/// </summary>
+		/// <param name="fileName">源文件的名称。</param>
 		/// <param name="start">范围的起始位置。</param>
 		/// <param name="end">范围的结束位置。</param>
 		/// <exception cref="ArgumentException"><paramref name="start"/> 和 <paramref name="end"/> 
 		/// 表的不是有效的范围。</exception>
-		public SourceRange(SourcePosition start, SourcePosition end)
+		public SourceFileRange(string fileName, SourcePosition start, SourcePosition end)
 		{
 			if (start.IsUnknown != end.IsUnknown)
 			{
@@ -67,15 +68,17 @@ namespace Cyjb.IO
 				throw CommonExceptions.ReversedArgument("start", "end");
 			}
 			Contract.EndContractBlock();
+			this.fileName = fileName;
 			this.start = start;
 			this.end = end;
 		}
 		/// <summary>
-		/// 使用指定的范围初始化 <see cref="SourceRange"/> 类的新实例。
+		/// 使用指定的源文件名称和范围初始化 <see cref="SourceFileRange"/> 类的新实例。
 		/// </summary>
+		/// <param name="fileName">源文件的名称。</param>
 		/// <param name="range">要设置的范围。</param>
 		/// <exception cref="ArgumentException"><paramref name="range"/> 表的不是有效的范围。</exception>
-		public SourceRange(ISourceLocatable range)
+		public SourceFileRange(string fileName, ISourceLocatable range)
 		{
 			if (range == null)
 			{
@@ -90,9 +93,15 @@ namespace Cyjb.IO
 				throw CommonExceptions.ReversedArgument("locatable.Start", "locatable.End");
 			}
 			Contract.EndContractBlock();
+			this.fileName = fileName;
 			this.start = range.Start;
 			this.end = range.End;
 		}
+		/// <summary>
+		/// 获取源文件的名称。
+		/// </summary>
+		/// <value>源文件的名称。</value>
+		public string FileName { get { return this.fileName; } }
 		/// <summary>
 		/// 获取在源文件中的起始位置。
 		/// </summary>
@@ -118,20 +127,6 @@ namespace Cyjb.IO
 		public bool IsUnknown
 		{
 			get { return this.start.IsUnknown; }
-		}
-		/// <summary>
-		/// 为当前源文件位置附加源文件名。
-		/// </summary>
-		/// <param name="fileName">源文件的名称。</param>
-		/// <returns>表示指定源文件中的指定范围的实例。</returns>
-		public SourceFileRange WithFile(string fileName)
-		{
-			if (fileName == null)
-			{
-				throw CommonExceptions.ArgumentNull("fileName");
-			}
-			Contract.EndContractBlock();
-			return new SourceFileRange(fileName, this.start, this.end);
 		}
 
 		#region 范围操作
@@ -231,14 +226,12 @@ namespace Cyjb.IO
 			return (!this.IsUnknown) && this.start <= locatable.End && this.end >= locatable.Start;
 		}
 		/// <summary>
-		/// 返回当前范围与指定 <see cref="ISourceLocatable"/> 的重叠范围，如果不存在则为 
-		/// <see cref="SourceRange.Unknown"/>。
+		/// 返回当前范围与指定 <see cref="ISourceLocatable"/> 的重叠范围。
 		/// </summary>
 		/// <param name="locatable">要检查的范围。</param>
-		/// <returns>当前范围与指定范围重叠的部分，如果不存在则为 
-		/// <see cref="SourceRange.Unknown"/>。</returns>
+		/// <returns>当前范围与指定范围重叠的部分。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="locatable"/> 为 <c>null</c>。</exception>
-		public SourceRange Overlap(ISourceLocatable locatable)
+		public SourceFileRange Overlap(ISourceLocatable locatable)
 		{
 			if (locatable == null)
 			{
@@ -249,9 +242,9 @@ namespace Cyjb.IO
 			SourcePosition minEnd = this.end < locatable.End ? this.end : locatable.End;
 			if (maxStart == SourcePosition.Unknown || maxStart > minEnd)
 			{
-				return Unknown;
+				maxStart = minEnd = SourcePosition.Unknown;
 			}
-			return new SourceRange(maxStart, minEnd);
+			return new SourceFileRange(this.fileName, maxStart, minEnd);
 		}
 
 		#endregion // 范围操作
@@ -261,6 +254,7 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 返回将指定的一个或多个范围合并的结果，忽略无效范围。
 		/// </summary>
+		/// <param name="fileName">源文件的名称。</param>
 		/// <param name="ranges">要进行合并的范围集合。</param>
 		/// <returns>合并后的结果。</returns>
 		/// <override>
@@ -268,20 +262,27 @@ namespace Cyjb.IO
 		/// 返回将指定的一个或多个范围合并的结果，忽略无效范围。
 		/// </summary>
 		/// </override>
-		public static SourceRange Merge(params ISourceLocatable[] ranges)
+		public static SourceFileRange Merge(string fileName, params ISourceLocatable[] ranges)
 		{
-			return Merge(ranges as IEnumerable<ISourceLocatable>);
+			if (fileName == null)
+			{
+				throw CommonExceptions.ArgumentNull("fileName");
+			}
+			Contract.EndContractBlock();
+			return Merge(fileName, ranges as IEnumerable<ISourceLocatable>);
 		}
 		/// <summary>
 		/// 返回将指定的一个或多个范围合并的结果，忽略无效范围。
 		/// </summary>
+		/// <param name="fileName">源文件的名称。</param>
 		/// <param name="ranges">要进行合并的范围集合。</param>
 		/// <returns>合并后的结果。</returns>
-		public static SourceRange Merge(IEnumerable<ISourceLocatable> ranges)
+		public static SourceFileRange Merge(string fileName, IEnumerable<ISourceLocatable> ranges)
 		{
+			Contract.EndContractBlock();
 			if (ranges == null)
 			{
-				return Unknown;
+				return new SourceFileRange(fileName, SourcePosition.Unknown, SourcePosition.Unknown);
 			}
 			SourcePosition finalStart = SourcePosition.Unknown;
 			SourcePosition finalEnd = SourcePosition.Unknown;
@@ -320,25 +321,30 @@ namespace Cyjb.IO
 					}
 				}
 			}
-			return finalStart.IsUnknown ? Unknown : new SourceRange(finalStart, finalEnd);
+			return new SourceFileRange(fileName, finalStart, finalEnd);
 		}
 
 		#endregion // 合并
 
-		#region IComparable<SourceRange> 成员
+		#region IComparable<SourceFileRange> 成员
 
 		/// <summary>
 		/// 比较当前对象和同一类型的另一对象。
 		/// </summary>
 		/// <param name="other">与此对象进行比较的对象。</param>
 		/// <returns>一个值，指示要比较的对象的相对顺序。</returns>
-		public int CompareTo(SourceRange other)
+		public int CompareTo(SourceFileRange other)
 		{
 			if (ReferenceEquals(other, null))
 			{
 				return 1;
 			}
-			int cmp = this.start.CompareTo(other.start);
+			int cmp = string.CompareOrdinal(this.fileName, other.fileName);
+			if (cmp != 0)
+			{
+				return cmp;
+			}
+			cmp = this.start.CompareTo(other.start);
 			if (cmp != 0)
 			{
 				return cmp;
@@ -346,9 +352,9 @@ namespace Cyjb.IO
 			return this.end.CompareTo(other.end);
 		}
 
-		#endregion // IComparable<SourceRange> 成员
+		#endregion // IComparable<SourceFileRange> 成员
 
-		#region IEquatable<SourceRange> 成员
+		#region IEquatable<SourceFileRange> 成员
 
 		/// <summary>
 		/// 指示当前对象是否等于同一类型的另一个对象。
@@ -361,7 +367,7 @@ namespace Cyjb.IO
 		/// 指示当前对象是否等于另一个对象。
 		/// </summary>
 		/// </overloads>
-		public virtual bool Equals(SourceRange other)
+		public virtual bool Equals(SourceFileRange other)
 		{
 			if (ReferenceEquals(other, this))
 			{
@@ -371,22 +377,23 @@ namespace Cyjb.IO
 			{
 				return false;
 			}
-			return this.start == other.start && this.end == other.end;
+			return this.start == other.start && this.end == other.end &&
+				string.Equals(this.fileName, other.fileName, StringComparison.Ordinal);
 		}
 
-		#endregion // IEquatable<SourceRange> 成员
+		#endregion // IEquatable<SourceFileRange> 成员
 
 		#region object 成员
 
 		/// <summary>
-		/// 确定指定的 <see cref="Object"/> 是否等于当前的 <see cref="SourceRange"/>。
+		/// 确定指定的 <see cref="Object"/> 是否等于当前的 <see cref="SourceFileRange"/>。
 		/// </summary>
-		/// <param name="obj">与当前的 <see cref="SourceRange"/> 进行比较的 object。</param>
-		/// <returns>如果指定的 <see cref="Object"/> 等于当前的 <see cref="SourceRange"/>，
+		/// <param name="obj">与当前的 <see cref="SourceFileRange"/> 进行比较的 object。</param>
+		/// <returns>如果指定的 <see cref="Object"/> 等于当前的 <see cref="SourceFileRange"/>，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public override bool Equals(object obj)
 		{
-			SourceRange range = obj as SourceRange;
+			SourceFileRange range = obj as SourceFileRange;
 			if (ReferenceEquals(range, null))
 			{
 				return false;
@@ -394,12 +401,12 @@ namespace Cyjb.IO
 			return this.Equals(range);
 		}
 		/// <summary>
-		/// 用于 <see cref="SourceRange"/> 类型的哈希函数。
+		/// 用于 <see cref="SourceFileRange"/> 类型的哈希函数。
 		/// </summary>
-		/// <returns>当前 <see cref="SourceRange"/> 的哈希代码。</returns>
+		/// <returns>当前 <see cref="SourceFileRange"/> 的哈希代码。</returns>
 		public override int GetHashCode()
 		{
-			return Hash.Combine(this.start.GetHashCode(), this.end);
+			return Hash.Combine(Hash.Combine(this.start.GetHashCode(), this.end), this.fileName);
 		}
 		/// <summary>
 		/// 返回当前对象的字符串表示形式。
@@ -407,7 +414,7 @@ namespace Cyjb.IO
 		/// <returns>当前对象的字符串表示形式。</returns>
 		public override string ToString()
 		{
-			return string.Concat("(", this.start, ")-(", this.end, ")");
+			return string.Concat(this.fileName, ": (", this.start, ")-(", this.end, ")");
 		}
 
 		#endregion // object 成员
@@ -415,13 +422,13 @@ namespace Cyjb.IO
 		#region 运算符重载
 
 		/// <summary>
-		/// 判断两个 <see cref="SourceRange"/> 是否相同。
+		/// 判断两个 <see cref="SourceFileRange"/> 是否相同。
 		/// </summary>
-		/// <param name="obj1">要比较的第一个 <see cref="SourceRange"/> 对象。</param>
-		/// <param name="obj2">要比较的第二个 <see cref="SourceRange"/> 对象。</param>
-		/// <returns>如果两个 <see cref="SourceRange"/> 对象相同，则为 <c>true</c>；
+		/// <param name="obj1">要比较的第一个 <see cref="SourceFileRange"/> 对象。</param>
+		/// <param name="obj2">要比较的第二个 <see cref="SourceFileRange"/> 对象。</param>
+		/// <returns>如果两个 <see cref="SourceFileRange"/> 对象相同，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</returns>
-		public static bool operator ==(SourceRange obj1, SourceRange obj2)
+		public static bool operator ==(SourceFileRange obj1, SourceFileRange obj2)
 		{
 			if (ReferenceEquals(obj1, null))
 			{
@@ -430,13 +437,13 @@ namespace Cyjb.IO
 			return obj1.Equals(obj2);
 		}
 		/// <summary>
-		/// 判断两个 <see cref="SourceRange"/> 是否不同。
+		/// 判断两个 <see cref="SourceFileRange"/> 是否不同。
 		/// </summary>
-		/// <param name="obj1">要比较的第一个 <see cref="SourceRange"/> 对象。</param>
-		/// <param name="obj2">要比较的第二个 <see cref="SourceRange"/> 对象。</param>
-		/// <returns>如果两个 <see cref="SourceRange"/> 对象不同，则为 <c>true</c>；
+		/// <param name="obj1">要比较的第一个 <see cref="SourceFileRange"/> 对象。</param>
+		/// <param name="obj2">要比较的第二个 <see cref="SourceFileRange"/> 对象。</param>
+		/// <returns>如果两个 <see cref="SourceFileRange"/> 对象不同，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</returns>
-		public static bool operator !=(SourceRange obj1, SourceRange obj2)
+		public static bool operator !=(SourceFileRange obj1, SourceFileRange obj2)
 		{
 			if (ReferenceEquals(obj1, null))
 			{
@@ -445,13 +452,13 @@ namespace Cyjb.IO
 			return !obj1.Equals(obj2);
 		}
 		/// <summary>
-		/// 判断第一个 <see cref="SourceRange"/> 是否大于第二个 <see cref="SourceRange"/>。
+		/// 判断第一个 <see cref="SourceFileRange"/> 是否大于第二个 <see cref="SourceFileRange"/>。
 		/// </summary>
-		/// <param name="obj1">要比较的第一个 <see cref="SourceRange"/> 对象。</param>
-		/// <param name="obj2">要比较的第二个 <see cref="SourceRange"/> 对象。</param>
-		/// <returns>如果第一个 <see cref="SourceRange"/> 对象大于第二个 <see cref="SourceRange"/> 对象，
+		/// <param name="obj1">要比较的第一个 <see cref="SourceFileRange"/> 对象。</param>
+		/// <param name="obj2">要比较的第二个 <see cref="SourceFileRange"/> 对象。</param>
+		/// <returns>如果第一个 <see cref="SourceFileRange"/> 对象大于第二个 <see cref="SourceFileRange"/> 对象，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		public static bool operator >(SourceRange obj1, SourceRange obj2)
+		public static bool operator >(SourceFileRange obj1, SourceFileRange obj2)
 		{
 			if (ReferenceEquals(obj1, null))
 			{
@@ -460,13 +467,13 @@ namespace Cyjb.IO
 			return obj1.CompareTo(obj2) > 0;
 		}
 		/// <summary>
-		/// 判断第一个 <see cref="SourceRange"/> 是否大于等于第二个 <see cref="SourceRange"/>。
+		/// 判断第一个 <see cref="SourceFileRange"/> 是否大于等于第二个 <see cref="SourceFileRange"/>。
 		/// </summary>
-		/// <param name="obj1">要比较的第一个 <see cref="SourceRange"/> 对象。</param>
-		/// <param name="obj2">要比较的第二个 <see cref="SourceRange"/> 对象。</param>
-		/// <returns>如果第一个 <see cref="SourceRange"/> 对象大于等于第二个 <see cref="SourceRange"/> 对象，
+		/// <param name="obj1">要比较的第一个 <see cref="SourceFileRange"/> 对象。</param>
+		/// <param name="obj2">要比较的第二个 <see cref="SourceFileRange"/> 对象。</param>
+		/// <returns>如果第一个 <see cref="SourceFileRange"/> 对象大于等于第二个 <see cref="SourceFileRange"/> 对象，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		public static bool operator >=(SourceRange obj1, SourceRange obj2)
+		public static bool operator >=(SourceFileRange obj1, SourceFileRange obj2)
 		{
 			if (ReferenceEquals(obj1, null))
 			{
@@ -475,13 +482,13 @@ namespace Cyjb.IO
 			return obj1.CompareTo(obj2) >= 0;
 		}
 		/// <summary>
-		/// 判断第一个 <see cref="SourceRange"/> 是否小于第二个 <see cref="SourceRange"/>。
+		/// 判断第一个 <see cref="SourceFileRange"/> 是否小于第二个 <see cref="SourceFileRange"/>。
 		/// </summary>
-		/// <param name="obj1">要比较的第一个 <see cref="SourceRange"/> 对象。</param>
-		/// <param name="obj2">要比较的第二个 <see cref="SourceRange"/> 对象。</param>
-		/// <returns>如果第一个 <see cref="SourceRange"/> 对象小于第二个 <see cref="SourceRange"/> 对象，
+		/// <param name="obj1">要比较的第一个 <see cref="SourceFileRange"/> 对象。</param>
+		/// <param name="obj2">要比较的第二个 <see cref="SourceFileRange"/> 对象。</param>
+		/// <returns>如果第一个 <see cref="SourceFileRange"/> 对象小于第二个 <see cref="SourceFileRange"/> 对象，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		public static bool operator <(SourceRange obj1, SourceRange obj2)
+		public static bool operator <(SourceFileRange obj1, SourceFileRange obj2)
 		{
 			if (ReferenceEquals(obj1, null))
 			{
@@ -490,19 +497,28 @@ namespace Cyjb.IO
 			return obj1.CompareTo(obj2) < 0;
 		}
 		/// <summary>
-		/// 判断第一个 <see cref="SourceRange"/> 是否小于等于第二个 <see cref="SourceRange"/>。
+		/// 判断第一个 <see cref="SourceFileRange"/> 是否小于等于第二个 <see cref="SourceFileRange"/>。
 		/// </summary>
-		/// <param name="obj1">要比较的第一个 <see cref="SourceRange"/> 对象。</param>
-		/// <param name="obj2">要比较的第二个 <see cref="SourceRange"/> 对象。</param>
-		/// <returns>如果第一个 <see cref="SourceRange"/> 对象小于等于第二个 <see cref="SourceRange"/> 对象，
+		/// <param name="obj1">要比较的第一个 <see cref="SourceFileRange"/> 对象。</param>
+		/// <param name="obj2">要比较的第二个 <see cref="SourceFileRange"/> 对象。</param>
+		/// <returns>如果第一个 <see cref="SourceFileRange"/> 对象小于等于第二个 <see cref="SourceFileRange"/> 对象，
 		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		public static bool operator <=(SourceRange obj1, SourceRange obj2)
+		public static bool operator <=(SourceFileRange obj1, SourceFileRange obj2)
 		{
 			if (ReferenceEquals(obj1, null))
 			{
 				return ReferenceEquals(obj2, null);
 			}
 			return obj1.CompareTo(obj2) <= 0;
+		}
+		/// <summary>
+		/// 到 <see cref="SourceRange"/> 类的隐式类型转换。
+		/// </summary>
+		/// <param name="range">要转换类型的 <see cref="SourceFileRange"/> 实例。</param>
+		/// <returns>相应的 <see cref="SourceRange"/> 实例。</returns>
+		public static implicit operator SourceRange(SourceFileRange range)
+		{
+			return new SourceRange(range.start, range.end);
 		}
 
 		#endregion // 运算符重载

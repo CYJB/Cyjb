@@ -60,7 +60,7 @@ namespace Cyjb.ComponentModel
 		{
 			if (destinationType == null)
 			{
-				throw ExceptionHelper.ArgumentNull("destinationType");
+				throw CommonExceptions.ArgumentNull("destinationType");
 			}
 			Contract.EndContractBlock();
 			if (value != null && destinationType == typeof(string))

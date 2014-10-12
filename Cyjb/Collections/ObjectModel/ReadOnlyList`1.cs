@@ -75,7 +75,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (index < 0 || index >= this.Count)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("index", index);
+					throw CommonExceptions.ArgumentOutOfRange("index", index);
 				}
 				Contract.EndContractBlock();
 				return this.GetItemAt(index);
@@ -114,16 +114,16 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (index < 0)
 				{
-					throw ExceptionHelper.ArgumentNegative("index", index);
+					throw CommonExceptions.ArgumentNegative("index", index);
 				}
 				if (index > this.Count)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("index", index);
+					throw CommonExceptions.ArgumentOutOfRange("index", index);
 				}
 				Contract.EndContractBlock();
 				return this.GetItemAt(index);
 			}
-			set { throw ExceptionHelper.MethodNotSupported(); }
+			set { throw CommonExceptions.MethodNotSupported(); }
 		}
 		/// <summary>
 		/// 确定 <see cref="ReadOnlyList{T}"/> 中指定对象的索引。
@@ -144,7 +144,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void IList<T>.Insert(int index, T item)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 		/// <summary>
 		/// 移除 <see cref="ReadOnlyList{T}"/> 的指定索引处的元素。
@@ -154,7 +154,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void IList<T>.RemoveAt(int index)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 
 		#endregion // IList<T> 成员
@@ -195,18 +195,18 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (index < 0)
 				{
-					throw ExceptionHelper.ArgumentNegative("index", index);
+					throw CommonExceptions.ArgumentNegative("index", index);
 				}
 				if (index > this.Count)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("index", index);
+					throw CommonExceptions.ArgumentOutOfRange("index", index);
 				}
 				Contract.EndContractBlock();
 				return this.GetItemAt(index);
 			}
 			set
 			{
-				throw ExceptionHelper.MethodNotSupported();
+				throw CommonExceptions.MethodNotSupported();
 			}
 		}
 		/// <summary>
@@ -218,7 +218,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		int IList.Add(object value)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 		/// <summary>
 		/// 从 <see cref="ReadOnlyList{T}"/> 中移除所有元素。
@@ -227,7 +227,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void IList.Clear()
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 		/// <summary>
 		/// 确定 <see cref="ReadOnlyList{T}"/> 是否包含指定对象。
@@ -264,7 +264,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void IList.Insert(int index, object value)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 		/// <summary>
 		/// 从 <see cref="ReadOnlyList{T}"/> 中移除特定对象的第一个匹配项。
@@ -274,7 +274,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void IList.Remove(object value)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 		/// <summary>
 		/// 移除 <see cref="ReadOnlyList{T}"/> 的指定索引处的元素。
@@ -286,7 +286,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void IList.RemoveAt(int index)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 
 		#endregion // IList 成员
@@ -319,7 +319,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void ICollection<T>.Add(T item)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 		/// <summary>
 		/// 从 <see cref="ReadOnlyList{T}"/> 中移除所有元素。
@@ -328,7 +328,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void ICollection<T>.Clear()
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 		/// <summary>
 		/// 确定 <see cref="ReadOnlyList{T}"/> 是否包含指定对象。
@@ -372,7 +372,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		bool ICollection<T>.Remove(T item)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 
 		#endregion // ICollection<T> 成员
@@ -400,9 +400,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (this.syncRoot == null)
 				{
-					ICollection collection = this.items as ICollection;
-					object syncObj = collection == null ? new object() : collection.SyncRoot;
-					Interlocked.CompareExchange(ref this.syncRoot, syncObj, null);
+					CollectionHelper.CreateSyncRoot(this.items, ref this.syncRoot);
 				}
 				return this.syncRoot;
 			}

@@ -27,19 +27,19 @@ namespace Cyjb
 	/// 	public delegate void MyDelegate(params int[] args);
 	/// 	public static void TestMethod(int value) { }
 	/// 	public void TestMethod(uint value) { }
-	/// 	public static void TestMethod&lt;T&gt;(params T[] arg) { }
+	/// 	public static void TestMethod{T}(params T[] arg) { }
 	/// 	static void Main(string[] args) {
 	/// 		Type type = typeof(Program);
-	/// 		Action&lt;int&gt; m1 = type.CreateDelegate&lt;Action&lt;int&gt;&gt;("TestMethod");
+	/// 		Action{int} m1 = type.CreateDelegate{Action{int}}("TestMethod");
 	/// 		m1(10);
 	/// 		Program p = new Program();
-	/// 		Action&lt;Program, uint&gt; m2 = type.CreateDelegate&lt;Action&lt;Program, uint&gt;&gt;("TestMethod");
+	/// 		Action{Program, uint} m2 = type.CreateDelegate{Action{Program, uint}}("TestMethod");
 	/// 		m2(p, 10);
-	/// 		Action&lt;object, uint&gt; m3 = type.CreateDelegate&lt;Action&lt;object, uint&gt;&gt;("TestMethod");
+	/// 		Action{object, uint} m3 = type.CreateDelegate{Action{object, uint}}("TestMethod");
 	/// 		m3(p, 10);
-	/// 		Action&lt;uint&gt; m4 = type.CreateDelegate&lt;Action&lt;uint&gt;&gt;("TestMethod", p);
+	/// 		Action{uint} m4 = type.CreateDelegate{Action{uint}}("TestMethod", p);
 	/// 		m4(10);
-	/// 		MyDelegate m5 = type.CreateDelegate&lt;MyDelegate&gt;("TestMethod");
+	/// 		MyDelegate m5 = type.CreateDelegate{MyDelegate}("TestMethod");
 	/// 		m5(0, 1, 2);
 	/// 	}
 	/// }
@@ -158,13 +158,13 @@ namespace Cyjb
 		/// <paramref name="method"/>。</exception>
 		public static Delegate CreateDelegate(Type type, MethodInfo method, bool throwOnBindFailure)
 		{
-			ExceptionHelper.CheckArgumentNull(method, "method");
-			ExceptionHelper.CheckDelegateType(type, "type");
+			CommonExceptions.CheckArgumentNull(method, "method");
+			CommonExceptions.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			Delegate dlg = CreateOpenDelegate(type, invoke, invoke.GetParameters(), method, method.GetParameters());
 			if (dlg == null && throwOnBindFailure)
 			{
-				throw ExceptionHelper.BindTargetMethod("method");
+				throw CommonExceptions.BindTargetMethod("method");
 			}
 			return dlg;
 		}
@@ -180,11 +180,11 @@ namespace Cyjb
 		/// <paramref name="method"/>。</exception>
 		public static MethodInvoker CreateDelegate(this MethodInfo method)
 		{
-			ExceptionHelper.CheckArgumentNull(method, "method");
+			CommonExceptions.CheckArgumentNull(method, "method");
 			if (method.IsGenericMethodDefinition)
 			{
 				// 不对开放的泛型方法执行绑定。
-				throw ExceptionHelper.BindTargetMethod("method");
+				throw CommonExceptions.BindTargetMethod("method");
 			}
 			// 要执行方法的实例。
 			ParameterExpression instanceParam = Expression.Parameter(typeof(object));
@@ -366,8 +366,8 @@ namespace Cyjb
 		/// <paramref name="method"/>。</exception>
 		public static Delegate CreateDelegate(Type type, MethodInfo method, object firstArgument, bool throwOnBindFailure)
 		{
-			ExceptionHelper.CheckArgumentNull(method, "method");
-			ExceptionHelper.CheckDelegateType(type, "type");
+			CommonExceptions.CheckArgumentNull(method, "method");
+			CommonExceptions.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			ParameterInfo[] invokeParams = invoke.GetParameters();
 			ParameterInfo[] methodParams = method.GetParameters();
@@ -375,7 +375,7 @@ namespace Cyjb
 			Delegate dlg = CreateDelegateWithArgument(type, firstArgument, invoke, invokeParams, method, methodParams);
 			if (dlg == null && throwOnBindFailure)
 			{
-				throw ExceptionHelper.BindTargetMethod("method");
+				throw CommonExceptions.BindTargetMethod("method");
 			}
 			return dlg;
 		}
@@ -628,8 +628,8 @@ namespace Cyjb
 		/// <paramref name="ctor"/>。</exception>
 		public static Delegate CreateDelegate(Type type, ConstructorInfo ctor, bool throwOnBindFailure)
 		{
-			ExceptionHelper.CheckArgumentNull(ctor, "ctor");
-			ExceptionHelper.CheckDelegateType(type, "type");
+			CommonExceptions.CheckArgumentNull(ctor, "ctor");
+			CommonExceptions.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			ParameterInfo[] invokeParams = invoke.GetParameters();
 			ParameterInfo[] methodParams = ctor.GetParameters();
@@ -652,7 +652,7 @@ namespace Cyjb
 			}
 			if (throwOnBindFailure)
 			{
-				throw ExceptionHelper.BindTargetMethod("ctor");
+				throw CommonExceptions.BindTargetMethod("ctor");
 			}
 			return null;
 		}
@@ -668,7 +668,7 @@ namespace Cyjb
 		/// <paramref name="ctor"/>。</exception>
 		public static InstanceCreator CreateDelegate(this ConstructorInfo ctor)
 		{
-			ExceptionHelper.CheckArgumentNull(ctor, "ctor");
+			CommonExceptions.CheckArgumentNull(ctor, "ctor");
 			// 构造函数的参数。
 			ParameterExpression parametersParam = Expression.Parameter(typeof(object[]));
 			// 构造参数列表。
@@ -788,8 +788,8 @@ namespace Cyjb
 		/// <paramref name="property"/>。</exception>
 		public static Delegate CreateDelegate(Type type, PropertyInfo property, bool throwOnBindFailure)
 		{
-			ExceptionHelper.CheckArgumentNull(property, "property");
-			ExceptionHelper.CheckDelegateType(type, "type");
+			CommonExceptions.CheckArgumentNull(property, "property");
+			CommonExceptions.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			// 判断是获取属性还是设置属性。
 			MethodInfo method = null;
@@ -798,7 +798,7 @@ namespace Cyjb
 				method = property.GetSetMethod(true);
 				if (method == null && throwOnBindFailure)
 				{
-					throw ExceptionHelper.BindTargetPropertyNoSet("property");
+					throw CommonExceptions.BindTargetPropertyNoSet("property");
 				}
 			}
 			else
@@ -806,7 +806,7 @@ namespace Cyjb
 				method = property.GetGetMethod(true);
 				if (method == null && throwOnBindFailure)
 				{
-					throw ExceptionHelper.BindTargetPropertyNoGet("property");
+					throw CommonExceptions.BindTargetPropertyNoGet("property");
 				}
 			}
 			Delegate dlg = null;
@@ -817,7 +817,7 @@ namespace Cyjb
 			}
 			if (dlg == null && throwOnBindFailure)
 			{
-				throw ExceptionHelper.BindTargetProperty("property");
+				throw CommonExceptions.BindTargetProperty("property");
 			}
 			return dlg;
 		}
@@ -928,8 +928,8 @@ namespace Cyjb
 		public static Delegate CreateDelegate(Type type, PropertyInfo property, object firstArgument,
 			bool throwOnBindFailure)
 		{
-			ExceptionHelper.CheckArgumentNull(property, "property");
-			ExceptionHelper.CheckDelegateType(type, "type");
+			CommonExceptions.CheckArgumentNull(property, "property");
+			CommonExceptions.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			// 判断是获取属性还是设置属性。
 			MethodInfo method = null;
@@ -938,7 +938,7 @@ namespace Cyjb
 				method = property.GetSetMethod(true);
 				if (method == null && throwOnBindFailure)
 				{
-					throw ExceptionHelper.BindTargetPropertyNoSet("property");
+					throw CommonExceptions.BindTargetPropertyNoSet("property");
 				}
 			}
 			else
@@ -946,7 +946,7 @@ namespace Cyjb
 				method = property.GetGetMethod(true);
 				if (method == null && throwOnBindFailure)
 				{
-					throw ExceptionHelper.BindTargetPropertyNoGet("property");
+					throw CommonExceptions.BindTargetPropertyNoGet("property");
 				}
 			}
 			Delegate dlg = null;
@@ -958,7 +958,7 @@ namespace Cyjb
 			}
 			if (dlg == null && throwOnBindFailure)
 			{
-				throw ExceptionHelper.BindTargetProperty("property");
+				throw CommonExceptions.BindTargetProperty("property");
 			}
 			return dlg;
 		}
@@ -1059,13 +1059,13 @@ namespace Cyjb
 		/// <paramref name="field"/>。</exception>
 		public static Delegate CreateDelegate(Type type, FieldInfo field, bool throwOnBindFailure)
 		{
-			ExceptionHelper.CheckArgumentNull(field, "field");
-			ExceptionHelper.CheckDelegateType(type, "type");
+			CommonExceptions.CheckArgumentNull(field, "field");
+			CommonExceptions.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			Delegate dlg = CreateOpenDelegate(type, field, invoke, invoke.GetParameters());
 			if (dlg == null && throwOnBindFailure)
 			{
-				throw ExceptionHelper.BindTargetField("field");
+				throw CommonExceptions.BindTargetField("field");
 			}
 			return dlg;
 		}
@@ -1227,8 +1227,8 @@ namespace Cyjb
 		/// <paramref name="field"/>。</exception>
 		public static Delegate CreateDelegate(Type type, FieldInfo field, object firstArgument, bool throwOnBindFailure)
 		{
-			ExceptionHelper.CheckArgumentNull(field, "field");
-			ExceptionHelper.CheckDelegateType(type, "type");
+			CommonExceptions.CheckArgumentNull(field, "field");
+			CommonExceptions.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			ParameterInfo[] invokeParams = invoke.GetParameters();
 			// 尝试创建开放的字段委托。
@@ -1259,7 +1259,7 @@ namespace Cyjb
 			}
 			if (dlg == null && throwOnBindFailure)
 			{
-				throw ExceptionHelper.BindTargetField("field");
+				throw CommonExceptions.BindTargetField("field");
 			}
 			return dlg;
 		}
@@ -1629,8 +1629,8 @@ namespace Cyjb
 		public static Delegate CreateDelegate(Type type, Type target, string memberName, BindingFlags bindingAttr,
 			bool throwOnBindFailure)
 		{
-			ExceptionHelper.CheckArgumentNull(memberName, "memberName");
-			ExceptionHelper.CheckDelegateType(type, "type");
+			CommonExceptions.CheckArgumentNull(memberName, "memberName");
+			CommonExceptions.CheckDelegateType(type, "type");
 			CheckTargetType(target, "target");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			ParameterInfo[] paramInfos = invoke.GetParameters();
@@ -1728,7 +1728,7 @@ namespace Cyjb
 			}
 			if (throwOnBindFailure)
 			{
-				throw ExceptionHelper.BindTargetMethod("memberName");
+				throw CommonExceptions.BindTargetMethod("memberName");
 			}
 			return null;
 		}
@@ -2130,8 +2130,8 @@ namespace Cyjb
 		public static Delegate CreateDelegate(Type type, Type target, string memberName, object firstArgument,
 			BindingFlags bindingAttr, bool throwOnBindFailure)
 		{
-			ExceptionHelper.CheckArgumentNull(memberName, "memberName");
-			ExceptionHelper.CheckDelegateType(type, "type");
+			CommonExceptions.CheckArgumentNull(memberName, "memberName");
+			CommonExceptions.CheckDelegateType(type, "type");
 			CheckTargetType(target, "target");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			ParameterInfo[] paramInfos = invoke.GetParameters();
@@ -2202,7 +2202,7 @@ namespace Cyjb
 			}
 			if (throwOnBindFailure)
 			{
-				throw ExceptionHelper.BindTargetMethod("memberName");
+				throw CommonExceptions.BindTargetMethod("memberName");
 			}
 			return null;
 		}
@@ -2235,7 +2235,7 @@ namespace Cyjb
 		public static TDelegate CreateDelegate<TDelegate>(object target, string memberName)
 			where TDelegate : class
 		{
-			ExceptionHelper.CheckArgumentNull(target, "target");
+			CommonExceptions.CheckArgumentNull(target, "target");
 			return CreateDelegate(typeof(TDelegate), target.GetType(), memberName, target,
 				BinderDefault, true) as TDelegate;
 		}
@@ -2265,7 +2265,7 @@ namespace Cyjb
 		public static TDelegate CreateDelegate<TDelegate>(object target, string memberName, BindingFlags bindingAttr)
 			where TDelegate : class
 		{
-			ExceptionHelper.CheckArgumentNull(target, "target");
+			CommonExceptions.CheckArgumentNull(target, "target");
 			return CreateDelegate(typeof(TDelegate), target.GetType(), memberName, target,
 				bindingAttr, true) as TDelegate;
 		}
@@ -2299,7 +2299,7 @@ namespace Cyjb
 			BindingFlags bindingAttr, bool throwOnBindFailure)
 			where TDelegate : class
 		{
-			ExceptionHelper.CheckArgumentNull(target, "target");
+			CommonExceptions.CheckArgumentNull(target, "target");
 			return CreateDelegate(typeof(TDelegate), target.GetType(), memberName, target,
 				bindingAttr, throwOnBindFailure) as TDelegate;
 		}
@@ -2327,7 +2327,7 @@ namespace Cyjb
 		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
 		public static Delegate CreateDelegate(Type type, object target, string memberName)
 		{
-			ExceptionHelper.CheckArgumentNull(target, "target");
+			CommonExceptions.CheckArgumentNull(target, "target");
 			return CreateDelegate(type, target.GetType(), memberName, target, BinderDefault, true);
 		}
 		/// <summary>
@@ -2356,7 +2356,7 @@ namespace Cyjb
 		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
 		public static Delegate CreateDelegate(Type type, object target, string memberName, BindingFlags bindingAttr)
 		{
-			ExceptionHelper.CheckArgumentNull(target, "target");
+			CommonExceptions.CheckArgumentNull(target, "target");
 			return CreateDelegate(type, target.GetType(), memberName, target, bindingAttr, true);
 		}
 		/// <summary>
@@ -2389,7 +2389,7 @@ namespace Cyjb
 		public static Delegate CreateDelegate(Type type, object target, string memberName,
 			BindingFlags bindingAttr, bool throwOnBindFailure)
 		{
-			ExceptionHelper.CheckArgumentNull(target, "target");
+			CommonExceptions.CheckArgumentNull(target, "target");
 			return CreateDelegate(type, target.GetType(), memberName, target, bindingAttr, throwOnBindFailure);
 		}
 
@@ -2434,8 +2434,8 @@ namespace Cyjb
 		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
 		public static Delegate Wrap(Type type, Delegate dlg)
 		{
-			ExceptionHelper.CheckArgumentNull(dlg, "dlg");
-			ExceptionHelper.CheckDelegateType(type, "type");
+			CommonExceptions.CheckArgumentNull(dlg, "dlg");
+			CommonExceptions.CheckDelegateType(type, "type");
 			ParameterInfo[] paramInfos = dlg.GetType().GetMethod("Invoke").GetParameters();
 			MethodInfo targetInvoke = type.GetMethod("Invoke");
 			ParameterInfo[] targetParamInfos = targetInvoke.GetParameters();
@@ -2470,10 +2470,10 @@ namespace Cyjb
 		/// <param name="paramName">参数的名称。</param>
 		private static void CheckTargetType(Type target, string paramName)
 		{
-			ExceptionHelper.CheckArgumentNull(target, paramName);
+			CommonExceptions.CheckArgumentNull(target, paramName);
 			if (target.IsGenericType && target.ContainsGenericParameters)
 			{
-				throw ExceptionHelper.UnboundGenParam(paramName);
+				throw CommonExceptions.UnboundGenParam(paramName);
 			}
 		}
 

@@ -111,7 +111,7 @@ namespace Cyjb.Configurations
 			{
 				if (!(value is TElement))
 				{
-					throw ExceptionHelper.ArgumentWrongType("value", value, typeof(TElement));
+					throw CommonExceptions.ArgumentWrongType("value", value, typeof(TElement));
 				}
 				Contract.EndContractBlock();
 				// 先添加后删除，如果添加失败，不会导致配置元素被删除。
@@ -130,7 +130,7 @@ namespace Cyjb.Configurations
 			TElement item = value as TElement;
 			if (item == null)
 			{
-				throw ExceptionHelper.ArgumentWrongType("value", value, typeof(TElement));
+				throw CommonExceptions.ArgumentWrongType("value", value, typeof(TElement));
 			}
 			this.BaseAdd(idx, item);
 			return idx;
@@ -179,7 +179,7 @@ namespace Cyjb.Configurations
 		{
 			if (!(value is TElement))
 			{
-				throw ExceptionHelper.ArgumentWrongType("value", value, typeof(TElement));
+				throw CommonExceptions.ArgumentWrongType("value", value, typeof(TElement));
 			}
 			Contract.EndContractBlock();
 			this.BaseAdd(index, (TElement)value);

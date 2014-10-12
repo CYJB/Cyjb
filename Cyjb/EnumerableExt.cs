@@ -5,7 +5,7 @@ using System.Linq;
 namespace Cyjb
 {
 	/// <summary>
-	/// 提供对 <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> 
+	/// 提供对 <see cref="System.Collections.Generic.IEnumerable{T}"/> 
 	/// 接口的扩展方法。
 	/// </summary>
 	public static class EnumerableExt
@@ -15,10 +15,10 @@ namespace Cyjb
 		/// </summary>
 		/// <typeparam name="TSource"><paramref name="source"/> 中的元素的类型。</typeparam>
 		/// <param name="source">包含要应用操作的元素的 
-		/// <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/>。
+		/// <see cref="System.Collections.Generic.IEnumerable{T}"/>。
 		/// </param>
 		/// <param name="action">用于对每个元素执行的操作的函数。</param>
-		/// <returns>类型为 <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> 
+		/// <returns>类型为 <see cref="System.Collections.Generic.IEnumerable{T}"/> 
 		/// 的输入序列。</returns>
 		/// <overloads>
 		/// <summary>
@@ -28,8 +28,8 @@ namespace Cyjb
 		public static IEnumerable<TSource> Each<TSource>(
 			this IEnumerable<TSource> source, Action<TSource> action)
 		{
-			ExceptionHelper.CheckArgumentNull(source, "source");
-			ExceptionHelper.CheckArgumentNull(action, "action");
+			CommonExceptions.CheckArgumentNull(source, "source");
+			CommonExceptions.CheckArgumentNull(action, "action");
 			foreach (TSource obj in source)
 			{
 				action(obj);
@@ -42,17 +42,17 @@ namespace Cyjb
 		/// <typeparam name="TSource"><paramref name="source"/> 中的元素的类型。
 		/// </typeparam>
 		/// <param name="source">包含要应用操作的元素的 
-		/// <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/>。
+		/// <see cref="System.Collections.Generic.IEnumerable{T}"/>。
 		/// </param>
 		/// <param name="func">用于对每个元素执行的操作的函数，返回 <c>true</c>
 		/// 则继续执行操作，返回 <c>false</c> 则停止操作。</param>
-		/// <returns>类型为 <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> 
+		/// <returns>类型为 <see cref="System.Collections.Generic.IEnumerable{T}"/> 
 		/// 的输入序列。</returns>
 		public static IEnumerable<TSource> Each<TSource>(
 			this IEnumerable<TSource> source, Func<TSource, bool> func)
 		{
-			ExceptionHelper.CheckArgumentNull(source, "source");
-			ExceptionHelper.CheckArgumentNull(func, "func");
+			CommonExceptions.CheckArgumentNull(source, "source");
+			CommonExceptions.CheckArgumentNull(func, "func");
 			foreach (TSource obj in source)
 			{
 				if (!func(obj))
@@ -72,7 +72,7 @@ namespace Cyjb
 		public static IEnumerable<TSource> RandomOrder<TSource>(
 			this IEnumerable<TSource> source)
 		{
-			ExceptionHelper.CheckArgumentNull(source, "source");
+			CommonExceptions.CheckArgumentNull(source, "source");
 			return source.ToArray().Random();
 		}
 		/// <summary>
@@ -94,19 +94,19 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 通过使用指定的 
-		/// <see cref="System.Collections.Generic.IEqualityComparer&lt;T&gt;"/> 
+		/// <see cref="System.Collections.Generic.IEqualityComparer{T}"/> 
 		/// 对值进行比较返回序列中的重复元素。
 		/// </summary>
 		/// <typeparam name="TSource"><paramref name="source"/> 中的元素的类型。
 		/// </typeparam>
 		/// <param name="source">要从中得到重复元素的序列。</param>
 		/// <param name="comparer">用于比较值的 
-		/// <see cref="System.Collections.Generic.IEqualityComparer&lt;T&gt;"/>。</param>
+		/// <see cref="System.Collections.Generic.IEqualityComparer{T}"/>。</param>
 		/// <returns>一个序列，包含源序列中的重复元素。</returns>
 		public static IEnumerable<TSource> Iterative<TSource>(
 			this IEnumerable<TSource> source, IEqualityComparer<TSource> comparer)
 		{
-			ExceptionHelper.CheckArgumentNull(source, "source");
+			CommonExceptions.CheckArgumentNull(source, "source");
 			Dictionary<TSource, bool> dict = new Dictionary<TSource, bool>(comparer);
 			foreach (TSource item in source)
 			{
@@ -130,7 +130,7 @@ namespace Cyjb
 		/// </summary>
 		/// <typeparam name="TSource"><paramref name="source"/> 中的元素的类型。</typeparam>
 		/// <param name="source">要从中返回元素索引的 
-		/// <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/>。</param>
+		/// <see cref="System.Collections.Generic.IEnumerable{T}"/>。</param>
 		/// <param name="predicate">用于测试每个元素是否满足条件的函数。</param>
 		/// <returns>序列中通过指定谓词函数中的测试的第一个元素的索引。
 		/// 如果没有这样的元素，则返回 <c>-1</c>。</returns>
@@ -139,8 +139,8 @@ namespace Cyjb
 		public static int FirstIndex<TSource>(this IEnumerable<TSource> source,
 			Func<TSource, bool> predicate)
 		{
-			ExceptionHelper.CheckArgumentNull(source, "source");
-			ExceptionHelper.CheckArgumentNull(predicate, "predicate");
+			CommonExceptions.CheckArgumentNull(source, "source");
+			CommonExceptions.CheckArgumentNull(predicate, "predicate");
 			int idx = 0;
 			foreach (TSource item in source)
 			{
@@ -157,7 +157,7 @@ namespace Cyjb
 		/// </summary>
 		/// <typeparam name="TSource"><paramref name="source"/> 中的元素的类型。</typeparam>
 		/// <param name="source">要从中返回元素索引的 
-		/// <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/>。</param>
+		/// <see cref="System.Collections.Generic.IEnumerable{T}"/>。</param>
 		/// <param name="predicate">用于测试每个元素是否满足条件的函数。</param>
 		/// <returns>序列中通过指定谓词函数中的测试的最后一个元素的索引。
 		/// 如果没有这样的元素，则返回 <c>-1</c>。</returns>
@@ -166,8 +166,8 @@ namespace Cyjb
 		public static int LastIndex<TSource>(this IEnumerable<TSource> source,
 			Func<TSource, bool> predicate)
 		{
-			ExceptionHelper.CheckArgumentNull(source, "source");
-			ExceptionHelper.CheckArgumentNull(predicate, "predicate");
+			CommonExceptions.CheckArgumentNull(source, "source");
+			CommonExceptions.CheckArgumentNull(predicate, "predicate");
 			int lastIdx = -1;
 			int idx = 0;
 			foreach (TSource item in source)

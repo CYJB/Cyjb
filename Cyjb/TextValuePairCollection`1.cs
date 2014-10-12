@@ -13,7 +13,7 @@ namespace Cyjb
 		BindingList<TextValuePair<TValue>>
 	{
 		/// <summary>
-		/// 初始化 <see cref="TextValuePairCollection&lt;TValue&gt;"/> 类的新实例。
+		/// 初始化 <see cref="TextValuePairCollection{TValue}"/> 类的新实例。
 		/// </summary>
 		public TextValuePairCollection() { }
 		/// <summary>

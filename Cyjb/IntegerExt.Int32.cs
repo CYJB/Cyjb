@@ -39,7 +39,7 @@ namespace Cyjb
 		/// </overloads>
 		public static void Times(this int source, Action action)
 		{
-			ExceptionHelper.CheckArgumentNull(action, "action");
+			CommonExceptions.CheckArgumentNull(action, "action");
 			for (int i = 0; i < source; i++)
 			{
 				action();
@@ -52,7 +52,7 @@ namespace Cyjb
 		/// <param name="action">要执行的操作，参数为已执行的次数。</param>
 		public static void Times(this int source, Action<int> action)
 		{
-			ExceptionHelper.CheckArgumentNull(action, "action");
+			CommonExceptions.CheckArgumentNull(action, "action");
 			for (int i = 0; i < source; i++)
 			{
 				action(i);
@@ -81,7 +81,7 @@ namespace Cyjb
 		/// <returns>将指定函数的返回值重复多次的序列。</returns>
 		public static IEnumerable<T> Times<T>(this int source, Func<T> value)
 		{
-			ExceptionHelper.CheckArgumentNull(value, "value");
+			CommonExceptions.CheckArgumentNull(value, "value");
 			for (int i = 0; i < source; i++)
 			{
 				yield return value();
@@ -96,7 +96,7 @@ namespace Cyjb
 		/// <returns>将指定函数的返回值重复多次的序列。</returns>
 		public static IEnumerable<T> Times<T>(this int source, Func<int, T> value)
 		{
-			ExceptionHelper.CheckArgumentNull(value, "value");
+			CommonExceptions.CheckArgumentNull(value, "value");
 			for (int i = 0; i < source; i++)
 			{
 				yield return value(i);
@@ -145,7 +145,7 @@ namespace Cyjb
 		/// <param name="action">要执行的操作，参数为当前的值。</param>
 		public static void To(this int source, int destination, Action<int> action)
 		{
-			ExceptionHelper.CheckArgumentNull(action, "action");
+			CommonExceptions.CheckArgumentNull(action, "action");
 			if (source < destination)
 			{
 				while (source <= destination)

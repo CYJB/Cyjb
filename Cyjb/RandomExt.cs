@@ -133,7 +133,7 @@ namespace Cyjb
 		{
 			if (minValue > maxValue)
 			{
-				throw ExceptionHelper.ArgumentMinMaxValue("minValue", "maxValue");
+				throw CommonExceptions.ArgumentMinMaxValue("minValue", "maxValue");
 			}
 			return (byte)random.Next(minValue, maxValue);
 		}
@@ -240,7 +240,7 @@ namespace Cyjb
 		{
 			if (minValue > maxValue)
 			{
-				throw ExceptionHelper.ArgumentMinMaxValue("minValue", "maxValue");
+				throw CommonExceptions.ArgumentMinMaxValue("minValue", "maxValue");
 			}
 			return (ushort)random.Next(minValue, maxValue);
 		}
@@ -347,7 +347,7 @@ namespace Cyjb
 		{
 			if (minValue > maxValue)
 			{
-				throw ExceptionHelper.ArgumentMinMaxValue("minValue", "maxValue");
+				throw CommonExceptions.ArgumentMinMaxValue("minValue", "maxValue");
 			}
 			return minValue + NextUInt32(maxValue - minValue);
 		}
@@ -390,7 +390,7 @@ namespace Cyjb
 		{
 			if (maxValue < 0)
 			{
-				throw ExceptionHelper.ArgumentMustBePositive("maxValue");
+				throw CommonExceptions.ArgumentMustBePositive("maxValue", maxValue);
 			}
 			return (long)(random.NextDouble() * maxValue);
 		}

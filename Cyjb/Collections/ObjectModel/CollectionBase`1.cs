@@ -159,9 +159,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (this.syncRoot == null)
 				{
-					ICollection collection = this.items as ICollection;
-					object syncObj = collection == null ? new object() : collection.SyncRoot;
-					Interlocked.CompareExchange(ref this.syncRoot, syncObj, null);
+					CollectionHelper.CreateSyncRoot(this.items, ref this.syncRoot);
 				}
 				return this.syncRoot;
 			}

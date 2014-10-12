@@ -74,7 +74,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		bool ISet<T>.Add(T item)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 		/// <summary>
 		/// 从当前集合内移除指定集合中的所有元素。
@@ -84,7 +84,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void ISet<T>.ExceptWith(IEnumerable<T> other)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 		/// <summary>
 		/// 修改当前集合，使该集合仅包含指定集合中也存在的元素。
@@ -94,7 +94,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void ISet<T>.IntersectWith(IEnumerable<T> other)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 		/// <summary>
 		/// 确定当前集合是否为指定集合的真子集合。
@@ -109,7 +109,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			return this.items.IsProperSubsetOf(other);
@@ -127,7 +127,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			return this.items.IsProperSubsetOf(other);
@@ -145,7 +145,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			return this.items.IsSubsetOf(other);
@@ -163,7 +163,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			return this.items.IsSupersetOf(other);
@@ -181,7 +181,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			return this.items.Overlaps(other);
@@ -199,7 +199,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			return this.items.SetEquals(other);
@@ -212,7 +212,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void ISet<T>.SymmetricExceptWith(IEnumerable<T> other)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 		/// <summary>
 		/// 修改当前集合，使该集合包含当前集合和指定集合中同时存在的所有元素。
@@ -222,7 +222,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void ISet<T>.UnionWith(IEnumerable<T> other)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 
 		#endregion
@@ -254,7 +254,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void ICollection<T>.Add(T item)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 		/// <summary>
 		/// 从 <see cref="ReadOnlySet{T}"/> 中移除所有元素。
@@ -263,7 +263,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void ICollection<T>.Clear()
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 		/// <summary>
 		/// 确定 <see cref="ReadOnlySet{T}"/> 是否包含特定值。
@@ -308,7 +308,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		bool ICollection<T>.Remove(T item)
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 
 		#endregion // ICollection<T> 成员
@@ -336,9 +336,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (this.syncRoot == null)
 				{
-					ICollection collection = this.items as ICollection;
-					object syncObj = collection == null ? new object() : collection.SyncRoot;
-					Interlocked.CompareExchange(ref this.syncRoot, syncObj, null);
+					CollectionHelper.CreateSyncRoot(this.items, ref this.syncRoot);
 				}
 				return this.syncRoot;
 			}
@@ -444,7 +442,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (other == null)
 				{
-					throw ExceptionHelper.ArgumentNull("other");
+					throw CommonExceptions.ArgumentNull("other");
 				}
 				Contract.EndContractBlock();
 				return other.Any();
@@ -462,7 +460,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (other == null)
 				{
-					throw ExceptionHelper.ArgumentNull("other");
+					throw CommonExceptions.ArgumentNull("other");
 				}
 				Contract.EndContractBlock();
 				return false;
@@ -480,7 +478,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (other == null)
 				{
-					throw ExceptionHelper.ArgumentNull("other");
+					throw CommonExceptions.ArgumentNull("other");
 				}
 				Contract.EndContractBlock();
 				return true;
@@ -498,7 +496,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (other == null)
 				{
-					throw ExceptionHelper.ArgumentNull("other");
+					throw CommonExceptions.ArgumentNull("other");
 				}
 				Contract.EndContractBlock();
 				return !other.Any();
@@ -516,7 +514,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (other == null)
 				{
-					throw ExceptionHelper.ArgumentNull("other");
+					throw CommonExceptions.ArgumentNull("other");
 				}
 				Contract.EndContractBlock();
 				return false;
@@ -534,7 +532,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (other == null)
 				{
-					throw ExceptionHelper.ArgumentNull("other");
+					throw CommonExceptions.ArgumentNull("other");
 				}
 				Contract.EndContractBlock();
 				return !other.Any();

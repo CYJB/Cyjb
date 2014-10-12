@@ -45,7 +45,7 @@ namespace Cyjb
 		{
 			if (epsilon <= 0)
 			{
-				throw ExceptionHelper.ArgumentMustBePositive("epsilon");
+				throw CommonExceptions.ArgumentMustBePositive("epsilon", epsilon);
 			}
 			this.epsilon = epsilon;
 		}

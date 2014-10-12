@@ -80,7 +80,7 @@ namespace Cyjb.Collections
 		{
 			if (obj == null)
 			{
-				throw ExceptionHelper.ArgumentNull("obj");
+				throw CommonExceptions.ArgumentNull("obj");
 			}
 			Contract.EndContractBlock();
 			// 使用与位置无关的弱哈希。

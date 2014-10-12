@@ -307,7 +307,7 @@ namespace Cyjb
 		{
 			if (length < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length");
+				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
 			if (length == 0 || string.IsNullOrEmpty(str))
 			{
@@ -333,7 +333,7 @@ namespace Cyjb
 		{
 			if (length < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length");
+				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
 			if (length == 0 || string.IsNullOrEmpty(str))
 			{
@@ -361,7 +361,7 @@ namespace Cyjb
 		/// <seealso cref="System.String.Substring(int)"/>
 		public static string SubstringEx(this string str, int startIndex)
 		{
-			ExceptionHelper.CheckArgumentNull(str, "str");
+			CommonExceptions.CheckArgumentNull(str, "str");
 			if (startIndex < 0)
 			{
 				startIndex += str.Length;
@@ -395,7 +395,7 @@ namespace Cyjb
 		/// </overloads>
 		public static string SubstringEx(this string str, int startIndex, int length)
 		{
-			ExceptionHelper.CheckArgumentNull(str, "str");
+			CommonExceptions.CheckArgumentNull(str, "str");
 			if (startIndex < 0)
 			{
 				startIndex += str.Length;
@@ -417,7 +417,7 @@ namespace Cyjb
 		/// <paramref name="startIndex"/> 指示的位置不在此实例中。</exception>
 		public static string Slice(this string str, int startIndex)
 		{
-			ExceptionHelper.CheckArgumentNull(str, "str");
+			CommonExceptions.CheckArgumentNull(str, "str");
 			if (startIndex < 0)
 			{
 				startIndex += str.Length;
@@ -451,7 +451,7 @@ namespace Cyjb
 		/// </overloads>
 		public static string Slice(this string str, int startIndex, int endIndex)
 		{
-			ExceptionHelper.CheckArgumentNull(str, "str");
+			CommonExceptions.CheckArgumentNull(str, "str");
 			if (startIndex < 0)
 			{
 				startIndex += str.Length;
@@ -487,7 +487,7 @@ namespace Cyjb
 			char[] strArr = new char[len];
 			while (end >= 0)
 			{
-				switch (char.GetUnicodeCategory(str[i]))
+				switch (CharUnicodeInfo.GetUnicodeCategory(str[i]))
 				{
 					case UnicodeCategory.Surrogate:
 					case UnicodeCategory.NonSpacingMark:
@@ -517,6 +517,9 @@ namespace Cyjb
 		EndReverse:
 			return new string(strArr);
 		}
+
+		#region 合并
+
 		/// <summary>
 		/// 合并字符串中的空白。
 		/// </summary>
@@ -580,5 +583,33 @@ namespace Cyjb
 			}
 			return builder.ToString();
 		}
+
+		#endregion // 合并
+
+		#region 字符串检查
+
+		/// <summary>
+		/// 判断指定的字符串是否是 <c>null</c> 或者 <see cref="String.Empty"/>。
+		/// </summary>
+		/// <param name="value">要测试的字符串。</param>
+		/// <returns>如果 <paramref name="value"/> 参数是 <c>null</c> 或者 <see cref="String.Empty"/>，
+		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		public static bool IsNullOrEmpty(this string value)
+		{
+			return string.IsNullOrEmpty(value);
+		}
+		/// <summary>
+		/// 判断指定的字符串是否是 <c>null</c>、<see cref="String.Empty"/> 或者仅由空白字符组成。
+		/// </summary>
+		/// <param name="value">要测试的字符串。</param>
+		/// <returns>如果 <paramref name="value"/> 参数是 <c>null</c>、<see cref="String.Empty"/> 
+		/// 或者仅由空白字符组成，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		public static bool IsNullOrWhiteSpace(this string value)
+		{
+			return string.IsNullOrWhiteSpace(value);
+		}
+
+		#endregion // 字符串检查
+
 	}
 }

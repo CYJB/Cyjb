@@ -17,7 +17,7 @@ namespace Cyjb
 	/// <see href="http://www.cnblogs.com/cyjb/archive/p/MethodSwitcher.html">
 	/// 《C# 方法调用的切换器》</see>
 	/// </remarks>
-	/// <seealso cref="MethodSwitcherManual&lt;TDelegate&gt;"/>
+	/// <seealso cref="MethodSwitcherManual{TDelegate}"/>
 	/// <seealso cref="ProcessorAttribute"/>
 	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/MethodSwitcher.html">
 	/// 《C# 方法调用的切换器》</seealso>
@@ -36,7 +36,7 @@ namespace Cyjb
 	///		[Processor]
 	/// 	static void E(object m) { Console.WriteLine("object"); }
 	/// 	static void Main(string[] args) {
-	/// 		Action&lt;object&gt; invoke = MethodSwitcher.GetSwitcher&lt;Action&lt;object&gt;&gt;(typeof(Program), 0);
+	/// 		Action{object} invoke = MethodSwitcher.GetSwitcher{Action{object}}(typeof(Program), 0);
 	/// 		invoke(10);
 	/// 		invoke("10");
 	/// 		invoke(new int[0]);
@@ -97,9 +97,9 @@ namespace Cyjb
 		public static TDelegate GetSwitcher<TDelegate>(Type type, int index, string id)
 			where TDelegate : class
 		{
-			ExceptionHelper.CheckArgumentNull(type, "type");
+			CommonExceptions.CheckArgumentNull(type, "type");
 			Type dlgType = typeof(TDelegate);
-			ExceptionHelper.CheckDelegateType(dlgType, "TDelegate");
+			CommonExceptions.CheckDelegateType(dlgType, "TDelegate");
 			Dictionary<Type, Delegate> methods = GetMethods<TDelegate>(type, id, index, true);
 			MethodInfo invoke = dlgType.GetMethod("Invoke");
 			// 构造委托。
@@ -142,9 +142,9 @@ namespace Cyjb
 		public static TDelegate GetSwitcher<TDelegate>(object target, int index, string id)
 			where TDelegate : class
 		{
-			ExceptionHelper.CheckArgumentNull(target, "target");
+			CommonExceptions.CheckArgumentNull(target, "target");
 			Type dlgType = typeof(TDelegate);
-			ExceptionHelper.CheckDelegateType(dlgType, "TDelegate");
+			CommonExceptions.CheckDelegateType(dlgType, "TDelegate");
 			Dictionary<Type, Delegate> methods = GetMethods<TDelegate>(target.GetType(), id, index, false);
 			MethodInfo invoke = dlgType.GetMethod("Invoke");
 			// 构造委托。
@@ -202,14 +202,14 @@ namespace Cyjb
 				int cnt = list.Count;
 				if (cnt == 0)
 				{
-					throw ExceptionHelper.ProcessorNotFound("type", type, id);
+					throw CommonExceptions.ProcessorNotFound("type", type, id);
 				}
 				bool isStatic = list[0].IsStatic;
 				for (int i = 1; i < cnt; i++)
 				{
 					if (list[i].IsStatic != isStatic)
 					{
-						throw ExceptionHelper.ProcessorMixed("type", type, id);
+						throw CommonExceptions.ProcessorMixed("type", type, id);
 					}
 				}
 				Dictionary<Type, Delegate> dict = new Dictionary<Type, Delegate>();
@@ -224,7 +224,7 @@ namespace Cyjb
 					Delegate dlg = DelegateBuilder.CreateDelegate(newDlgType, list[i], false);
 					if (dlg == null)
 					{
-						throw ExceptionHelper.DelegateCompatible(list[i].ToString(), dlgType);
+						throw CommonExceptions.DelegateCompatible(list[i].ToString(), dlgType);
 					}
 					dict.Add(keyType, dlg);
 				}
@@ -233,7 +233,7 @@ namespace Cyjb
 			}
 			if (data.Item1 != queryStatic)
 			{
-				throw ExceptionHelper.ProcessorMismatch("type", type, id);
+				throw CommonExceptions.ProcessorMismatch("type", type, id);
 			}
 			if (data.Item2 != dlgType)
 			{
@@ -242,13 +242,13 @@ namespace Cyjb
 				ParameterInfo[] dlgParamInfos = dlgType.GetMethod("Invoke").GetParameters();
 				if (paramInfos.Length != dlgParamInfos.Length)
 				{
-					throw ExceptionHelper.DelegateCompatible("TDelegate", dlgType);
+					throw CommonExceptions.DelegateCompatible("TDelegate", dlgType);
 				}
 				for (int i = 0; i < paramInfos.Length; i++)
 				{
 					if (paramInfos[i].ParameterType != dlgParamInfos[i].ParameterType)
 					{
-						throw ExceptionHelper.DelegateCompatible("TDelegate", dlgType);
+						throw CommonExceptions.DelegateCompatible("TDelegate", dlgType);
 					}
 				}
 			}
@@ -283,7 +283,7 @@ namespace Cyjb
 			Delegate dlg = GetMethodUnderlying(dict, type);
 			if (dlg == null)
 			{
-				throw ExceptionHelper.ProcessorNotFound("type", type);
+				throw CommonExceptions.ProcessorNotFound("type", type);
 			}
 			return dlg;
 		}

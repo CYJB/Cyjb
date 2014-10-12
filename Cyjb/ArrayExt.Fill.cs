@@ -28,7 +28,7 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			Contract.Ensures(Contract.Result<Array>() != null);
 			return FillInternal(array, value, 0, array.Length);
@@ -47,11 +47,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (startIndex < 0 || startIndex >= array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			Contract.Ensures(Contract.Result<Array>() != null);
 			return FillInternal(array, value, startIndex, array.Length - startIndex);
@@ -73,15 +73,15 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (startIndex < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			if (length < 0 || startIndex + length > array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length");
+				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
 			Contract.Ensures(Contract.Result<Array>() != null);
 			return FillInternal(array, value, startIndex, array.Length - startIndex);
@@ -117,11 +117,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			Contract.Ensures(Contract.Result<Array>() != null);
 			return FillInternal(array, value, 0, array.Length);
@@ -141,15 +141,15 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			if (startIndex < 0 || startIndex >= array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			Contract.Ensures(Contract.Result<Array>() != null);
 			return FillInternal(array, value, startIndex, array.Length - startIndex);
@@ -172,19 +172,19 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			if (startIndex < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			if (length < 0 || startIndex + length > array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length");
+				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
 			Contract.Ensures(Contract.Result<Array>() != null);
 			return FillInternal(array, value, startIndex, length);
@@ -222,11 +222,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			Contract.Ensures(Contract.Result<Array>() != null);
 			return FillInternal(array, value, 0, array.Length);
@@ -246,15 +246,15 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			if (startIndex < 0 || startIndex >= array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			Contract.Ensures(Contract.Result<Array>() != null);
 			return FillInternal(array, value, startIndex, array.Length - startIndex);
@@ -277,19 +277,19 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			if (startIndex < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			if (length < 0 || startIndex + length > array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length");
+				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
 			Contract.Ensures(Contract.Result<Array>() != null);
 			return FillInternal(array, value, startIndex, length);
@@ -332,7 +332,7 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			return FillInternal(array, value, 0, array.Length);
@@ -352,11 +352,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (startIndex < 0 || startIndex >= array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			return FillInternal(array, value, startIndex, array.Length - startIndex);
@@ -379,15 +379,15 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (startIndex < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			if (length < 0 || startIndex + length > array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length");
+				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			return FillInternal(array, value, startIndex, array.Length - startIndex);
@@ -425,11 +425,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			return FillInternal(array, value, 0, array.Length);
@@ -450,15 +450,15 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			if (startIndex < 0 || startIndex >= array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			return FillInternal(array, value, startIndex, array.Length - startIndex);
@@ -482,19 +482,19 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			if (startIndex < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			if (length < 0 || startIndex + length > array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length");
+				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			return FillInternal(array, value, startIndex, length);
@@ -534,11 +534,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			return FillInternal(array, value, 0, array.Length);
@@ -557,15 +557,15 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			if (startIndex < 0 || startIndex >= array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			return FillInternal(array, value, startIndex, array.Length - startIndex);
@@ -589,19 +589,19 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			if (startIndex < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			if (length < 0 || startIndex + length > array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length");
+				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			return FillInternal(array, value, startIndex, length);
@@ -647,7 +647,7 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			Contract.Ensures(Contract.Result<T[,]>() != null);
 			for (int i = array.GetLength(0) - 1; i >= 0; i--)
@@ -674,11 +674,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			Contract.Ensures(Contract.Result<T[,]>() != null);
 			for (int i = 0; i < array.GetLength(0); i++)
@@ -705,11 +705,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			Contract.Ensures(Contract.Result<T[,]>() != null);
 			for (int i = 0; i < array.GetLength(0); i++)
@@ -738,7 +738,7 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			Contract.Ensures(Contract.Result<T[][]>() != null);
 			for (int i = array.Length - 1; i >= 0; i--)
@@ -763,11 +763,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			Contract.Ensures(Contract.Result<T[][]>() != null);
 			for (int i = 0; i < array.Length; i++)
@@ -792,11 +792,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			Contract.Ensures(Contract.Result<T[][]>() != null);
 			for (int i = 0; i < array.Length; i++)
@@ -827,7 +827,7 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			Contract.Ensures(Contract.Result<T[, ,]>() != null);
 			for (int i = 0; i < array.GetLength(0); i++)
@@ -857,11 +857,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			Contract.Ensures(Contract.Result<T[, ,]>() != null);
 			for (int i = 0; i < array.GetLength(0); i++)
@@ -891,11 +891,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			Contract.Ensures(Contract.Result<T[, ,]>() != null);
 			for (int i = 0; i < array.GetLength(0); i++)
@@ -927,7 +927,7 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			Contract.Ensures(Contract.Result<T[][][]>() != null);
 			for (int i = 0; i < array.Length; i++)
@@ -955,11 +955,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			Contract.Ensures(Contract.Result<T[][][]>() != null);
 			for (int i = 0; i < array.Length; i++)
@@ -987,11 +987,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (value == null)
 			{
-				throw ExceptionHelper.ArgumentNull("value");
+				throw CommonExceptions.ArgumentNull("value");
 			}
 			Contract.Ensures(Contract.Result<T[][][]>() != null);
 			for (int i = 0; i < array.Length; i++)

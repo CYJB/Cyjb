@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Cyjb
 {
@@ -10,6 +11,7 @@ namespace Cyjb
 		/// <summary>
 		/// 说明是否已本地化。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private bool localized;
 		/// <summary>
 		/// 初始化 <see cref="Cyjb.ResDescriptionAttribute"/> 类的新实例。
@@ -31,7 +33,7 @@ namespace Cyjb
 			{
 				if (!localized)
 				{
-					base.DescriptionValue = Resources.GetString(base.DescriptionValue);
+					base.DescriptionValue = Resources.ResourceManager.GetString(base.DescriptionValue, Resources.Culture);
 					localized = true;
 				}
 				return base.DescriptionValue;

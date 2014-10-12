@@ -56,12 +56,12 @@ namespace Cyjb.Utility
 		/// </summary>
 		private IEqualityComparer<TKey> comparer = EqualityComparer<TKey>.Default;
 		/// <summary>
-		/// 使用指定的最大对象数目初始化 <see cref="LruCache&lt;TKey,TValue&gt;"/> 类的新实例。
+		/// 使用指定的最大对象数目初始化 <see cref="LruCache{TKey,TValue}"/> 类的新实例。
 		/// </summary>
 		/// <param name="maxSize">缓存中可以保存的最大对象数目，必须大于等于 2。</param>
 		/// <overloads>
 		/// <summary>
-		/// 初始化 <see cref="LruCache&lt;TKey,TValue&gt;"/> 类的新实例。
+		/// 初始化 <see cref="LruCache{TKey,TValue}"/> 类的新实例。
 		/// </summary>
 		/// </overloads>
 		public LruCache(int maxSize)
@@ -69,7 +69,7 @@ namespace Cyjb.Utility
 		{ }
 		/// <summary>
 		/// 使用指定的最大对象数目和热对象所占的百分比初始化 
-		/// <see cref="LruCache&lt;TKey,TValue&gt;"/> 类的新实例。
+		/// <see cref="LruCache{TKey,TValue}"/> 类的新实例。
 		/// </summary>
 		/// <param name="maxSize">缓存中可以保存的最大对象数目，必须大于等于 2。</param>
 		/// <param name="hotPrecent">热对象所占的百分比，必须保证热对象和冷对象的实际值能够大于等于 1。</param>
@@ -77,13 +77,13 @@ namespace Cyjb.Utility
 		{
 			if (maxSize < 2)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("maxSize");
+				throw CommonExceptions.ArgumentOutOfRange("maxSize", maxSize);
 			}
 			this.maxSize = maxSize;
 			this.hotSize = (int)(maxSize * hotPrecent);
 			if (this.hotSize < 1 || this.maxSize - this.hotSize < 1)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("hotPrecent");
+				throw CommonExceptions.ArgumentOutOfRange("hotPrecent", hotPrecent);
 			}
 		}
 		/// <summary>
@@ -108,7 +108,7 @@ namespace Cyjb.Utility
 		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public void Add(TKey key, TValue value)
 		{
-			ExceptionHelper.CheckArgumentNull(key, "key");
+			CommonExceptions.CheckArgumentNull(key, "key");
 			this.AddInternal(key, new Lazy<TValue>(() => value, false), true);
 		}
 		/// <summary>
@@ -151,7 +151,7 @@ namespace Cyjb.Utility
 		/// </overloads>
 		public TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory)
 		{
-			ExceptionHelper.CheckArgumentNull(valueFactory, "valueFactory");
+			CommonExceptions.CheckArgumentNull(valueFactory, "valueFactory");
 			LruNode<TKey, TValue> node;
 			if (cacheDict.TryGetValue(key, out node))
 			{
@@ -176,7 +176,7 @@ namespace Cyjb.Utility
 		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public TValue GetOrAdd<TArg>(TKey key, TArg arg, Func<TKey, TArg, TValue> valueFactory)
 		{
-			ExceptionHelper.CheckArgumentNull(valueFactory, "valueFactory");
+			CommonExceptions.CheckArgumentNull(valueFactory, "valueFactory");
 			LruNode<TKey, TValue> node;
 			if (cacheDict.TryGetValue(key, out node))
 			{
@@ -204,7 +204,7 @@ namespace Cyjb.Utility
 		public TValue GetOrAdd<TArg0, TArg1>(TKey key, TArg0 arg0, TArg1 arg1,
 			Func<TKey, TArg0, TArg1, TValue> valueFactory)
 		{
-			ExceptionHelper.CheckArgumentNull(valueFactory, "valueFactory");
+			CommonExceptions.CheckArgumentNull(valueFactory, "valueFactory");
 			LruNode<TKey, TValue> node;
 			if (cacheDict.TryGetValue(key, out node))
 			{

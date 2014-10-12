@@ -34,7 +34,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static void Times(this ulong source, Action action)
 		{
-			ExceptionHelper.CheckArgumentNull(action, "action");
+			CommonExceptions.CheckArgumentNull(action, "action");
 			for (ulong i = 0; i < source; i++)
 			{
 				action();
@@ -48,7 +48,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static void Times(this ulong source, Action<ulong> action)
 		{
-			ExceptionHelper.CheckArgumentNull(action, "action");
+			CommonExceptions.CheckArgumentNull(action, "action");
 			for (ulong i = 0; i < source; i++)
 			{
 				action(i);
@@ -79,7 +79,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static IEnumerable<T> Times<T>(this ulong source, Func<T> value)
 		{
-			ExceptionHelper.CheckArgumentNull(value, "value");
+			CommonExceptions.CheckArgumentNull(value, "value");
 			for (ulong i = 0; i < source; i++)
 			{
 				yield return value();
@@ -95,7 +95,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static IEnumerable<T> Times<T>(this uint source, Func<ulong, T> value)
 		{
-			ExceptionHelper.CheckArgumentNull(value, "value");
+			CommonExceptions.CheckArgumentNull(value, "value");
 			for (ulong i = 0; i < source; i++)
 			{
 				yield return value(i);
@@ -143,7 +143,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static void To(this ulong source, ulong destination, Action<ulong> action)
 		{
-			ExceptionHelper.CheckArgumentNull(action, "action");
+			CommonExceptions.CheckArgumentNull(action, "action");
 			if (source < destination)
 			{
 				while (source < destination)

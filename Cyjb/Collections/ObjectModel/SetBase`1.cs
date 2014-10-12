@@ -96,7 +96,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			this.items.ExceptWith(other);
@@ -111,7 +111,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			this.items.IntersectWith(other);
@@ -129,7 +129,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			return this.items.IsProperSubsetOf(other);
@@ -147,7 +147,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			return this.items.IsProperSubsetOf(other);
@@ -165,7 +165,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			return this.items.IsSubsetOf(other);
@@ -183,7 +183,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			return this.items.IsSupersetOf(other);
@@ -201,7 +201,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			return this.items.Overlaps(other);
@@ -219,7 +219,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			return this.items.SetEquals(other);
@@ -234,7 +234,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			this.items.SymmetricExceptWith(other);
@@ -249,7 +249,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			this.items.UnionWith(other);
@@ -360,9 +360,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (this.syncRoot == null)
 				{
-					ICollection collection = this.items as ICollection;
-					object syncObj = collection == null ? new object() : collection.SyncRoot;
-					Interlocked.CompareExchange(ref this.syncRoot, syncObj, null);
+					CollectionHelper.CreateSyncRoot(this.items, ref this.syncRoot);
 				}
 				return this.syncRoot;
 			}

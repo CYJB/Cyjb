@@ -133,7 +133,7 @@ namespace Cyjb.Utility
 				catch (TargetInvocationException) { }
 				catch (SecurityException) { }
 			}
-			return OnCacheResolve<TKey, TValue>(key, ExceptionHelper.InvalidCacheOptions(element));
+			return OnCacheResolve<TKey, TValue>(key, CommonExceptions.InvalidCacheOptions(element));
 		}
 		/// <summary>
 		/// 获取缓冲池的类型。
@@ -158,7 +158,7 @@ namespace Cyjb.Utility
 			Type cacheType = Type.GetType(typeName, false, true);
 			if (cacheType == null)
 			{
-				throw ExceptionHelper.InvalidCacheType(element);
+				throw CommonExceptions.InvalidCacheType(element);
 			}
 			// 构造闭合泛型类型。
 			try
@@ -168,12 +168,12 @@ namespace Cyjb.Utility
 			catch (ArgumentException ex)
 			{
 				// 闭合泛型类型构造失败。
-				throw ExceptionHelper.InvalidCacheType(element, ex);
+				throw CommonExceptions.InvalidCacheType(element, ex);
 			}
-			// 缓冲池类型不是 ICache&lt;TKey, TValue&gt;。
+			// 缓冲池类型不是 ICache{TKey, TValue}。
 			if (!typeof(ICache<TKey, TValue>).IsAssignableFrom(cacheType))
 			{
-				throw ExceptionHelper.InvalidCacheType_ICache(element);
+				throw CommonExceptions.InvalidCacheType_ICache(element);
 			}
 			return cacheType;
 		}

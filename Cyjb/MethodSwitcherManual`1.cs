@@ -11,7 +11,7 @@ namespace Cyjb
 	/// </summary>
 	/// <typeparam name="TDelegate">使用基类调用方法的委托。</typeparam>
 	/// <remarks>与 <see cref="MethodSwitcher"/> 不同，
-	/// <see cref="MethodSwitcherManual&lt;TDelegate&gt;"/> 需要手动添加方法委托。
+	/// <see cref="MethodSwitcherManual{TDelegate}"/> 需要手动添加方法委托。
 	/// 关于方法切换器的更多信息，可以参加我的博文
 	/// <see href="http://www.cnblogs.com/cyjb/archive/p/MethodSwitcher.html">
 	/// 《C# 方法调用的切换器》</see>
@@ -27,9 +27,9 @@ namespace Cyjb
 	/// 	static void D(int[] m) { Console.WriteLine("int[]"); }
 	/// 	static void E(object m) { Console.WriteLine("object"); }
 	/// 	static void Main(string[] args) {
-	/// 		MethodSwitcherManual&lt;Action&lt;object&gt;&gt; switcher = 
-	/// 			new MethodSwitcherManual&lt;Action&lt;object&gt;&gt;(0, (Action&lt;int&gt;)A, 
-	/// 			(Action&lt;string&gt;)B, (Action&lt;Array&gt;)C, (Action&lt;int[]&gt;)D, (Action&lt;object&gt;)E);
+	/// 		MethodSwitcherManual{Action{object}} switcher = 
+	/// 			new MethodSwitcherManual{Action{object}}(0, (Action{int})A, 
+	/// 			(Action{string})B, (Action{Array})C, (Action{int[]})D, (Action{object})E);
 	/// 		switcher.Invoke(10);
 	/// 		switcher.Invoke("10");
 	/// 		switcher.Invoke(new int[0]);
@@ -59,7 +59,7 @@ namespace Cyjb
 		private TDelegate invoke;
 		/// <summary>
 		/// 使用指定的关键参数索引和方法委托列表初始化 
-		/// <see cref="MethodSwitcherManual&lt;TDelegate&gt;"/> 类的新实例。
+		/// <see cref="MethodSwitcherManual{TDelegate}"/> 类的新实例。
 		/// </summary>
 		/// <param name="idx">关键参数的索引。</param>
 		/// <param name="methods">使用不同子类作为参数的方法列表。</param>
@@ -73,14 +73,14 @@ namespace Cyjb
 		/// 中存在不与 <typeparamref name="TDelegate"/> 兼容的方法。</exception>
 		public MethodSwitcherManual(int idx, params Delegate[] methods)
 		{
-			ExceptionHelper.CheckArgumentNull(methods, "methods");
+			CommonExceptions.CheckArgumentNull(methods, "methods");
 			Type dlgType = typeof(TDelegate);
-			ExceptionHelper.CheckDelegateType(dlgType, "TDelegate");
+			CommonExceptions.CheckDelegateType(dlgType, "TDelegate");
 			ParameterInfo[] paramInfos = dlgType.GetMethod("Invoke").GetParameters();
 			int len = paramInfos.Length;
 			if (idx < 0 || idx >= len)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("idx");
+				throw CommonExceptions.ArgumentOutOfRange("idx", idx);
 			}
 			keyIndex = idx;
 			InitMethods(methods);
@@ -105,12 +105,12 @@ namespace Cyjb
 			{
 				if (methods[i] == null)
 				{
-					throw ExceptionHelper.ArgumentNull("methods[" + i + "]");
+					throw CommonExceptions.ArgumentNull("methods[" + i + "]");
 				}
 				TDelegate dlg = methods[i].Wrap<TDelegate>();
 				if (dlg == null)
 				{
-					throw ExceptionHelper.DelegateCompatible("methods[" + i + "]", typeof(TDelegate));
+					throw CommonExceptions.DelegateCompatible("methods[" + i + "]", typeof(TDelegate));
 				}
 				methodDict.Add(methods[i].GetType().GetMethod("Invoke").GetParameters()[keyIndex].ParameterType, dlg);
 			}
@@ -140,7 +140,7 @@ namespace Cyjb
 			TDelegate dlg = GetMethodUnderlying(type);
 			if (dlg == null)
 			{
-				throw ExceptionHelper.ProcessorNotFound("type", type);
+				throw CommonExceptions.ProcessorNotFound("type", type);
 			}
 			return dlg;
 		}

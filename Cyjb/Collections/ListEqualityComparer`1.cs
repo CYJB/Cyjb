@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Threading;
+using Cyjb.Utility;
 
 namespace Cyjb.Collections
 {
@@ -101,11 +102,6 @@ namespace Cyjb.Collections
 			return true;
 		}
 		/// <summary>
-		/// Hash 的魔数。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private const int MagicCode = unchecked((int)0x9E3779B9);
-		/// <summary>
 		/// 返回指定对象的哈希代码。
 		/// </summary>
 		/// <param name="obj">将为其返回哈希代码。</param>
@@ -120,17 +116,10 @@ namespace Cyjb.Collections
 		{
 			if (obj == null)
 			{
-				throw ExceptionHelper.ArgumentNull("obj");
+				throw CommonExceptions.ArgumentNull("obj");
 			}
 			Contract.EndContractBlock();
-			// 算法来自 boost::hash_range。
-			int cnt = obj.Count;
-			int hashCode = cnt;
-			for (int i = 0; i < cnt; i++)
-			{
-				hashCode ^= unchecked(comparer.GetHashCode(obj[i]) + MagicCode + (hashCode << 6) + (hashCode >> 2));
-			}
-			return hashCode;
+			return Hash.Combine(obj.Count, obj);
 		}
 
 		#endregion // EqualityComparer<IList<T>> 成员

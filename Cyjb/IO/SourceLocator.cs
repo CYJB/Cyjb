@@ -1,68 +1,72 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
+using System.Diagnostics.Contracts;
 
 namespace Cyjb.IO
 {
 	/// <summary>
-	/// 提供可以用于在源文件中定位的方法。
+	/// 提供可以用于在要定位的方法。
 	/// 支持 \n（Unix） 和 \r\n（Windows） 作为换行符。
 	/// </summary>
 	/// <remarks>
-	/// <para>对代码定位方法的详细解释，请参见我的 C# 词法分析器系列博文
+	/// 对代码定位方法的详细解释，请参见我的 C# 词法分析器系列博文
 	/// <see href="http://www.cnblogs.com/cyjb/archive/p/LexerInputBuffer.html#SourceLocation">
-	/// 《C# 词法分析器（二）输入缓冲和代码定位》</see>。</para>
-	/// <para>在大量调用 <see cref="Encoding.GetByteCount(char[])"/> 方法（用于判断字符是全角还是半角）的时候，
-	/// 可能会导致多次垃圾回收，影响程序的效率。关于此问题的详细解释，请参见我的博文
-	/// <see href="http://www.cnblogs.com/cyjb/archive/p/GetByteCountMemoryProblem.html">
-	/// 《C# 中容易忽视的 Encoding.GetByteCount 内存问题》</see>。</para></remarks>
-	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/GetByteCountMemoryProblem.html">
-	/// 《C# 中容易忽视的 Encoding.GetByteCount 内存问题》</seealso>
+	/// 《C# 词法分析器（二）输入缓冲和代码定位》</see>。</remarks>
 	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/LexerInputBuffer.html#SourceLocation">
 	/// 《C# 词法分析器（二）输入缓冲和代码定位》</seealso>
-	[DebuggerDisplay("Location")]
+	[DebuggerDisplay("{Position}")]
 	public sealed class SourceLocator
 	{
 		/// <summary>
 		/// 默认的 Tab 长度。
 		/// </summary>
-		public const int DefaultTabSize = 4;
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		internal const int DefaultTabSize = 4;
+		/// <summary>
+		/// 不存在的代理项。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private const char NoSurrogate = '\0';
 		/// <summary>
 		/// Tab 的宽度。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private readonly int tabSize;
+		/// <summary>
+		/// 代理项对的待匹配代理项。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private char surrogate = NoSurrogate;
 		/// <summary>
 		/// 当前字符所在的行。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private int curLine = 1;
+		/// <summary>
+		/// 当前字符所在的列，若为 <c>0</c> 则表示当前位置无效。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private int curCol;
 		/// <summary>
 		/// 下一个字符所在的行。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private int nextLine = 1;
-		/// <summary>
-		/// 当前字符所在的列。
-		/// </summary>
-		private int curCol = 0;
 		/// <summary>
 		/// 下一个字符所在的列。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private int nextCol = 1;
 		/// <summary>
 		/// 当前字符从零开始的索引。
 		/// </summary>
 		private int curIndex = -1;
 		/// <summary>
-		/// 单一的字符数组。
+		/// 被 TAB 字符的字符串宽度列表。
 		/// </summary>
-		private char[] charArr = new char[1];
-		/// <summary>
-		/// 储存特殊位置的列表。
-		/// </summary>
-		private List<int> idxList;
-		/// <summary>
-		/// 计算字节数使用的编码器。
-		/// </summary>
-		private Encoder encoder = Encoding.Default.GetEncoder();
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private readonly List<int> widths = new List<int>();
 		/// <summary>
 		/// 使用默认的 Tab 宽度初始化 <see cref="SourceLocator"/> 类的新实例。
 		/// </summary>
@@ -73,13 +77,22 @@ namespace Cyjb.IO
 		/// </overloads>
 		public SourceLocator() : this(DefaultTabSize) { }
 		/// <summary>
-		/// 使用默认的 Tab 宽度初始化 <see cref="SourceLocator"/> 类的新实例。
+		/// 使用指定的 Tab 宽度初始化 <see cref="SourceLocator"/> 类的新实例。
 		/// </summary>
 		/// <param name="tabSize">Tab 的宽度。</param>
 		public SourceLocator(int tabSize)
 		{
 			this.tabSize = tabSize;
-			Reset();
+		}
+		/// <summary>
+		/// 使用指定的起始位置和 Tab 宽度初始化 <see cref="SourceLocator"/> 类的新实例。
+		/// </summary>
+		/// <param name="initPosition">起始位置。</param>
+		/// <param name="tabSize">Tab 的宽度。</param>
+		public SourceLocator(SourcePosition initPosition, int tabSize)
+		{
+			this.tabSize = tabSize;
+			this.NextPosition = initPosition;
 		}
 		/// <summary>
 		/// 获取 Tab 的宽度。
@@ -93,17 +106,44 @@ namespace Cyjb.IO
 		/// 获取当前读进字符的的位置。
 		/// </summary>
 		/// <value>当前读进字符的位置。</value>
-		public SourceLocation Location
+		public SourcePosition Position
 		{
-			get { return new SourceLocation(curIndex, curLine, curCol); }
+			get
+			{
+				if (curCol == 0)
+				{
+					return SourcePosition.Unknown;
+				}
+				return new SourcePosition(curIndex, curLine, curCol);
+			}
 		}
 		/// <summary>
-		/// 获取下一个字符的位置。
+		/// 获取或设置下一个字符的位置。
 		/// </summary>
 		/// <value>下一个未读进字符的位置。</value>
-		public SourceLocation NextLocation
+		/// <remarks>不会改变 <see cref="Position"/>，因为难以根据 <see cref="NextPosition"/> 确定 
+		/// <see cref="Position"/> 的准确值。</remarks>
+		public SourcePosition NextPosition
 		{
-			get { return new SourceLocation(curIndex + 1, nextLine, nextCol); }
+			get { return new SourcePosition(curIndex + 1, nextLine, nextCol); }
+			set
+			{
+				if (value.IsUnknown)
+				{
+					this.Reset();
+				}
+				else
+				{
+					curIndex = value.Index - 1;
+					if (curIndex == -1)
+					{
+						// curIndex 为 -1，会导致当前位置无效。
+						curCol = 0;
+					}
+					nextLine = value.Line;
+					nextCol = value.Col;
+				}
+			}
 		}
 		/// <summary>
 		/// 重置当前的定位信息。
@@ -116,12 +156,12 @@ namespace Cyjb.IO
 			nextCol = 1;
 		}
 		/// <summary>
-		/// 在源文件中前进一个字符。
+		/// 令位置前进一个字符。
 		/// </summary>
-		/// <param name="ch">源文件中前进的字符。</param>
+		/// <param name="ch">要前进的字符。</param>
 		/// <overloads>
 		/// <summary>
-		/// 在源文件中前进一个或多个字符。
+		/// 令位置前进一个或多个字符。
 		/// </summary>
 		/// </overloads>
 		public void Forward(char ch)
@@ -129,88 +169,92 @@ namespace Cyjb.IO
 			curIndex++;
 			curLine = nextLine;
 			curCol = nextCol;
-			if (ch == '\n')
+			switch (ch)
 			{
-				// 换到新行。
-				nextLine++;
-				nextCol = 1;
-			}
-			else if (ch == '\t')
-			{
-				ForwardTab();
-			}
-			else
-			{
-				charArr[0] = ch;
-				nextCol += encoder.GetByteCount(charArr, 0, 1, false);
+				case '\n':
+					nextLine++;
+					nextCol = 1;
+					break;
+				case '\t':
+					nextCol = ForwardTab(nextCol);
+					break;
+				default:
+					nextCol += GetWidth(ch);
+					break;
 			}
 		}
 		/// <summary>
-		/// 在源文件中前进一个字符数组。
+		/// 令位置前进指定的字符数组。
 		/// </summary>
-		/// <param name="arr">源文件中前进的字符数组。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="arr"/> 为 <c>null</c>。</exception>
-		public void Forward(char[] arr)
+		/// <param name="chars">要前进的字符数组。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="chars"/> 为 <c>null</c>。</exception>
+		public void Forward(char[] chars)
 		{
-			ExceptionHelper.CheckArgumentNull(arr, "arr");
-			if (arr.Length == 1)
+			if (chars == null)
 			{
-				Forward(arr[0]);
+				throw CommonExceptions.ArgumentNull("chars");
 			}
-			else if (arr.Length > 1)
+			Contract.EndContractBlock();
+			if (chars.Length == 1)
 			{
-				ForwardInternal(arr, 0, arr.Length);
+				Forward(chars[0]);
+			}
+			else if (chars.Length > 1)
+			{
+				ForwardInternal(chars, 0, chars.Length);
 			}
 		}
 		/// <summary>
-		/// 在源文件中前进一个字符数组的一部分。
+		/// 令位置前进指定字符数组的一部分。
 		/// </summary>
-		/// <param name="arr">源文件中前进的字符数组。</param>
+		/// <param name="chars">要前进的字符数组。</param>
 		/// <param name="index">要前进的字符的索引。</param>
 		/// <param name="count">要前进的字符的长度。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="arr"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 小于零。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <exception cref="ArgumentNullException"><paramref name="chars"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 或 
 		/// <paramref name="count"/> 小于零。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 和 <paramref name="count"/> 不表示
-		/// <paramref name="arr"/> 中的有效范围。</exception>
-		public void Forward(char[] arr, int index, int count)
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 和 <paramref name="count"/> 
+		/// 不表示 <paramref name="chars"/> 中的有效范围。</exception>
+		public void Forward(char[] chars, int index, int count)
 		{
-			ExceptionHelper.CheckArgumentNull(arr, "arr");
+			if (chars == null)
+			{
+				throw CommonExceptions.ArgumentNull("chars");
+			}
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
+				throw CommonExceptions.ArgumentNegative("index", index);
 			}
 			if (count < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("count");
+				throw CommonExceptions.ArgumentNegative("count", count);
 			}
-			if (index + count > arr.Length)
+			if (index + count > chars.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("count");
+				throw CommonExceptions.ArgumentOutOfRange("count", count);
 			}
+			Contract.EndContractBlock();
 			if (count == 1)
 			{
-				Forward(arr[index]);
+				Forward(chars[index]);
 			}
 			else if (count > 1)
 			{
-				ForwardInternal(arr, index, count);
+				ForwardInternal(chars, index, count);
 			}
 		}
 		/// <summary>
-		/// 在源文件中前进一个字符串。
+		/// 令位置前进指定字符串。
 		/// </summary>
-		/// <param name="str">源文件中前进的字符串。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="str"/> 为 <c>null</c>。</exception>
+		/// <param name="str">要前进的字符串。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="str"/> 为 <c>null</c>。</exception>
 		public void Forward(string str)
 		{
-			ExceptionHelper.CheckArgumentNull(str, "str");
+			if (str == null)
+			{
+				throw CommonExceptions.ArgumentNull("str");
+			}
+			Contract.EndContractBlock();
 			if (str.Length == 1)
 			{
 				Forward(str[0]);
@@ -221,35 +265,35 @@ namespace Cyjb.IO
 			}
 		}
 		/// <summary>
-		/// 在源文件中前进一个字符串的一部分。
+		/// 令位置前进指定字符串的一部分。
 		/// </summary>
-		/// <param name="str">源文件中前进的字符串。</param>
+		/// <param name="str">要前进的字符串。</param>
 		/// <param name="index">要前进的字符的索引。</param>
 		/// <param name="count">要前进的字符的长度。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="str"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 小于零。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <exception cref="ArgumentNullException"><paramref name="str"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 或 
 		/// <paramref name="count"/> 小于零。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 和 <paramref name="count"/> 不表示
-		/// <paramref name="str"/> 中的有效范围。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 和 <paramref name="count"/> 
+		/// 不表示 <paramref name="str"/> 中的有效范围。</exception>
 		public void Forward(string str, int index, int count)
 		{
-			ExceptionHelper.CheckArgumentNull(str, "chars");
+			if (str == null)
+			{
+				throw CommonExceptions.ArgumentNull("str");
+			}
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index");
+				throw CommonExceptions.ArgumentNegative("index", index);
 			}
 			if (count < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("count");
+				throw CommonExceptions.ArgumentNegative("count", count);
 			}
 			if (index + count > str.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("count");
+				throw CommonExceptions.ArgumentOutOfRange("count", count);
 			}
+			Contract.EndContractBlock();
 			if (count == 1)
 			{
 				Forward(str[index]);
@@ -260,149 +304,206 @@ namespace Cyjb.IO
 			}
 		}
 		/// <summary>
-		/// 在源文件中前进一个字符数组的一部分。
+		/// 令位置前进指定字符数组的一部分。
 		/// </summary>
-		/// <param name="chars">源文件中前进的字符数组。</param>
+		/// <param name="chars">要前进的字符数组。</param>
 		/// <param name="idx">要前进的字符的索引。</param>
 		/// <param name="count">要前进的字符的长度，必须大于 <c>1</c>。</param>
 		private void ForwardInternal(char[] chars, int idx, int count)
 		{
-			Debug.Assert(count > 1);
-			if (idxList == null)
+			Contract.Requires(chars != null && chars.Length > 1);
+			Contract.Requires(idx >= 0 && count > 1 && idx + count <= chars.Length);
+			unsafe
 			{
-				idxList = new List<int>();
-			}
-			else
-			{
-				idxList.Clear();
-			}
-			// 余下最后一个字符单独考虑。
-			count--;
-			int end = idx + count;
-			int i = end - 1;
-			for (; i >= idx; i--)
-			{
-				if (chars[i] == '\t')
+				fixed (char* start = &chars[idx])
 				{
-					if (end > i)
-					{
-						idxList.Add(encoder.GetByteCount(chars, i + 1, end - i - 1, false));
-						end = i;
-					}
-					else
-					{
-						idxList.Add(0);
-					}
-				}
-				else if (chars[i] == '\n')
-				{
-					// 统计之前的行数。
-					nextCol = 1;
-					nextLine++;
-					if (end > i)
-					{
-						idxList.Add(encoder.GetByteCount(chars, i + 1, end - i - 1, false));
-						end = i;
-					}
-					for (int j = i - 1; j >= idx; j--)
-					{
-						if (chars[j] == '\n') { nextLine++; }
-					}
-					break;
+					ForwardInternal(start, start + count - 1);
 				}
 			}
-			if (end > i)
-			{
-				idxList.Add(encoder.GetByteCount(chars, i + 1, end - i - 1, false));
-			}
-			// 统计列数。
-			for (int j = idxList.Count - 1; j > 0; j--)
-			{
-				nextCol += idxList[j];
-				ForwardTab();
-			}
-			nextCol += idxList[0];
 			curIndex += count;
-			Forward(chars[idx + count]);
 		}
 		/// <summary>
-		/// 在源文件中前进一个字符串的一部分。
+		/// 令位置前进指定字符串的一部分。
 		/// </summary>
-		/// <param name="str">源文件中前进的字符串。</param>
+		/// <param name="str">要前进的字符串。</param>
 		/// <param name="idx">要前进的字符的索引。</param>
 		/// <param name="count">要前进的字符的长度，必须大于 <c>1</c>。</param>
 		private void ForwardInternal(string str, int idx, int count)
 		{
-			Debug.Assert(count > 1);
-			if (idxList == null)
-			{
-				idxList = new List<int>();
-			}
-			else
-			{
-				idxList.Clear();
-			}
-			// 余下最后一个字符单独考虑。
-			count--;
+			Contract.Requires(str != null && str.Length > 1);
+			Contract.Requires(idx >= 0 && count > 1 && idx + count <= str.Length);
 			unsafe
 			{
 				fixed (char* start = str)
 				{
-					char* end = start + count;
-					char* i = end - 1;
-					for (; i >= start; i--)
-					{
-						if (*i == '\t')
-						{
-							if (end > i)
-							{
-								idxList.Add(encoder.GetByteCount(i + 1, (int)(end - i) - 1, false));
-								end = i;
-							}
-							else
-							{
-								idxList.Add(0);
-							}
-						}
-						else if (*i == '\n')
-						{
-							// 统计之前的行数。
-							nextCol = 1;
-							nextLine++;
-							if (end > i)
-							{
-								idxList.Add(encoder.GetByteCount(i + 1, (int)(end - i) - 1, false));
-								end = i;
-							}
-							for (char* j = i - 1; j >= start; j--)
-							{
-								if (*j == '\n') { nextLine++; }
-							}
-							break;
-						}
-					}
-					if (end > i)
-					{
-						idxList.Add(encoder.GetByteCount(i + 1, (int)(end - i) - 1, false));
-					}
+					ForwardInternal(start + idx, start + idx + count - 1);
 				}
 			}
-			// 统计列数。
-			for (int j = idxList.Count - 1; j > 0; j--)
-			{
-				nextCol += idxList[j];
-				ForwardTab();
-			}
-			nextCol += idxList[0];
 			curIndex += count;
-			Forward(str[idx + count]);
 		}
 		/// <summary>
-		/// 向前前进一个 Tab 字符。
+		/// 令位置前进指定字符指针所指的部分。
 		/// </summary>
-		private void ForwardTab()
+		/// <param name="start">要前进的起始字符指针（包含）。</param>
+		/// <param name="end">要前进的结束字符指针（包含）。</param>
+		/// <remarks>不会修改 <c>curIndex</c> 属性。</remarks>
+		private unsafe void ForwardInternal(char* start, char* end)
 		{
-			nextCol = tabSize * (1 + (nextCol - 1) / tabSize) + 1;
+			Contract.Requires(end > start);
+			Contract.Requires(widths.Count == 0);
+			char oldHighSurrogate = this.surrogate;
+			this.surrogate = NoSurrogate;
+			// 最后一个字符需要特殊考虑，否则无法得到当前位置。
+			int lastWidth = 0;
+			char lastChar = *end--;
+			if (!char.IsHighSurrogate(lastChar))
+			{
+				if (lastChar == '\n')
+				{
+					lastWidth = -1;
+				}
+				else if (lastChar == '\t')
+				{
+					lastWidth = -2;
+				}
+				else if (char.IsLowSurrogate(lastChar))
+				{
+					if (char.IsHighSurrogate(*end))
+					{
+						// 匹配的代理项对。
+						lastWidth = CharExt.Width(char.ConvertToUtf32(*end, lastChar));
+						end--;
+					}
+				}
+				else
+				{
+					lastWidth = lastChar.Width();
+				}
+				lastChar = NoSurrogate;
+			}
+			this.curCol = this.nextCol;
+			this.curLine = this.nextLine;
+			int width = 0;
+			for (; end >= start; end--)
+			{
+				if (*end == '\n')
+				{
+					widths.Add(width);
+					oldHighSurrogate = NoSurrogate;
+					// 统计之前的行数。
+					this.curCol = 1;
+					this.curLine++;
+					for (; end >= start; end--)
+					{
+						if (*end == '\n')
+						{
+							this.curLine++;
+						}
+					}
+					break;
+				}
+				if (*end == '\t')
+				{
+					widths.Add(width);
+					width = 0;
+				}
+				else
+				{
+					width += GetWidthReversed(*end);
+				}
+			}
+			if (oldHighSurrogate != NoSurrogate)
+			{
+				width += GetWidthReversed(oldHighSurrogate);
+			}
+			if (width > 0)
+			{
+				widths.Add(width);
+			}
+			// 统计列数。
+			for (int j = widths.Count - 1; j > 0; j--)
+			{
+				this.curCol += widths[j];
+				this.curCol = ForwardTab(this.curCol);
+			}
+			this.surrogate = lastChar;
+			this.curCol += widths[0];
+			widths.Clear();
+			this.nextLine = this.curLine;
+			if (lastWidth >= 0)
+			{
+				this.nextCol = this.curCol + lastWidth;
+			}
+			else if (lastWidth == -1)
+			{
+				this.nextCol = 1;
+				this.nextLine++;
+			}
+			else
+			{
+				this.nextCol = this.ForwardTab(this.curCol);
+			}
+		}
+		/// <summary>
+		/// 令列前进一个 Tab 字符。
+		/// </summary>
+		/// <param name="col">当前所在列。</param>
+		/// <returns>前进一个 Tab 字符后的列。</returns>
+		private int ForwardTab(int col)
+		{
+			return tabSize * (1 + (col - 1) / tabSize) + 1;
+		}
+		/// <summary>
+		/// 返回指定字符的宽度。
+		/// </summary>
+		/// <param name="ch">要获取宽度的字符。</param>
+		/// <returns><paramref name="ch"/> 的宽度。</returns>
+		private int GetWidth(char ch)
+		{
+			if (!char.IsSurrogate(ch))
+			{
+				return ch.Width();
+			}
+			if (char.IsHighSurrogate(ch))
+			{
+				this.surrogate = ch;
+				return 0;
+			}
+			// ch 是低代理项
+			if (this.surrogate == NoSurrogate)
+			{
+				// 缺失相应高代理项，忽略无效数据。
+				return 0;
+			}
+			int chValue = char.ConvertToUtf32(this.surrogate, ch);
+			this.surrogate = NoSurrogate;
+			return CharExt.Width(chValue);
+		}
+		/// <summary>
+		/// 返回指定字符的宽度，字符串遍历的顺序是从后至前的。
+		/// </summary>
+		/// <param name="ch">要获取宽度的字符。</param>
+		/// <returns><paramref name="ch"/> 的宽度。</returns>
+		private int GetWidthReversed(char ch)
+		{
+			if (!char.IsSurrogate(ch))
+			{
+				return ch.Width();
+			}
+			if (char.IsLowSurrogate(ch))
+			{
+				this.surrogate = ch;
+				return 0;
+			}
+			// ch 是高代理项
+			if (this.surrogate == NoSurrogate)
+			{
+				// 缺失相应低代理项，忽略无效数据。
+				return 0;
+			}
+			int chValue = char.ConvertToUtf32(ch, this.surrogate);
+			this.surrogate = NoSurrogate;
+			return CharExt.Width(chValue);
 		}
 	}
 }

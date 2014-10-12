@@ -18,7 +18,7 @@ namespace Cyjb
 	/// 获取与解析，可以参考我的博文 
 	/// <see href="http://www.cnblogs.com/cyjb/archive/p/EnumDescription.html">
 	/// C# 获取与解析枚举类型的 DescriptionAttribute</see></para>
-	/// <para>内部使用 <see cref="Cyjb.Utility.ICache&lt;TKey,TValue&gt;"/> 
+	/// <para>内部使用 <see cref="Cyjb.Utility.ICache{TKey,TValue}"/> 
 	/// 接口缓存枚举的描述，使用的键为 Cyjb.EnumDescriptionCache。
 	/// 关于如何设置缓存，可以参见 <see cref="CacheFactory"/>。</para>
 	/// </remarks>
@@ -403,16 +403,16 @@ namespace Cyjb
 		/// 基础类型的范围。</exception>
 		public static object ParseEx(Type enumType, string value, bool ignoreCase)
 		{
-			ExceptionHelper.CheckArgumentNull(enumType, "enumType");
-			ExceptionHelper.CheckArgumentNull(value, "value");
+			CommonExceptions.CheckArgumentNull(enumType, "enumType");
+			CommonExceptions.CheckArgumentNull(value, "value");
 			if (!enumType.IsEnum)
 			{
-				throw ExceptionHelper.MustBeEnum("enumType", enumType);
+				throw CommonExceptions.MustBeEnum("enumType", enumType);
 			}
 			value = value.Trim();
 			if (value.Length == 0)
 			{
-				throw ExceptionHelper.MustContainEnumInfo("value");
+				throw CommonExceptions.MustContainEnumInfo("value");
 			}
 			// 尝试对数字进行解析，这样可避免之后的字符串比较。
 			ulong tmpValue;
@@ -473,7 +473,7 @@ namespace Cyjb
 						else
 						{
 							// 不能识别为数字。
-							throw ExceptionHelper.EnumValueNotFound(enumType, str);
+							throw CommonExceptions.EnumValueNotFound(enumType, str);
 						}
 					}
 				}
@@ -567,7 +567,7 @@ namespace Cyjb
 		{
 			if (!Type.GetTypeHandle(baseEnum).Equals(Type.GetTypeHandle(value)))
 			{
-				throw ExceptionHelper.EnumTypeDoesNotMatch("value", value.GetType(), baseEnum.GetType());
+				throw CommonExceptions.EnumTypeDoesNotMatch("value", value.GetType(), baseEnum.GetType());
 			}
 			return ((ToUInt64(baseEnum) & ToUInt64(value)) != 0);
 		}

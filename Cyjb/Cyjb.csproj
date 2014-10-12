@@ -104,6 +104,11 @@
     <Compile Include="Collections\BitListEqualityComparer.cs" />
     <Compile Include="ConversionMethod.cs" />
     <Compile Include="DelegateBuilder.cs" />
+    <Compile Include="ExceptionResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ExceptionResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="DoubleComparer.cs" />
     <Compile Include="IntegerExt.Byte.cs" />
@@ -113,12 +118,14 @@
     <Compile Include="IntegerExt.UInt64.cs" />
     <Compile Include="IO\AggregateSourceException.cs" />
     <Compile Include="IO\DirectoryExt.cs" />
-    <Compile Include="IO\DriectoryInfoExt.cs" />
     <Compile Include="IO\FileExt.cs" />
+    <Compile Include="IO\ISourceFileLocatable.cs" />
+    <Compile Include="IO\SourceFileRange.cs" />
+    <Compile Include="IO\SourceLocatableExt.cs" />
     <Compile Include="IO\ISourceLocatable.cs" />
     <Compile Include="IO\PathExt.cs" />
     <Compile Include="IO\SourceException.cs" />
-    <Compile Include="IO\SourceLocation.cs" />
+    <Compile Include="IO\SourcePosition.cs" />
     <Compile Include="IO\SourceLocator.cs" />
     <Compile Include="IO\SourceRange.cs" />
     <Compile Include="IO\SourceReader.cs" />
@@ -143,6 +150,11 @@
     <Compile Include="EnumExt.cs" />
     <Compile Include="RandomExt.cs" />
     <Compile Include="ProcessorAttribute.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Text\TokenParser`1.cs" />
     <Compile Include="Text\TokenReader`1.cs" />
     <Compile Include="Text\Token`1.cs" />
@@ -153,17 +165,16 @@
     <Compile Include="Utility\CacheFactory.cs" />
     <Compile Include="Utility\CacheResolveEventArgs.cs" />
     <Compile Include="Utility\CacheSection.cs" />
+    <Compile Include="Utility\Hash.cs" />
     <Compile Include="Utility\LruCache`2.cs" />
     <Compile Include="Utility\LruNode`2.cs" />
     <Compile Include="Collections\ObjectModel\CollectionBase`1.cs" />
     <Compile Include="Collections\ObjectModel\ListBase`1.cs" />
     <Compile Include="Collections\ObjectModel\ReadOnlyCollection`1.cs" />
     <Compile Include="Collections\ObjectModel\ReadOnlyList`1.cs" />
-    <Compile Include="ExceptionHelper.cs" />
-    <Compile Include="ExceptionResources.cs" />
+    <Compile Include="CommonExceptions.cs" />
     <Compile Include="Utility\ICache`2.cs" />
     <Compile Include="ResDescriptionAttribute.cs" />
-    <Compile Include="Resources.cs" />
     <Compile Include="StringExt.cs" />
     <Compile Include="TextValuePair.cs" />
     <Compile Include="TextValuePairCollection.cs" />
@@ -184,10 +195,16 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ExceptionResource.resx" />
-    <EmbeddedResource Include="ExceptionResource.zh-CN.resx" />
-    <EmbeddedResource Include="Resource.resx" />
-    <EmbeddedResource Include="Resource.zh-CN.resx" />
+    <EmbeddedResource Include="ExceptionResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ExceptionResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExceptionResources.zh-CN.resx" />
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.zh-CN.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

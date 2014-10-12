@@ -81,7 +81,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (key == null)
 				{
-					throw ExceptionHelper.ArgumentNull("key");
+					throw CommonExceptions.ArgumentNull("key");
 				}
 				Contract.Ensures(Contract.Result<TItem>() != null);
 				return this.dict[key];
@@ -112,7 +112,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (key == null)
 			{
-				throw ExceptionHelper.ArgumentNull("key");
+				throw CommonExceptions.ArgumentNull("key");
 			}
 			Contract.EndContractBlock();
 			return this.dict.TryGetValue(key, out item);

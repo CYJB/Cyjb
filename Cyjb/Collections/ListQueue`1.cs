@@ -54,11 +54,11 @@ namespace Cyjb.Collections
 			{
 				if (index < 0)
 				{
-					throw ExceptionHelper.ArgumentNegative("index", index);
+					throw CommonExceptions.ArgumentNegative("index", index);
 				}
 				if (index >= this.Count)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("index", index);
+					throw CommonExceptions.ArgumentOutOfRange("index", index);
 				}
 				Contract.EndContractBlock();
 				return getElement(this, index);

@@ -139,7 +139,7 @@ namespace Cyjb.Collections
 		{
 			if (collection == null)
 			{
-				throw ExceptionHelper.ArgumentNull("colletion");
+				throw CommonExceptions.ArgumentNull("colletion");
 			}
 			Contract.EndContractBlock();
 			this.UnionWith(collection);
@@ -156,7 +156,7 @@ namespace Cyjb.Collections
 		{
 			if (collection == null)
 			{
-				throw ExceptionHelper.ArgumentNull("colletion");
+				throw CommonExceptions.ArgumentNull("colletion");
 			}
 			Contract.EndContractBlock();
 			this.UnionWith(collection);
@@ -175,7 +175,7 @@ namespace Cyjb.Collections
 		{
 			if (collection == null)
 			{
-				throw ExceptionHelper.ArgumentNull("colletion");
+				throw CommonExceptions.ArgumentNull("colletion");
 			}
 			Contract.EndContractBlock();
 			this.UnionWith(collection);
@@ -193,7 +193,7 @@ namespace Cyjb.Collections
 		{
 			if (info == null)
 			{
-				throw ExceptionHelper.ArgumentNull("info");
+				throw CommonExceptions.ArgumentNull("info");
 			}
 			Contract.EndContractBlock();
 			this.data = (uint[][])info.GetValue("Data", typeof(uint[][]));
@@ -493,7 +493,7 @@ namespace Cyjb.Collections
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			if (this.count <= 0)
@@ -566,7 +566,7 @@ namespace Cyjb.Collections
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			if (this.count <= 0 || ReferenceEquals(this, other))
@@ -638,7 +638,7 @@ namespace Cyjb.Collections
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			ICollection<char> col = other as ICollection<char>;
@@ -672,7 +672,7 @@ namespace Cyjb.Collections
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			if (this.count == 0)
@@ -706,7 +706,7 @@ namespace Cyjb.Collections
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			if (this.count == 0)
@@ -735,7 +735,7 @@ namespace Cyjb.Collections
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			ICollection<char> col = other as ICollection<char>;
@@ -770,7 +770,7 @@ namespace Cyjb.Collections
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			if (this.count <= 0)
@@ -829,7 +829,7 @@ namespace Cyjb.Collections
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			CharSet otherSet = other as CharSet;
@@ -864,7 +864,7 @@ namespace Cyjb.Collections
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			if (this.count == 0)
@@ -942,7 +942,7 @@ namespace Cyjb.Collections
 		{
 			if (other == null)
 			{
-				throw ExceptionHelper.ArgumentNull("other");
+				throw CommonExceptions.ArgumentNull("other");
 			}
 			Contract.EndContractBlock();
 			if (ReferenceEquals(this, other))
@@ -1133,7 +1133,7 @@ namespace Cyjb.Collections
 		{
 			if (info == null)
 			{
-				throw ExceptionHelper.ArgumentNull("info");
+				throw CommonExceptions.ArgumentNull("info");
 			}
 			Contract.EndContractBlock();
 			info.AddValue("Data", this.data);

@@ -10,13 +10,13 @@ namespace Cyjb.Text
 		where T : struct
 	{
 		/// <summary>
-		/// 初始化 <see cref="TokenParser&lt;T&gt;"/> 类的新实例。
+		/// 初始化 <see cref="TokenParser{T}"/> 类的新实例。
 		/// </summary>
 		protected TokenParser() { }
 		/// <summary>
 		/// 获取词法单元的分析结果。
 		/// </summary>
-		/// <value>词法单元的分析结果。其值储存在 <see cref="Token&lt;T&gt;.Value"/> 属性中。</value>
+		/// <value>词法单元的分析结果。其值储存在 <see cref="Token{T}.Value"/> 属性中。</value>
 		public abstract Token<T> Result { get; }
 		/// <summary>
 		/// 分析当前的词法单元。

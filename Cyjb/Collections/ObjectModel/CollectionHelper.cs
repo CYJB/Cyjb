@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Threading;
 
 namespace Cyjb.Collections.ObjectModel
 {
@@ -30,23 +32,23 @@ namespace Cyjb.Collections.ObjectModel
 			Contract.Requires(source != null);
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (array.Rank != 1)
 			{
-				throw ExceptionHelper.ArrayRankMultiDimNotSupported();
+				throw CommonExceptions.ArrayRankMultiDimNotSupported();
 			}
 			if (array.GetLowerBound(0) != 0)
 			{
-				throw ExceptionHelper.ArrayNonZeroLowerBound("array");
+				throw CommonExceptions.ArrayNonZeroLowerBound("array");
 			}
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index", index);
+				throw CommonExceptions.ArgumentNegative("index", index);
 			}
 			if (array.Length - index < source.Count)
 			{
-				throw ExceptionHelper.ArrayTooSmall("array");
+				throw CommonExceptions.ArrayTooSmall("array");
 			}
 			Contract.EndContractBlock();
 			T[] arr = array as T[];
@@ -68,7 +70,7 @@ namespace Cyjb.Collections.ObjectModel
 				}
 				catch (InvalidCastException ex)
 				{
-					throw ExceptionHelper.InvalidArrayType(ex);
+					throw CommonExceptions.InvalidArrayType(ex);
 				}
 			}
 		}
@@ -92,10 +94,22 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (dict == null)
 			{
-				throw ExceptionHelper.ArgumentNull("dict");
+				throw CommonExceptions.ArgumentNull("dict");
 			}
 			Contract.Ensures(Contract.Result<IEnumerable<TItem>>() != null);
 			return dict.Values;
+		}
+		/// <summary>
+		/// 创建用于同步访问的对象。
+		/// </summary>
+		/// <typeparam name="T">内建列表的类型。</typeparam>
+		/// <param name="items">可能已包含同步访问对象的内建列表。</param>
+		/// <param name="syncRoot">用于同步访问的对象。</param>
+		public static void CreateSyncRoot<T>(T items, ref object syncRoot)
+		{
+			ICollection collection = items as ICollection;
+			object syncObj = collection == null ? new object() : collection.SyncRoot;
+			Interlocked.CompareExchange(ref syncRoot, syncObj, null);
 		}
 	}
 }

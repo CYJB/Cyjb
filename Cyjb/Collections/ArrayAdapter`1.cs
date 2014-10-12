@@ -45,7 +45,7 @@ namespace Cyjb.Collections
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			Contract.EndContractBlock();
 			this.array = array;
@@ -68,19 +68,19 @@ namespace Cyjb.Collections
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (offset < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("offset", offset);
+				throw CommonExceptions.ArgumentNegative("offset", offset);
 			}
 			if (count < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("count", count);
+				throw CommonExceptions.ArgumentNegative("count", count);
 			}
 			if (offset + count > array.Length)
 			{
-				throw ExceptionHelper.InvalidOffsetLength();
+				throw CommonExceptions.InvalidOffsetLength();
 			}
 			Contract.EndContractBlock();
 			this.array = array;
@@ -109,7 +109,7 @@ namespace Cyjb.Collections
 		/// <param name="item">要插入的对象。</param>
 		protected override void InsertItem(int index, T item)
 		{
-			throw ExceptionHelper.FixedSizeCollection();
+			throw CommonExceptions.FixedSizeCollection();
 		}
 		/// <summary>
 		/// 移除 <see cref="ArrayAdapter{T}"/> 的指定索引处的元素。
@@ -117,7 +117,7 @@ namespace Cyjb.Collections
 		/// <param name="index">要移除的元素的从零开始的索引。</param>
 		protected override void RemoveItem(int index)
 		{
-			throw ExceptionHelper.FixedSizeCollection();
+			throw CommonExceptions.FixedSizeCollection();
 		}
 		/// <summary>
 		/// 替换指定索引处的元素。
@@ -187,7 +187,7 @@ namespace Cyjb.Collections
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		public override void Clear()
 		{
-			throw ExceptionHelper.FixedSizeCollection();
+			throw CommonExceptions.FixedSizeCollection();
 		}
 
 		#endregion // ICollection<T> 成员

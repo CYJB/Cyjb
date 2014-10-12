@@ -22,14 +22,14 @@ namespace Cyjb
 		/// <code>int size = 10;
 		/// int[] arr = new int[size];
 		/// int[,] cnt = new int[size, size];
-		/// for (int i = 0; i &lt; 200; i++)
+		/// for (int i = 0; i { 200; i++)
 		/// {
 		/// 	arr.Fill(n => n).Random();
-		/// 	for (int j = 0; j &lt; size; j++) cnt[j, arr[j]]++;
+		/// 	for (int j = 0; j { size; j++) cnt[j, arr[j]]++;
 		/// }
-		/// for (int i = 0; i &lt; size; i++)
+		/// for (int i = 0; i { size; i++)
 		/// {
-		/// 	for (int j = 0; j &lt; size; j++)
+		/// 	for (int j = 0; j { size; j++)
 		/// 		Console.Write("{0} ", cnt[i, j]);
 		/// 	Console.WriteLine();
 		/// }</code>
@@ -43,7 +43,7 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			for (int i = array.Length - 1; i > 0; i--)
@@ -71,14 +71,14 @@ namespace Cyjb
 		/// int size = w * h;
 		/// int[,] arr = new int[h, w];
 		/// int[,] cnt = new int[size, size];
-		/// for (int i = 0; i &lt; 320; i++)
+		/// for (int i = 0; i { 320; i++)
 		/// {
 		/// 	arr.Fill((y, x) => y * w + x).Random();
-		/// 	for (int j = 0; j &lt; size; j++) cnt[j, arr[j / w, j % w]]++;
+		/// 	for (int j = 0; j { size; j++) cnt[j, arr[j / w, j % w]]++;
 		/// }
-		/// for (int i = 0; i &lt; size; i++)
+		/// for (int i = 0; i { size; i++)
 		/// {
-		/// 	for (int j = 0; j &lt; size; j++) Console.Write("{0} ", cnt[i, j]);
+		/// 	for (int j = 0; j { size; j++) Console.Write("{0} ", cnt[i, j]);
 		/// 	Console.WriteLine();
 		/// }</code>
 		/// </remarks>
@@ -88,7 +88,7 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			Contract.Ensures(Contract.Result<T[,]>() != null);
 			int w = array.GetLength(1);
@@ -124,15 +124,15 @@ namespace Cyjb
 		/// int size = w * h * d;
 		/// int[, ,] arr = new int[d, h, w];
 		/// int[,] cnt = new int[size, size];
-		/// for (int i = 0; i &lt; 240; i++)
+		/// for (int i = 0; i { 240; i++)
 		/// {
 		/// 	arr.Fill((z, y, x) => z * w * h + y * w + x);
 		/// 	arr.Random();
-		/// 	for (int j = 0; j &lt; size; j++) cnt[j, arr[j / (w * h), j / w % h, j % w]]++;
+		/// 	for (int j = 0; j { size; j++) cnt[j, arr[j / (w * h), j / w % h, j % w]]++;
 		/// }
-		/// for (int i = 0; i &lt; size; i++)
+		/// for (int i = 0; i { size; i++)
 		/// {
-		/// 	for (int j = 0; j &lt; size; j++) Console.Write("{0} ", cnt[i, j]);
+		/// 	for (int j = 0; j { size; j++) Console.Write("{0} ", cnt[i, j]);
 		/// 	Console.WriteLine();
 		/// }</code>
 		/// </remarks>
@@ -142,7 +142,7 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			Contract.Ensures(Contract.Result<T[, ,]>() != null);
 			int h = array.GetLength(1);
@@ -192,11 +192,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (length < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length");
+				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			if (length == 0)
@@ -226,11 +226,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (length < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length");
+				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			if (length == 0)
@@ -267,11 +267,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (startIndex < -array.Length || startIndex > array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			if (startIndex == array.Length)
@@ -303,15 +303,15 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (startIndex < -array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			if (length < 0 || startIndex + length > array.Length)
 			{
-				throw ExceptionHelper.InvalidOffsetLength();
+				throw CommonExceptions.InvalidOffsetLength();
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			if (length == 0)
@@ -346,11 +346,11 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (startIndex < -array.Length || startIndex >= array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			if (startIndex == array.Length)
@@ -383,15 +383,15 @@ namespace Cyjb
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("array");
+				throw CommonExceptions.ArgumentNull("array");
 			}
 			if (startIndex < -array.Length || startIndex > array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("startIndex");
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
 			if (endIndex < -array.Length || endIndex > array.Length)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("endIndex");
+				throw CommonExceptions.ArgumentOutOfRange("endIndex", endIndex);
 			}
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			if (startIndex == endIndex)

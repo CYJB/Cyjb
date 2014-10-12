@@ -76,7 +76,7 @@ namespace Cyjb.Collections
 		{
 			if (obj == null)
 			{
-				throw ExceptionHelper.ArgumentNull("obj");
+				throw CommonExceptions.ArgumentNull("obj");
 			}
 			Contract.EndContractBlock();
 			return obj.GetContentHashCode();

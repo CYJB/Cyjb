@@ -109,7 +109,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		public virtual void Reset()
 		{
-			throw ExceptionHelper.MethodNotSupported();
+			throw CommonExceptions.MethodNotSupported();
 		}
 
 		#endregion // IEnumerator 成员

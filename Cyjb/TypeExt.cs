@@ -250,8 +250,8 @@ namespace Cyjb
 		/// <example>
 		/// 下面是 <see cref="OpenGenericIsAssignableFrom(Type,Type)"/> 方法的简单示例：
 		/// <code>
-		/// Console.WriteLine(typeof(IEnumerable&lt;&gt;).UniqueOpenGenericIsAssignableFrom(
-		///		typeof(List&gt;int&gt;))); // True
+		/// Console.WriteLine(typeof(IEnumerable{}).UniqueOpenGenericIsAssignableFrom(
+		///		typeof(List}int}))); // True
 		/// </code>
 		/// </example>
 		/// <remarks>
@@ -279,8 +279,8 @@ namespace Cyjb
 		/// 下面是 <see cref="OpenGenericIsAssignableFrom(Type,Type,out Type)"/> 方法的简单示例：
 		/// <code>
 		/// Type type;
-		/// Console.WriteLine(typeof(IEnumerable&lt;&gt;).UniqueOpenGenericIsAssignableFrom(
-		///		typeof(List&gt;int&gt;), out type));
+		/// Console.WriteLine(typeof(IEnumerable{}).UniqueOpenGenericIsAssignableFrom(
+		///		typeof(List}int}), out type));
 		/// Console.WriteLine(type);
 		/// // 示例输出：
 		/// // True
@@ -337,11 +337,11 @@ namespace Cyjb
 		/// 下面是 <see cref="UniqueOpenGenericIsAssignableFrom(Type,Type)"/> 方法的简单示例：
 		/// <code>
 		/// Type type;
-		/// Console.WriteLine(typeof(IEnumerable&lt;&gt;).UniqueOpenGenericIsAssignableFrom(
-		///		typeof(List&gt;int&gt;))); // True
-		/// Console.WriteLine(typeof(IEnumerable&lt;&gt;).UniqueOpenGenericIsAssignableFrom(
+		/// Console.WriteLine(typeof(IEnumerable{}).UniqueOpenGenericIsAssignableFrom(
+		///		typeof(List}int}))); // True
+		/// Console.WriteLine(typeof(IEnumerable{}).UniqueOpenGenericIsAssignableFrom(
 		///		typeof(TestClass))); // False
-		/// class TestClass : IEnumerable&lt;int&gt;, IEnumerable&lt;long&gt; { }
+		/// class TestClass : IEnumerable{int}, IEnumerable{long} { }
 		/// </code>
 		/// </example>
 		/// <remarks>
@@ -369,12 +369,12 @@ namespace Cyjb
 		/// 下面是 <see cref="UniqueOpenGenericIsAssignableFrom(Type,Type,out Type)"/> 方法的简单示例：
 		/// <code>
 		/// Type type;
-		/// Console.WriteLine(typeof(IEnumerable&lt;&gt;).UniqueOpenGenericIsAssignableFrom(
-		///		typeof(List&gt;int&gt;), out type));
+		/// Console.WriteLine(typeof(IEnumerable{}).UniqueOpenGenericIsAssignableFrom(
+		///		typeof(List}int}), out type));
 		/// Console.WriteLine(type);
-		/// Console.WriteLine(typeof(IEnumerable&lt;&gt;).UniqueOpenGenericIsAssignableFrom(
+		/// Console.WriteLine(typeof(IEnumerable{}).UniqueOpenGenericIsAssignableFrom(
 		///		typeof(TestClass)));
-		/// class TestClass : IEnumerable&lt;int&gt;, IEnumerable&lt;long&gt; { }
+		/// class TestClass : IEnumerable{int}, IEnumerable{long} { }
 		/// // 示例输出：
 		/// // True
 		/// // System.Collections.Generic.IEnumerable`1[System.Int32]
@@ -432,7 +432,7 @@ namespace Cyjb
 			return false;
 		}
 		/// <summary>
-		/// 确定指定 <see cref="System.Type"/> 是否是 Nullable&lt;&gt; 泛型。
+		/// 确定指定 <see cref="System.Type"/> 是否是 Nullable{} 泛型。
 		/// </summary>
 		/// <param name="type">要判断是否可空类型的类型。</param>
 		/// <returns>如果 <paramref name="type"/> 是可空类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
@@ -441,7 +441,7 @@ namespace Cyjb
 			return (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
 		}
 		/// <summary>
-		/// 确定指定 <see cref="System.Type"/> 是否是 Nullable&lt;&gt; 泛型，如果是则返回泛型的参数。
+		/// 确定指定 <see cref="System.Type"/> 是否是 Nullable{} 泛型，如果是则返回泛型的参数。
 		/// </summary>
 		/// <param name="type">要判断是否可空类型的类型。</param>
 		/// <param name="nonNullalbeType">如果 <paramref name="type"/> 是可空类型，则返回泛型类型参数。
@@ -461,7 +461,7 @@ namespace Cyjb
 			}
 		}
 		/// <summary>
-		/// 确定指定 <see cref="System.Type"/> 是否是 Nullable&lt;&gt; 泛型，如果是则返回泛型的参数。
+		/// 确定指定 <see cref="System.Type"/> 是否是 Nullable{} 泛型，如果是则返回泛型的参数。
 		/// </summary>
 		/// <param name="type">要判断是否可空类型的类型。如果是可空类型，则返回泛型类型参数；否则不变。</param>
 		/// <returns>如果 <paramref name="type"/> 是可空类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
@@ -478,7 +478,7 @@ namespace Cyjb
 			}
 		}
 		/// <summary>
-		/// 确定指定 <see cref="System.Type"/> 是否是 Nullable&lt;&gt; 泛型，如果是则返回泛型的参数。
+		/// 确定指定 <see cref="System.Type"/> 是否是 Nullable{} 泛型，如果是则返回泛型的参数。
 		/// </summary>
 		/// <param name="type">要判断是否可空类型的类型。</param>
 		/// <returns>如果 <paramref name="type"/> 是可空类型，则为泛型的参数；否则为原类型。</returns>

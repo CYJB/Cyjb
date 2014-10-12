@@ -81,7 +81,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (key == null)
 				{
-					throw ExceptionHelper.ArgumentNull("key");
+					throw CommonExceptions.ArgumentNull("key");
 				}
 				Contract.Ensures(Contract.Result<TItem>() != null);
 				return this.dict[key];
@@ -110,7 +110,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (key == null)
 			{
-				throw ExceptionHelper.ArgumentNull("key");
+				throw CommonExceptions.ArgumentNull("key");
 			}
 			Contract.EndContractBlock();
 			return this.dict.Remove(key);
@@ -128,7 +128,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (key == null)
 			{
-				throw ExceptionHelper.ArgumentNull("key");
+				throw CommonExceptions.ArgumentNull("key");
 			}
 			Contract.EndContractBlock();
 			return this.dict.TryGetValue(key, out item);
@@ -173,7 +173,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (item == null)
 			{
-				throw ExceptionHelper.ArgumentNull("item");
+				throw CommonExceptions.ArgumentNull("item");
 			}
 			Contract.EndContractBlock();
 			TKey key = this.GetKeyForItem(item);
@@ -217,7 +217,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (item == null)
 			{
-				throw ExceptionHelper.ArgumentNull("item");
+				throw CommonExceptions.ArgumentNull("item");
 			}
 			Contract.EndContractBlock();
 			TKey key = this.GetKeyForItem(item);

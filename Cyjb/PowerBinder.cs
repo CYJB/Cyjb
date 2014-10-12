@@ -14,7 +14,7 @@ namespace Cyjb
 	/// <code>
 	/// class TestClass {
 	/// 	public static void TestMethod(int value) { }
-	/// 	public static void TestMethod2&lt;T&gt;(T value) { }
+	/// 	public static void TestMethod2{T}(T value) { }
 	/// }
 	/// Type type = typeof(TestClass);
 	/// Console.WriteLine(type.GetMethod("TestMethod", new Type[] { typeof(long) }));
@@ -171,7 +171,7 @@ namespace Cyjb
 			}
 			if (ambig)
 			{
-				throw ExceptionHelper.AmbiguousMatchField();
+				throw CommonExceptions.AmbiguousMatchField();
 			}
 			return match[min];
 		}
@@ -191,7 +191,14 @@ namespace Cyjb
 		public override MethodBase BindToMethod(BindingFlags bindingAttr, MethodBase[] match, ref object[] args,
 			ParameterModifier[] modifiers, CultureInfo culture, string[] names, out object state)
 		{
-			ExceptionHelper.CheckArrayEmpty(match, "match");
+			if (match == null)
+			{
+				throw CommonExceptions.ArgumentNull("match");
+			}
+			if (match.Length == 0)
+			{
+				throw CommonExceptions.ArrayEmpty("match");
+			}
 			// 检查参数名称数组，不能出现名称相同的两个参数。
 			if (names != null)
 			{
@@ -293,7 +300,14 @@ namespace Cyjb
 		public override MethodBase SelectMethod(BindingFlags bindingAttr, MethodBase[] match, Type[] types,
 			ParameterModifier[] modifiers)
 		{
-			ExceptionHelper.CheckArrayEmpty(match, "match");
+			if (match == null)
+			{
+				throw CommonExceptions.ArgumentNull("match");
+			}
+			if (match.Length == 0)
+			{
+				throw CommonExceptions.ArrayEmpty("match");
+			}
 			// 构造方法信息数组。
 			MatchInfo[] infos = new MatchInfo[match.Length];
 			MatchInfo info = null;
@@ -327,7 +341,7 @@ namespace Cyjb
 		public override PropertyInfo SelectProperty(BindingFlags bindingAttr, PropertyInfo[] match, Type returnType,
 			Type[] indexes, ParameterModifier[] modifiers)
 		{
-			ExceptionHelper.CheckArgumentNull(match, "match");
+			CommonExceptions.CheckArgumentNull(match, "match");
 			if (match.Length == 0)
 			{
 				return null;
@@ -388,7 +402,7 @@ namespace Cyjb
 			}
 			if (ambig)
 			{
-				throw ExceptionHelper.AmbiguousMatchProperty();
+				throw CommonExceptions.AmbiguousMatchProperty();
 			}
 			return match[min];
 		}
@@ -513,7 +527,7 @@ namespace Cyjb
 			}
 			if (ambig)
 			{
-				throw ExceptionHelper.AmbiguousMatchMethod();
+				throw CommonExceptions.AmbiguousMatchMethod();
 			}
 			return infos[min];
 		}
@@ -535,7 +549,7 @@ namespace Cyjb
 				{
 					if (string.Equals(names[i], names[j], StringComparison.Ordinal))
 					{
-						throw ExceptionHelper.SameParameterName("names");
+						throw CommonExceptions.SameParameterName("names");
 					}
 				}
 			}

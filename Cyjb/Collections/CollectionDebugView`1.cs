@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace Cyjb.Collections
 {
@@ -31,12 +32,7 @@ namespace Cyjb.Collections
 		[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
 		public T[] Items
 		{
-			get
-			{
-				T[] items = new T[this.source.Count];
-				this.source.CopyTo(items, 0);
-				return items;
-			}
+			get { return this.source.ToArray(); }
 		}
 	}
 }

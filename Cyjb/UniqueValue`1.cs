@@ -21,11 +21,11 @@ namespace Cyjb
 		/// </summary>
 		private IEqualityComparer<TValue> comparer = null;
 		/// <summary>
-		/// 初始化 <see cref="UniqueValue&lt;TValue&gt;"/> 类的新实例。
+		/// 初始化 <see cref="UniqueValue{TValue}"/> 类的新实例。
 		/// </summary>
 		/// <overloads>
 		/// <summary>
-		/// 初始化 <see cref="UniqueValue&lt;TValue&gt;"/> 类的新实例。
+		/// 初始化 <see cref="UniqueValue{TValue}"/> 类的新实例。
 		/// </summary>
 		/// </overloads>
 		public UniqueValue()
@@ -33,7 +33,7 @@ namespace Cyjb
 			this.comparer = EqualityComparer<TValue>.Default;
 		}
 		/// <summary>
-		/// 使用指定的比较器初始化 <see cref="UniqueValue&lt;TValue&gt;"/> 类的新实例。
+		/// 使用指定的比较器初始化 <see cref="UniqueValue{TValue}"/> 类的新实例。
 		/// </summary>
 		/// <param name="comparer">值相等的比较器。</param>
 		public UniqueValue(IEqualityComparer<TValue> comparer)
@@ -48,7 +48,7 @@ namespace Cyjb
 			}
 		}
 		/// <summary>
-		/// 使用指定的初始值初始化 <see cref="UniqueValue&lt;TValue&gt;"/> 类的新实例。
+		/// 使用指定的初始值初始化 <see cref="UniqueValue{TValue}"/> 类的新实例。
 		/// </summary>
 		/// <param name="value">初始的设定值。</param>
 		public UniqueValue(TValue value)
@@ -58,7 +58,7 @@ namespace Cyjb
 			isUnique = Tristate.True;
 		}
 		/// <summary>
-		/// 使用指定的初始值和比较器初始化 <see cref="UniqueValue&lt;TValue&gt;"/> 类的新实例。
+		/// 使用指定的初始值和比较器初始化 <see cref="UniqueValue{TValue}"/> 类的新实例。
 		/// </summary>
 		/// <param name="value">初始的设定值。</param>
 		/// <param name="comparer">值相等的比较器。</param>

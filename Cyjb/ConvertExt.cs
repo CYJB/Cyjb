@@ -53,7 +53,7 @@ namespace Cyjb
 				}
 				return value;
 			}
-			throw ExceptionHelper.ConvertInvalidValue(value, conversionType);
+			throw CommonExceptions.ConvertInvalidValue(value, conversionType);
 		}
 		/// <summary>
 		/// 对指定类型执行基本的类型转换判断，包括转换为 object 和 null 转换。
@@ -65,7 +65,7 @@ namespace Cyjb
 		/// <returns>如果基本类型转换成功，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		private static bool BasicChangeType(ref object value, Type conversionType, out Type nonNullableType)
 		{
-			ExceptionHelper.CheckArgumentNull(conversionType, "conversionType");
+			CommonExceptions.CheckArgumentNull(conversionType, "conversionType");
 			if (conversionType.IsByRef)
 			{
 				conversionType = conversionType.GetElementType();
@@ -82,7 +82,7 @@ namespace Cyjb
 			{
 				if (conversionType.IsValueType && !nullableCType)
 				{
-					throw ExceptionHelper.CannotCastNullToValueType();
+					throw CommonExceptions.CannotCastNullToValueType();
 				}
 				return true;
 			}
@@ -92,7 +92,7 @@ namespace Cyjb
 		/// 返回指定类型的对象，其值等效于指定对象。参数提供区域性特定的格式设置信息。
 		/// 只对允许进行标准隐式类型转换。
 		/// </summary>
-		/// <remarks>在运行时，value.GetType() 永远不可能为 Nullalbe&lt;T&gt;，因此某些情况可以不考虑。</remarks>
+		/// <remarks>在运行时，value.GetType() 永远不可能为 Nullalbe{T}，因此某些情况可以不考虑。</remarks>
 		/// <param name="value">要转换的对象。</param>
 		/// <param name="type">要转换的对象的类型。</param>
 		/// <param name="conversionType">要返回的对象的类型。</param>
@@ -245,10 +245,7 @@ namespace Cyjb
 					}
 					return Enum.ToObject(conversionType, value);
 				}
-				else
-				{
-					return Convert.ChangeType(value, conversionType, provider);
-				}
+				return Convert.ChangeType(value, conversionType, provider);
 			}
 			// 尝试标准显式类型转换。
 			bool success;
@@ -261,7 +258,7 @@ namespace Cyjb
 			ConversionMethod method = ConversionCache.GetExplicitConversion(type, conversionType);
 			if (method != null)
 			{
-				value = MethodInfo.GetMethodFromHandle(method.Method).Invoke(null, new object[] { value });
+				value = MethodBase.GetMethodFromHandle(method.Method).Invoke(null, new [] { value });
 				if (value != null)
 				{
 					type = value.GetType();
@@ -280,7 +277,7 @@ namespace Cyjb
 		/// 返回指定类型的对象，其值等效于指定对象。参数提供区域性特定的格式设置信息。
 		/// 只对允许进行标准显式类型转换。
 		/// </summary>
-		/// <remarks>在运行时，value.GetType() 永远不可能为 Nullalbe&lt;T&gt;，因此某些情况可以不考虑。</remarks>
+		/// <remarks>在运行时，value.GetType() 永远不可能为 Nullalbe{T}，因此某些情况可以不考虑。</remarks>
 		/// <param name="value">要转换的对象。</param>
 		/// <param name="type">要转换的对象的类型。</param>
 		/// <param name="conversionType">要返回的对象的类型。</param>
@@ -510,7 +507,7 @@ namespace Cyjb
 			uint result = ToUInt32(value, fromBase);
 			if (result > byte.MaxValue)
 			{
-				throw ExceptionHelper.OverflowByte();
+				throw CommonExceptions.OverflowByte();
 			}
 			return unchecked((byte)result);
 		}
@@ -546,7 +543,7 @@ namespace Cyjb
 			uint result = ToUInt32(value, fromBase);
 			if (result > ushort.MaxValue)
 			{
-				throw ExceptionHelper.OverflowUInt16();
+				throw CommonExceptions.OverflowUInt16();
 			}
 			return unchecked((ushort)result);
 		}
@@ -599,18 +596,18 @@ namespace Cyjb
 				{
 					if (i == 0)
 					{
-						throw ExceptionHelper.NoParsibleDigits();
+						throw CommonExceptions.NoParsibleDigits();
 					}
 					else
 					{
-						throw ExceptionHelper.ExtraJunkAtEnd();
+						throw CommonExceptions.ExtraJunkAtEnd();
 					}
 				}
 				uint next = unchecked(result * uBase + (uint)t);
 				// 判断是否超出 UInt32 的范围。
 				if (next < result)
 				{
-					throw ExceptionHelper.OverflowUInt32();
+					throw CommonExceptions.OverflowUInt32();
 				}
 				result = next;
 			}
@@ -665,18 +662,18 @@ namespace Cyjb
 				{
 					if (i == 0)
 					{
-						throw ExceptionHelper.NoParsibleDigits();
+						throw CommonExceptions.NoParsibleDigits();
 					}
 					else
 					{
-						throw ExceptionHelper.ExtraJunkAtEnd();
+						throw CommonExceptions.ExtraJunkAtEnd();
 					}
 				}
 				ulong next = unchecked(result * ulBase + (ulong)t);
 				// 判断是否超出 UInt64 的范围。
 				if (next < result)
 				{
-					throw ExceptionHelper.OverflowUInt64();
+					throw CommonExceptions.OverflowUInt64();
 				}
 				result = next;
 			}
@@ -896,7 +893,7 @@ namespace Cyjb
 		{
 			if (toBase < 2 || toBase > 36)
 			{
-				throw ExceptionHelper.InvalidBase("toBase");
+				throw CommonExceptions.InvalidBase("toBase", toBase);
 			}
 			// 从后向前转换，不必反转字符串。
 			ulong ulBase = (ulong)toBase;
@@ -929,16 +926,16 @@ namespace Cyjb
 			// 基数检查。
 			if (fromBase < 3 || fromBase > 36)
 			{
-				throw ExceptionHelper.InvalidBase("toBase");
+				throw CommonExceptions.InvalidBase("fromBase", fromBase);
 			}
 			if (value.Length == 0)
 			{
-				throw ExceptionHelper.NoParsibleDigits();
+				throw CommonExceptions.NoParsibleDigits();
 			}
 			// 负号检查。
 			if (value[0] == '-')
 			{
-				throw ExceptionHelper.BaseConvertNegativeValue();
+				throw CommonExceptions.BaseConvertNegativeValue();
 			}
 		}
 		/// <summary>

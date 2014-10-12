@@ -23,7 +23,7 @@ namespace Cyjb.Collections
 		{
 			if (dict == null)
 			{
-				throw ExceptionHelper.ArgumentNull("dict");
+				throw CommonExceptions.ArgumentNull("dict");
 			}
 			Contract.EndContractBlock();
 			TValue value;

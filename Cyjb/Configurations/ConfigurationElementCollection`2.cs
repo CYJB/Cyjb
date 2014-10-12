@@ -46,7 +46,7 @@ namespace Cyjb.Configurations
 			{
 				if (value == null)
 				{
-					throw ExceptionHelper.ArgumentNull("value");
+					throw CommonExceptions.ArgumentNull("value");
 				}
 				Contract.EndContractBlock();
 				ConfigurationElement item = BaseGet(key);

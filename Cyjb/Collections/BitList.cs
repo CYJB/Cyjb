@@ -77,7 +77,7 @@ namespace Cyjb.Collections
 		{
 			if (capacity < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("capacity", capacity);
+				throw CommonExceptions.ArgumentNegative("capacity", capacity);
 			}
 			Contract.EndContractBlock();
 			this.items = new uint[(capacity >> IndexShift) + 1];
@@ -94,7 +94,7 @@ namespace Cyjb.Collections
 		{
 			if (collection == null)
 			{
-				throw ExceptionHelper.ArgumentNull("collection");
+				throw CommonExceptions.ArgumentNull("collection");
 			}
 			Contract.EndContractBlock();
 			this.AddRange(collection);
@@ -111,7 +111,7 @@ namespace Cyjb.Collections
 		{
 			if (collection == null)
 			{
-				throw ExceptionHelper.ArgumentNull("collection");
+				throw CommonExceptions.ArgumentNull("collection");
 			}
 			Contract.EndContractBlock();
 			this.AddRange(collection);
@@ -128,7 +128,7 @@ namespace Cyjb.Collections
 		{
 			if (collection == null)
 			{
-				throw ExceptionHelper.ArgumentNull("collection");
+				throw CommonExceptions.ArgumentNull("collection");
 			}
 			Contract.EndContractBlock();
 			this.AddRange(collection);
@@ -144,7 +144,7 @@ namespace Cyjb.Collections
 		{
 			if (collection == null)
 			{
-				throw ExceptionHelper.ArgumentNull("collection");
+				throw CommonExceptions.ArgumentNull("collection");
 			}
 			Contract.EndContractBlock();
 			this.AddRange(collection);
@@ -161,7 +161,7 @@ namespace Cyjb.Collections
 		{
 			if (length < 0)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length", length);
+				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
 			Contract.EndContractBlock();
 			this.count = length;
@@ -186,7 +186,7 @@ namespace Cyjb.Collections
 			{
 				if (value < this.count)
 				{
-					throw ExceptionHelper.ArgumentOutOfRange("Capacity", value);
+					throw CommonExceptions.ArgumentOutOfRange("Capacity", value);
 				}
 				Contract.EndContractBlock();
 				int newLength = (value >> IndexShift) + 1;
@@ -217,7 +217,7 @@ namespace Cyjb.Collections
 		{
 			if (collection == null)
 			{
-				throw ExceptionHelper.ArgumentNull("collection");
+				throw CommonExceptions.ArgumentNull("collection");
 			}
 			Contract.EndContractBlock();
 			this.InsertRange(this.count, collection);
@@ -232,7 +232,7 @@ namespace Cyjb.Collections
 		{
 			if (collection == null)
 			{
-				throw ExceptionHelper.ArgumentNull("collection");
+				throw CommonExceptions.ArgumentNull("collection");
 			}
 			Contract.EndContractBlock();
 			this.InsertRange(this.count, collection);
@@ -247,7 +247,7 @@ namespace Cyjb.Collections
 		{
 			if (collection == null)
 			{
-				throw ExceptionHelper.ArgumentNull("collection");
+				throw CommonExceptions.ArgumentNull("collection");
 			}
 			Contract.EndContractBlock();
 			this.InsertRange(this.count, collection);
@@ -262,7 +262,7 @@ namespace Cyjb.Collections
 		{
 			if (collection == null)
 			{
-				throw ExceptionHelper.ArgumentNull("collection");
+				throw CommonExceptions.ArgumentNull("collection");
 			}
 			Contract.EndContractBlock();
 			this.InsertRange(this.count, collection);
@@ -277,7 +277,7 @@ namespace Cyjb.Collections
 		{
 			if (length < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("length", length);
+				throw CommonExceptions.ArgumentNegative("length", length);
 			}
 			Contract.EndContractBlock();
 			int cnt = this.count;
@@ -308,15 +308,15 @@ namespace Cyjb.Collections
 		{
 			if (collection == null)
 			{
-				throw ExceptionHelper.ArgumentNull("collection");
+				throw CommonExceptions.ArgumentNull("collection");
 			}
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index", index);
+				throw CommonExceptions.ArgumentNegative("index", index);
 			}
 			if (index > this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index", index);
+				throw CommonExceptions.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			IList<uint> uintList = collection.Select(i => unchecked((uint)i)).ToList();
@@ -335,15 +335,15 @@ namespace Cyjb.Collections
 		{
 			if (collection == null)
 			{
-				throw ExceptionHelper.ArgumentNull("collection");
+				throw CommonExceptions.ArgumentNull("collection");
 			}
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index", index);
+				throw CommonExceptions.ArgumentNegative("index", index);
 			}
 			if (index > this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index", index);
+				throw CommonExceptions.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			IList<uint> uintList = collection as IList<uint> ?? new List<uint>(collection);
@@ -362,15 +362,15 @@ namespace Cyjb.Collections
 		{
 			if (collection == null)
 			{
-				throw ExceptionHelper.ArgumentNull("collection");
+				throw CommonExceptions.ArgumentNull("collection");
 			}
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index", index);
+				throw CommonExceptions.ArgumentNegative("index", index);
 			}
 			if (index > this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index", IndexMask);
+				throw CommonExceptions.ArgumentOutOfRange("index", IndexMask);
 			}
 			Contract.EndContractBlock();
 			IList<uint> uintList = new List<uint>();
@@ -408,15 +408,15 @@ namespace Cyjb.Collections
 		{
 			if (collection == null)
 			{
-				throw ExceptionHelper.ArgumentNull("collection");
+				throw CommonExceptions.ArgumentNull("collection");
 			}
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index", index);
+				throw CommonExceptions.ArgumentNegative("index", index);
 			}
 			if (index > this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index", index);
+				throw CommonExceptions.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			IList<uint> uintList;
@@ -467,15 +467,15 @@ namespace Cyjb.Collections
 		{
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index", index);
+				throw CommonExceptions.ArgumentNegative("index", index);
 			}
 			if (length < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("length", length);
+				throw CommonExceptions.ArgumentNegative("length", length);
 			}
 			if (index + length > this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length", length);
+				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
 			Contract.EndContractBlock();
 			int cnt = this.count + length;
@@ -547,15 +547,15 @@ namespace Cyjb.Collections
 		{
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index", index);
+				throw CommonExceptions.ArgumentNegative("index", index);
 			}
 			if (length < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("length", length);
+				throw CommonExceptions.ArgumentNegative("length", length);
 			}
 			if (index + length > this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length", length);
+				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
 			Contract.EndContractBlock();
 			if (length <= 0)
@@ -632,15 +632,15 @@ namespace Cyjb.Collections
 		{
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index", index);
+				throw CommonExceptions.ArgumentNegative("index", index);
 			}
 			if (length < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("length", length);
+				throw CommonExceptions.ArgumentNegative("length", length);
 			}
 			if (index + length > this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("length", length);
+				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
 			Contract.EndContractBlock();
 			this.FillInternal(index, length, value);
@@ -804,11 +804,11 @@ namespace Cyjb.Collections
 		{
 			if (list == null)
 			{
-				throw ExceptionHelper.ArgumentNull("list");
+				throw CommonExceptions.ArgumentNull("list");
 			}
 			if (list.count != this.count)
 			{
-				throw ExceptionHelper.ArrayLengthsDiffer("list");
+				throw CommonExceptions.ArrayLengthsDiffer("list");
 			}
 			Contract.EndContractBlock();
 			int cnt = this.count >> IndexShift;
@@ -835,11 +835,11 @@ namespace Cyjb.Collections
 		{
 			if (list == null)
 			{
-				throw ExceptionHelper.ArgumentNull("list");
+				throw CommonExceptions.ArgumentNull("list");
 			}
 			if (list.count != this.count)
 			{
-				throw ExceptionHelper.ArrayLengthsDiffer("list");
+				throw CommonExceptions.ArrayLengthsDiffer("list");
 			}
 			Contract.EndContractBlock();
 			int cnt = this.count >> IndexShift;
@@ -866,11 +866,11 @@ namespace Cyjb.Collections
 		{
 			if (list == null)
 			{
-				throw ExceptionHelper.ArgumentNull("list");
+				throw CommonExceptions.ArgumentNull("list");
 			}
 			if (list.count != this.count)
 			{
-				throw ExceptionHelper.ArrayLengthsDiffer("list");
+				throw CommonExceptions.ArrayLengthsDiffer("list");
 			}
 			Contract.EndContractBlock();
 			int cnt = this.count >> IndexShift;
@@ -1006,7 +1006,7 @@ namespace Cyjb.Collections
 		{
 			if (index < 0 || index >= this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index", index);
+				throw CommonExceptions.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			if (item)
@@ -1027,7 +1027,7 @@ namespace Cyjb.Collections
 		{
 			if (index < 0 || index >= this.count)
 			{
-				throw ExceptionHelper.ArgumentOutOfRange("index", index);
+				throw CommonExceptions.ArgumentOutOfRange("index", index);
 			}
 			Contract.EndContractBlock();
 			return (this.items[index >> IndexShift] & (1 << (index & IndexMask))) != 0U;
@@ -1118,19 +1118,19 @@ namespace Cyjb.Collections
 		{
 			if (array == null)
 			{
-				throw ExceptionHelper.ArgumentNull("source");
+				throw CommonExceptions.ArgumentNull("source");
 			}
 			if (array.Rank != 1)
 			{
-				throw ExceptionHelper.ArrayRankMultiDimNotSupported();
+				throw CommonExceptions.ArrayRankMultiDimNotSupported();
 			}
 			if (array.GetLowerBound(0) != 0)
 			{
-				throw ExceptionHelper.ArrayNonZeroLowerBound("array");
+				throw CommonExceptions.ArrayNonZeroLowerBound("array");
 			}
 			if (index < 0)
 			{
-				throw ExceptionHelper.ArgumentNegative("index", index);
+				throw CommonExceptions.ArgumentNegative("index", index);
 			}
 			Contract.EndContractBlock();
 			uint[] uarr = array as uint[];
@@ -1154,7 +1154,7 @@ namespace Cyjb.Collections
 				}
 				if (array.Length - index < cnt)
 				{
-					throw ExceptionHelper.ArrayTooSmall("array");
+					throw CommonExceptions.ArrayTooSmall("array");
 				}
 				for (int i = 0; i < cnt; i++)
 				{
@@ -1172,7 +1172,7 @@ namespace Cyjb.Collections
 				}
 				if (array.Length - index < cnt)
 				{
-					throw ExceptionHelper.ArrayTooSmall("array");
+					throw CommonExceptions.ArrayTooSmall("array");
 				}
 				for (int i = 0; i < cnt; i++)
 				{
@@ -1185,7 +1185,7 @@ namespace Cyjb.Collections
 			{
 				if (array.Length - index < this.count)
 				{
-					throw ExceptionHelper.ArrayTooSmall("array");
+					throw CommonExceptions.ArrayTooSmall("array");
 				}
 				for (int i = 0; i < this.count; i++)
 				{
@@ -1193,7 +1193,7 @@ namespace Cyjb.Collections
 				}
 				return;
 			}
-			throw ExceptionHelper.InvalidArrayType();
+			throw CommonExceptions.InvalidArrayType();
 		}
 
 		#endregion // ICollection 成员

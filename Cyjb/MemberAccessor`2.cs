@@ -38,13 +38,13 @@ namespace Cyjb
 		#region 从委托创建
 
 		/// <summary>
-		/// 使用指定的访问委托，初始化 <see cref="MemberAccessor&lt;T&gt;"/> 类的新实例。
+		/// 使用指定的访问委托，初始化 <see cref="MemberAccessor{T}"/> 类的新实例。
 		/// </summary>
 		/// <param name="getDelegate">用于获取实例属性或字段的委托。</param>
 		/// <param name="setDelegate">用于设置实例属性或字段的委托。</param>
 		/// <overloads>
 		/// <summary>
-		/// 初始化 <see cref="MemberAccessor&lt;T&gt;"/> 类的新实例。
+		/// 初始化 <see cref="MemberAccessor{T}"/> 类的新实例。
 		/// </summary>
 		/// </overloads>
 		public MemberAccessor(Func<TTarget, TValue> getDelegate, Action<TTarget, TValue> setDelegate)
@@ -53,7 +53,7 @@ namespace Cyjb
 			this.setDelegate = setDelegate;
 		}
 		/// <summary>
-		/// 使用指定的名字和访问委托，初始化 <see cref="MemberAccessor&lt;T&gt;"/> 类的新实例。
+		/// 使用指定的名字和访问委托，初始化 <see cref="MemberAccessor{T}"/> 类的新实例。
 		/// </summary>
 		/// <param name="name">实例属性或字段的名字。</param>
 		/// <param name="getDelegate">用于获取实例属性或字段的委托。</param>
@@ -70,7 +70,7 @@ namespace Cyjb
 		#region 从类型创建
 
 		/// <summary>
-		/// 使用实例属性或字段的名称，初始化 <see cref="MemberAccessor&lt;T&gt;"/> 类的新实例，
+		/// 使用实例属性或字段的名称，初始化 <see cref="MemberAccessor{T}"/> 类的新实例，
 		/// 表示 <typeparamref name="TTarget"/> 中的的实例属性或字段。
 		/// </summary>
 		/// <param name="name">实例属性或字段的名称。</param>
@@ -78,7 +78,7 @@ namespace Cyjb
 			: this(typeof(TTarget), name, false)
 		{ }
 		/// <summary>
-		/// 使用实例属性或字段的名称，初始化 <see cref="MemberAccessor&lt;T&gt;"/> 类的新实例，
+		/// 使用实例属性或字段的名称，初始化 <see cref="MemberAccessor{T}"/> 类的新实例，
 		/// 表示 <typeparamref name="TTarget"/> 中的的实例属性或字段。
 		/// </summary>
 		/// <param name="name">实例属性或字段的名称。</param>
@@ -88,7 +88,7 @@ namespace Cyjb
 			: this(typeof(TTarget), name, nonPublic)
 		{ }
 		/// <summary>
-		/// 使用包含实例属性或字段的类型和名称，初始化 <see cref="MemberAccessor&lt;T&gt;"/> 类的新实例，
+		/// 使用包含实例属性或字段的类型和名称，初始化 <see cref="MemberAccessor{T}"/> 类的新实例，
 		/// 表示指定的实例属性或字段。
 		/// </summary>
 		/// <param name="targetType">包含实例属性或字段的类型。</param>
@@ -97,7 +97,7 @@ namespace Cyjb
 			: this(targetType, name, false)
 		{ }
 		/// <summary>
-		/// 使用包含实例属性或字段的类型和名称，初始化 <see cref="MemberAccessor&lt;T&gt;"/> 类的新实例，
+		/// 使用包含实例属性或字段的类型和名称，初始化 <see cref="MemberAccessor{T}"/> 类的新实例，
 		/// 表示指定的实例属性或字段。
 		/// </summary>
 		/// <param name="targetType">包含实例属性或字段的类型。</param>
@@ -106,7 +106,7 @@ namespace Cyjb
 		/// 如果要访问非公共实例属性或字段，则为 <c>true</c>；否则为 <c>false</c>。</param>
 		public MemberAccessor(Type targetType, string name, bool nonPublic)
 		{
-			ExceptionHelper.CheckArgumentNull(targetType, "targetType");
+			CommonExceptions.CheckArgumentNull(targetType, "targetType");
 			this.name = name;
 			PropertyInfo property = targetType.GetProperty(name, nonPublic ? NonPublic : Public);
 			if (property != null)
@@ -123,7 +123,7 @@ namespace Cyjb
 			}
 		}
 		/// <summary>
-		/// 使用指定的实例属性，初始化 <see cref="MemberAccessor&lt;T&gt;"/> 类的新实例，
+		/// 使用指定的实例属性，初始化 <see cref="MemberAccessor{T}"/> 类的新实例，
 		/// 表示指定的实例属性。
 		/// </summary>
 		/// <param name="property">要访问的实例属性。</param>
@@ -131,7 +131,7 @@ namespace Cyjb
 			: this(property, false)
 		{ }
 		/// <summary>
-		/// 使用指定的实例属性，初始化 <see cref="MemberAccessor&lt;T&gt;"/> 类的新实例，
+		/// 使用指定的实例属性，初始化 <see cref="MemberAccessor{T}"/> 类的新实例，
 		/// 表示指定的实例属性。
 		/// </summary>
 		/// <param name="property">要访问的实例属性。</param>
@@ -139,18 +139,18 @@ namespace Cyjb
 		/// 如果要访问非公共实例属性，则为 <c>true</c>；否则为 <c>false</c>。</param>
 		public MemberAccessor(PropertyInfo property, bool nonPublic)
 		{
-			ExceptionHelper.CheckArgumentNull(property, "property");
+			CommonExceptions.CheckArgumentNull(property, "property");
 			this.name = property.Name;
 			Init(property, nonPublic);
 		}
 		/// <summary>
-		/// 使用指定的字段，初始化 <see cref="MemberAccessor&lt;T&gt;"/> 类的新实例，
+		/// 使用指定的字段，初始化 <see cref="MemberAccessor{T}"/> 类的新实例，
 		/// 表示指定的字段。
 		/// </summary>
 		/// <param name="field">要访问的字段。</param>
 		public MemberAccessor(FieldInfo field)
 		{
-			ExceptionHelper.CheckArgumentNull(field, "field");
+			CommonExceptions.CheckArgumentNull(field, "field");
 			this.name = field.Name;
 			Init(field);
 		}
@@ -204,7 +204,7 @@ namespace Cyjb
 		{
 			if (this.getDelegate == null)
 			{
-				throw ExceptionHelper.BindTargetPropertyNoGet(this.name);
+				throw CommonExceptions.BindTargetPropertyNoGet(this.name);
 			}
 			return this.getDelegate(target);
 		}
@@ -217,7 +217,7 @@ namespace Cyjb
 		{
 			if (this.setDelegate == null)
 			{
-				throw ExceptionHelper.BindTargetPropertyNoSet(this.name);
+				throw CommonExceptions.BindTargetPropertyNoSet(this.name);
 			}
 			this.setDelegate(target, value);
 		}

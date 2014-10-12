@@ -5,15 +5,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTestCyjb
 {
 	/// <summary>
-	/// <see cref="Cyjb.TextValuePair&lt;T&gt;"/> 类的单元测试。
+	/// <see cref="Cyjb.TextValuePair{T}"/> 类的单元测试。
 	/// </summary>
 	[TestClass]
 	public class UnitTestTextValuePair
 	{
 		/// <summary>
-		/// 测试 <see cref="TextValuePair&lt;T&gt;"/> 的构造函数，
-		/// <see cref="TextValuePair&lt;T&gt;.Text"/> 属性和
-		/// <see cref="TextValuePair&lt;T&gt;.Value"/> 属性。
+		/// 测试 <see cref="TextValuePair{T}"/> 的构造函数，
+		/// <see cref="TextValuePair{T}.Text"/> 属性和
+		/// <see cref="TextValuePair{T}.Value"/> 属性。
 		/// </summary>
 		[TestMethod]
 		public void TestProperty()
@@ -31,8 +31,8 @@ namespace UnitTestCyjb
 			Assert.AreEqual(target.Value, new GenericParameterHelper(2), "测试 Value 构造函数赋值失败。");
 		}
 		/// <summary>
-		/// 测试 <see cref="TextValuePair&lt;T&gt;"/> 对 
-		/// <see cref="TextValuePair&lt;T&gt;.Text"/> 属性改变的事件。
+		/// 测试 <see cref="TextValuePair{T}"/> 对 
+		/// <see cref="TextValuePair{T}.Text"/> 属性改变的事件。
 		/// </summary>
 		[TestMethod]
 		public void TestTextEvent()
@@ -69,8 +69,8 @@ namespace UnitTestCyjb
 			Assert.IsTrue(changed);
 		}
 		/// <summary>
-		/// 测试 <see cref="TextValuePair&lt;T&gt;"/> 对 
-		/// <see cref="TextValuePair&lt;T&gt;.Value"/> 属性改变的事件。
+		/// 测试 <see cref="TextValuePair{T}"/> 对 
+		/// <see cref="TextValuePair{T}.Value"/> 属性改变的事件。
 		/// </summary>
 		[TestMethod]
 		public void TestValueEvent()
@@ -109,7 +109,7 @@ namespace UnitTestCyjb
 			Assert.IsTrue(changed);
 		}
 		/// <summary>
-		/// 测试 <see cref="TextValuePair&lt;T&gt;"/> 的相等比较。
+		/// 测试 <see cref="TextValuePair{T}"/> 的相等比较。
 		/// </summary>
 		[TestMethod]
 		public void TestEqual()
@@ -140,8 +140,8 @@ namespace UnitTestCyjb
 			Assert.IsFalse(pair1 != pair2);
 		}
 		/// <summary>
-		/// 测试 <see cref="TextValuePair&lt;T&gt;"/> 的 
-		/// <see cref="TextValuePair&lt;T&gt;.Text"/> 属性对 
+		/// 测试 <see cref="TextValuePair{T}"/> 的 
+		/// <see cref="TextValuePair{T}.Text"/> 属性对 
 		/// <see cref="IEditableObject"/> 接口的实现。
 		/// </summary>
 		[TestMethod]
@@ -220,8 +220,8 @@ namespace UnitTestCyjb
 			Assert.IsFalse(changed);
 		}
 		/// <summary>
-		/// 测试 <see cref="TextValuePair&lt;T&gt;"/> 的 
-		/// <see cref="TextValuePair&lt;T&gt;.Value"/> 属性对 
+		/// 测试 <see cref="TextValuePair{T}"/> 的 
+		/// <see cref="TextValuePair{T}.Value"/> 属性对 
 		/// <see cref="IEditableObject"/> 接口的实现。
 		/// </summary>
 		[TestMethod]
@@ -302,9 +302,9 @@ namespace UnitTestCyjb
 			Assert.IsFalse(changed);
 		}
 		/// <summary>
-		/// 测试 <see cref="TextValuePair&lt;T&gt;"/> 的 
-		/// <see cref="TextValuePair&lt;T&gt;.Text"/> 和 
-		/// <see cref="TextValuePair&lt;T&gt;.Value"/> 属性对 
+		/// 测试 <see cref="TextValuePair{T}"/> 的 
+		/// <see cref="TextValuePair{T}.Text"/> 和 
+		/// <see cref="TextValuePair{T}.Value"/> 属性对 
 		/// <see cref="IEditableObject"/> 接口的实现。
 		/// </summary>
 		[TestMethod]

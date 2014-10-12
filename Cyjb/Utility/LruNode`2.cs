@@ -30,7 +30,7 @@ namespace Cyjb.Utility
 		/// </summary>
 		public LruNode<TKey, TValue> Next;
 		/// <summary>
-		/// 使用指定的键和对象初始化 <see cref="LruNode&lt;TKey,TValue&gt;"/> 类的新实例。
+		/// 使用指定的键和对象初始化 <see cref="LruNode{TKey,TValue}"/> 类的新实例。
 		/// </summary>
 		/// <param name="key">对象缓存的键。</param>
 		/// <param name="value">被缓存的对象。</param>

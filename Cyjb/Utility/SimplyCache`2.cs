@@ -9,7 +9,7 @@ namespace Cyjb.Utility
 	/// </summary>
 	/// <typeparam name="TKey">缓存对象的键的类型。</typeparam>
 	/// <typeparam name="TValue">缓存对象的类型。</typeparam>
-	/// <remarks>该类仅仅是 <see cref="ConcurrentDictionary&lt;TKey,TValue&gt;"/> 类的一个简单包装。
+	/// <remarks>该类仅仅是 <see cref="ConcurrentDictionary{TKey,TValue}"/> 类的一个简单包装。
 	/// 缓存的对象数量会一直增长下去，通常应仅作为测试使用。</remarks>
 	[DebuggerDisplay("Count = {Count}")]
 	public sealed class SimplyCache<TKey, TValue> : ICache<TKey, TValue>
@@ -19,7 +19,7 @@ namespace Cyjb.Utility
 		/// </summary>
 		private ConcurrentDictionary<TKey, TValue> cacheDict = new ConcurrentDictionary<TKey, TValue>();
 		/// <summary>
-		/// 初始化 <see cref="SimplyCache&lt;TKey,TValue&gt;"/> 类的新实例。
+		/// 初始化 <see cref="SimplyCache{TKey,TValue}"/> 类的新实例。
 		/// </summary>
 		public SimplyCache() { }
 		/// <summary>
@@ -39,7 +39,7 @@ namespace Cyjb.Utility
 		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public void Add(TKey key, TValue value)
 		{
-			ExceptionHelper.CheckArgumentNull(key, "key");
+			CommonExceptions.CheckArgumentNull(key, "key");
 			this.cacheDict[key] = value;
 		}
 		/// <summary>
@@ -59,7 +59,7 @@ namespace Cyjb.Utility
 		/// <paramref name="key"/> 为 <c>null</c>。</exception>
 		public bool Contains(TKey key)
 		{
-			ExceptionHelper.CheckArgumentNull(key, "key");
+			CommonExceptions.CheckArgumentNull(key, "key");
 			return cacheDict.ContainsKey(key);
 		}
 		/// <summary>

@@ -315,7 +315,7 @@ namespace Cyjb
 		/// <summary>
 		/// 到 <see cref="TextValuePair"/> 类型的隐式类型转换。
 		/// </summary>
-		/// <param name="pair">要转换类型的 <see cref="TextValuePair&lt;TValue&gt;"/> 实例。</param>
+		/// <param name="pair">要转换类型的 <see cref="TextValuePair{TValue}"/> 实例。</param>
 		/// <returns>类型转换的结果。</returns>
 		public static implicit operator TextValuePair(TextValuePair<TValue> pair)
 		{
@@ -338,7 +338,7 @@ namespace Cyjb
 			}
 			else
 			{
-				throw ExceptionHelper.ArgumentWrongType("pair");
+				throw CommonExceptions.ArgumentWrongType("pair");
 			}
 		}
 

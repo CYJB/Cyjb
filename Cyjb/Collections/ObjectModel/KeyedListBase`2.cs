@@ -104,7 +104,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (dictionaryCreationThreshold < -1)
 			{
-				throw ExceptionHelper.InvalidDictionaryThreshold("dictionaryCreationThreshold", dictionaryCreationThreshold);
+				throw CommonExceptions.InvalidDictionaryThreshold("dictionaryCreationThreshold", dictionaryCreationThreshold);
 			}
 			Contract.EndContractBlock();
 			this.comparer = comparer ?? EqualityComparer<TKey>.Default;
@@ -158,7 +158,7 @@ namespace Cyjb.Collections.ObjectModel
 			{
 				if (key == null)
 				{
-					throw ExceptionHelper.ArgumentNull("key");
+					throw CommonExceptions.ArgumentNull("key");
 				}
 				Contract.Ensures(Contract.Result<TItem>() != null);
 				TItem item;
@@ -166,7 +166,7 @@ namespace Cyjb.Collections.ObjectModel
 				{
 					return item;
 				}
-				throw ExceptionHelper.KeyNotFound(key);
+				throw CommonExceptions.KeyNotFound(key);
 			}
 		}
 		/// <summary>
@@ -241,7 +241,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (key == null)
 			{
-				throw ExceptionHelper.ArgumentNull("key");
+				throw CommonExceptions.ArgumentNull("key");
 			}
 			Contract.EndContractBlock();
 			int index = this.IndexOf(key);
@@ -265,7 +265,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (key == null)
 			{
-				throw ExceptionHelper.ArgumentNull("key");
+				throw CommonExceptions.ArgumentNull("key");
 			}
 			Contract.EndContractBlock();
 			if (this.dict != null)
@@ -330,7 +330,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (item == null)
 			{
-				throw ExceptionHelper.ArgumentNull("item");
+				throw CommonExceptions.ArgumentNull("item");
 			}
 			Contract.EndContractBlock();
 			TKey key = this.GetKeyForItem(item);
@@ -359,7 +359,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (item == null)
 			{
-				throw ExceptionHelper.ArgumentNull("item");
+				throw CommonExceptions.ArgumentNull("item");
 			}
 			Contract.EndContractBlock();
 			TKey oldKey = this.GetKeyForItem(this.GetItemAt(index));
@@ -443,7 +443,7 @@ namespace Cyjb.Collections.ObjectModel
 			}
 			else if (this.ContainsKey(key))
 			{
-				throw ExceptionHelper.KeyDuplicate("key");
+				throw CommonExceptions.KeyDuplicate("key");
 			}
 		}
 		/// <summary>
