@@ -90,7 +90,7 @@ namespace Cyjb
 		#endregion // 字符串异常
 
 		/// <summary>
-		/// 返回至少有一个对象实现 <see cref="System.IComparable"/> 的异常。
+		/// 返回至少有一个对象实现 <see cref="IComparable"/> 的异常。
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
@@ -335,59 +335,36 @@ namespace Cyjb
 		/// <summary>
 		/// 返回基不为 <c>10</c> 的字符串包含减号的异常。
 		/// </summary>
-		/// <returns><see cref="System.FormatException"/> 对象。</returns>
+		/// <returns><see cref="FormatException"/> 对象。</returns>
 		public static FormatException BaseConvertNegativeValue()
 		{
-			return GetFormatException("BaseConvertNegativeValue");
+			return new FormatException(ExceptionResources.BaseConvertNegativeValue);
 		}
 		/// <summary>
 		/// 返回未识别的枚举值的异常。
 		/// </summary>
 		/// <param name="enumType">枚举类型。</param>
 		/// <param name="value">未识别的枚举值。</param>
-		/// <returns><see cref="System.FormatException"/> 对象。</returns>
+		/// <returns><see cref="FormatException"/> 对象。</returns>
 		public static FormatException EnumValueNotFound(Type enumType, object value)
 		{
-			return GetFormatException("EnumValueNotFound", enumType, value);
+			return new FormatException(Format(ExceptionResources.EnumValueNotFound, enumType, value));
 		}
 		/// <summary>
 		/// 返回字符串末尾有其它无法分析的字符的异常。
 		/// </summary>
-		/// <returns><see cref="System.FormatException"/> 对象。</returns>
+		/// <returns><see cref="FormatException"/> 对象。</returns>
 		public static FormatException ExtraJunkAtEnd()
 		{
-			return GetFormatException("ExtraJunkAtEnd");
+			return new FormatException(ExceptionResources.ExtraJunkAtEnd);
 		}
 		/// <summary>
 		/// 返回找不到可识别的数字的异常。
 		/// </summary>
-		/// <returns><see cref="System.FormatException"/> 对象。</returns>
+		/// <returns><see cref="FormatException"/> 对象。</returns>
 		public static FormatException NoParsibleDigits()
 		{
-			return GetFormatException("NoParsibleDigits");
-		}
-		/// <summary>
-		/// 返回以特定名称字符串资源为信息的
-		/// <see cref="System.FormatException"/> 对象。
-		/// </summary>
-		/// <param name="resName">作为异常信息的字符串资源名称。</param>
-		/// <param name="args">异常信息的格式化值。</param>
-		/// <returns><see cref="System.FormatException"/> 对象。</returns>
-		private static FormatException GetFormatException(string resName, params object[] args)
-		{
-			string message = ExceptionResources.ResourceManager.GetString(resName);
-			return new FormatException(message);
-		}
-		/// <summary>
-		/// 返回以特定名称字符串资源为信息的
-		/// <see cref="System.FormatException"/> 对象。
-		/// </summary>
-		/// <param name="resName">作为异常信息的字符串资源名称。</param>
-		/// <returns><see cref="System.FormatException"/> 对象。</returns>
-		private static FormatException GetFormatException(string resName)
-		{
-			string message = ExceptionResources.ResourceManager.GetString(resName);
-			return new FormatException(message);
+			return new FormatException(ExceptionResources.NoParsibleDigits);
 		}
 
 		#endregion // FormatException
@@ -397,17 +374,17 @@ namespace Cyjb
 		/// <summary>
 		/// 返回空对象不能转换为值类型的异常。
 		/// </summary>
-		/// <returns><see cref="System.InvalidCastException"/> 对象。</returns>
+		/// <returns><see cref="InvalidCastException"/> 对象。</returns>
 		public static InvalidCastException CannotCastNullToValueType()
 		{
-			return GetInvalidCast("CannotCastNullToValueType");
+			return new InvalidCastException(ExceptionResources.CannotCastNullToValueType);
 		}
 		/// <summary>
 		/// 返回转换无效的异常。
 		/// </summary>
 		/// <param name="value">无效的值。</param>
 		/// <param name="type">要转换到的类型。</param>
-		/// <returns><see cref="System.InvalidCastException"/> 对象。</returns>
+		/// <returns><see cref="InvalidCastException"/> 对象。</returns>
 		/// <overloads>
 		/// <summary>
 		/// 返回转换无效的异常。
@@ -415,7 +392,7 @@ namespace Cyjb
 		/// </overloads>
 		public static InvalidCastException ConvertInvalidValue(object value, Type type)
 		{
-			return GetInvalidCast("ConvertInvalidValue", value, type);
+			return new InvalidCastException(Format(ExceptionResources.ConvertInvalidValue, value, type));
 		}
 		/// <summary>
 		/// 返回转换无效的异常。
@@ -423,31 +400,10 @@ namespace Cyjb
 		/// <param name="value">无效的值。</param>
 		/// <param name="type">要转换到的类型。</param>
 		/// <param name="innerException">内部异常。</param>
-		/// <returns><see cref="System.InvalidCastException"/> 对象。</returns>
+		/// <returns><see cref="InvalidCastException"/> 对象。</returns>
 		public static InvalidCastException ConvertInvalidValue(object value, Type type, Exception innerException)
 		{
-			return null;
-			//string message = ExceptionResources.ResourceManager.GetString("ConvertInvalidValue", actualValue, type);
-			//return new InvalidCastException(message, innerException);
-		}
-		/// <summary>
-		/// 返回转换无效的异常。
-		/// </summary>
-		/// <param name="resName">异常信息的资源名称。</param>
-		/// <returns><see cref="System.InvalidCastException"/> 对象。</returns>
-		private static InvalidCastException GetInvalidCast(string resName)
-		{
-			return new InvalidCastException(ExceptionResources.ResourceManager.GetString(resName));
-		}
-		/// <summary>
-		/// 返回转换无效的异常。
-		/// </summary>
-		/// <param name="resName">异常信息的资源名称。</param>
-		/// <param name="args">异常信息的格式化值。</param>
-		/// <returns><see cref="System.InvalidCastException"/> 对象。</returns>
-		private static InvalidCastException GetInvalidCast(string resName, params object[] args)
-		{
-			return new InvalidCastException(ExceptionResources.ResourceManager.GetString(resName));
+			return new InvalidCastException(Format(ExceptionResources.ConvertInvalidValue, value, type), innerException);
 		}
 
 		#endregion // InvalidCastException
@@ -457,58 +413,29 @@ namespace Cyjb
 		/// <summary>
 		/// 返回无法执行枚举操作的异常。
 		/// </summary>
-		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
+		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
 		public static InvalidOperationException EnumFailedVersion()
 		{
-			return GetInvalidOperation("EnumFailedVersion");
+			return new InvalidOperationException(ExceptionResources.EnumFailedVersion);
 		}
 		/// <summary>
 		/// 返回无法比较数组元素的异常。
 		/// </summary>
 		/// <param name="innerException">导致当前异常的异常。</param>
-		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
+		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
 		public static InvalidOperationException ComparerFailed(Exception innerException)
 		{
-			return GetInvalidOperation("ComparerFailed", innerException);
+			return new InvalidOperationException(ExceptionResources.ComparerFailed, innerException);
 		}
 		/// <summary>
 		/// 返回不表示泛型方法定义的异常。
 		/// </summary>
 		/// <param name="method">不是泛型方法的方法。</param>
 		/// <param name="operatorName">产生异常的操作名。</param>
-		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
+		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
 		public static InvalidOperationException NotGenericMethodDefinition(MethodBase method, string operatorName)
 		{
-			return GetInvalidOperation("NotGenericMethodDefinition", method, operatorName);
-		}
-		/// <summary>
-		/// 返回操作无效的异常。
-		/// </summary>
-		/// <param name="resName">异常信息的资源名称。</param>
-		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
-		private static InvalidOperationException GetInvalidOperation(string resName)
-		{
-			return new InvalidOperationException(ExceptionResources.ResourceManager.GetString(resName));
-		}
-		/// <summary>
-		/// 返回操作无效的异常。
-		/// </summary>
-		/// <param name="resName">异常信息的资源名称。</param>
-		/// <param name="innerException">导致当前异常的异常。</param>
-		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
-		private static InvalidOperationException GetInvalidOperation(string resName, Exception innerException)
-		{
-			return new InvalidOperationException(ExceptionResources.ResourceManager.GetString(resName), innerException);
-		}
-		/// <summary>
-		/// 返回操作无效的异常。
-		/// </summary>
-		/// <param name="resName">异常信息的资源名称。</param>
-		/// <param name="args">异常信息的格式化值。</param>
-		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
-		private static InvalidOperationException GetInvalidOperation(string resName, params object[] args)
-		{
-			return new InvalidOperationException(ExceptionResources.ResourceManager.GetString(resName));
+			return new InvalidOperationException(Format(ExceptionResources.NotGenericMethodDefinition, method, operatorName));
 		}
 
 		#endregion
@@ -532,35 +459,26 @@ namespace Cyjb
 		/// <summary>
 		/// 返回固定大小集合的异常。
 		/// </summary>
-		/// <returns><see cref="System.NotSupportedException"/> 对象。</returns>
+		/// <returns><see cref="NotSupportedException"/> 对象。</returns>
 		public static NotSupportedException FixedSizeCollection()
 		{
-			return GetNotSupported("FixedSizeCollection");
+			return new NotSupportedException(ExceptionResources.FixedSizeCollection);
 		}
 		/// <summary>
 		/// 返回方法不支持的异常。
 		/// </summary>
-		/// <returns><see cref="System.NotSupportedException"/> 对象。</returns>
+		/// <returns><see cref="NotSupportedException"/> 对象。</returns>
 		public static NotSupportedException MethodNotSupported()
 		{
-			return GetNotSupported("MethodNotSupported");
+			return new NotSupportedException(ExceptionResources.MethodNotSupported);
 		}
 		/// <summary>
 		/// 返回只读集合的异常。
 		/// </summary>
-		/// <returns><see cref="System.NotSupportedException"/> 对象。</returns>
+		/// <returns><see cref="NotSupportedException"/> 对象。</returns>
 		public static NotSupportedException ReadOnlyCollection()
 		{
-			return GetNotSupported("ReadOnlyCollection");
-		}
-		/// <summary>
-		/// 返回不支持的异常。
-		/// </summary>
-		/// <param name="resName">异常信息的资源名称。</param>
-		/// <returns><see cref="System.NotSupportedException"/> 对象。</returns>
-		private static NotSupportedException GetNotSupported(string resName)
-		{
-			return new NotSupportedException(ExceptionResources.ResourceManager.GetString(resName));
+			return new NotSupportedException(ExceptionResources.ReadOnlyCollection);
 		}
 
 		#endregion // NotSupportedException
@@ -568,20 +486,28 @@ namespace Cyjb
 		#region ObjectDisposedException
 
 		/// <summary>
-		/// 返回 SourceReader 已关闭的异常。
+		/// 返回 TextReader 已关闭的异常。
 		/// </summary>
-		/// <returns><see cref="System.ObjectDisposedException"/> 对象。</returns>
-		internal static ObjectDisposedException SourceReaderClosed()
+		/// <returns><see cref="ObjectDisposedException"/> 对象。</returns>
+		public static ObjectDisposedException TextReaderClosed()
 		{
-			return new ObjectDisposedException(ExceptionResources.ResourceManager.GetString("SourceReaderClosed"));
+			return new ObjectDisposedException(ExceptionResources.TextReaderClosed);
 		}
 		/// <summary>
 		/// 返回对象已释放资源的异常。
 		/// </summary>
-		/// <returns><see cref="System.ObjectDisposedException"/> 对象。</returns>
+		/// <returns><see cref="ObjectDisposedException"/> 对象。</returns>
 		public static ObjectDisposedException ObjectDisposed()
 		{
-			return new ObjectDisposedException(ExceptionResources.ResourceManager.GetString("ObjectDisposed"));
+			return new ObjectDisposedException(ExceptionResources.ObjectDisposed);
+		}
+		/// <summary>
+		/// 返回 SourceReader 已关闭的异常。
+		/// </summary>
+		/// <returns><see cref="ObjectDisposedException"/> 对象。</returns>
+		internal static ObjectDisposedException SourceReaderClosed()
+		{
+			return new ObjectDisposedException(ExceptionResources.SourceReaderClosed);
 		}
 
 		#endregion // ObjectDisposedException
@@ -589,79 +515,68 @@ namespace Cyjb
 		#region OverflowException
 
 		/// <summary>
-		/// 返回值超出 <see cref="System.SByte"/> 范围的异常。
+		/// 返回值超出 <see cref="SByte"/> 范围的异常。
 		/// </summary>
-		/// <returns><see cref="System.OverflowException"/> 对象。</returns>
+		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowSByte()
 		{
-			return GetOverflowException("OverflowSByte");
+			return new OverflowException(ExceptionResources.OverflowSByte);
 		}
 		/// <summary>
-		/// 返回值超出 <see cref="System.Int16"/> 范围的异常。
+		/// 返回值超出 <see cref="Int16"/> 范围的异常。
 		/// </summary>
-		/// <returns><see cref="System.OverflowException"/> 对象。</returns>
+		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowInt16()
 		{
-			return GetOverflowException("OverflowInt16");
+			return new OverflowException(ExceptionResources.OverflowInt16);
 		}
 		/// <summary>
-		/// 返回值超出 <see cref="System.Int32"/> 范围的异常。
+		/// 返回值超出 <see cref="Int32"/> 范围的异常。
 		/// </summary>
-		/// <returns><see cref="System.OverflowException"/> 对象。</returns>
+		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowInt32()
 		{
-			return GetOverflowException("OverflowInt32");
+			return new OverflowException(ExceptionResources.OverflowInt32);
 		}
 		/// <summary>
-		/// 返回值超出 <see cref="System.Int64"/> 范围的异常。
+		/// 返回值超出 <see cref="Int64"/> 范围的异常。
 		/// </summary>
-		/// <returns><see cref="System.OverflowException"/> 对象。</returns>
+		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowInt64()
 		{
-			return GetOverflowException("OverflowInt64");
+			return new OverflowException(ExceptionResources.OverflowInt64);
 		}
 		/// <summary>
-		/// 返回值超出 <see cref="System.Byte"/> 范围的异常。
+		/// 返回值超出 <see cref="Byte"/> 范围的异常。
 		/// </summary>
-		/// <returns><see cref="System.OverflowException"/> 对象。</returns>
+		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowByte()
 		{
-			return GetOverflowException("OverflowByte");
+			return new OverflowException(ExceptionResources.OverflowByte);
 		}
 		/// <summary>
-		/// 返回值超出 <see cref="System.UInt16"/> 范围的异常。
+		/// 返回值超出 <see cref="UInt16"/> 范围的异常。
 		/// </summary>
-		/// <returns><see cref="System.OverflowException"/> 对象。</returns>
+		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowUInt16()
 		{
-			return GetOverflowException("OverflowUInt16");
+			return new OverflowException(ExceptionResources.OverflowUInt16);
 		}
 		/// <summary>
-		/// 返回值超出 <see cref="System.UInt32"/> 范围的异常。
+		/// 返回值超出 <see cref="UInt32"/> 范围的异常。
 		/// </summary>
-		/// <returns><see cref="System.OverflowException"/> 对象。</returns>
+		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowUInt32()
 		{
-			return GetOverflowException("OverflowUInt32");
+			return new OverflowException(ExceptionResources.OverflowUInt32);
 		}
 		/// <summary>
-		/// 返回值超出 <see cref="System.UInt64"/> 范围的异常。
+		/// 返回值超出 <see cref="UInt64"/> 范围的异常。
 		/// </summary>
-		/// <returns><see cref="System.OverflowException"/> 对象。</returns>
+		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowUInt64()
 		{
-			return GetOverflowException("OverflowUInt64");
-		}
-		/// <summary>
-		/// 返回以特定名称字符串资源为信息的
-		/// <see cref="System.OverflowException"/> 对象。
-		/// </summary>
-		/// <param name="resName">作为异常信息的字符串资源名称。</param>
-		/// <returns><see cref="System.OverflowException"/> 对象。</returns>
-		private static OverflowException GetOverflowException(string resName)
-		{
-			string message = ExceptionResources.ResourceManager.GetString(resName);
-			return new OverflowException(message);
+			return new OverflowException(ExceptionResources.OverflowUInt64);
 		}
 
 		#endregion // OverflowException
@@ -684,37 +599,13 @@ namespace Cyjb
 		/// <summary>
 		/// 返回异常集合反序列化失败的异常。
 		/// </summary>
-		/// <returns><see cref="System.Runtime.Serialization.SerializationException"/> 对象。</returns>
+		/// <returns><see cref="SerializationException"/> 对象。</returns>
 		public static SerializationException AggregateExceptionDeserializationFailure()
 		{
-			return new SerializationException(
-				ExceptionResources.AggregateExceptionDeserializationFailure);
+			return new SerializationException(ExceptionResources.AggregateExceptionDeserializationFailure);
 		}
 
 		#endregion // SerializationException
-
-		#region Interval<T> 异常
-
-		/// <summary>
-		/// 返回无效区间的异常。
-		/// </summary>
-		/// <param name="interval">无效的区间。</param>
-		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException InvalidInterval(string interval)
-		{
-			return new ArgumentException(Format(ExceptionResources.InvalidInterval, interval));
-		}
-		/// <summary>
-		/// 返回无效区间格式的异常。
-		/// </summary>
-		/// <param name="interval">无效的区间格式。</param>
-		/// <returns><see cref="FormatException"/> 对象。</returns>
-		internal static FormatException InvalidIntervalFormat(string interval)
-		{
-			return new FormatException(Format(ExceptionResources.InvalidInterval, interval));
-		}
-
-		#endregion // Interval<T> 异常
 
 		#region 缓冲池工厂异常
 
@@ -725,7 +616,7 @@ namespace Cyjb
 		/// <returns><see cref="ConfigurationErrorsException"/> 对象。</returns>
 		internal static ConfigurationErrorsException InvalidCacheType(CacheElement element)
 		{
-			Contract.Assert(element != null);
+			Contract.Requires(element != null);
 			string message = Format(ExceptionResources.InvalidCacheType, element.CacheType);
 			return GetConfigurationErrorsException(message, element.ElementInformation);
 		}
@@ -737,7 +628,7 @@ namespace Cyjb
 		/// <returns><see cref="ConfigurationErrorsException"/> 对象。</returns>
 		internal static ConfigurationErrorsException InvalidCacheType(CacheElement element, Exception innerException)
 		{
-			Contract.Assert(element != null);
+			Contract.Requires(element != null);
 			string message = Format(ExceptionResources.InvalidCacheType, element.CacheType);
 			return GetConfigurationErrorsException(message, innerException, element.ElementInformation);
 		}
@@ -748,7 +639,7 @@ namespace Cyjb
 		/// <returns><see cref="ConfigurationErrorsException"/> 对象。</returns>
 		internal static ConfigurationErrorsException InvalidCacheType_ICache(CacheElement element)
 		{
-			Contract.Assert(element != null);
+			Contract.Requires(element != null);
 			string message = Format(ExceptionResources.InvalidCacheType_ICache, element.CacheType);
 			return GetConfigurationErrorsException(message, element.ElementInformation);
 		}
@@ -759,7 +650,7 @@ namespace Cyjb
 		/// <returns><see cref="ConfigurationErrorsException"/> 对象。</returns>
 		internal static ConfigurationErrorsException InvalidCacheOptions(CacheElement element)
 		{
-			Contract.Assert(element != null);
+			Contract.Requires(element != null);
 			string message = Format(ExceptionResources.InvalidCacheOptions, element.CacheType);
 			return GetConfigurationErrorsException(message, element.ElementInformation);
 		}
@@ -771,26 +662,26 @@ namespace Cyjb
 		/// <summary>
 		/// 返回找到多个与绑定约束匹配的字段的异常。
 		/// </summary>
-		/// <returns><see cref="System.Reflection.AmbiguousMatchException"/> 对象。</returns>
+		/// <returns><see cref="AmbiguousMatchException"/> 对象。</returns>
 		internal static AmbiguousMatchException AmbiguousMatchField()
 		{
-			return new AmbiguousMatchException(ExceptionResources.ResourceManager.GetString("AmbiguousMatchField"));
+			return new AmbiguousMatchException(ExceptionResources.AmbiguousMatchField);
 		}
 		/// <summary>
 		/// 返回找到多个与绑定约束匹配的方法的异常。
 		/// </summary>
-		/// <returns><see cref="System.Reflection.AmbiguousMatchException"/> 对象。</returns>
+		/// <returns><see cref="AmbiguousMatchException"/> 对象。</returns>
 		internal static AmbiguousMatchException AmbiguousMatchMethod()
 		{
-			return new AmbiguousMatchException(ExceptionResources.ResourceManager.GetString("AmbiguousMatchMethod"));
+			return new AmbiguousMatchException(ExceptionResources.AmbiguousMatchMethod);
 		}
 		/// <summary>
 		/// 返回找到多个与绑定约束匹配的属性的异常。
 		/// </summary>
-		/// <returns><see cref="System.Reflection.AmbiguousMatchException"/> 对象。</returns>
+		/// <returns><see cref="AmbiguousMatchException"/> 对象。</returns>
 		internal static AmbiguousMatchException AmbiguousMatchProperty()
 		{
-			return new AmbiguousMatchException(ExceptionResources.ResourceManager.GetString("AmbiguousMatchProperty"));
+			return new AmbiguousMatchException(ExceptionResources.AmbiguousMatchProperty);
 		}
 		/// <summary>
 		/// 返回存在相同的参数名称的异常。
@@ -799,7 +690,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException SameParameterName(string paramName)
 		{
-			throw GetArgumentException(paramName, "SameParameterName");
+			return new ArgumentException(ExceptionResources.SameParameterName, paramName);
 		}
 
 		#endregion // PowerBinder 异常
@@ -807,27 +698,13 @@ namespace Cyjb
 		#region DelegateBuilder 异常
 
 		/// <summary>
-		/// 检查委托的类型是否合法。
-		/// </summary>
-		/// <param name="type">委托的类型。</param>
-		/// <param name="paramName">参数的名称。</param>
-		internal static void CheckDelegateType(Type type, string paramName)
-		{
-			CommonExceptions.CheckArgumentNull(type, paramName);
-			Type baseType = type.BaseType;
-			if (baseType != typeof(MulticastDelegate))
-			{
-				throw CommonExceptions.MustBeDelegate(paramName);
-			}
-		}
-		/// <summary>
 		/// 返回绑定到目标方法出错的异常。
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException BindTargetMethod(string paramName)
 		{
-			throw GetArgumentException(paramName, "BindTargetMethod");
+			return new ArgumentException(ExceptionResources.BindTargetMethod, paramName);
 		}
 		/// <summary>
 		/// 返回绑定到目标属性出错的异常。
@@ -836,7 +713,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException BindTargetProperty(string paramName)
 		{
-			throw GetArgumentException(paramName, "BindTargetProperty");
+			return new ArgumentException(ExceptionResources.BindTargetProperty, paramName);
 		}
 		/// <summary>
 		/// 返回绑定到目标属性出错，不存在 set 访问器的异常。
@@ -845,7 +722,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException BindTargetPropertyNoSet(string paramName)
 		{
-			throw GetArgumentException(paramName, "BindTargetPropertyNoSet");
+			return new ArgumentException(ExceptionResources.BindTargetPropertyNoSet, paramName);
 		}
 		/// <summary>
 		/// 返回绑定到目标属性出错，不存在 get 访问器的异常。
@@ -854,7 +731,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException BindTargetPropertyNoGet(string paramName)
 		{
-			throw GetArgumentException(paramName, "BindTargetPropertyNoGet");
+			return new ArgumentException(ExceptionResources.BindTargetPropertyNoGet, paramName);
 		}
 		/// <summary>
 		/// 返回绑定到目标字段出错的异常。
@@ -863,7 +740,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException BindTargetField(string paramName)
 		{
-			throw GetArgumentException(paramName, "BindTargetField");
+			return new ArgumentException(ExceptionResources.BindTargetField, paramName);
 		}
 		/// <summary>
 		/// 返回类型必须从委托派生的异常。
@@ -872,7 +749,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException MustBeDelegate(string paramName)
 		{
-			throw GetArgumentException(paramName, "MustBeDelegate");
+			return new ArgumentException(ExceptionResources.MustBeDelegate, paramName);
 		}
 		/// <summary>
 		/// 返回不能是开放泛型类型的异常。
@@ -881,7 +758,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException UnboundGenParam(string paramName)
 		{
-			throw GetArgumentException(paramName, "UnboundGenParam");
+			return new ArgumentException(ExceptionResources.UnboundGenParam, paramName);
 		}
 
 		#endregion // DelegateBuilder 异常
@@ -897,7 +774,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException ProcessorNotFound(string paramName, Type type, string id)
 		{
-			throw GetArgumentException(paramName, "ProcessorNotFound", type, id);
+			return GetArgumentException(paramName, ExceptionResources.ProcessorNotFound, type, id);
 		}
 		/// <summary>
 		/// 返回方法处理器不匹配的异常。
@@ -908,7 +785,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException ProcessorMismatch(string paramName, Type type, string id)
 		{
-			throw GetArgumentException(paramName, "ProcessorMismatch", type, id);
+			return GetArgumentException(paramName, ExceptionResources.ProcessorMismatch, type, id);
 		}
 		/// <summary>
 		/// 返回方法切换器中混杂着静态和实例方法的异常。
@@ -919,7 +796,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException ProcessorMixed(string paramName, Type type, string id)
 		{
-			throw GetArgumentException(paramName, "ProcessorMixed", type, id);
+			return GetArgumentException(paramName, ExceptionResources.ProcessorMixed, type, id);
 		}
 		/// <summary>
 		/// 返回特定类型的方法处理器未能找到的异常。
@@ -929,14 +806,12 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException ProcessorNotFound(string paramName, Type type)
 		{
-			if (type == null)
+			string typeName = "null";
+			if (type != null)
 			{
-				return GetArgumentException(paramName, "ProcessorNotFound_Type", "null");
+				typeName = type.ToString();
 			}
-			else
-			{
-				return GetArgumentException(paramName, "ProcessorNotFound_Type", type);
-			}
+			return GetArgumentException(paramName, ExceptionResources.ProcessorNotFound_Type, typeName);
 		}
 		/// <summary>
 		/// 返回委托类型不兼容的异常。
@@ -946,7 +821,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException DelegateCompatible(string paramName, Type target)
 		{
-			return GetArgumentException(paramName, "DelegateCompatible", target);
+			return GetArgumentException(paramName, ExceptionResources.DelegateCompatible, target);
 		}
 
 		#endregion // MethodSwitcher 异常
@@ -966,18 +841,18 @@ namespace Cyjb
 		/// <summary>
 		/// 返回冲突的接受动作的异常。
 		/// </summary>
-		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
+		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
 		public static InvalidOperationException ConflictingAcceptAction()
 		{
-			return GetInvalidOperation("ConflictingAcceptAction");
+			return new InvalidOperationException(ExceptionResources.ConflictingAcceptAction);
 		}
 		/// <summary>
 		/// 返回冲突的拒绝动作的异常。
 		/// </summary>
-		/// <returns><see cref="System.InvalidOperationException"/> 对象。</returns>
+		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
 		public static InvalidOperationException ConflictingRejectAction()
 		{
-			return GetInvalidOperation("ConflictingRejectAction");
+			return new InvalidOperationException(ExceptionResources.ConflictingRejectAction);
 		}
 		/// <summary>
 		/// 返回词法分析器的上下文无效的异常。
@@ -987,7 +862,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		public static ArgumentException InvalidLexerContext(string paramName, string context)
 		{
-			return GetArgumentException(paramName, "InvalidLexerContext", context);
+			return GetArgumentException(paramName, ExceptionResources.InvalidLexerContext, context);
 		}
 		/// <summary>
 		/// 返回未识别的词法单元的异常。
@@ -995,11 +870,10 @@ namespace Cyjb
 		/// <param name="text">未被识别的词法单元的文本。</param>
 		/// <param name="start">词法单元的起始位置。</param>
 		/// <param name="end">词法单元的结束位置。</param>
-		/// <returns><see cref="Cyjb.IO.SourceException"/> 对象。</returns>
+		/// <returns><see cref="SourceException"/> 对象。</returns>
 		public static SourceException UnrecognizedToken(string text, SourcePosition start, SourcePosition end)
 		{
-			return null;
-			// return new SourceException(ExceptionResources.ResourceManager.GetString("UnrecognizedToken", text), start, end);
+			return new SourceException(Format(ExceptionResources.UnrecognizedToken, text), new SourceRange(start, end));
 		}
 
 		#endregion // 词法分析异常
@@ -1014,7 +888,7 @@ namespace Cyjb
 		/// <returns>格式化后的异常信息。</returns>
 		private static string Format(string message, params object[] args)
 		{
-			Contract.Assert(message != null);
+			Contract.Requires(message != null);
 			return string.Format(ExceptionResources.Culture, message, args);
 		}
 		/// <summary>
@@ -1036,7 +910,7 @@ namespace Cyjb
 		/// <returns><see cref="ConfigurationErrorsException"/> 对象。</returns>
 		private static ConfigurationErrorsException GetConfigurationErrorsException(string message, ElementInformation info)
 		{
-			Contract.Assert(info != null);
+			Contract.Requires(info != null);
 			return new ConfigurationErrorsException(message, info.Source, info.LineNumber);
 		}
 		/// <summary>
@@ -1049,7 +923,7 @@ namespace Cyjb
 		private static ConfigurationErrorsException GetConfigurationErrorsException(string message,
 			Exception innerException, ElementInformation info)
 		{
-			Contract.Assert(info != null);
+			Contract.Requires(info != null);
 			return new ConfigurationErrorsException(message, innerException, info.Source, info.LineNumber);
 		}
 
@@ -1057,13 +931,12 @@ namespace Cyjb
 
 		#region 临时方法
 
-
 		/// <summary>
 		/// 检查参数是否为 <c>null</c>，如果为 <c>null</c> 则抛出异常。
 		/// </summary>
 		/// <param name="value">要检查的参数值。</param>
 		/// <param name="paramName">要检查的参数名。</param>
-		/// <exception cref="System.ArgumentNullException">
+		/// <exception cref="ArgumentNullException">
 		/// <paramref name="value"/> 为 <c>null</c>。</exception>
 		/// <overloads>
 		/// <summary>
@@ -1084,7 +957,7 @@ namespace Cyjb
 		/// <typeparam name="T">要检查的参数的类型。</typeparam>
 		/// <param name="value">要检查的参数值。</param>
 		/// <param name="paramName">要检查的参数名。</param>
-		/// <exception cref="System.ArgumentNullException">
+		/// <exception cref="ArgumentNullException">
 		/// <paramref name="value"/> 为 <c>null</c>。</exception>
 		public static void CheckArgumentNull<T>(T value, string paramName)
 		{
@@ -1093,6 +966,22 @@ namespace Cyjb
 				throw ArgumentNull(paramName);
 			}
 		}
+
+		/// <summary>
+		/// 检查委托的类型是否合法。
+		/// </summary>
+		/// <param name="type">委托的类型。</param>
+		/// <param name="paramName">参数的名称。</param>
+		internal static void CheckDelegateType(Type type, string paramName)
+		{
+			CommonExceptions.CheckArgumentNull(type, paramName);
+			Type baseType = type.BaseType;
+			if (baseType != typeof(MulticastDelegate))
+			{
+				throw CommonExceptions.MustBeDelegate(paramName);
+			}
+		}
+
 		#endregion // 临时方法
 
 	}

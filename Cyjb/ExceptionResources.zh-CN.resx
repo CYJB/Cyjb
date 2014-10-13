@@ -285,10 +285,6 @@
     <value>指定的用于创建字典的阈值超出范围。</value>
     <comment>用于创建字典的阈值超出范围。</comment>
   </data>
-  <data name="InvalidInterval" xml:space="preserve">
-    <value>无效的区间 {0}。</value>
-    <comment>无效的区间。</comment>
-  </data>
   <data name="InvalidLexerContext" xml:space="preserve">
     <value>无效的词法分析上下文 '{0}'。</value>
     <comment>无效的词法分析上下文。</comment>
@@ -412,6 +408,10 @@
   <data name="StringWhiteSpace" xml:space="preserve">
     <value>参数 '{0}' 需要一个非空白的字符串。</value>
     <comment>参数需要非空白的字符串。</comment>
+  </data>
+  <data name="TextReaderClosed" xml:space="preserve">
+    <value>不能从关闭的 TextReader 中读取。</value>
+    <comment>不能从关闭的 TextReader 中读取。</comment>
   </data>
   <data name="UnboundGenParam" xml:space="preserve">
     <value>不能对 ContainssGenericParameters 为 True 的类型或方法执行后期绑定操作。</value>

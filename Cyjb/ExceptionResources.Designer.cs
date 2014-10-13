@@ -439,15 +439,6 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 Invalid interval {0}. 的本地化字符串。
-        /// </summary>
-        internal static string InvalidInterval {
-            get {
-                return ResourceManager.GetString("InvalidInterval", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Invalid lexer context &apos;{0}&apos;. 的本地化字符串。
         /// </summary>
         internal static string InvalidLexerContext {
@@ -723,6 +714,15 @@ namespace Cyjb {
         internal static string StringWhiteSpace {
             get {
                 return ResourceManager.GetString("StringWhiteSpace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Cannot read from a closed TextReader. 的本地化字符串。
+        /// </summary>
+        internal static string TextReaderClosed {
+            get {
+                return ResourceManager.GetString("TextReaderClosed", resourceCulture);
             }
         }
         

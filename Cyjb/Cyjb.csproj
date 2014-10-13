@@ -155,6 +155,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Text\CharsReader.cs" />
     <Compile Include="Text\TokenParser`1.cs" />
     <Compile Include="Text\TokenReader`1.cs" />
     <Compile Include="Text\Token`1.cs" />
