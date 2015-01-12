@@ -430,6 +430,15 @@ namespace Cyjb {
         }
         
         /// <summary>
+        ///   查找类似 Invalid cast from &apos;{0}&apos; to &apos;{1}&apos;. 的本地化字符串。
+        /// </summary>
+        internal static string InvalidCastFromTo {
+            get {
+                return ResourceManager.GetString("InvalidCastFromTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 The specified threshold for creating dictionary is out of range. 的本地化字符串。
         /// </summary>
         internal static string InvalidDictionaryThreshold {

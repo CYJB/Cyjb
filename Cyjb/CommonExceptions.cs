@@ -380,6 +380,15 @@ namespace Cyjb
 			return new InvalidCastException(ExceptionResources.CannotCastNullToValueType);
 		}
 		/// <summary>
+		/// 返回一种类型不能转换为另一种类型的异常。
+		/// </summary>
+		/// <returns><see cref="InvalidCastException"/> 对象。</returns>
+		public static InvalidCastException InvalidCastFromTo(Type fromType, Type toType)
+		{
+			return new InvalidCastException(Format(ExceptionResources.InvalidCastFromTo, 
+				fromType.FullName, toType.FullName));
+		}
+		/// <summary>
 		/// 返回转换无效的异常。
 		/// </summary>
 		/// <param name="value">无效的值。</param>
@@ -888,7 +897,7 @@ namespace Cyjb
 		/// <returns>格式化后的异常信息。</returns>
 		private static string Format(string message, params object[] args)
 		{
-			Contract.Requires(message != null);
+			Contract.Requires(message != null && args != null);
 			return string.Format(ExceptionResources.Culture, message, args);
 		}
 		/// <summary>
@@ -900,6 +909,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		private static ArgumentException GetArgumentException(string paramName, string message, params object[] args)
 		{
+			Contract.Requires(paramName != null && message != null && args != null);
 			return new ArgumentException(Format(message, args), paramName);
 		}
 		/// <summary>
@@ -910,7 +920,7 @@ namespace Cyjb
 		/// <returns><see cref="ConfigurationErrorsException"/> 对象。</returns>
 		private static ConfigurationErrorsException GetConfigurationErrorsException(string message, ElementInformation info)
 		{
-			Contract.Requires(info != null);
+			Contract.Requires(message != null && info != null);
 			return new ConfigurationErrorsException(message, info.Source, info.LineNumber);
 		}
 		/// <summary>
@@ -923,7 +933,7 @@ namespace Cyjb
 		private static ConfigurationErrorsException GetConfigurationErrorsException(string message,
 			Exception innerException, ElementInformation info)
 		{
-			Contract.Requires(info != null);
+			Contract.Requires(message != null && innerException != null && info != null);
 			return new ConfigurationErrorsException(message, innerException, info.Source, info.LineNumber);
 		}
 

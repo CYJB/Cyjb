@@ -151,7 +151,7 @@ namespace Cyjb.Text
 			return text.ToString();
 		}
 		/// <summary>
-		/// 从字符序列中读取一行字符串。
+		/// 从字符序列中读取一行字符并将数据作为字符串返回。
 		/// </summary>
 		/// <returns>字符序列中的下一行，若到达了字符序列的末尾则为 <c>null</c>。</returns>
 		public override String ReadLine()

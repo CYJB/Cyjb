@@ -9,8 +9,8 @@ namespace Cyjb.Text
 	/// 表示一个词法单元。在比较时不考虑 <see cref="Token{T}.Value"/> 属性。
 	/// </summary>
 	/// <typeparam name="T">词法单元标识符的类型，必须是一个枚举类型。</typeparam>
-	/// <remarks><typeparamref name="T"/> 必须的枚举类型，
-	/// 该类型的特殊值 <c>-1</c> 将用于表示文件结束。</remarks>
+	/// <remarks><typeparamref name="T"/> 必须的枚举类型，使用该类型的特殊值 
+	/// <c>-1</c> 用于表示文件结束，<c>-2</c> 表示语法产生式的错误。</remarks>
 	public class Token<T> : ISourceLocatable, IEquatable<Token<T>>
 		where T : struct
 	{
@@ -97,17 +97,17 @@ namespace Cyjb.Text
 		/// <param name="range">位置范围。</param>
 		public Token(T id, string text, ISourceLocatable range)
 		{
+			if (range != null && range.Start.IsUnknown != range.End.IsUnknown)
+			{
+				throw CommonExceptions.InvalidSourceRange(range.Start, range.End);
+			}
+			if (range != null && !range.Start.IsUnknown && range.Start > range.End)
+			{
+				throw CommonExceptions.ReversedArgument("range.Start", "range.End");
+			}
+			Contract.EndContractBlock();
 			if (range != null)
 			{
-				if (range.Start.IsUnknown != range.End.IsUnknown)
-				{
-					throw CommonExceptions.InvalidSourceRange(range.Start, range.End);
-				}
-				if (!range.Start.IsUnknown && range.Start > range.End)
-				{
-					throw CommonExceptions.ReversedArgument("locatable.Start", "locatable.End");
-				}
-				//Contract.EndContractBlock();
 				this.Start = range.Start;
 				this.End = range.End;
 			}
@@ -124,10 +124,15 @@ namespace Cyjb.Text
 		/// <param name="value">词法单元的值。</param>
 		public Token(T id, string text, SourcePosition start, SourcePosition end, object value)
 		{
-			if (start > end)
+			if (start.IsUnknown != end.IsUnknown)
+			{
+				throw CommonExceptions.InvalidSourceRange(start, end);
+			}
+			if (!start.IsUnknown && start > end)
 			{
 				throw CommonExceptions.ReversedArgument("start", "end");
 			}
+			Contract.EndContractBlock();
 			this.Id = id;
 			this.Text = text;
 			this.Start = start;
@@ -143,12 +148,17 @@ namespace Cyjb.Text
 		/// <param name="value">词法单元的值。</param>
 		public Token(T id, string text, ISourceLocatable range, object value)
 		{
+			if (range != null && range.Start.IsUnknown != range.End.IsUnknown)
+			{
+				throw CommonExceptions.InvalidSourceRange(range.Start, range.End);
+			}
+			if (range != null && !range.Start.IsUnknown && range.Start > range.End)
+			{
+				throw CommonExceptions.ReversedArgument("range.Start", "range.End");
+			}
+			Contract.EndContractBlock();
 			if (range != null)
 			{
-				if (range.Start > range.End)
-				{
-					throw CommonExceptions.ReversedArgument("range.Start", "range.End");
-				}
 				this.Start = range.Start;
 				this.End = range.End;
 			}
