@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Cyjb.Utility
 {
@@ -41,11 +42,7 @@ namespace Cyjb.Utility
 		/// <remarks>算法来自 boost::hash_range。</remarks>
 		public static int Combine<T>(int seed, IEnumerable<T> objs)
 		{
-			foreach (T obj in objs)
-			{
-				seed = Combine(seed, obj);
-			}
-			return seed;
+			return objs.Aggregate(seed, Combine);
 		}
 	}
 }

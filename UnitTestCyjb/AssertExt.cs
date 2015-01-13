@@ -24,20 +24,18 @@ namespace UnitTestCyjb
 					Assert.Fail("实际的集合 {{{0}}} 不为 null", string.Join(", ", actual));
 				}
 			}
+			else if (actual == null)
+			{
+				Assert.Fail("实际的集合为 null");
+			}
 			else
 			{
-				if (actual == null)
+				HashSet<T> expectedSet = new HashSet<T>(expected);
+				HashSet<T> actualSet = new HashSet<T>(expected);
+				if (!expectedSet.SetEquals(actualSet))
 				{
-					Assert.Fail("实际的集合为 null");
-				}
-				else
-				{
-					HashSet<T> e = new HashSet<T>(expected);
-					if (!e.SetEquals(actual))
-					{
-						Assert.Fail("期望得到 {{{0}}}，而实际得到的是 {{{1}}}",
-							string.Join(", ", expected), string.Join(", ", actual));
-					}
+					Assert.Fail("期望得到 {{{0}}}，而实际得到的是 {{{1}}}",
+						string.Join(", ", expectedSet), string.Join(", ", actualSet));
 				}
 			}
 		}
@@ -55,25 +53,18 @@ namespace UnitTestCyjb
 					Assert.Fail("实际的数组 {{{0}}} 不为 null", string.Join(", ", actual));
 				}
 			}
+			else if (actual == null)
+			{
+				Assert.Fail("实际的数组为 null");
+			}
 			else
 			{
-				if (actual == null)
+				for (int i = 0; i < expected.Length; i++)
 				{
-					Assert.Fail("实际的数组为 null");
-				}
-				else
-				{
-					if (expected.Length != actual.Length)
+					if (!EqualityComparer<T>.Default.Equals(expected[i], actual[i]))
 					{
-						Assert.Fail("数组长度 {0} 不是期望的 {1}", actual.Length, expected.Length);
-					}
-					for (int i = 0; i < expected.Length; i++)
-					{
-						if (!EqualityComparer<T>.Default.Equals(expected[i], actual[i]))
-						{
-							Assert.Fail("期望得到 {{{0}}}，而实际得到的是 {{{1}}}",
-								string.Join(", ", expected), string.Join(", ", actual));
-						}
+						Assert.Fail("期望得到 {{{0}}}，而实际得到的是 {{{1}}}",
+							string.Join(", ", expected), string.Join(", ", actual));
 					}
 				}
 			}
@@ -93,17 +84,14 @@ namespace UnitTestCyjb
 			catch (Exception ex)
 			{
 				// 检查是否是期望的异常。
-				for (int i = 0; i < expectedException.Length; i++)
+				if (expectedException.Any(t => t.IsInstanceOfType(ex)))
 				{
-					if (expectedException[i].IsInstanceOfType(ex))
-					{
-						return;
-					}
+					return;
 				}
-				throw ex;
+				throw;
 			}
 			// 未发生异常。
-			Assert.Fail("没有抛出期望的异常 {0}", string.Join(", ", expectedException.AsEnumerable<Type>()));
+			Assert.Fail("没有抛出期望的异常 {0}", string.Join(", ", expectedException.AsEnumerable()));
 		}
 	}
 }

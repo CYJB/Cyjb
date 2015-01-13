@@ -61,8 +61,7 @@ namespace Cyjb
 		/// <summary>
 		/// 使用指定值搜索具有指定属性说明符的项的索引。
 		/// </summary>
-		/// <param name="prop">要搜索的 
-		/// <see cref="System.ComponentModel.PropertyDescriptor"/>。</param>
+		/// <param name="prop">要搜索的 <see cref="PropertyDescriptor"/>。</param>
 		/// <param name="key">要匹配的 <paramref name="prop"/> 值。</param>
 		/// <returns>与属性说明符匹配并包含指定值的项的从零开始的索引。
 		/// </returns>
@@ -72,7 +71,7 @@ namespace Cyjb
 			{
 				for (int i = 0; i < Count; i++)
 				{
-					if (object.Equals(Items[i].Value, key))
+					if (Equals(Items[i].Value, key))
 					{
 						return i;
 					}
