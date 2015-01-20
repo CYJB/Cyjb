@@ -578,18 +578,18 @@ namespace Cyjb
 		/// <returns><see cref="System.UInt64"/> 类型的枚举值。</returns>
 		private static ulong ToUInt64(object value)
 		{
-			switch (Convert.GetTypeCode(value))
+			switch (System.Convert.GetTypeCode(value))
 			{
 				case TypeCode.SByte:
 				case TypeCode.Int16:
 				case TypeCode.Int32:
 				case TypeCode.Int64:
-					return unchecked((ulong)Convert.ToInt64(value, CultureInfo.InvariantCulture));
+					return unchecked((ulong)System.Convert.ToInt64(value, CultureInfo.InvariantCulture));
 				case TypeCode.Byte:
 				case TypeCode.UInt16:
 				case TypeCode.UInt32:
 				case TypeCode.UInt64:
-					return Convert.ToUInt64(value, CultureInfo.InvariantCulture);
+					return System.Convert.ToUInt64(value, CultureInfo.InvariantCulture);
 			}
 			Debug.Fail("无效的枚举类型");
 			return 0;

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 
 namespace Cyjb
 {
@@ -11,15 +13,17 @@ namespace Cyjb
 		/// <summary>
 		/// 要获取的唯一值。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private TValue uniqueValue;
 		/// <summary>
 		/// 获取的值是否是唯一的。
 		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private Tristate isUnique = Tristate.NotSure;
 		/// <summary>
 		/// 值相等的比较器。
 		/// </summary>
-		private IEqualityComparer<TValue> comparer = null;
+		private readonly IEqualityComparer<TValue> comparer;
 		/// <summary>
 		/// 初始化 <see cref="UniqueValue{TValue}"/> 类的新实例。
 		/// </summary>
@@ -38,14 +42,7 @@ namespace Cyjb
 		/// <param name="comparer">值相等的比较器。</param>
 		public UniqueValue(IEqualityComparer<TValue> comparer)
 		{
-			if (comparer == null)
-			{
-				this.comparer = EqualityComparer<TValue>.Default;
-			}
-			else
-			{
-				this.comparer = comparer;
-			}
+			this.comparer = comparer ?? EqualityComparer<TValue>.Default;
 		}
 		/// <summary>
 		/// 使用指定的初始值初始化 <see cref="UniqueValue{TValue}"/> 类的新实例。
@@ -133,11 +130,11 @@ namespace Cyjb
 			switch (isUnique)
 			{
 				case Tristate.True:
-					return string.Concat("[Unique ", uniqueValue, "]");
+					return string.Format(CultureInfo.InvariantCulture, Resources.UniqueValue_Unique, uniqueValue);
 				case Tristate.False:
-					return "[Ambig]";
+					return Resources.UniqueValue_Ambig;
 				default:
-					return "[Empty]";
+					return Resources.UniqueValue_Empty;
 			}
 		}
 	}

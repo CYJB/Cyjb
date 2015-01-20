@@ -97,6 +97,15 @@ namespace Cyjb {
         }
         
         /// <summary>
+        ///   查找类似 Ambiguous user-defined converter found when convert &apos;{0}&apos; to &apos;{1}&apos;. 的本地化字符串。
+        /// </summary>
+        internal static string AmbiguousUserDefinedConverter {
+            get {
+                return ResourceManager.GetString("AmbiguousUserDefinedConverter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 At least one object must implement IComparable. 的本地化字符串。
         /// </summary>
         internal static string ArgumentImplementIComparable {
@@ -745,7 +754,7 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 Unrecognized token &quot;{0}&quot;. 的本地化字符串。
+        ///   查找类似 Unrecognized token &apos;{0}&apos;. 的本地化字符串。
         /// </summary>
         internal static string UnrecognizedToken {
             get {

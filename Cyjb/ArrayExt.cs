@@ -1,5 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace Cyjb
 {
@@ -463,5 +465,59 @@ namespace Cyjb
 
 		#endregion // 零长数组
 
+		#region 合并
+
+		/// <summary>
+		/// 将多个数组合并为一个数组。
+		/// </summary>
+		/// <typeparam name="T">数组中元素的类型。</typeparam>
+		/// <param name="arrays">要合并的数组。</param>
+		/// <returns>数组的合并结果。</returns>
+		/// <exception cref="System.ArgumentNullException"><paramref name="arrays"/> 为 <c>null</c>。</exception>
+		public static T[] Combine<T>(params T[][] arrays)
+		{
+			if (arrays == null)
+			{
+				throw CommonExceptions.ArgumentNull("arrays");
+			}
+			Contract.Ensures(Contract.Result<T[]>() != null);
+			int len = arrays.Sum(arr => arr == null ? 0 : arr.Length);
+			if (len == 0)
+			{
+				return Empty<T>();
+			}
+			T[] result = new T[len];
+			int idx = 0;
+			for (int i = 0; i < arrays.Length; i++)
+			{
+				if (arrays[i] != null)
+				{
+					arrays[i].CopyTo(result, idx);
+					idx += arrays[i].Length;
+				}
+			}
+			return result;
+		}
+
+		#endregion // 合并
+
+		/// <summary>
+		/// 使用默认的类型转换方法将当前数组转换为另一种类型的数组。
+		/// </summary>
+		/// <typeparam name="TInput">源数组元素的类型。</typeparam>
+		/// <typeparam name="TOutput">目标数组元素的类型。</typeparam>
+		/// <param name="array">要转换为目标类型的一维数组。</param>
+		/// <returns>目标类型的数组，包含从源数组转换而来的元素。</returns>
+		/// <exception cref="InvalidCastException"><typeparamref name="TInput"/> 类型不能转换到 
+		/// <typeparamref name="TOutput"/> 类型。</exception>
+		public static TOutput[] ConvertAll<TInput, TOutput>(this TInput[] array)
+		{
+			Converter<TInput, TOutput> converter = Convert.GetConverter<TInput, TOutput>();
+			if (converter == null)
+			{
+				throw CommonExceptions.InvalidCastFromTo(typeof (TInput), typeof (TOutput));
+			}
+			return Array.ConvertAll(array, converter);
+		}
 	}
 }

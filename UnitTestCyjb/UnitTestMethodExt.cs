@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Cyjb;
+using Cyjb.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTestCyjb
 {
 	/// <summary>
-	/// <see cref="Cyjb.MethodExt"/> 类的单元测试。
+	/// <see cref="MethodExt"/> 类的单元测试。
 	/// </summary>
 	[TestClass]
 	public class UnitTestMethodExt
 	{
 		/// <summary>
-		/// 对 <see cref="Cyjb.MethodExt.MakeGenericMethodFromParams"/> 方法进行测试。
+		/// 对 <see cref="MethodExt.MakeGenericMethodFromParams"/> 方法进行测试。
 		/// </summary>
 		[TestMethod]
 		public void TestMakeGenericMethodFromParams()

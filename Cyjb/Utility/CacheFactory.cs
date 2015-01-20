@@ -108,7 +108,7 @@ namespace Cyjb.Utility
 					try
 					{
 						values[j] = Convert.ChangeType(value.Value,
-							parameters[j].ParameterType, CultureInfo.InvariantCulture);
+							parameters[j].ParameterType);
 					}
 					catch (InvalidCastException)
 					{

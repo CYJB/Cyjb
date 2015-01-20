@@ -124,6 +124,33 @@ namespace Cyjb {
         }
         
         /// <summary>
+        ///   查找类似 [Ambig] 的本地化字符串。
+        /// </summary>
+        internal static string UniqueValue_Ambig {
+            get {
+                return ResourceManager.GetString("UniqueValue_Ambig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 [Empty] 的本地化字符串。
+        /// </summary>
+        internal static string UniqueValue_Empty {
+            get {
+                return ResourceManager.GetString("UniqueValue_Empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 [Unique {0}] 的本地化字符串。
+        /// </summary>
+        internal static string UniqueValue_Unique {
+            get {
+                return ResourceManager.GetString("UniqueValue_Unique", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 [Warning]  的本地化字符串。
         /// </summary>
         internal static string WarningText {

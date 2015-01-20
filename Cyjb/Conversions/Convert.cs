@@ -1,357 +1,401 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Reflection;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
+using System.Reflection.Emit;
+using Cyjb.Conversions;
+using Cyjb.Reflection;
 
 namespace Cyjb
 {
 	/// <summary>
-	/// 提供将一个数据类型转换为另一个数据类型的方法。
+	/// 提供将一种类型转换为另一种类型的方法。
 	/// </summary>
-	public static class ConvertExt
+	/// <remarks><para>支持预定义的隐式、显式类型转换，用户自定义类型转换（Implicit 和 Explicit 运算符），
+	/// 并可以通过 <see cref="AddConverter{TInput, TOutput}"/> 和 <see cref="AddConverterProvider"/> 
+	/// 方法注入额外的类型转换方法。</para>
+	/// <para>默认添加了所有类型转换为字符串，和字符串转换为数字、布尔和日期/时间的额外方法。</para>
+	/// <para>所有数值类型转换，都会对溢出进行检查，如果数值不在范围内则会抛出异常。</para>
+	/// </remarks>
+	public static class Convert
 	{
+		/// <summary>
+		/// 返回具有指定输入和输出类型的 <see cref="Converter{TInput, TOutput}"/> 类型。
+		/// </summary>
+		/// <param name="inputType">要转换的对象的类型。</param>
+		/// <param name="outputType">要将输入对象转换到的类型。</param>
+		/// <returns>具有指定输入和输出类型的 <see cref="Converter{TInput, TOutput}"/> 类型。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="inputType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="outputType"/> 为 <c>null</c>。</exception>
+		public static Type GetConverterType(Type inputType, Type outputType)
+		{
+			if (inputType == null)
+			{
+				throw CommonExceptions.ArgumentNull("inputType");
+			}
+			if (outputType == null)
+			{
+				throw CommonExceptions.ArgumentNull("outputType");
+			}
+			Contract.EndContractBlock();
+			return typeof(Converter<,>).MakeGenericType(inputType, outputType);
+		}
 
-		#region 隐式类型转换
+		#region 转换器
 
 		/// <summary>
-		/// 返回指定类型的对象，其值等效于指定对象。参数提供区域性特定的格式设置信息。
-		/// 只对允许进行隐式类型转换。
+		/// 类型的转换器。
 		/// </summary>
-		/// <param name="value">要转换的对象。</param>
-		/// <param name="conversionType">要返回的对象的类型。</param>
-		/// <param name="provider">一个提供区域性特定的格式设置信息的对象。</param>
-		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，
-		/// 并且其值等效于 <paramref name="value"/>。</returns>
-		internal static object ImplicitChangeType(object value, Type conversionType, IFormatProvider provider)
+		private sealed class Converter
 		{
-			Type nonNullableType;
-			if (BasicChangeType(ref value, conversionType, out nonNullableType))
+			/// <summary>
+			/// 泛型的类型转换器。
+			/// </summary>
+			public Delegate GenericConverter;
+			/// <summary>
+			/// 非泛型的类型转换器。
+			/// </summary>
+			public Converter<object, object> ObjectConverter;
+		}
+		/// <summary>
+		/// 直接返回对象的类型转换器，用于隐式引用转换。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private static readonly Converter<object, object> defaultObjectConverter = obj => obj;
+		/// <summary>
+		/// 类型转换器的存储字典。
+		/// </summary>
+		private static readonly ConcurrentDictionary<Tuple<Type, Type>, Converter> converterDict =
+			new ConcurrentDictionary<Tuple<Type, Type>, Converter>();
+		/// <summary>
+		/// 获取将对象从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 类型的转换器。
+		/// </summary>
+		/// <param name="inputType">要转换的对象的类型。</param>
+		/// <param name="outputType">要将输入对象转换到的类型。</param>
+		/// <param name="buildGeneric"><c>true</c> 表示需要生成泛型类型转换委托；<c>false</c> 
+		/// 表示需要生成非泛型的类型转换委托。</param>
+		/// <returns>将对象从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 类型的转换器。
+		/// 如果不存在则为 <c>null</c>。</returns>
+		private static Converter GetConverterInternal(Type inputType, Type outputType, bool buildGeneric)
+		{
+			Contract.Requires(inputType != null && outputType != null);
+			return converterDict.GetOrAdd(new Tuple<Type, Type>(inputType, outputType), types =>
 			{
-				return value;
-			}
-			Type type = value.GetType();
-			// 尝试标准隐式类型转换。
-			bool success;
-			object result = StandardImplicitChangeType(value, type, nonNullableType, provider, out success);
-			if (success)
-			{
-				return result;
-			}
-			// 对隐式类型转换运算符进行判断。
-			ConversionMethod method = ConversionCache.GetImplicitConversion(type, conversionType);
-			if (method != null)
-			{
-				value = MethodInfo.GetMethodFromHandle(method.Method).Invoke(null, new object[] { value });
-				if (value != null)
+				Conversion conversion = ConversionFactory.GetConversion(inputType, outputType);
+				if (conversion == null)
 				{
-					type = value.GetType();
-					if (type != nonNullableType)
+					return null;
+				}
+				Converter converter = new Converter();
+				DelegateConversion dlgConversion = conversion as DelegateConversion;
+				if (dlgConversion != null)
+				{
+					converter.GenericConverter = dlgConversion.Converter;
+					if (buildGeneric)
 					{
-						// 处理用户定义隐式类型转换之后的标准隐式类型转换。
-						value = StandardImplicitChangeType(value, type, nonNullableType, provider, out success);
+						return converter;
 					}
 				}
-				return value;
-			}
-			throw CommonExceptions.ConvertInvalidValue(value, conversionType);
-		}
-		/// <summary>
-		/// 对指定类型执行基本的类型转换判断，包括转换为 object 和 null 转换。
-		/// 基本类型转换失败时，保证 value != null，nonNullableType != null。
-		/// </summary>
-		/// <param name="value">要转换的对象。</param>
-		/// <param name="conversionType">要返回的对象的类型。</param>
-		/// <param name="nonNullableType"><paramref name="value"/> 对应的 non-nullable-type。</param>
-		/// <returns>如果基本类型转换成功，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private static bool BasicChangeType(ref object value, Type conversionType, out Type nonNullableType)
-		{
-			CommonExceptions.CheckArgumentNull(conversionType, "conversionType");
-			if (conversionType.IsByRef)
-			{
-				conversionType = conversionType.GetElementType();
-			}
-			// 总是可以转换为 Object。
-			if (conversionType == typeof(object))
-			{
-				nonNullableType = null;
-				return true;
-			}
-			// value 为 null 的情况。
-			bool nullableCType = TypeExt.IsNullableType(conversionType, out nonNullableType);
-			if (value == null)
-			{
-				if (conversionType.IsValueType && !nullableCType)
+				if (conversion.ConversionType == ConversionType.ImplicitReferenceConversion)
 				{
-					throw CommonExceptions.CannotCastNullToValueType();
-				}
-				return true;
-			}
-			return false;
-		}
-		/// <summary>
-		/// 返回指定类型的对象，其值等效于指定对象。参数提供区域性特定的格式设置信息。
-		/// 只对允许进行标准隐式类型转换。
-		/// </summary>
-		/// <remarks>在运行时，value.GetType() 永远不可能为 Nullalbe{T}，因此某些情况可以不考虑。</remarks>
-		/// <param name="value">要转换的对象。</param>
-		/// <param name="type">要转换的对象的类型。</param>
-		/// <param name="conversionType">要返回的对象的类型。</param>
-		/// <param name="provider">一个提供区域性特定的格式设置信息的对象。</param>
-		/// <param name="success">如果标准隐式类型转换成功，则为 <c>true</c>；否则为 <c>false</c>。</param>
-		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，并且其值等效于 <paramref name="value"/>。</returns>
-		private static object StandardImplicitChangeType(object value, Type type, Type conversionType,
-			IFormatProvider provider, out bool success)
-		{
-			success = true;
-			// 判断隐式数值转换。
-			HashSet<TypeCode> typeSet;
-			TypeCode cTypeCode = Type.GetTypeCode(conversionType);
-			if (!conversionType.IsEnum && TypeExt.ImplicitNumericConversions.TryGetValue(cTypeCode, out typeSet))
-			{
-				TypeCode typeCode = Type.GetTypeCode(type);
-				if (!type.IsEnum && typeSet.Contains(typeCode))
-				{
-					// char 类型的变量需要额外判断，
-					// 因为 Convert 类并不支持到 Single，Double 和 Decimal 类型的转换。
-					if (typeCode == TypeCode.Char)
+					converter.ObjectConverter = defaultObjectConverter;
+					if (!buildGeneric)
 					{
-						switch (cTypeCode)
-						{
-							case TypeCode.Single: return ConvertCharToSingle(value);
-							case TypeCode.Double: return ConvertCharToDouble(value);
-							case TypeCode.Decimal: return ConvertCharToDecimal(value);
-						}
+						return converter;
 					}
-					return Convert.ChangeType(value, conversionType, provider);
+				}
+				Delegate dlg = BuildConverter(conversion, inputType, outputType, false, buildGeneric);
+				if (buildGeneric)
+				{
+					converter.GenericConverter = dlg;
+				}
+				else
+				{
+					converter.ObjectConverter = (Converter<object, object>)dlg;
+				}
+				return converter;
+			});
+		}
+		/// <summary>
+		/// 构造类型转换器。
+		/// </summary>
+		/// <param name="conversion">使用的类型转换。</param>
+		/// <param name="inputType">要转换的对象的类型。</param>
+		/// <param name="outputType">要将输入对象转换到的类型。</param>
+		/// <param name="isChecked">是否执行溢出检查。</param>
+		/// <param name="buildGeneric"><c>true</c> 表示需要生成泛型类型转换委托；<c>false</c> 
+		/// 表示需要生成非泛型的类型转换委托。</param>
+		/// <returns>将对象从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 类型的转换器。</returns>
+		private static Delegate BuildConverter(Conversion conversion, Type inputType, Type outputType, bool isChecked,
+			bool buildGeneric)
+		{
+			Contract.Requires(conversion != null && inputType != null && outputType != null);
+			Contract.Ensures(Contract.Result<Delegate>() != null);
+			string methodName = string.Concat("Converter_", inputType.FullName(), "_To_", outputType.FullName());
+			DynamicMethod method = new DynamicMethod(methodName, buildGeneric ? outputType : typeof(object),
+				new[] { buildGeneric ? inputType : typeof(object) }, true);
+			ILGenerator il = method.GetILGenerator();
+			bool passByAddress = conversion is FromNullableConversion;
+			if (passByAddress && (buildGeneric || !inputType.IsValueType))
+			{
+				il.Emit(OpCodes.Ldarga_S, (byte)0);
+			}
+			else
+			{
+				il.Emit(OpCodes.Ldarg_0);
+			}
+			if (buildGeneric)
+			{
+				conversion.Emit(il, inputType, outputType, isChecked);
+				il.Emit(OpCodes.Ret);
+				return method.CreateDelegate(typeof(Converter<,>).MakeGenericType(inputType, outputType));
+			}
+			// 从 object 拆箱得到值类型。
+			ConversionFactory.GetPreDefinedConversion(typeof(object), inputType).Emit(il, typeof(object), inputType, isChecked);
+			if (passByAddress)
+			{
+				il.EmitGetAddress(inputType);
+			}
+			conversion.Emit(il, inputType, outputType, isChecked);
+			// 值类型装箱为 object。
+			if (outputType.IsValueType)
+			{
+				il.Emit(OpCodes.Box, outputType);
+			}
+			il.Emit(OpCodes.Ret);
+			return method.CreateDelegate(typeof(Converter<object, object>));
+		}
+		/// <summary>
+		/// 获取将对象从 <typeparamref name="TInput"/> 类型转换为 <typeparamref name="TOutput"/> 类型的转换器。
+		/// </summary>
+		/// <returns>将对象从 <typeparamref name="TInput"/> 类型转换为 <typeparamref name="TOutput"/> 类型的转换器。
+		/// 如果不存在则为 <c>null</c>。</returns>
+		public static Converter<TInput, TOutput> GetConverter<TInput, TOutput>()
+		{
+			Type inputType = typeof(TInput);
+			Type outputType = typeof(TOutput);
+			Converter converter = GetConverterInternal(inputType, outputType, true);
+			if (converter == null)
+			{
+				return null;
+			}
+			if (converter.GenericConverter == null)
+			{
+				converter.GenericConverter = BuildConverter(ConversionFactory.GetConversion(inputType, outputType),
+					inputType, outputType, false, true);
+			}
+			return converter.GenericConverter as Converter<TInput, TOutput>;
+		}
+		/// <summary>
+		/// 获取将对象从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 类型的转换器。
+		/// </summary>
+		/// <param name="inputType">要转换的对象的类型。</param>
+		/// <param name="outputType">要将输入对象转换到的类型。</param>
+		/// <returns>将对象从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 类型的转换器。
+		/// 如果不存在则为 <c>null</c>。</returns>
+		/// <remarks>尽可能使用泛型方法 <see cref="GetConverter{TInput,TOutput}"/>，这样可以避免额外的类型转换。</remarks>
+		/// <exception cref="ArgumentNullException"><paramref name="inputType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="outputType"/> 为 <c>null</c>。</exception>
+		public static Converter<object, object> GetConverter(Type inputType, Type outputType)
+		{
+			if (inputType == null)
+			{
+				throw CommonExceptions.ArgumentNull("inputType");
+			}
+			if (outputType == null)
+			{
+				throw CommonExceptions.ArgumentNull("outputType");
+			}
+			Contract.EndContractBlock();
+			Converter converter = GetConverterInternal(inputType, outputType, false);
+			if (converter == null)
+			{
+				return null;
+			}
+			return converter.ObjectConverter ?? (converter.ObjectConverter = (Converter<object, object>)BuildConverter(
+				ConversionFactory.GetConversion(inputType, outputType), inputType, outputType, false, false));
+		}
+		/// <summary>
+		/// 获取将对象从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 类型的转换器类型。
+		/// </summary>
+		/// <param name="inputType">要转换的对象的类型。</param>
+		/// <param name="outputType">要将输入对象转换到的类型。</param>
+		/// <returns>将对象从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 
+		/// 类型的转换器类型。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="inputType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="outputType"/> 为 <c>null</c>。</exception>
+		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+		public static ConversionType GetConvertType(Type inputType, Type outputType)
+		{
+			if (inputType == null)
+			{
+				throw CommonExceptions.ArgumentNull("inputType");
+			}
+			if (outputType == null)
+			{
+				throw CommonExceptions.ArgumentNull("outputType");
+			}
+			Contract.EndContractBlock();
+			try
+			{
+				Conversion conversion = ConversionFactory.GetConversion(inputType, outputType);
+				if (conversion != null)
+				{
+					return conversion.ConversionType;
 				}
 			}
-			// 判断隐式引用转换和装箱转换。
-			if (conversionType.IsAssignableFrom(type))
+			catch { }
+			return ConversionType.None;
+		}
+		/// <summary>
+		/// 返回表示对象能否从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 类型的布尔值。
+		/// </summary>
+		/// <param name="inputType">要转换的对象的类型。</param>
+		/// <param name="outputType">要将输入对象转换到的类型。</param>
+		/// <returns>如果对象能够从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 类型，
+		/// 则为 <c>true</c>。否则为 <c>false</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="inputType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="outputType"/> 为 <c>null</c>。</exception>
+		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+		public static bool CanChangeType(Type inputType, Type outputType)
+		{
+			if (inputType == null)
 			{
-				return value;
+				throw CommonExceptions.ArgumentNull("inputType");
 			}
-			success = false;
-			return null;
+			if (outputType == null)
+			{
+				throw CommonExceptions.ArgumentNull("outputType");
+			}
+			Contract.EndContractBlock();
+			try
+			{
+				return ConversionFactory.GetConversion(inputType, outputType) != null;
+			}
+			catch
+			{
+				return false;
+			}
 		}
 		/// <summary>
-		/// 将 <see cref="System.Char"/> 类型的值转换为 <see cref="System.Single"/> 类型的值。
+		/// 添加将对象从 <typeparamref name="TInput"/> 类型转换为 <typeparamref name="TOutput"/> 类型的转换器。
 		/// </summary>
-		/// <param name="value">要转换的 <see cref="System.Char"/> 类型的值。</param>
-		/// <returns>转换得到的 <see cref="Single"/> 类型的值。</returns>
-		private static object ConvertCharToSingle(object value)
+		/// <param name="converter">将对象从 <typeparamref name="TInput"/> 类型转换为 
+		/// <typeparamref name="TOutput"/> 类型的转换器。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="converter"/> 为 <c>null</c>。</exception>
+		public static void AddConverter<TInput, TOutput>(Converter<TInput, TOutput> converter)
 		{
-			return (float)(char)value;
+			if (converter == null)
+			{
+				throw CommonExceptions.ArgumentNull("converter");
+			}
+			Contract.EndContractBlock();
+			ConversionFactory.AddConverterProvider(new ConverterProvider(converter, typeof(TInput), typeof(TOutput)));
 		}
 		/// <summary>
-		/// 将 <see cref="System.Char"/> 类型的值转换为 <see cref="System.Double"/> 类型的值。
+		/// 添加指定的类型转换器提供者。
 		/// </summary>
-		/// <param name="value">要转换的 <see cref="System.Char"/> 类型的值。</param>
-		/// <returns>转换得到的 <see cref="Double"/> 类型的值。</returns>
-		private static object ConvertCharToDouble(object value)
+		/// <param name="provider">要添加的类型转换器提供者。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="provider"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="provider"/> 的源类型为 <c>null</c>。</exception>
+		public static void AddConverterProvider(IConverterProvider provider)
 		{
-			return (double)(char)value;
-		}
-		/// <summary>
-		/// 将 <see cref="System.Char"/> 类型的值转换为 <see cref="System.Decimal"/> 类型的值。
-		/// </summary>
-		/// <param name="value">要转换的 <see cref="System.Char"/> 类型的值。</param>
-		/// <returns>转换得到的 <see cref="Decimal"/> 类型的值。</returns>
-		private static object ConvertCharToDecimal(object value)
-		{
-			return (decimal)(char)value;
+			if (provider == null)
+			{
+				throw CommonExceptions.ArgumentNull("provider");
+			}
+			if (provider.OriginType == null)
+			{
+				throw CommonExceptions.ArgumentNull("provider.OriginType");
+			}
+			Contract.EndContractBlock();
+			ConversionFactory.AddConverterProvider(provider);
 		}
 
-		#endregion // 隐式类型转换
+		#endregion // 转换器
 
 		#region 类型转换
 
 		/// <summary>
-		/// 返回指定类型的对象，其值等效于指定对象。支持可空类型、枚举和用户自定义类型转换。
+		/// 返回指定类型的对象，其值等效于指定对象。
 		/// </summary>
-		/// <typeparam name="T">要转换到的类型。</typeparam>
+		/// <typeparam name="TInput">要转换的对象的类型。</typeparam>
+		/// <typeparam name="TOutput">要将 <paramref name="value"/> 转换到的类型。</typeparam>
 		/// <param name="value">要转换的对象。</param>
-		/// <returns>一个对象，其类型为 <typeparamref name="T"/>，
+		/// <returns>一个对象，其类型为 <typeparamref name="TOutput"/>，
 		/// 并且其值等效于 <paramref name="value"/>。</returns>
-		public static T ChangeType<T>(object value)
+		/// <exception cref="InvalidCastException">不支持此转换。</exception>
+		public static TOutput ChangeType<TInput, TOutput>(TInput value)
 		{
-			return (T)ChangeType(value, typeof(T), CultureInfo.CurrentCulture);
-		}
-		/// <summary>
-		/// 返回指定类型的对象，其值等效于指定对象。参数提供区域性特定的格式设置信息。
-		/// 支持可空类型、枚举和用户自定义类型转换。
-		/// </summary>
-		/// <typeparam name="T">要转换到的类型。</typeparam>
-		/// <param name="value">要转换的对象。</param>
-		/// <param name="provider">一个提供区域性特定的格式设置信息的对象。</param>
-		/// <returns>一个对象，其类型为 <typeparamref name="T"/>，
-		/// 并且其值等效于 <paramref name="value"/>。</returns>
-		public static T ChangeType<T>(object value, IFormatProvider provider)
-		{
-			return (T)ChangeType(value, typeof(T), provider);
-		}
-		/// <summary>
-		/// 返回指定类型的对象，其值等效于指定对象。 支持可空类型、枚举和用户自定义类型转换。
-		/// </summary>
-		/// <param name="value">要转换的对象。</param>
-		/// <param name="conversionType">要返回的对象的类型。</param>
-		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，
-		/// 并且其值等效于 <paramref name="value"/>。</returns>
-		public static object ChangeType(object value, Type conversionType)
-		{
-			return ChangeType(value, conversionType, CultureInfo.CurrentCulture);
-		}
-		/// <summary>
-		/// 返回指定类型的对象，其值等效于指定对象。参数提供区域性特定的格式设置信息。
-		/// 支持可空类型、枚举和用户自定义类型转换。
-		/// </summary>
-		/// <param name="value">要转换的对象。</param>
-		/// <param name="conversionType">要返回的对象的类型。</param>
-		/// <param name="provider">一个提供区域性特定的格式设置信息的对象。</param>
-		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，
-		/// 并且其值等效于 <paramref name="value"/>。</returns>
-		/// <overloads>
-		/// <summary>
-		/// 返回指定类型的对象，其值等效于指定对象。支持可空类型、枚举和用户自定义类型转换。
-		/// </summary>
-		/// </overloads>
-		public static object ChangeType(object value, Type conversionType, IFormatProvider provider)
-		{
-			Type nonNullableType;
-			if (BasicChangeType(ref value, conversionType, out nonNullableType))
+			Converter<TInput, TOutput> converter = GetConverter<TInput, TOutput>();
+			if (converter == null)
 			{
-				return value;
+				throw CommonExceptions.InvalidCastFromTo(typeof(TInput), typeof(TOutput));
 			}
-			Type type = value.GetType();
-			// 尝试显示枚举转换。
-			if (conversionType.IsEnumExplicitFrom(type))
+			return converter(value);
+		}
+		/// <summary>
+		/// 返回指定类型的对象，其值等效于指定对象。
+		/// </summary>
+		/// <typeparam name="TOutput">要转换到的类型。</typeparam>
+		/// <param name="value">要将 <paramref name="value"/> 转换的对象。</param>
+		/// <returns>一个对象，其类型为 <typeparamref name="TOutput"/>，
+		/// 并且其值等效于 <paramref name="value"/>。</returns>
+		/// <remarks>尽可能使用泛型方法 <see cref="ChangeType{TInput,TOutput}"/>，这样可以避免额外的类型转换。</remarks>
+		/// <exception cref="InvalidCastException"><paramref name="value"/> 为 <c>null</c>，
+		/// 而且 <typeparamref name="TOutput"/> 是值类型。</exception>
+		/// <exception cref="InvalidCastException">不支持此转换。</exception>
+		public static TOutput ChangeType<TOutput>(object value)
+		{
+			if (value == null)
 			{
-				if (conversionType.IsEnum)
+				if (typeof(TOutput).IsValueType)
 				{
-					// Enum.ToObject 不支持 char, float, double 和 decimal。
-					switch (Type.GetTypeCode(type))
-					{
-						case TypeCode.Char:
-							value = (ushort)(char)value;
-							break;
-						case TypeCode.Single:
-							value = (long)(float)value;
-							break;
-						case TypeCode.Double:
-							value = (long)(double)value;
-							break;
-						case TypeCode.Decimal:
-							value = (long)(decimal)value;
-							break;
-					}
-					return Enum.ToObject(conversionType, value);
+					throw CommonExceptions.CannotCastNullToValueType();
 				}
-				return Convert.ChangeType(value, conversionType, provider);
+				return default(TOutput);
 			}
-			// 尝试标准显式类型转换。
-			bool success;
-			object result = StandardExplicitChangeType(value, type, nonNullableType, provider, out success);
-			if (success)
+			Converter<object, object> converter = GetConverter(value.GetType(), typeof(TOutput));
+			if (converter == null)
 			{
-				return result;
+				throw CommonExceptions.InvalidCastFromTo(value.GetType(), typeof(TOutput));
 			}
-			// 对显式类型转换运算符进行判断。
-			ConversionMethod method = ConversionCache.GetExplicitConversion(type, conversionType);
-			if (method != null)
-			{
-				value = MethodBase.GetMethodFromHandle(method.Method).Invoke(null, new [] { value });
-				if (value != null)
-				{
-					type = value.GetType();
-					if (type != nonNullableType)
-					{
-						// 处理用户定义显式类型转换之后的标准显式类型转换。
-						value = StandardExplicitChangeType(value, type, nonNullableType, provider, out success);
-					}
-				}
-				return value;
-			}
-			// 尝试其他支持的转换。
-			return Convert.ChangeType(value, conversionType, provider);
+			return (TOutput)converter(value);
 		}
 		/// <summary>
-		/// 返回指定类型的对象，其值等效于指定对象。参数提供区域性特定的格式设置信息。
-		/// 只对允许进行标准显式类型转换。
+		/// 返回指定类型的对象，其值等效于指定对象。
 		/// </summary>
-		/// <remarks>在运行时，value.GetType() 永远不可能为 Nullalbe{T}，因此某些情况可以不考虑。</remarks>
 		/// <param name="value">要转换的对象。</param>
-		/// <param name="type">要转换的对象的类型。</param>
-		/// <param name="conversionType">要返回的对象的类型。</param>
-		/// <param name="provider">一个提供区域性特定的格式设置信息的对象。</param>
-		/// <param name="success">如果标准显式类型转换成功，则为 <c>true</c>；否则为 <c>false</c>。</param>
-		/// <returns>一个对象，其类型为 <paramref name="conversionType"/>，
+		/// <param name="outputType">要将 <paramref name="value"/> 转换到的类型。</param>
+		/// <returns>一个对象，其类型为 <paramref name="outputType"/>，
 		/// 并且其值等效于 <paramref name="value"/>。</returns>
-		private static object StandardExplicitChangeType(object value, Type type, Type conversionType,
-			IFormatProvider provider, out bool success)
+		/// <remarks>尽可能使用泛型方法 <see cref="ChangeType{TInput,TOutput}"/>，这样可以避免额外的类型转换。</remarks>
+		/// <exception cref="ArgumentNullException"><paramref name="outputType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="InvalidCastException"><paramref name="value"/> 为 <c>null</c>，
+		/// 而且 <paramref name="outputType"/> 是值类型。</exception>
+		/// <exception cref="InvalidCastException">不支持此转换。</exception>
+		public static object ChangeType(object value, Type outputType)
 		{
-			success = true;
-			// 判断显式数值转换。
-			TypeCode cTypeCode = Type.GetTypeCode(conversionType);
-			TypeCode typeCode = Type.GetTypeCode(type);
-			if (!conversionType.IsEnum && TypeExt.ExplicitNumericConversions.Contains(cTypeCode) &&
-				!type.IsEnum && TypeExt.ExplicitNumericConversions.Contains(typeCode))
+			if (outputType == null)
 			{
-				// char 类型的变量需要额外判断，
-				// 因为 Convert 类并不支持与 Single，Double 和 Decimal 类型之间的转换。
-				if (typeCode == TypeCode.Char)
-				{
-					switch (cTypeCode)
-					{
-						case TypeCode.Single: return ConvertCharToSingle(value);
-						case TypeCode.Double: return ConvertCharToDouble(value);
-						case TypeCode.Decimal: return ConvertCharToDecimal(value);
-					}
-				}
-				else if (cTypeCode == TypeCode.Char)
-				{
-					switch (typeCode)
-					{
-						case TypeCode.Single: return ConvertSingleToChar(value);
-						case TypeCode.Double: return ConvertDoubleToChar(value);
-						case TypeCode.Decimal: return ConvertDecimalToChar(value);
-					}
-				}
-				return Convert.ChangeType(value, conversionType, provider);
+				throw CommonExceptions.ArgumentNull("outputType");
 			}
-			// 要想显式转换成功，value 必须为 null 或者可以进行隐式转换。
-			// 判断隐式引用转换和装箱转换。
-			if (conversionType.IsAssignableFrom(type))
+			Contract.EndContractBlock();
+			if (value == null)
 			{
-				return value;
+				if (outputType.IsValueType)
+				{
+					throw CommonExceptions.CannotCastNullToValueType();
+				}
+				return null;
 			}
-			success = false;
-			return null;
-		}
-		/// <summary>
-		/// 将 <see cref="System.Single"/> 类型的值转换为 <see cref="System.Char"/> 类型的值。
-		/// </summary>
-		/// <param name="value">要转换的 <see cref="System.Single"/> 类型的值。</param>
-		/// <returns>转换得到的 <see cref="Char"/> 类型的值。</returns>
-		private static object ConvertSingleToChar(object value)
-		{
-			return (char)(float)value;
-		}
-		/// <summary>
-		/// 将 <see cref="System.Double"/> 类型的值转换为 <see cref="System.Char"/> 类型的值。
-		/// </summary>
-		/// <param name="value">要转换的 <see cref="System.Double"/> 类型的值。</param>
-		/// <returns>转换得到的 <see cref="Char"/> 类型的值。</returns>
-		private static object ConvertDoubleToChar(object value)
-		{
-			return (char)(double)value;
-		}
-		/// <summary>
-		/// 将 <see cref="System.Decimal"/> 类型的值转换为 <see cref="System.Char"/> 类型的值。
-		/// </summary>
-		/// <param name="value">要转换的 <see cref="System.Decimal"/> 类型的值。</param>
-		/// <returns>转换得到的 <see cref="Char"/> 类型的值。</returns>
-		private static object ConvertDecimalToChar(object value)
-		{
-			return (char)(decimal)value;
+			Converter<object, object> converter = GetConverter(value.GetType(), outputType);
+			if (converter == null)
+			{
+				throw CommonExceptions.InvalidCastFromTo(value.GetType(), outputType);
+			}
+			return converter(value);
 		}
 
 		#endregion // 类型转换
@@ -363,24 +407,20 @@ namespace Cyjb
 		/// <summary>
 		/// 将指定基的数字的字符串表示形式转换为等效的 <c>8</c> 位有符号整数。
 		/// </summary>
-		/// <param name="value">包含要转换的数字的字符串，
-		/// 使用不区分大小写的字母表示大于 <c>10</c> 的数。</param>
-		/// <param name="fromBase"><paramref name="value"/> 中数字的基数，
-		/// 它必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
+		/// <param name="value">包含要转换的数字的字符串，使用不区分大小写的字母表示大于 <c>10</c> 的数。</param>
+		/// <param name="fromBase"><paramref name="value"/> 中数字的基数，它必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>与 <paramref name="value"/> 中数字等效的 <c>8</c> 位有符号整数，
 		/// 如果 <paramref name="value"/> 为 <c>null</c>，则为 <c>0</c>（零）。</returns>
-		/// <exception cref="System.ArgumentException">
-		/// <paramref name="fromBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
-		/// <exception cref="System.ArgumentException">
-		/// <paramref name="value"/> 表示一个非 <c>10</c> 为基的有符号数，
+		/// <exception cref="ArgumentException"><paramref name="fromBase"/> 不是 
+		/// <c>2</c> 到 <c>36</c> 之间的数字。</exception>
+		/// <exception cref="ArgumentException"><paramref name="value"/> 表示一个非 <c>10</c> 为基的有符号数，
 		/// 但前面带一个负号。</exception>
-		/// <exception cref="System.FormatException"><paramref name="value"/> 
-		/// 包含的一个字符不是 <paramref name="fromBase"/> 指定的基中的有效数字。
+		/// <exception cref="FormatException"><paramref name="value"/> 包含的一个字符不是 
+		/// <paramref name="fromBase"/> 指定的基中的有效数字。
 		/// 如果 <paramref name="value"/> 中的第一个字符无效，异常消息则指示没有可转换的数字；
 		/// 否则，该消息将指示 <paramref name="value"/> 包含无效的尾随字符。</exception>
-		/// <exception cref="System.OverflowException"><paramref name="value"/> 
-		/// 表示小于 <see cref="System.SByte.MinValue"/> 或大于 
-		/// <see cref="System.SByte.MaxValue"/> 的数字。</exception>
+		/// <exception cref="OverflowException"><paramref name="value"/> 表示小于 
+		/// <see cref="SByte.MinValue"/> 或大于 <see cref="SByte.MaxValue"/> 的数字。</exception>
 		[CLSCompliant(false)]
 		public static sbyte ToSByte(string value, int fromBase)
 		{
@@ -400,18 +440,18 @@ namespace Cyjb
 		/// 它必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>与 <paramref name="value"/> 中数字等效的 <c>16</c> 位有符号整数，
 		/// 如果 <paramref name="value"/> 为 <c>null</c>，则为 <c>0</c>（零）。</returns>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="fromBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="value"/> 表示一个非 <c>10</c> 为基的有符号数，
 		/// 但前面带一个负号。</exception>
-		/// <exception cref="System.FormatException"><paramref name="value"/> 
+		/// <exception cref="FormatException"><paramref name="value"/> 
 		/// 包含的一个字符不是 <paramref name="fromBase"/> 指定的基中的有效数字。
 		/// 如果 <paramref name="value"/> 中的第一个字符无效，异常消息则指示没有可转换的数字；
 		/// 否则，该消息将指示 <paramref name="value"/> 包含无效的尾随字符。</exception>
-		/// <exception cref="System.OverflowException"><paramref name="value"/> 
-		/// 表示小于 <see cref="System.Int16.MinValue"/> 或大于 
-		/// <see cref="System.Int16.MaxValue"/> 的数字。</exception>
+		/// <exception cref="OverflowException"><paramref name="value"/> 
+		/// 表示小于 <see cref="Int16.MinValue"/> 或大于 
+		/// <see cref="Int16.MaxValue"/> 的数字。</exception>
 		public static short ToInt16(string value, int fromBase)
 		{
 			return unchecked((short)ToUInt16(value, fromBase));
@@ -430,18 +470,18 @@ namespace Cyjb
 		/// 它必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>与 <paramref name="value"/> 中数字等效的 <c>32</c> 位有符号整数，
 		/// 如果 <paramref name="value"/> 为 <c>null</c>，则为 <c>0</c>（零）。</returns>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="fromBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="value"/> 表示一个非 <c>10</c> 为基的有符号数，
 		/// 但前面带一个负号。</exception>
-		/// <exception cref="System.FormatException"><paramref name="value"/> 
+		/// <exception cref="FormatException"><paramref name="value"/> 
 		/// 包含的一个字符不是 <paramref name="fromBase"/> 指定的基中的有效数字。
 		/// 如果 <paramref name="value"/> 中的第一个字符无效，异常消息则指示没有可转换的数字；
 		/// 否则，该消息将指示 <paramref name="value"/> 包含无效的尾随字符。</exception>
-		/// <exception cref="System.OverflowException"><paramref name="value"/> 
-		/// 表示小于 <see cref="System.Int32.MinValue"/> 或大于 
-		/// <see cref="System.Int32.MaxValue"/> 的数字。</exception>
+		/// <exception cref="OverflowException"><paramref name="value"/> 
+		/// 表示小于 <see cref="Int32.MinValue"/> 或大于 
+		/// <see cref="Int32.MaxValue"/> 的数字。</exception>
 		public static int ToInt32(string value, int fromBase)
 		{
 			return unchecked((int)ToUInt32(value, fromBase));
@@ -460,18 +500,18 @@ namespace Cyjb
 		/// 它必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>与 <paramref name="value"/> 中数字等效的 <c>64</c> 位有符号整数，
 		/// 如果 <paramref name="value"/> 为 <c>null</c>，则为 <c>0</c>（零）。</returns>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="fromBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="value"/> 表示一个非 <c>10</c> 为基的有符号数，
 		/// 但前面带一个负号。</exception>
-		/// <exception cref="System.FormatException"><paramref name="value"/> 
+		/// <exception cref="FormatException"><paramref name="value"/> 
 		/// 包含的一个字符不是 <paramref name="fromBase"/> 指定的基中的有效数字。
 		/// 如果 <paramref name="value"/> 中的第一个字符无效，异常消息则指示没有可转换的数字；
 		/// 否则，该消息将指示 <paramref name="value"/> 包含无效的尾随字符。</exception>
-		/// <exception cref="System.OverflowException"><paramref name="value"/> 
-		/// 表示小于 <see cref="System.Int64.MinValue"/> 或大于 
-		/// <see cref="System.Int64.MaxValue"/> 的数字。</exception>
+		/// <exception cref="OverflowException"><paramref name="value"/> 
+		/// 表示小于 <see cref="Int64.MinValue"/> 或大于 
+		/// <see cref="Int64.MaxValue"/> 的数字。</exception>
 		public static long ToInt64(string value, int fromBase)
 		{
 			return unchecked((long)ToUInt64(value, fromBase));
@@ -490,18 +530,18 @@ namespace Cyjb
 		/// 它必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>与 <paramref name="value"/> 中数字等效的 <c>8</c> 位无符号整数，
 		/// 如果 <paramref name="value"/> 为 <c>null</c>，则为 <c>0</c>（零）。</returns>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="fromBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="value"/> 表示一个非 <c>10</c> 为基的有符号数，
 		/// 但前面带一个负号。</exception>
-		/// <exception cref="System.FormatException"><paramref name="value"/> 
+		/// <exception cref="FormatException"><paramref name="value"/> 
 		/// 包含的一个字符不是 <paramref name="fromBase"/> 指定的基中的有效数字。
 		/// 如果 <paramref name="value"/> 中的第一个字符无效，异常消息则指示没有可转换的数字；
 		/// 否则，该消息将指示 <paramref name="value"/> 包含无效的尾随字符。</exception>
-		/// <exception cref="System.OverflowException"><paramref name="value"/> 
-		/// 表示小于 <see cref="System.Byte.MinValue"/> 或大于 
-		/// <see cref="System.Byte.MaxValue"/> 的数字。</exception>
+		/// <exception cref="OverflowException"><paramref name="value"/> 
+		/// 表示小于 <see cref="Byte.MinValue"/> 或大于 
+		/// <see cref="Byte.MaxValue"/> 的数字。</exception>
 		public static byte ToByte(string value, int fromBase)
 		{
 			uint result = ToUInt32(value, fromBase);
@@ -525,18 +565,18 @@ namespace Cyjb
 		/// 它必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>与 <paramref name="value"/> 中数字等效的 <c>16</c> 位无符号整数，
 		/// 如果 <paramref name="value"/> 为 <c>null</c>，则为 <c>0</c>（零）。</returns>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="fromBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="value"/> 表示一个非 <c>10</c> 为基的有符号数，
 		/// 但前面带一个负号。</exception>
-		/// <exception cref="System.FormatException"><paramref name="value"/> 
+		/// <exception cref="FormatException"><paramref name="value"/> 
 		/// 包含的一个字符不是 <paramref name="fromBase"/> 指定的基中的有效数字。
 		/// 如果 <paramref name="value"/> 中的第一个字符无效，异常消息则指示没有可转换的数字；
 		/// 否则，该消息将指示 <paramref name="value"/> 包含无效的尾随字符。</exception>
-		/// <exception cref="System.OverflowException"><paramref name="value"/> 
-		/// 表示小于 <see cref="System.UInt16.MinValue"/> 或大于 
-		/// <see cref="System.UInt16.MaxValue"/> 的数字。</exception>
+		/// <exception cref="OverflowException"><paramref name="value"/> 
+		/// 表示小于 <see cref="UInt16.MinValue"/> 或大于 
+		/// <see cref="UInt16.MaxValue"/> 的数字。</exception>
 		[CLSCompliant(false)]
 		public static ushort ToUInt16(string value, int fromBase)
 		{
@@ -561,25 +601,25 @@ namespace Cyjb
 		/// 它必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>与 <paramref name="value"/> 中数字等效的 <c>32</c> 位无符号整数，
 		/// 如果 <paramref name="value"/> 为 <c>null</c>，则为 <c>0</c>（零）。</returns>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="fromBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="value"/> 表示一个非 <c>10</c> 为基的有符号数，
 		/// 但前面带一个负号。</exception>
-		/// <exception cref="System.FormatException"><paramref name="value"/> 
+		/// <exception cref="FormatException"><paramref name="value"/> 
 		/// 包含的一个字符不是 <paramref name="fromBase"/> 指定的基中的有效数字。
 		/// 如果 <paramref name="value"/> 中的第一个字符无效，异常消息则指示没有可转换的数字；
 		/// 否则，该消息将指示 <paramref name="value"/> 包含无效的尾随字符。</exception>
-		/// <exception cref="System.OverflowException"><paramref name="value"/> 
-		/// 表示小于 <see cref="System.UInt32.MinValue"/> 或大于 
-		/// <see cref="System.UInt32.MaxValue"/> 的数字。</exception>
+		/// <exception cref="OverflowException"><paramref name="value"/> 
+		/// 表示小于 <see cref="UInt32.MinValue"/> 或大于 
+		/// <see cref="UInt32.MaxValue"/> 的数字。</exception>
 		[CLSCompliant(false)]
 		public static uint ToUInt32(string value, int fromBase)
 		{
 			// 使用内置方法，会快一些。
 			if (fromBase == 2 || fromBase == 8 || fromBase == 10 || fromBase == 16)
 			{
-				return Convert.ToUInt32(value, fromBase);
+				return System.Convert.ToUInt32(value, fromBase);
 			}
 			// 使用自己的算法。
 			if (value == null)
@@ -598,10 +638,7 @@ namespace Cyjb
 					{
 						throw CommonExceptions.NoParsibleDigits();
 					}
-					else
-					{
-						throw CommonExceptions.ExtraJunkAtEnd();
-					}
+					throw CommonExceptions.ExtraJunkAtEnd();
 				}
 				uint next = unchecked(result * uBase + (uint)t);
 				// 判断是否超出 UInt32 的范围。
@@ -627,25 +664,25 @@ namespace Cyjb
 		/// 它必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>与 <paramref name="value"/> 中数字等效的 <c>64</c> 位无符号整数，
 		/// 如果 <paramref name="value"/> 为 <c>null</c>，则为 <c>0</c>（零）。</returns>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="fromBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="value"/> 表示一个非 <c>10</c> 为基的有符号数，
 		/// 但前面带一个负号。</exception>
-		/// <exception cref="System.FormatException"><paramref name="value"/> 
+		/// <exception cref="FormatException"><paramref name="value"/> 
 		/// 包含的一个字符不是 <paramref name="fromBase"/> 指定的基中的有效数字。
 		/// 如果 <paramref name="value"/> 中的第一个字符无效，异常消息则指示没有可转换的数字；
 		/// 否则，该消息将指示 <paramref name="value"/> 包含无效的尾随字符。</exception>
-		/// <exception cref="System.OverflowException"><paramref name="value"/> 
-		/// 表示小于 <see cref="System.UInt64.MinValue"/> 或大于 
-		/// <see cref="System.UInt64.MaxValue"/> 的数字。</exception>
+		/// <exception cref="OverflowException"><paramref name="value"/> 
+		/// 表示小于 <see cref="UInt64.MinValue"/> 或大于 
+		/// <see cref="UInt64.MaxValue"/> 的数字。</exception>
 		[CLSCompliant(false)]
 		public static ulong ToUInt64(string value, int fromBase)
 		{
 			// 使用内置方法，会快一些。
 			if (fromBase == 2 || fromBase == 8 || fromBase == 10 || fromBase == 16)
 			{
-				return Convert.ToUInt64(value, fromBase);
+				return System.Convert.ToUInt64(value, fromBase);
 			}
 			// 使用自己的算法。
 			if (value == null)
@@ -664,10 +701,7 @@ namespace Cyjb
 					{
 						throw CommonExceptions.NoParsibleDigits();
 					}
-					else
-					{
-						throw CommonExceptions.ExtraJunkAtEnd();
-					}
+					throw CommonExceptions.ExtraJunkAtEnd();
 				}
 				ulong next = unchecked(result * ulBase + (ulong)t);
 				// 判断是否超出 UInt64 的范围。
@@ -689,10 +723,9 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="value">要转换的 <c>8</c> 位有符号整数。</param>
 		/// <param name="toBase">返回值的基数，必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
-		/// <returns>以 <paramref name="toBase"/> 为基的 <paramref name="value"/> 
-		/// 的字符串表示形式。</returns>
-		/// <exception cref="System.ArgumentException">
-		/// <paramref name="toBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
+		/// <returns>以 <paramref name="toBase"/> 为基的 <paramref name="value"/> 的字符串表示形式。</returns>
+		/// <exception cref="ArgumentException"><paramref name="toBase"/> 不是 
+		/// <c>2</c> 到 <c>36</c> 之间的数字。</exception>
 		/// <overloads>
 		/// <summary>
 		/// 将给定的整数值转换为其指定基的等效字符串表示形式。
@@ -701,8 +734,13 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static string ToString(this sbyte value, int toBase)
 		{
+			if (toBase < 2 || toBase > 36)
+			{
+				throw CommonExceptions.InvalidBase("toBase", toBase);
+			}
+			Contract.EndContractBlock();
 			bool neg = false;
-			ulong ulValue = 0;
+			ulong ulValue;
 			if (value < 0 && toBase == 10)
 			{
 				// 仅 10 进制支持负数。
@@ -729,12 +767,17 @@ namespace Cyjb
 		/// <param name="toBase">返回值的基数，必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>以 <paramref name="toBase"/> 为基的 <paramref name="value"/> 
 		/// 的字符串表示形式。</returns>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="toBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
 		public static string ToString(this short value, int toBase)
 		{
+			if (toBase < 2 || toBase > 36)
+			{
+				throw CommonExceptions.InvalidBase("toBase", toBase);
+			}
+			Contract.EndContractBlock();
 			bool neg = false;
-			ulong ulValue = 0;
+			ulong ulValue;
 			if (value < 0 && toBase == 10)
 			{
 				// 仅 10 进制支持负数。
@@ -761,12 +804,17 @@ namespace Cyjb
 		/// <param name="toBase">返回值的基数，必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>以 <paramref name="toBase"/> 为基的 <paramref name="value"/> 
 		/// 的字符串表示形式。</returns>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="toBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
 		public static string ToString(this int value, int toBase)
 		{
+			if (toBase < 2 || toBase > 36)
+			{
+				throw CommonExceptions.InvalidBase("toBase", toBase);
+			}
+			Contract.EndContractBlock();
 			bool neg = false;
-			ulong ulValue = 0;
+			ulong ulValue;
 			if (value < 0 && toBase == 10)
 			{
 				// 仅 10 进制支持负数。
@@ -793,12 +841,17 @@ namespace Cyjb
 		/// <param name="toBase">返回值的基数，必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>以 <paramref name="toBase"/> 为基的 <paramref name="value"/> 
 		/// 的字符串表示形式。</returns>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="toBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
 		public static string ToString(this long value, int toBase)
 		{
+			if (toBase < 2 || toBase > 36)
+			{
+				throw CommonExceptions.InvalidBase("toBase", toBase);
+			}
+			Contract.EndContractBlock();
 			bool neg = false;
-			ulong ulValue = 0;
+			ulong ulValue;
 			if (value < 0 && toBase == 10)
 			{
 				// 仅 10 进制支持负数。
@@ -824,10 +877,15 @@ namespace Cyjb
 		/// <param name="toBase">返回值的基数，必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>以 <paramref name="toBase"/> 为基的 <paramref name="value"/> 
 		/// 的字符串表示形式。</returns>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="toBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
 		public static string ToString(this byte value, int toBase)
 		{
+			if (toBase < 2 || toBase > 36)
+			{
+				throw CommonExceptions.InvalidBase("toBase", toBase);
+			}
+			Contract.EndContractBlock();
 			char[] buffer = new char[8];
 			int idx = ConvertBase(buffer, value, toBase);
 			return new string(buffer, idx, buffer.Length - idx);
@@ -839,11 +897,16 @@ namespace Cyjb
 		/// <param name="toBase">返回值的基数，必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>以 <paramref name="toBase"/> 为基的 <paramref name="value"/> 
 		/// 的字符串表示形式。</returns>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="toBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
 		[CLSCompliant(false)]
 		public static string ToString(this ushort value, int toBase)
 		{
+			if (toBase < 2 || toBase > 36)
+			{
+				throw CommonExceptions.InvalidBase("toBase", toBase);
+			}
+			Contract.EndContractBlock();
 			char[] buffer = new char[16];
 			int idx = ConvertBase(buffer, value, toBase);
 			return new string(buffer, idx, buffer.Length - idx);
@@ -855,11 +918,16 @@ namespace Cyjb
 		/// <param name="toBase">返回值的基数，必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>以 <paramref name="toBase"/> 为基的 <paramref name="value"/> 
 		/// 的字符串表示形式。</returns>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="toBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
 		[CLSCompliant(false)]
 		public static string ToString(this uint value, int toBase)
 		{
+			if (toBase < 2 || toBase > 36)
+			{
+				throw CommonExceptions.InvalidBase("toBase", toBase);
+			}
+			Contract.EndContractBlock();
 			char[] buffer = new char[32];
 			int idx = ConvertBase(buffer, value, toBase);
 			return new string(buffer, idx, buffer.Length - idx);
@@ -871,11 +939,16 @@ namespace Cyjb
 		/// <param name="toBase">返回值的基数，必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>以 <paramref name="toBase"/> 为基的 <paramref name="value"/> 
 		/// 的字符串表示形式。</returns>
-		/// <exception cref="System.ArgumentException">
+		/// <exception cref="ArgumentException">
 		/// <paramref name="toBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
 		[CLSCompliant(false)]
 		public static string ToString(this ulong value, int toBase)
 		{
+			if (toBase < 2 || toBase > 36)
+			{
+				throw CommonExceptions.InvalidBase("toBase", toBase);
+			}
+			Contract.EndContractBlock();
 			char[] buffer = new char[64];
 			int idx = ConvertBase(buffer, value, toBase);
 			return new string(buffer, idx, buffer.Length - idx);
@@ -887,14 +960,10 @@ namespace Cyjb
 		/// <param name="value">要转换的 <c>64</c> 位无符号整数。</param>
 		/// <param name="toBase">返回值的基数，必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
 		/// <returns>转换后字符串的起始索引。</returns>
-		/// <exception cref="System.ArgumentException">
-		/// <paramref name="toBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
 		private static int ConvertBase(char[] buffer, ulong value, int toBase)
 		{
-			if (toBase < 2 || toBase > 36)
-			{
-				throw CommonExceptions.InvalidBase("toBase", toBase);
-			}
+			Contract.Requires(buffer != null && toBase >= 2 && toBase <= 36);
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() < buffer.Length);
 			// 从后向前转换，不必反转字符串。
 			ulong ulBase = (ulong)toBase;
 			int idx = buffer.Length - 1;
@@ -916,9 +985,9 @@ namespace Cyjb
 		/// 使用不区分大小写的字母表示大于 <c>10</c> 的数。</param>
 		/// <param name="fromBase"><paramref name="value"/> 中数字的基数，
 		/// 它必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="fromBase"/> 不是 <c>2</c> 到 <c>36</c> 之间的数字。</exception>
-		/// <exception cref="System.FormatException">
+		/// <exception cref="FormatException">
 		/// <paramref name="value"/> 表示一个非 <c>10</c> 为基的有符号数，
 		/// 但前面带一个负号。</exception>
 		private static void CheckBaseConvert(string value, int fromBase)
@@ -948,6 +1017,7 @@ namespace Cyjb
 		/// <returns>如果字符有效，则返回字符对应的值。否则返回 <c>-1</c>。</returns>
 		private static int GetBaseValue(char ch, int fromBase)
 		{
+			Contract.Requires(fromBase >= 2 && fromBase <= 36);
 			int value = -1;
 			if (ch < 'A')
 			{

@@ -105,7 +105,27 @@
     <Compile Include="Collections\ObjectModel\ReadOnlySet`1.cs" />
     <Compile Include="Collections\ObjectModel\SetBase`1.cs" />
     <Compile Include="Collections\BitListEqualityComparer.cs" />
-    <Compile Include="ConversionMethod.cs" />
+    <Compile Include="Conversions\BetweenNullableConversion.cs" />
+    <Compile Include="Conversions\BoxConversion.cs" />
+    <Compile Include="Conversions\StringConverterProvider.cs" />
+    <Compile Include="Conversions\UserConversion.cs" />
+    <Compile Include="Conversions\DecimalConversion.cs" />
+    <Compile Include="Conversions\DelegateConversion.cs" />
+    <Compile Include="Conversions\CastClassConversion.cs" />
+    <Compile Include="Conversions\Conversion.cs" />
+    <Compile Include="Conversions\ConversionFactory.cs" />
+    <Compile Include="Conversions\ConversionType.cs" />
+    <Compile Include="Conversions\Convert.cs" />
+    <Compile Include="Conversions\ConverterProvider.cs" />
+    <Compile Include="Conversions\IConverterProvider.cs" />
+    <Compile Include="Conversions\FromNullableConversion.cs" />
+    <Compile Include="Conversions\IdentityConversion.cs" />
+    <Compile Include="Conversions\NumericConversion.cs" />
+    <Compile Include="Conversions\ToNullableConversion.cs" />
+    <Compile Include="Conversions\UnboxConversion.cs" />
+    <Compile Include="Conversions\UserConversionCache.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DelegateBuilder.cs" />
     <Compile Include="ExceptionResources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -133,13 +153,11 @@
     <Compile Include="IO\SourceRange.cs" />
     <Compile Include="IO\SourceReader.cs" />
     <Compile Include="MemberAccessor`1.cs" />
-    <Compile Include="MethodExt.cs" />
     <Compile Include="MethodSwitcher.cs" />
     <Compile Include="MethodSwitcherManual`1.cs" />
     <Compile Include="Net\HttpWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="PowerBinder.cs" />
     <Compile Include="CharExt.cs" />
     <Compile Include="Collections\ArrayAdapter`1.cs" />
     <Compile Include="Collections\CollectionDebugView`1.cs" />
@@ -147,12 +165,17 @@
     <Compile Include="ComponentModel\EnumDescConverter.cs" />
     <Compile Include="Configurations\ConfigurationElementCollection`1.cs" />
     <Compile Include="Configurations\ConfigurationElementCollection`2.cs" />
-    <Compile Include="ConversionCache.cs" />
-    <Compile Include="ConvertExt.cs" />
     <Compile Include="EnumerableExt.cs" />
     <Compile Include="EnumExt.cs" />
     <Compile Include="RandomExt.cs" />
     <Compile Include="ProcessorAttribute.cs" />
+    <Compile Include="Reflection\Converter.cs" />
+    <Compile Include="Reflection\ILExt.Constant.cs" />
+    <Compile Include="Reflection\ILExt.cs" />
+    <Compile Include="Reflection\ILManager.cs" />
+    <Compile Include="Reflection\MethodExt.cs" />
+    <Compile Include="Reflection\PowerBinder.cs" />
+    <Compile Include="Reflection\TypeExt.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -162,7 +185,6 @@
     <Compile Include="Text\TokenParser`1.cs" />
     <Compile Include="Text\TokenReader`1.cs" />
     <Compile Include="Text\Token`1.cs" />
-    <Compile Include="TypeExt.cs" />
     <Compile Include="UniqueValue`1.cs" />
     <Compile Include="Utility\CacheElement.cs" />
     <Compile Include="Utility\CacheElementCollection.cs" />

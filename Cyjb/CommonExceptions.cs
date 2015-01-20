@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Cyjb.IO;
+using Cyjb.Reflection;
 using Cyjb.Utility;
 
 namespace Cyjb
@@ -385,8 +387,8 @@ namespace Cyjb
 		/// <returns><see cref="InvalidCastException"/> 对象。</returns>
 		public static InvalidCastException InvalidCastFromTo(Type fromType, Type toType)
 		{
-			return new InvalidCastException(Format(ExceptionResources.InvalidCastFromTo, 
-				fromType.FullName, toType.FullName));
+			return new InvalidCastException(Format(ExceptionResources.InvalidCastFromTo,
+				fromType.FullName(), toType.FullName()));
 		}
 		/// <summary>
 		/// 返回转换无效的异常。
@@ -420,6 +422,17 @@ namespace Cyjb
 		#region  InvalidOperationException
 
 		/// <summary>
+		/// 返回找到多个用户自定义类型转换的异常。
+		/// </summary>
+		/// <param name="inputType">输入类型。</param>
+		/// <param name="outputType">输出类型。</param>
+		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
+		internal static InvalidOperationException AmbiguousUserDefinedConverter(Type inputType, Type outputType)
+		{
+			return new InvalidOperationException(
+				Format(ExceptionResources.AmbiguousUserDefinedConverter, inputType.FullName(), outputType.FullName()));
+		}
+		/// <summary>
 		/// 返回无法执行枚举操作的异常。
 		/// </summary>
 		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
@@ -445,6 +458,15 @@ namespace Cyjb
 		public static InvalidOperationException NotGenericMethodDefinition(MethodBase method, string operatorName)
 		{
 			return new InvalidOperationException(Format(ExceptionResources.NotGenericMethodDefinition, method, operatorName));
+		}
+		/// <summary>
+		/// 返回代码不应到达这里的异常。
+		/// </summary>
+		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
+		internal static InvalidOperationException Unreachable()
+		{
+			Contract.Assert(false, "Unreachable");
+			return new InvalidOperationException("Code supposed to be unreachable.");
 		}
 
 		#endregion

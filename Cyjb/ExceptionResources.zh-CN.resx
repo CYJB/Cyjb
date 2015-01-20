@@ -133,6 +133,10 @@
     <value>找到多个有指定名称且与指定绑定约束匹配的属性。</value>
     <comment>找到多个有指定名称且与指定绑定约束匹配的属性。</comment>
   </data>
+  <data name="AmbiguousUserDefinedConverter" xml:space="preserve">
+    <value>将 '{0}' 转换为 '{1}' 时，存在不明确的用户定义转换。</value>
+    <comment>找到多个用户自定义的类型转换。</comment>
+  </data>
   <data name="ArgumentImplementIComparable" xml:space="preserve">
     <value>必须至少有一个对象实现 IComparable。</value>
     <comment>必须至少有一个对象实现 IComparable。</comment>
@@ -422,7 +426,7 @@
     <comment>不能是开放式泛型类型。</comment>
   </data>
   <data name="UnrecognizedToken" xml:space="preserve">
-    <value>未识别的词法单元 "{0}"。</value>
+    <value>未识别的词法单元 '{0}'。</value>
     <comment>未识别的词法单元异常。</comment>
   </data>
 </root>

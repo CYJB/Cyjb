@@ -145,6 +145,18 @@
     <value>是</value>
     <comment>Tristate 枚举 True 项的说明。</comment>
   </data>
+  <data name="UniqueValue_Ambig" xml:space="preserve">
+    <value>[冲突]</value>
+    <comment>冲突的文本。</comment>
+  </data>
+  <data name="UniqueValue_Empty" xml:space="preserve">
+    <value>[空]</value>
+    <comment>空的文本。</comment>
+  </data>
+  <data name="UniqueValue_Unique" xml:space="preserve">
+    <value>[唯一 {0}]</value>
+    <comment>唯一的文本。</comment>
+  </data>
   <data name="WarningText" xml:space="preserve">
     <value>[警告] </value>
     <comment>警告的文本。</comment>

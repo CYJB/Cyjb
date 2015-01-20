@@ -133,6 +133,10 @@
     <value>More than one property is found with the specified name and matching the specified binding constraints.</value>
     <comment>找到多个有指定名称且与指定绑定约束匹配的属性。</comment>
   </data>
+  <data name="AmbiguousUserDefinedConverter" xml:space="preserve">
+    <value>Ambiguous user-defined converter found when convert '{0}' to '{1}'.</value>
+    <comment>找到多个用户自定义的类型转换。</comment>
+  </data>
   <data name="ArgumentImplementIComparable" xml:space="preserve">
     <value>At least one object must implement IComparable.</value>
     <comment>必须至少有一个对象实现 IComparable。</comment>
@@ -422,7 +426,7 @@
     <comment>不能是开放式泛型类型。</comment>
   </data>
   <data name="UnrecognizedToken" xml:space="preserve">
-    <value>Unrecognized token "{0}".</value>
+    <value>Unrecognized token '{0}'.</value>
     <comment>未识别的词法单元异常。</comment>
   </data>
 </root>
