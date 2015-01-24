@@ -302,6 +302,10 @@ namespace Cyjb
 		/// <returns>类型转换的结果。</returns>
 		public static implicit operator TextValuePair(TextValuePair<TValue> pair)
 		{
+			if (pair == null)
+			{
+				return null;
+			}
 			return new TextValuePair(pair.text, pair.pairValue);
 		}
 		/// <summary>
@@ -311,6 +315,10 @@ namespace Cyjb
 		/// <returns>类型转换的结果。</returns>
 		public static explicit operator TextValuePair<TValue>(TextValuePair pair)
 		{
+			if (pair == null)
+			{
+				return null;
+			}
 			if (pair.Value == null)
 			{
 				return new TextValuePair<TValue>(pair.Text, default(TValue));

@@ -518,6 +518,10 @@ namespace Cyjb.IO
 		/// <returns>相应的 <see cref="SourceRange"/> 实例。</returns>
 		public static implicit operator SourceRange(SourceFileRange range)
 		{
+			if (range == null)
+			{
+				return null;
+			}
 			return new SourceRange(range.start, range.end);
 		}
 
