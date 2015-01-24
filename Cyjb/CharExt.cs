@@ -49,9 +49,19 @@ namespace Cyjb
 		/// <param name="index">要计算的字符在 <paramref name="str"/> 中的位置。</param>
 		/// <returns>如果 <paramref name="str"/> 中位于 <paramref name="index"/> 处的字符是十进制数字，
 		/// 则为 <c>true</c>；否则，为 <c>false</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="str"/> 为 <c>null</c>。</exception>
 		/// <exception cref="IndexOutOfRangeException"><paramref name="index"/> 大于等于字符串的长度或小于零。</exception>
 		public static bool IsHex(string str, int index)
 		{
+			if (str == null)
+			{
+				throw CommonExceptions.ArgumentNull("str");
+			}
+			if (index < 0 || index >= str.Length)
+			{
+				throw CommonExceptions.ArgumentOutOfRange("index", index);
+			}
+			Contract.EndContractBlock();
 			return IsHex(str[index]);
 		}
 
@@ -76,13 +86,14 @@ namespace Cyjb
 		/// </remarks>
 		public static string Escape(this char ch)
 		{
+			Contract.Ensures(Contract.Result<string>() != null);
 			return Escape(ch, null);
 		}
 		/// <summary>
 		/// 返回当前字符的转义字符串。
 		/// </summary>
 		/// <param name="ch">要获取转义字符串的字符。</param>
-		/// <param name="customEscape">自定义的需要转义的字符。</param>
+		/// <param name="customEscape">自定义的需要转义的字符，会在前面加上 \。</param>
 		/// <returns>字符的转义字符串，如果无需转义则返回原始字符。</returns>
 		/// <remarks>
 		/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），会返回原始字符。</para>
@@ -91,6 +102,7 @@ namespace Cyjb
 		/// </remarks>
 		public static string Escape(this char ch, ISet<char> customEscape)
 		{
+			Contract.Ensures(Contract.Result<string>() != null);
 			// 转换字符转义。
 			switch (ch)
 			{
@@ -121,6 +133,7 @@ namespace Cyjb
 		/// </remarks>
 		public static string EscapeUnicode(this char ch)
 		{
+			Contract.Ensures(Contract.Result<string>() != null);
 			if (ch >= ' ' && ch <= '~')
 			{
 				return ch.ToString(CultureInfo.InvariantCulture);

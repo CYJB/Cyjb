@@ -353,6 +353,17 @@ namespace Cyjb
 			return new FormatException(Format(ExceptionResources.EnumValueNotFound, enumType, value));
 		}
 		/// <summary>
+		/// 返回未识别的枚举值的异常。
+		/// </summary>
+		/// <param name="enumType">枚举类型。</param>
+		/// <param name="value">未识别的枚举值。</param>
+		/// <param name="innerException">内部异常引用。</param>
+		/// <returns><see cref="FormatException"/> 对象。</returns>
+		public static FormatException EnumValueNotFound(Type enumType, object value, Exception innerException)
+		{
+			return new FormatException(Format(ExceptionResources.EnumValueNotFound, enumType, value), innerException);
+		}
+		/// <summary>
 		/// 返回字符串末尾有其它无法分析的字符的异常。
 		/// </summary>
 		/// <returns><see cref="FormatException"/> 对象。</returns>
@@ -410,7 +421,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="value">无效的值。</param>
 		/// <param name="type">要转换到的类型。</param>
-		/// <param name="innerException">内部异常。</param>
+		/// <param name="innerException">内部异常引用。</param>
 		/// <returns><see cref="InvalidCastException"/> 对象。</returns>
 		public static InvalidCastException ConvertInvalidValue(object value, Type type, Exception innerException)
 		{

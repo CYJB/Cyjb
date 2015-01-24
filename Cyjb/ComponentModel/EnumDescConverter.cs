@@ -65,7 +65,7 @@ namespace Cyjb.ComponentModel
 			Contract.EndContractBlock();
 			if (value != null && destinationType == typeof(string))
 			{
-				return ((Enum)value).GetDescription();
+				return ((Enum)value).ToDescription();
 			}
 			return base.ConvertTo(context, culture, value, destinationType);
 		}

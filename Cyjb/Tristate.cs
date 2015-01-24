@@ -8,17 +8,17 @@
 		/// <summary>
 		/// 表示否。
 		/// </summary>
-		[ResDescription("Tristate.False")]
+		[ResDescription("Tristate_False")]
 		False = 0,
 		/// <summary>
 		/// 表示是。
 		/// </summary>
-		[ResDescription("Tristate.True")]
+		[ResDescription("Tristate_True")]
 		True = 1,
 		/// <summary>
 		/// 表示未知。
 		/// </summary>
-		[ResDescription("Tristate.NotSure")]
+		[ResDescription("Tristate_NotSure")]
 		NotSure = 2
 	}
 }

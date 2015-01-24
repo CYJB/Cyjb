@@ -48,7 +48,7 @@ namespace Cyjb.Utility
 		/// <param name="key">要获取的缓冲池的键。</param>
 		/// <returns>与指定的键关联的缓冲池。如果配置不存在或非法，则返回 <c>null</c>。</returns>
 		/// <exception cref="System.Configuration.ConfigurationErrorsException">配置文件错误。</exception>
-		public static ICache<TKey, TValue> CreateCache<TKey, TValue>(string key)
+		public static ICache<TKey, TValue> Create<TKey, TValue>(string key)
 		{
 			// 读取配置文件。
 			CacheSection section = null;

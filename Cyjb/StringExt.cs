@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Text;
 
@@ -36,7 +37,7 @@ namespace Cyjb
 		/// 返回当前字符串的转义字符串。
 		/// </summary>
 		/// <param name="str">要进行转义的字符串。</param>
-		/// <param name="customEscape">自定义的需要转义的字符。</param>
+		/// <param name="customEscape">自定义的需要转义的字符，会在前面加上 \。</param>
 		/// <returns>转义后的字符串。</returns>
 		/// <remarks>
 		/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），不会发生改变。</para>
@@ -101,7 +102,7 @@ namespace Cyjb
 		/// 将字符串中的转义字符转换为原始的字符。
 		/// </summary>
 		/// <param name="str">要转换的字符串。</param>
-		/// <param name="customEscape">自定义的转义字符。</param>
+		/// <param name="customEscape">自定义的转义字符，会在前面加上 \。</param>
 		/// <returns>转换后的字符串。</returns>
 		/// <remarks>
 		/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），不会发生改变。</para>
@@ -131,7 +132,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="str">要转换的字符串。</param>
 		/// <param name="unicodeOnly">是否只处理 Unicode 转义。</param>
-		/// <param name="customEscape">自定义的转义字符。</param>
+		/// <param name="customEscape">自定义的转义字符，会在前面加上 \。</param>
 		/// <returns>转换后的字符串。</returns>
 		private static string Unescape(this string str, bool unicodeOnly, ISet<char> customEscape)
 		{
@@ -301,14 +302,14 @@ namespace Cyjb
 		/// 如果为 <c>0</c>，则返回零长度字符串 ("")。
 		/// 如果大于或等于 <paramref name="str"/> 的长度，则返回整个字符串。</param>
 		/// <returns>从指定字符串左端开始的指定数量的字符。</returns>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="length"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> 小于 <c>0</c>。</exception>
 		public static string Left(this string str, int length)
 		{
 			if (length < 0)
 			{
 				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
+			Contract.Ensures(Contract.Result<string>() != null);
 			if (length == 0 || string.IsNullOrEmpty(str))
 			{
 				return string.Empty;
@@ -327,14 +328,15 @@ namespace Cyjb
 		/// 如果为 <c>0</c>，则返回零长度字符串 ("")。
 		/// 如果大于或等于 <paramref name="str"/> 的长度，则返回整个字符串。</param>
 		/// <returns>从指定字符串右端开始的指定数量的字符。</returns>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="length"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="str"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> 小于 <c>0</c>。</exception>
 		public static string Right(this string str, int length)
 		{
 			if (length < 0)
 			{
 				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
+			Contract.Ensures(Contract.Result<string>() != null);
 			if (length == 0 || string.IsNullOrEmpty(str))
 			{
 				return string.Empty;
@@ -352,16 +354,22 @@ namespace Cyjb
 		/// <param name="str">要检索子字符串的字符串实例。</param>
 		/// <param name="startIndex">此示例中子字符串的起始字符位置（从零开始）。</param>
 		/// <returns>与此实例中在 <paramref name="startIndex"/> 处开头的子字符串等效的一个字符串，
-		/// 如果 <paramref name="startIndex"/> 等于此实例的长度，
-		/// 则为 <see cref="System.String.Empty"/>。</returns>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="startIndex"/> 大于此实例的长度。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="startIndex"/> 小于负的此实例的长度。</exception>
-		/// <seealso cref="System.String.Substring(int)"/>
+		/// 如果 <paramref name="startIndex"/> 等于此实例的长度，则为 <see cref="String.Empty"/>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="str"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> 大于此实例的长度。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> 小于负的此实例的长度。</exception>
+		/// <seealso cref="String.Substring(int)"/>
 		public static string SubstringEx(this string str, int startIndex)
 		{
-			CommonExceptions.CheckArgumentNull(str, "str");
+			if (str == null)
+			{
+				throw CommonExceptions.ArgumentNull("str");
+			}
+			if (startIndex < -str.Length)
+			{
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
+			}
+			Contract.Ensures(Contract.Result<string>() != null);
 			if (startIndex < 0)
 			{
 				startIndex += str.Length;
@@ -369,25 +377,21 @@ namespace Cyjb
 			return str.Substring(startIndex);
 		}
 		/// <summary>
-		/// 从此实例检索子字符串。子字符串从指定的字符位置开始且具有指定的长度。
-		/// 如果 <paramref name="startIndex"/> 小于 <c>0</c>，
-		/// 那么表示从字符串结束位置向前计算的位置。
+		/// 从此实例检索子字符串。子字符串从指定的字符位置开始且具有指定的长度。如果 
+		/// <paramref name="startIndex"/> 小于 <c>0</c>，那么表示从字符串结束位置向前计算的位置。
 		/// </summary>
 		/// <param name="str">要检索子字符串的字符串实例。</param>
 		/// <param name="startIndex">此示例中子字符串的起始字符位置（从零开始）。</param>
 		/// <param name="length">子字符串中的字符数。</param>
-		/// <returns>与此实例中在 <paramref name="startIndex"/> 处开头、
-		/// 长度为 <paramref name="length"/> 的子字符串等效的一个字符串，
-		/// 如果 <paramref name="startIndex"/> 等于此实例的长度或 
+		/// <returns>与此实例中在 <paramref name="startIndex"/> 处开头、长度为 <paramref name="length"/> 
+		/// 的子字符串等效的一个字符串，如果 <paramref name="startIndex"/> 等于此实例的长度或 
 		/// <paramref name="length"/> 为零，则为空字符串（""）。</returns>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="startIndex"/> 加 <paramref name="length"/>
+		/// <exception cref="ArgumentNullException"><paramref name="str"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> 加 <paramref name="length"/>
 		/// 之和指示的位置不在此实例中。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="startIndex"/> 小于负的此实例的长度。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="length"/> 小于零。</exception>
-		/// <seealso cref="System.String.Substring(int,int)"/>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> 小于负的此实例的长度。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> 小于零。</exception>
+		/// <seealso cref="String.Substring(int,int)"/>
 		/// <overloads>
 		/// <summary>
 		/// 从此实例检索子字符串。
@@ -395,7 +399,19 @@ namespace Cyjb
 		/// </overloads>
 		public static string SubstringEx(this string str, int startIndex, int length)
 		{
-			CommonExceptions.CheckArgumentNull(str, "str");
+			if (str == null)
+			{
+				throw CommonExceptions.ArgumentNull("str");
+			}
+			if (length < 0)
+			{
+				throw CommonExceptions.ArgumentOutOfRange("length", length);
+			}
+			if (startIndex < -str.Length)
+			{
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
+			}
+			Contract.Ensures(Contract.Result<string>() != null);
 			if (startIndex < 0)
 			{
 				startIndex += str.Length;
@@ -404,20 +420,25 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 从此实例检索子字符串。子字符串从指定的字符位置开始到字符串的结尾。
-		/// 如果 <paramref name="startIndex"/> 小于 <c>0</c>，
-		/// 那么表示从字符串结束位置向前计算的位置。
+		/// 如果 <paramref name="startIndex"/> 小于 <c>0</c>，那么表示从字符串结束位置向前计算的位置。
 		/// </summary>
 		/// <param name="str">要检索子字符串的字符串实例。</param>
 		/// <param name="startIndex">此示例中子字符串的起始字符位置（从零开始）。</param>
-		/// <returns>与此实例中在 <paramref name="startIndex"/> 
-		/// 处开头到字符串结尾的子字符串等效的一个字符串，
-		/// 如果 <paramref name="startIndex"/> 等于此实例的长度或大于等于字符串的长度，
-		/// 则为空字符串（""）。</returns>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="startIndex"/> 指示的位置不在此实例中。</exception>
+		/// <returns>与此实例中在 <paramref name="startIndex"/> 处开头到字符串结尾的子字符串等效的一个字符串，
+		/// 如果 <paramref name="startIndex"/> 等于此实例的长度或大于等于字符串的长度，则为空字符串（""）。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="str"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> 指示的位置不在此实例中。</exception>
 		public static string Slice(this string str, int startIndex)
 		{
-			CommonExceptions.CheckArgumentNull(str, "str");
+			if (str == null)
+			{
+				throw CommonExceptions.ArgumentNull("str");
+			}
+			if (startIndex < -str.Length)
+			{
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
+			}
+			Contract.Ensures(Contract.Result<string>() != null);
 			if (startIndex < 0)
 			{
 				startIndex += str.Length;
@@ -435,14 +456,12 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="str">要检索子字符串的字符串实例。</param>
 		/// <param name="startIndex">此示例中子字符串的起始字符位置（从零开始）。</param>
-		/// <param name="endIndex">此示例中子字符串的结束字符位置（从零开始），
-		/// 但不包括该位置的字符。</param>
-		/// <returns>与此实例中在 <paramref name="startIndex"/> 处开头、
-		/// 在 <paramref name="endIndex"/> 处结束的子字符串等效的一个字符串，
-		/// 如果 <paramref name="startIndex"/> 等于此实例的长度或大于等于 
-		/// <paramref name="endIndex"/> ，则为 <see cref="System.String.Empty"/>。</returns>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="startIndex"/> 或 <paramref name="endIndex"/>
+		/// <param name="endIndex">此示例中子字符串的结束字符位置（从零开始），但不包括该位置的字符。</param>
+		/// <returns>与此实例中在 <paramref name="startIndex"/> 处开头、在 <paramref name="endIndex"/> 
+		/// 处结束的子字符串等效的一个字符串，如果 <paramref name="startIndex"/> 等于此实例的长度或大于等于 
+		/// <paramref name="endIndex"/> ，则为 <see cref="String.Empty"/>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="str"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> 或 <paramref name="endIndex"/>
 		/// 指示的位置不在此实例中。</exception>
 		/// <overloads>
 		/// <summary>
@@ -451,7 +470,19 @@ namespace Cyjb
 		/// </overloads>
 		public static string Slice(this string str, int startIndex, int endIndex)
 		{
-			CommonExceptions.CheckArgumentNull(str, "str");
+			if (str == null)
+			{
+				throw CommonExceptions.ArgumentNull("str");
+			}
+			if (startIndex < -str.Length)
+			{
+				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
+			}
+			if (endIndex < -str.Length)
+			{
+				throw CommonExceptions.ArgumentOutOfRange("endIndex", endIndex);
+			}
+			Contract.Ensures(Contract.Result<string>() != null);
 			if (startIndex < 0)
 			{
 				startIndex += str.Length;

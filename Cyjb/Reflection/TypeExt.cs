@@ -34,7 +34,8 @@ namespace Cyjb.Reflection
 		/// <remarks>数字类型为 <see cref="TypeCode.Char"/>、<see cref="TypeCode.SByte"/>、<see cref="TypeCode.Byte"/>、 
 		/// <see cref="TypeCode.Int16"/>、<see cref="TypeCode.UInt16"/>、<see cref="TypeCode.Int32"/>、
 		/// <see cref="TypeCode.UInt32"/>、<see cref="TypeCode.Int64"/>、<see cref="TypeCode.UInt64"/>、
-		/// <see cref="TypeCode.Single"/>、<see cref="TypeCode.Double"/> 和 <see cref="TypeCode.Decimal"/>。</remarks>
+		/// <see cref="TypeCode.Single"/>、<see cref="TypeCode.Double"/> 和 <see cref="TypeCode.Decimal"/>，
+		/// 或者基础类型为其中之一的枚举类型。</remarks>
 		[Pure]
 		public static bool IsNumeric(this TypeCode typeCode)
 		{
@@ -45,13 +46,27 @@ namespace Cyjb.Reflection
 		/// </summary>
 		/// <param name="typeCode">要判断的类型。</param>
 		/// <returns>如果当前 <see cref="TypeCode"/> 表示无符号整数类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <remarks>数字类型为 <see cref="TypeCode.Char"/>、<see cref="TypeCode.Byte"/>、
-		/// <see cref="TypeCode.UInt16"/>、<see cref="TypeCode.UInt32"/> 和 <see cref="TypeCode.UInt64"/></remarks>
+		/// <remarks>无符号整数类型为 <see cref="TypeCode.Char"/>、<see cref="TypeCode.Byte"/>、
+		/// <see cref="TypeCode.UInt16"/>、<see cref="TypeCode.UInt32"/> 和 <see cref="TypeCode.UInt64"/>，
+		/// 或者基础类型为其中之一的枚举类型。</remarks>
 		[Pure]
 		public static bool IsUnsigned(this TypeCode typeCode)
 		{
 			return typeCode == TypeCode.Char || typeCode == TypeCode.Byte || typeCode == TypeCode.UInt16 ||
 				typeCode == TypeCode.UInt32 || typeCode == TypeCode.UInt64;
+		}
+		/// <summary>
+		/// 返回当前 <see cref="TypeCode"/> 是否表示有符号整数类型。
+		/// </summary>
+		/// <param name="typeCode">要判断的类型。</param>
+		/// <returns>如果当前 <see cref="TypeCode"/> 表示有符号整数类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <remarks>有符号整数类型为 <see cref="TypeCode.SByte"/>、<see cref="TypeCode.Int16"/>、
+		/// <see cref="TypeCode.Int32"/> 和 <see cref="TypeCode.Int64"/>，或者基础类型为其中之一的枚举类型。</remarks>
+		[Pure]
+		public static bool IsSigned(this TypeCode typeCode)
+		{
+			return typeCode == TypeCode.SByte || typeCode == TypeCode.Int16 ||
+				typeCode == TypeCode.Int32 || typeCode == TypeCode.Int64;
 		}
 		/// <summary>
 		/// 返回当前 <see cref="Type"/> 是否表示数字类型。
@@ -61,52 +76,45 @@ namespace Cyjb.Reflection
 		/// <remarks>数字类型为 <see cref="char"/>、<see cref="sbyte"/>、<see cref="byte"/>、 
 		/// <see cref="short"/>、<see cref="ushort"/>、<see cref="int"/>、<see cref="uint"/>、 
 		/// <see cref="long"/>、<see cref="ulong"/>、<see cref="float"/>、<see cref="double"/> 
-		/// 和 <see cref="decimal"/>。</remarks>
-		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// 和 <see cref="decimal"/>，或者基础类型为其中之一的枚举类型。</remarks>
 		[Pure]
 		public static bool IsNumeric(this Type type)
 		{
-			if (type == null)
-			{
-				throw CommonExceptions.ArgumentNull("type");
-			}
-			Contract.EndContractBlock();
-			TypeCode typeCode = Type.GetTypeCode(type);
-			return typeCode >= TypeCode.Char && typeCode <= TypeCode.Decimal;
+			return Type.GetTypeCode(type).IsNumeric();
 		}
 		/// <summary>
 		/// 返回当前 <see cref="Type"/> 是否表示无符号整数类型。
 		/// </summary>
 		/// <param name="type">要判断的类型。</param>
 		/// <returns>如果当前 <see cref="Type"/> 表示无符号整数类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <remarks>数字类型为 <see cref="char"/>、<see cref="byte"/>、<see cref="ushort"/>、<see cref="uint"/> 和 
-		/// <see cref="ulong"/>。</remarks>
-		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <remarks>无符号整数类型为 <see cref="char"/>、<see cref="byte"/>、<see cref="ushort"/>、<see cref="uint"/> 和 
+		/// <see cref="ulong"/>，或者基础类型为其中之一的枚举类型。</remarks>
 		[Pure]
 		public static bool IsUnsigned(this Type type)
 		{
-			if (type == null)
-			{
-				throw CommonExceptions.ArgumentNull("type");
-			}
-			Contract.EndContractBlock();
 			return Type.GetTypeCode(type).IsUnsigned();
+		}
+		/// <summary>
+		/// 返回当前 <see cref="Type"/> 是否表示有符号整数类型。
+		/// </summary>
+		/// <param name="type">要判断的类型。</param>
+		/// <returns>如果当前 <see cref="Type"/> 表示有符号整数类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <remarks>有符号整数类型为 <see cref="sbyte"/>、<see cref="short"/>、<see cref="int"/> 和 
+		/// <see cref="long"/>，或者基础类型为其中之一的枚举类型。</remarks>
+		[Pure]
+		public static bool IsSigned(this Type type)
+		{
+			return Type.GetTypeCode(type).IsSigned();
 		}
 		/// <summary>
 		/// 确定当前 <see cref="Type"/> 是否是可空类型。
 		/// </summary>
 		/// <param name="type">要判断是否可空类型的类型。</param>
 		/// <returns>如果 <paramref name="type"/> 是可空类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
 		[Pure]
 		public static bool IsNullable(this Type type)
 		{
-			if (type == null)
-			{
-				throw CommonExceptions.ArgumentNull("type");
-			}
-			Contract.EndContractBlock();
-			return Nullable.GetUnderlyingType(type) != null;
+			return type != null && Nullable.GetUnderlyingType(type) != null;
 		}
 		/// <summary>
 		/// 返回与当前 <see cref="Type"/> 对应的非可空类型。

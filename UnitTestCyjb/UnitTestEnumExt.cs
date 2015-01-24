@@ -6,42 +6,42 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTestCyjb
 {
 	/// <summary>
-	/// <see cref="Cyjb.EnumExt"/> 类的单元测试。
+	/// <see cref="EnumExt"/> 类的单元测试。
 	/// </summary>
 	[TestClass]
 	public class UnitTestEnumExt
 	{
 		/// <summary>
-		/// 对 <see cref="Cyjb.EnumExt.GetDescription"/> 方法进行测试。
+		/// 对 <see cref="EnumExt.ToDescription"/> 方法进行测试。
 		/// </summary>
 		[TestMethod]
-		public void TestGetDescription()
+		public void TestToDesctiption()
 		{
 			for (int i = 0; i < 129; i++)
 			{
 				BindingFlags value = (BindingFlags)i;
-				Assert.AreEqual(value.ToString(), value.GetDescription());
+				Assert.AreEqual(value.ToString(), value.ToDescription());
 			}
-			Assert.AreEqual("0", ((TestEnum)0).GetDescription());
-			Assert.AreEqual("A Des", TestEnum.A.GetDescription());
-			Assert.AreEqual("B Des", TestEnum.B.GetDescription());
-			Assert.AreEqual("C Des", TestEnum.C.GetDescription());
-			Assert.AreEqual("D Des", TestEnum.D.GetDescription());
-			Assert.AreEqual("E", TestEnum.E.GetDescription());
-			Assert.AreEqual("0", ((TestEnum2)0).GetDescription());
-			Assert.AreEqual("A Des", TestEnum2.A.GetDescription());
-			Assert.AreEqual("B Des", TestEnum2.B.GetDescription());
-			Assert.AreEqual("C Des", TestEnum2.C.GetDescription());
-			Assert.AreEqual("D", TestEnum2.D.GetDescription());
-			Assert.AreEqual("AB Des", TestEnum2.AB.GetDescription());
-			Assert.AreEqual("BC Des", TestEnum2.BC.GetDescription());
-			Assert.AreEqual("A Des, BC Des", (TestEnum2.BC | TestEnum2.A).GetDescription());
-			Assert.AreEqual("BC Des, D", (TestEnum2.BC | TestEnum2.D).GetDescription());
-			Assert.AreEqual("All Des", TestEnum2.All.GetDescription());
-			Assert.AreEqual("All Des, 128", (TestEnum2.All | (TestEnum2)128).GetDescription());
+			Assert.AreEqual("0", ((TestEnum)0).ToDescription());
+			Assert.AreEqual("A Des", TestEnum.A.ToDescription());
+			Assert.AreEqual("B Des", TestEnum.B.ToDescription());
+			Assert.AreEqual("C Des", TestEnum.C.ToDescription());
+			Assert.AreEqual("D Des", TestEnum.D.ToDescription());
+			Assert.AreEqual("E", TestEnum.E.ToDescription());
+			Assert.AreEqual("0", ((TestEnum2)0).ToDescription());
+			Assert.AreEqual("A Des", TestEnum2.A.ToDescription());
+			Assert.AreEqual("B Des", TestEnum2.B.ToDescription());
+			Assert.AreEqual("C Des", TestEnum2.C.ToDescription());
+			Assert.AreEqual("D", TestEnum2.D.ToDescription());
+			Assert.AreEqual("AB Des", TestEnum2.AB.ToDescription());
+			Assert.AreEqual("BC Des", TestEnum2.BC.ToDescription());
+			Assert.AreEqual("A Des, BC Des", (TestEnum2.BC | TestEnum2.A).ToDescription());
+			Assert.AreEqual("BC Des, D", (TestEnum2.BC | TestEnum2.D).ToDescription());
+			Assert.AreEqual("All Des", TestEnum2.All.ToDescription());
+			Assert.AreEqual("All Des, 128", (TestEnum2.All | (TestEnum2)128).ToDescription());
 		}
 		/// <summary>
-		/// 对 <see cref="Cyjb.EnumExt.ParseEx"/> 方法进行测试。
+		/// 对 <c>ParseEx</c> 方法进行测试。
 		/// </summary>
 		[TestMethod]
 		public void TestParseEx()
@@ -50,7 +50,7 @@ namespace UnitTestCyjb
 			{
 				BindingFlags value = (BindingFlags)i;
 				Assert.AreEqual(value, EnumExt.ParseEx<BindingFlags>(value.ToString()));
-				Assert.AreEqual(value, EnumExt.ParseEx<BindingFlags>(value.GetDescription()));
+				Assert.AreEqual(value, EnumExt.ParseEx<BindingFlags>(value.ToDescription()));
 			}
 			Assert.AreEqual((TestEnum)0, EnumExt.ParseEx<TestEnum>("  0"));
 			Assert.AreEqual(TestEnum.A, EnumExt.ParseEx<TestEnum>("A "));
