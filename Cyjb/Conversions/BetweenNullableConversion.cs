@@ -37,7 +37,7 @@ namespace Cyjb.Conversions
 		/// <param name="isChecked">是否执行溢出检查。</param>
 		public override void Emit(ILGenerator generator, Type inputType, Type outputType, bool isChecked)
 		{
-			Contract.Requires(inputType.IsNullable());
+			Contract.Assume(inputType.IsNullable());
 			Type inputUnderlyingType = Nullable.GetUnderlyingType(inputType);
 			Type outputUnderlyingType = Nullable.GetUnderlyingType(outputType);
 			// 定义变量和标签

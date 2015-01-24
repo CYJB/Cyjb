@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Threading;
 
@@ -32,6 +33,7 @@ namespace Cyjb.Reflection
 		/// </summary>
 		/// <param name="method">要获取参数列表的方法。</param>
 		/// <returns>方法的参数列表。</returns>
+		[Pure]
 		public static ParameterInfo[] GetParametersNoCopy(this MethodInfo method)
 		{
 			return getParametersNoCopy(method);

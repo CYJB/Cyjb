@@ -75,7 +75,12 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		public static void EmitConstant(this ILGenerator il, char value)
 		{
-			il.EmitConstant((int)value);
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			Contract.EndContractBlock();
+			il.EmitInt(value);
 			il.Emit(OpCodes.Conv_U2);
 		}
 		/// <summary>
@@ -84,9 +89,15 @@ namespace Cyjb.Reflection
 		/// <param name="il">IL 指令生成器。</param>
 		/// <param name="value">要写入的常量。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		[CLSCompliant(false)]
 		public static void EmitConstant(this ILGenerator il, sbyte value)
 		{
-			il.EmitConstant((int)value);
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			Contract.EndContractBlock();
+			il.EmitInt(value);
 			il.Emit(OpCodes.Conv_I1);
 		}
 		/// <summary>
@@ -97,7 +108,12 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		public static void EmitConstant(this ILGenerator il, byte value)
 		{
-			il.EmitConstant((int)value);
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			Contract.EndContractBlock();
+			il.EmitInt(value);
 			il.Emit(OpCodes.Conv_U1);
 		}/// <summary>
 		/// 写入指定的 <see cref="short"/> 常量。
@@ -107,7 +123,12 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		public static void EmitConstant(this ILGenerator il, short value)
 		{
-			il.EmitConstant((int)value);
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			Contract.EndContractBlock();
+			il.EmitInt(value);
 			il.Emit(OpCodes.Conv_I2);
 		}
 		/// <summary>
@@ -116,9 +137,15 @@ namespace Cyjb.Reflection
 		/// <param name="il">IL 指令生成器。</param>
 		/// <param name="value">要写入的常量。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		[CLSCompliant(false)]
 		public static void EmitConstant(this ILGenerator il, ushort value)
 		{
-			il.EmitConstant((int)value);
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			Contract.EndContractBlock();
+			il.EmitInt(value);
 			il.Emit(OpCodes.Conv_U2);
 		}
 		/// <summary>
@@ -134,51 +161,7 @@ namespace Cyjb.Reflection
 				throw CommonExceptions.ArgumentNull("il");
 			}
 			Contract.EndContractBlock();
-			OpCode code;
-			switch (value)
-			{
-				case -1:
-					code = OpCodes.Ldc_I4_M1;
-					break;
-				case 0:
-					code = OpCodes.Ldc_I4_0;
-					break;
-				case 1:
-					code = OpCodes.Ldc_I4_1;
-					break;
-				case 2:
-					code = OpCodes.Ldc_I4_2;
-					break;
-				case 3:
-					code = OpCodes.Ldc_I4_3;
-					break;
-				case 4:
-					code = OpCodes.Ldc_I4_4;
-					break;
-				case 5:
-					code = OpCodes.Ldc_I4_5;
-					break;
-				case 6:
-					code = OpCodes.Ldc_I4_6;
-					break;
-				case 7:
-					code = OpCodes.Ldc_I4_7;
-					break;
-				case 8:
-					code = OpCodes.Ldc_I4_8;
-					break;
-				default:
-					if (value >= -128 && value <= 127)
-					{
-						il.Emit(OpCodes.Ldc_I4_S, (sbyte)value);
-					}
-					else
-					{
-						il.Emit(OpCodes.Ldc_I4, value);
-					}
-					return;
-			}
-			il.Emit(code);
+			il.EmitInt(value);
 		}
 		/// <summary>
 		/// 写入指定的 <see cref="uint"/> 常量。
@@ -186,9 +169,15 @@ namespace Cyjb.Reflection
 		/// <param name="il">IL 指令生成器。</param>
 		/// <param name="value">要写入的常量。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		[CLSCompliant(false)]
 		public static void EmitConstant(this ILGenerator il, uint value)
 		{
-			il.EmitConstant((int)value);
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			Contract.EndContractBlock();
+			il.EmitInt((int)value);
 		}
 		/// <summary>
 		/// 写入指定的 <see cref="long"/> 常量。
@@ -211,6 +200,7 @@ namespace Cyjb.Reflection
 		/// <param name="il">IL 指令生成器。</param>
 		/// <param name="value">要写入的常量。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		[CLSCompliant(false)]
 		public static void EmitConstant(this ILGenerator il, ulong value)
 		{
 			if (il == null)
@@ -469,7 +459,7 @@ namespace Cyjb.Reflection
 					il.EmitConstant((ushort)value);
 					return true;
 				case TypeCode.Int32:
-					il.EmitConstant((int)value);
+					il.EmitInt((int)value);
 					return true;
 				case TypeCode.UInt32:
 					il.EmitConstant((uint)value);
@@ -502,7 +492,7 @@ namespace Cyjb.Reflection
 		/// <param name="type">要写入默认值的类型。</param>
 		internal static void EmitDefault(this ILGenerator il, Type type)
 		{
-			Contract.Requires(type != null);
+			Contract.Requires(il != null && type != null);
 			switch (Type.GetTypeCode(type))
 			{
 				case TypeCode.Object:
@@ -550,8 +540,63 @@ namespace Cyjb.Reflection
 					il.Emit(OpCodes.Ldc_I4_0);
 					il.Emit(OpCodes.Newobj, decimalCtorInt);
 					break;
+				default:
+					throw CommonExceptions.Unreachable();
 			}
-			throw CommonExceptions.Unreachable();
+		}
+		/// <summary>
+		/// 写入指定的 <see cref="int"/> 常量。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="value">要写入的常量。</param>
+		public static void EmitInt(this ILGenerator il, int value)
+		{
+			Contract.Requires(il != null);
+			OpCode code;
+			switch (value)
+			{
+				case -1:
+					code = OpCodes.Ldc_I4_M1;
+					break;
+				case 0:
+					code = OpCodes.Ldc_I4_0;
+					break;
+				case 1:
+					code = OpCodes.Ldc_I4_1;
+					break;
+				case 2:
+					code = OpCodes.Ldc_I4_2;
+					break;
+				case 3:
+					code = OpCodes.Ldc_I4_3;
+					break;
+				case 4:
+					code = OpCodes.Ldc_I4_4;
+					break;
+				case 5:
+					code = OpCodes.Ldc_I4_5;
+					break;
+				case 6:
+					code = OpCodes.Ldc_I4_6;
+					break;
+				case 7:
+					code = OpCodes.Ldc_I4_7;
+					break;
+				case 8:
+					code = OpCodes.Ldc_I4_8;
+					break;
+				default:
+					if (value >= -128 && value <= 127)
+					{
+						il.Emit(OpCodes.Ldc_I4_S, (sbyte)value);
+					}
+					else
+					{
+						il.Emit(OpCodes.Ldc_I4, value);
+					}
+					return;
+			}
+			il.Emit(code);
 		}
 	}
 }

@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Reflection.Emit;
 using Cyjb.Conversions;
 using Cyjb.Reflection;
+using Cyjb.Utility;
 
 namespace Cyjb
 {
@@ -17,6 +17,10 @@ namespace Cyjb
 	/// 方法注入额外的类型转换方法。</para>
 	/// <para>默认添加了所有类型转换为字符串，和字符串转换为数字、布尔和日期/时间的额外方法。</para>
 	/// <para>所有数值类型转换，都会对溢出进行检查，如果数值不在范围内则会抛出异常。</para>
+	/// <para>explicit 和 implicit 方法缓存的键为 Cyjb.UserConversionCache，默认使用上限为 <c>256</c> 的 
+	/// <see cref="LruCache{TKey, TValue}"/>。动态生成的类型转换方法缓存的键为 Cyjb.ConverterCache，
+	/// 默认使用无上限的 <see cref="SimplyCache{TKey, TValue}"/>。关于如何设置缓存，
+	/// 可以参见 <see cref="CacheFactory"/>。</para>
 	/// </remarks>
 	public static class Convert
 	{
@@ -66,8 +70,9 @@ namespace Cyjb
 		/// <summary>
 		/// 类型转换器的存储字典。
 		/// </summary>
-		private static readonly ConcurrentDictionary<Tuple<Type, Type>, Converter> converterDict =
-			new ConcurrentDictionary<Tuple<Type, Type>, Converter>();
+		private static readonly ICache<Tuple<Type, Type>, Converter> converterCache =
+			CacheFactory.Create<Tuple<Type, Type>, Converter>("Cyjb.ConverterCache") ??
+			new SimplyCache<Tuple<Type, Type>, Converter>();
 		/// <summary>
 		/// 获取将对象从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 类型的转换器。
 		/// </summary>
@@ -80,7 +85,7 @@ namespace Cyjb
 		private static Converter GetConverterInternal(Type inputType, Type outputType, bool buildGeneric)
 		{
 			Contract.Requires(inputType != null && outputType != null);
-			return converterDict.GetOrAdd(new Tuple<Type, Type>(inputType, outputType), types =>
+			return converterCache.GetOrAdd(new Tuple<Type, Type>(inputType, outputType), types =>
 			{
 				Conversion conversion = ConversionFactory.GetConversion(inputType, outputType);
 				if (conversion == null)

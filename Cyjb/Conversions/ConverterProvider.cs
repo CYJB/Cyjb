@@ -107,7 +107,7 @@ namespace Cyjb.Conversions
 			{
 				this.subProvider = provider.subProvider;
 			}
-			else if (this.subProvider.Length > 0)
+			else if (provider.subProvider.Length > 0)
 			{
 				this.subProvider = ArrayExt.Combine(this.subProvider, provider.subProvider);
 			}
@@ -149,9 +149,6 @@ namespace Cyjb.Conversions
 		/// 其输入类型是 <see cref="OriginType"/>，输出类型是 <paramref name="outputType"/>。</remarks>
 		public Delegate GetConverterTo(Type outputType)
 		{
-			Contract.Requires(outputType != null);
-			Contract.Ensures(Contract.Result<Delegate>() == null ||
-				this.IsValidConverterTo(Contract.Result<Delegate>(), outputType));
 			Delegate dlg;
 			if (toDict.TryGetValue(outputType, out dlg))
 			{
@@ -178,9 +175,6 @@ namespace Cyjb.Conversions
 		/// 其输入类型是 <paramref name="inputType"/>，输出类型是 <see cref="OriginType"/>。</remarks>
 		public Delegate GetConverterFrom(Type inputType)
 		{
-			Contract.Requires(inputType != null);
-			Contract.Ensures(Contract.Result<Delegate>() == null ||
-				this.IsValidConverterFrom(Contract.Result<Delegate>(), inputType));
 			Delegate dlg;
 			if (fromDict.TryGetValue(inputType, out dlg))
 			{

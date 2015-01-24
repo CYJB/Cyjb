@@ -84,7 +84,7 @@ namespace Cyjb
 				throw CommonExceptions.ArgumentOutOfRange("length", length);
 			}
 			Contract.Ensures(Contract.Result<Array>() != null);
-			return FillInternal(array, value, startIndex, array.Length - startIndex);
+			return FillInternal(array, value, startIndex, length);
 		}
 		/// <summary>
 		/// 将数组从指定的索引位置开始使用指定的值填充指定的长度。
@@ -97,7 +97,9 @@ namespace Cyjb
 		private static Array FillInternal(this Array array, object value, int startIndex, int length)
 		{
 			Contract.Requires(array != null);
-			Contract.Requires(startIndex >= 0 && startIndex + length <= array.Length);
+			Contract.Requires(startIndex >= array.GetLowerBound(0));
+			Contract.Requires(length >= 0);
+			Contract.Requires(startIndex + length <= array.Length);
 			Contract.Ensures(Contract.Result<Array>() != null);
 			for (int i = startIndex + length - 1; i >= startIndex; i--)
 			{

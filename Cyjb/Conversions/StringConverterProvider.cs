@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 using Cyjb.Reflection;
 
@@ -113,8 +114,14 @@ namespace Cyjb.Conversions
 		/// </summary>
 		/// <typeparam name="TOutput">要转换到的数据类型。</typeparam>
 		/// <returns>转换得到的枚举类型。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="value"/> 为 <c>null</c>。</exception>
 		private static TOutput ConvertToEnum<TOutput>(string value)
 		{
+			if (value == null)
+			{
+				throw CommonExceptions.ArgumentNull("value");
+			}
+			Contract.EndContractBlock();
 			return (TOutput)Enum.Parse(typeof(TOutput), value);
 		}
 	}

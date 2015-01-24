@@ -39,7 +39,7 @@ namespace Cyjb.Conversions
 		/// <param name="isChecked">是否执行溢出检查。</param>
 		public override void Emit(ILGenerator generator, Type inputType, Type outputType, bool isChecked)
 		{
-			Contract.Requires((inputType == typeof(decimal) && outputType.IsNumeric()) ||
+			Contract.Assume((inputType == typeof(decimal) && outputType.IsNumeric()) ||
 				(outputType == typeof(decimal) && inputType.IsNumeric()));
 			MethodInfo method;
 			if (inputType == typeof(decimal))

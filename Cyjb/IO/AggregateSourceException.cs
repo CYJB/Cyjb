@@ -15,7 +15,6 @@ namespace Cyjb.IO
 	/// <summary>
 	/// 表示源文件的异常的集合。
 	/// </summary>
-	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]
 	[Serializable, DebuggerDisplay("Count = {InnerExceptionCount}")]
 	public class AggregateSourceException : Exception
 	{
@@ -77,7 +76,7 @@ namespace Cyjb.IO
 		/// </summary>
 		/// <param name="message">解释异常原因的错误消息。</param>
 		/// <param name="innerException">导致当前异常的异常。</param>
-		public AggregateSourceException(string message, SourceException innerException)
+		public AggregateSourceException(string message, Exception innerException)
 			: base(message, innerException)
 		{
 			if (innerException == null)
@@ -87,7 +86,12 @@ namespace Cyjb.IO
 			}
 			else
 			{
-				this.innerExps = new[] { innerException };
+				SourceException sourceExp = innerException as SourceException;
+				if (sourceExp == null)
+				{
+					throw CommonExceptions.InvalidCastFromTo(innerException.GetType(), typeof(SourceException));
+				}
+				this.innerExps = new[] { sourceExp };
 				this.innerExpsCollection = new ReadOnlyCollection<SourceException>(innerExps);
 			}
 		}
@@ -117,8 +121,6 @@ namespace Cyjb.IO
 		/// </summary>
 		/// <param name="message">解释异常原因的错误消息。</param>
 		/// <param name="innerExceptions">导致当前异常的异常。</param>
-		/// <exception cref="ArgumentNullException"><paramref name="innerExceptions"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentException"><paramref name="innerExceptions"/> 的元素为 <c>null</c>。</exception>
 		private AggregateSourceException(string message, IList<SourceException> innerExceptions)
 			: base(message, innerExceptions != null && innerExceptions.Count > 0 ? innerExceptions[0] : null)
 		{
@@ -130,7 +132,6 @@ namespace Cyjb.IO
 			{
 				throw CommonExceptions.InnerExceptionNull("innerExceptions");
 			}
-			Contract.EndContractBlock();
 			int cnt = innerExceptions.Count;
 			this.innerExps = new SourceException[cnt];
 			for (int i = 0; i < cnt; i++)
@@ -193,6 +194,7 @@ namespace Cyjb.IO
 			AggregateSourceException backAsAggregate = this;
 			while (backAsAggregate != null && backAsAggregate.InnerExceptions.Count == 1)
 			{
+				Contract.Assume(back != null);
 				back = back.InnerException;
 				backAsAggregate = back as AggregateSourceException;
 			}

@@ -51,7 +51,7 @@ namespace Cyjb.Reflection
 			{
 				throw CommonExceptions.ArgumentNull("type");
 			}
-			Contract.EndContractBlock();
+			Contract.Ensures(Contract.Result<LocalBuilder>() != null);
 			return il.GetManager().GetLocal(type);
 		}
 		/// <summary>

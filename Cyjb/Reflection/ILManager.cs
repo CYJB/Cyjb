@@ -38,6 +38,7 @@ namespace Cyjb.Reflection
 		public LocalBuilder GetLocal(Type type)
 		{
 			Contract.Requires(type != null);
+			Contract.Ensures(Contract.Result<LocalBuilder>() != null);
 			Stack<LocalBuilder> localStack;
 			if (locals.TryGetValue(type, out localStack))
 			{

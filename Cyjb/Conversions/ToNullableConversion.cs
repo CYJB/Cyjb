@@ -33,12 +33,13 @@ namespace Cyjb.Conversions
 		/// <param name="isChecked">是否执行溢出检查。</param>
 		public override void Emit(ILGenerator generator, Type inputType, Type outputType, bool isChecked)
 		{
-			Contract.Requires(outputType.IsNullable());
+			Contract.Assume(outputType.IsNullable());
 			Type outputUnderlyingType = Nullable.GetUnderlyingType(outputType);
 			if (inputType != outputUnderlyingType)
 			{
-				ConversionFactory.GetConversion(inputType, outputUnderlyingType)
-					.Emit(generator, inputType, outputUnderlyingType, isChecked);
+				Conversion conversion = ConversionFactory.GetConversion(inputType, outputUnderlyingType);
+				Contract.Assume(conversion != null);
+				conversion.Emit(generator, inputType, outputUnderlyingType, isChecked);
 			}
 			ConstructorInfo ctor = outputType.GetConstructor(new[] { outputUnderlyingType });
 			Contract.Assume(ctor != null);

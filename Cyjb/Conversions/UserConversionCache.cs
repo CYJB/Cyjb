@@ -12,12 +12,16 @@ namespace Cyjb.Conversions
 	/// <summary>
 	/// 表示用户定义类型转换的缓存。
 	/// </summary>
+	/// <remarks>
+	/// </remarks>
 	internal static class UserConversionCache
 	{
 		/// <summary>
 		/// 用户自定义类型转换方法的缓存。
 		/// </summary>
-		private static readonly ICache<Type, UserConversions> conversions = new LruCache<Type, UserConversions>(256);
+		private static readonly ICache<Type, UserConversions> conversions =
+			CacheFactory.Create<Type, UserConversions>("Cyjb.UserConversionCache") ??
+			new LruCache<Type, UserConversions>(256);
 		/// <summary>
 		/// 返回与指定类型相关的用户自定义类型转换方法。基类中声明的类型转换方法也包含在内。
 		/// </summary>
@@ -131,6 +135,7 @@ namespace Cyjb.Conversions
 		{
 			Contract.Requires(outputType != null && basicType != null);
 			UserConversions convs = GetUserConversions(basicType);
+			Contract.Assume(convs.ConvertToIndex >= 0);
 			for (int i = convs.ConvertToIndex; i < convs.Methods.Length; i++)
 			{
 				UserConversionMethod method = convs.Methods[i];
@@ -211,6 +216,7 @@ namespace Cyjb.Conversions
 				UserConversions convs = GetUserConversions(inputType);
 				if (convs != null)
 				{
+					Contract.Assume(convs.ConvertToIndex >= 0);
 					for (int i = convs.ConvertToIndex; i < convs.Methods.Length; i++)
 					{
 						UserConversionMethod method = convs.Methods[i];
@@ -406,8 +412,9 @@ namespace Cyjb.Conversions
 			/// <param name="method">类型转换方法。</param>
 			public UserConversionMethod(MethodInfo method)
 			{
+				Contract.Requires(method != null && method.GetParametersNoCopy().Length == 1);
 				this.method = method;
-				this.inputType = method.GetParameters()[0].ParameterType;
+				this.inputType = method.GetParametersNoCopy()[0].ParameterType;
 			}
 		}
 		/// <summary>
@@ -431,16 +438,9 @@ namespace Cyjb.Conversions
 			/// <param name="index">转换到方法在列表中的起始索引。</param>
 			public UserConversions(UserConversionMethod[] methods, int index)
 			{
+				Contract.Requires(methods != null && index >= 0 && index < methods.Length);
 				this.Methods = methods;
 				this.ConvertToIndex = index;
-			}
-			/// <summary>
-			/// 对象不变量。
-			/// </summary>
-			[ContractInvariantMethod]
-			private void ObjectInvariant()
-			{
-				Contract.Invariant(ConvertToIndex >= 0 && ConvertToIndex <= Methods.Length);
 			}
 		}
 

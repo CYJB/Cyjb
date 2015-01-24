@@ -350,7 +350,7 @@ namespace Cyjb
 			{
 				throw CommonExceptions.ArgumentNull("array");
 			}
-			if (startIndex < -array.Length || startIndex >= array.Length)
+			if (startIndex < -array.Length || startIndex > array.Length)
 			{
 				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
 			}
@@ -508,10 +508,16 @@ namespace Cyjb
 		/// <typeparam name="TOutput">目标数组元素的类型。</typeparam>
 		/// <param name="array">要转换为目标类型的一维数组。</param>
 		/// <returns>目标类型的数组，包含从源数组转换而来的元素。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
 		/// <exception cref="InvalidCastException"><typeparamref name="TInput"/> 类型不能转换到 
 		/// <typeparamref name="TOutput"/> 类型。</exception>
 		public static TOutput[] ConvertAll<TInput, TOutput>(this TInput[] array)
 		{
+			if (array == null)
+			{
+				throw CommonExceptions.ArgumentNull("array");
+			}
+			Contract.EndContractBlock();
 			Converter<TInput, TOutput> converter = Convert.GetConverter<TInput, TOutput>();
 			if (converter == null)
 			{
