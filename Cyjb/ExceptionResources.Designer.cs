@@ -223,15 +223,6 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 String cannot contain a minus sign if the base is not 10. 的本地化字符串。
-        /// </summary>
-        internal static string BaseConvertNegativeValue {
-            get {
-                return ResourceManager.GetString("BaseConvertNegativeValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Cannot bind to the target field because its type or security transparency is not compatible with that of the delegate type. 的本地化字符串。
         /// </summary>
         internal static string BindTargetField {
@@ -543,6 +534,15 @@ namespace Cyjb {
         internal static string MustContainEnumInfo {
             get {
                 return ResourceManager.GetString("MustContainEnumInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The string was being parsed as an unsigned number and could not have a negative sign. 的本地化字符串。
+        /// </summary>
+        internal static string NegativeUnsigned {
+            get {
+                return ResourceManager.GetString("NegativeUnsigned", resourceCulture);
             }
         }
         

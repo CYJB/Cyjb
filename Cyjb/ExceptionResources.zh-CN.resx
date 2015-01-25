@@ -189,10 +189,6 @@
     <value>目标数组的长度不足，请检查数组索引和长度。</value>
     <comment>目标数组太小。</comment>
   </data>
-  <data name="BaseConvertNegativeValue" xml:space="preserve">
-    <value>如果基不为 10，则此字符串不能包含减号。</value>
-    <comment>如果基不为 10，则此字符串不能包含减号。</comment>
-  </data>
   <data name="BindTargetField" xml:space="preserve">
     <value>无法绑定到目标字段，因其类型或安全透明度与委托类型的签名或安全透明度不兼容。</value>
     <comment>绑定到目标字段时出错。</comment>
@@ -332,6 +328,10 @@
   <data name="MustContainEnumInfo" xml:space="preserve">
     <value>要在此字符串中进行分析，必须指定有效信息。</value>
     <comment>必须包含枚举信息。</comment>
+  </data>
+  <data name="NegativeUnsigned" xml:space="preserve">
+    <value>该字符串正被当作无符号数字进行分析，因此不能带有负号。</value>
+    <comment>无符号数的字符串不能包含负号。</comment>
   </data>
   <data name="NoParsibleDigits" xml:space="preserve">
     <value>未能找到任何可识别的数字。</value>

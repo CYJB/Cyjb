@@ -335,39 +335,20 @@ namespace Cyjb
 		#region FormatException
 
 		/// <summary>
-		/// 返回基不为 <c>10</c> 的字符串包含减号的异常。
-		/// </summary>
-		/// <returns><see cref="FormatException"/> 对象。</returns>
-		public static FormatException BaseConvertNegativeValue()
-		{
-			return new FormatException(ExceptionResources.BaseConvertNegativeValue);
-		}
-		/// <summary>
 		/// 返回未识别的枚举值的异常。
 		/// </summary>
 		/// <param name="enumType">枚举类型。</param>
 		/// <param name="value">未识别的枚举值。</param>
 		/// <returns><see cref="FormatException"/> 对象。</returns>
-		public static FormatException EnumValueNotFound(Type enumType, object value)
+		internal static FormatException EnumValueNotFound(Type enumType, object value)
 		{
 			return new FormatException(Format(ExceptionResources.EnumValueNotFound, enumType, value));
-		}
-		/// <summary>
-		/// 返回未识别的枚举值的异常。
-		/// </summary>
-		/// <param name="enumType">枚举类型。</param>
-		/// <param name="value">未识别的枚举值。</param>
-		/// <param name="innerException">内部异常引用。</param>
-		/// <returns><see cref="FormatException"/> 对象。</returns>
-		public static FormatException EnumValueNotFound(Type enumType, object value, Exception innerException)
-		{
-			return new FormatException(Format(ExceptionResources.EnumValueNotFound, enumType, value), innerException);
 		}
 		/// <summary>
 		/// 返回字符串末尾有其它无法分析的字符的异常。
 		/// </summary>
 		/// <returns><see cref="FormatException"/> 对象。</returns>
-		public static FormatException ExtraJunkAtEnd()
+		internal static FormatException ExtraJunkAtEnd()
 		{
 			return new FormatException(ExceptionResources.ExtraJunkAtEnd);
 		}
@@ -375,7 +356,7 @@ namespace Cyjb
 		/// 返回找不到可识别的数字的异常。
 		/// </summary>
 		/// <returns><see cref="FormatException"/> 对象。</returns>
-		public static FormatException NoParsibleDigits()
+		internal static FormatException NoParsibleDigits()
 		{
 			return new FormatException(ExceptionResources.NoParsibleDigits);
 		}
@@ -619,6 +600,14 @@ namespace Cyjb
 		public static OverflowException OverflowUInt64()
 		{
 			return new OverflowException(ExceptionResources.OverflowUInt64);
+		}
+		/// <summary>
+		/// 返回无符号数的字符串包含负号的异常。
+		/// </summary>
+		/// <returns><see cref="OverflowException"/> 对象。</returns>
+		public static OverflowException NegativeUnsigned()
+		{
+			return new OverflowException(ExceptionResources.NegativeUnsigned);
 		}
 
 		#endregion // OverflowException

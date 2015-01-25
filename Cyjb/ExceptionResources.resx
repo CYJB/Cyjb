@@ -189,10 +189,6 @@
     <value>Destination array is not long enough, check array index and length.</value>
     <comment>目标数组太小。</comment>
   </data>
-  <data name="BaseConvertNegativeValue" xml:space="preserve">
-    <value>String cannot contain a minus sign if the base is not 10.</value>
-    <comment>如果基不为 10，则此字符串不能包含减号。</comment>
-  </data>
   <data name="BindTargetField" xml:space="preserve">
     <value>Cannot bind to the target field because its type or security transparency is not compatible with that of the delegate type.</value>
     <comment>绑定到目标字段时出错。</comment>
@@ -332,6 +328,10 @@
   <data name="MustContainEnumInfo" xml:space="preserve">
     <value>Must specify valid information for parsing in the string.</value>
     <comment>必须包含枚举信息。</comment>
+  </data>
+  <data name="NegativeUnsigned" xml:space="preserve">
+    <value>The string was being parsed as an unsigned number and could not have a negative sign.</value>
+    <comment>无符号数的字符串不能包含负号。</comment>
   </data>
   <data name="NoParsibleDigits" xml:space="preserve">
     <value>Could not find any recognizable digits.</value>

@@ -115,6 +115,7 @@
     <Compile Include="Collections\BitListEqualityComparer.cs" />
     <Compile Include="Conversions\BetweenNullableConversion.cs" />
     <Compile Include="Conversions\BoxConversion.cs" />
+    <Compile Include="Conversions\Convert.Base.cs" />
     <Compile Include="Conversions\StringConverterProvider.cs" />
     <Compile Include="Conversions\UserConversion.cs" />
     <Compile Include="Conversions\DecimalConversion.cs" />

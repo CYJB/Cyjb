@@ -185,7 +185,7 @@ namespace Cyjb
 					if (CheckHexLength(str, idx + 1, hexLen))
 					{
 						idx++;
-						int charNum = Convert.ToInt32(str.Substring(idx, hexLen), 16);
+						int charNum = System.Convert.ToInt32(str.Substring(idx, hexLen), 16);
 						if (charNum < 0xFFFF)
 						{
 							// 单个字符。
