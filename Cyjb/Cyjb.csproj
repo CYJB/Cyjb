@@ -163,7 +163,6 @@
     <Compile Include="IO\SourceReader.cs" />
     <Compile Include="MemberAccessor`1.cs" />
     <Compile Include="MethodSwitcher.cs" />
-    <Compile Include="MethodSwitcherManual`1.cs" />
     <Compile Include="Net\HttpWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -184,6 +183,7 @@
     <Compile Include="Reflection\ILManager.cs" />
     <Compile Include="Reflection\MethodExt.cs" />
     <Compile Include="Reflection\PowerBinder.cs" />
+    <Compile Include="Reflection\Reflections.cs" />
     <Compile Include="Reflection\TypeExt.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>

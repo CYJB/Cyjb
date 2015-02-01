@@ -1,28 +1,49 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
+using Cyjb.Reflection;
 
 namespace Cyjb
 {
 	/// <summary>
-	/// 方法调用的切换器，对于使用同一个基类的不同子类作为参数的多个方法，
-	/// 可以根据关键参数的实际类型调用相应的方法。
+	/// 方法调用的切换器，对于使用同一个基类的不同子类作为参数的多个方法，能够自动推断关键参数
+	/// （使用不同子类的参数，必须是唯一的），并根据关键参数的实际类型调用相应的方法。
 	/// </summary>
-	/// <remarks><see cref="MethodSwitcher"/> 可以自动从类型中寻找方法处理器，
-	/// 无需手动配置。
-	/// 关于方法切换器的更多信息，可以参加我的博文
-	/// <see href="http://www.cnblogs.com/cyjb/archive/p/MethodSwitcher.html">
-	/// 《C# 方法调用的切换器》</see>
-	/// </remarks>
-	/// <seealso cref="MethodSwitcherManual{TDelegate}"/>
+	/// <remarks><see cref="MethodSwitcher"/> 可以手动添加委托，也可以自动从类型中寻找处理器。
+	/// 关于方法切换器的更多信息，可以参加我的博文<see href="http://www.cnblogs.com/cyjb/archive/p/MethodSwitcher.html">
+	/// 《C# 方法调用的切换器》</see></remarks>
 	/// <seealso cref="ProcessorAttribute"/>
-	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/MethodSwitcher.html">
-	/// 《C# 方法调用的切换器》</seealso>
+	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/MethodSwitcher.html">《C# 方法调用的切换器》</seealso>
 	/// <example>
-	/// 下面演示了方法切换器的简单用法。
+	/// 下面演示了手动添加委托的简单用法。
+	/// <code>
+	/// class Program {
+	/// 	static void A(int m) { Console.WriteLine("int"); }
+	/// 	static void B(string m) { Console.WriteLine("string"); }
+	/// 	static void C(Array m) { Console.WriteLine("Array"); }
+	/// 	static void D(int[] m) { Console.WriteLine("int[]"); }
+	/// 	static void E(object m) { Console.WriteLine("object"); }
+	/// 	static void Main(string[] args) {
+	/// 		Action&lt;object&gt; invoke = MethodSwitcher.Create&lt;Action&lt;object&gt;&gt;((Action&lt;int&gt;)A, 
+	/// 			(Action&lt;string&gt;)B, (Action&lt;Array&gt;)C, (Action&lt;int[]&gt;)D, (Action&lt;object&gt;)E);
+	/// 		invoke(10);
+	/// 		invoke("10");
+	/// 		invoke(new int[0]);
+	/// 		invoke(new string[0]);
+	/// 		invoke(10L);
+	/// 	}
+	/// }
+	/// </code>
+	/// </example>
+	/// <example>
+	/// 下面演示了自动寻找处理器的简单用法。
 	/// <code>
 	/// class Program {
 	///		[Processor]
@@ -36,7 +57,7 @@ namespace Cyjb
 	///		[Processor]
 	/// 	static void E(object m) { Console.WriteLine("object"); }
 	/// 	static void Main(string[] args) {
-	/// 		Action{object} invoke = MethodSwitcher.GetSwitcher{Action{object}}(typeof(Program), 0);
+	/// 		Action&lt;object&gt; invoke = MethodSwitcher.Create&lt;Action&lt;object&gt;&gt;(typeof(Program));
 	/// 		invoke(10);
 	/// 		invoke("10");
 	/// 		invoke(new int[0]);
@@ -50,123 +71,273 @@ namespace Cyjb
 	public static class MethodSwitcher
 	{
 		/// <summary>
-		/// 扫描所有公共和非公共的实例或静态方法。
+		/// 表示 object.GetType 方法。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private const BindingFlags MethodFlags = BindingFlags.Static | BindingFlags.Instance |
-			BindingFlags.Public | BindingFlags.NonPublic;
+		private static readonly MethodInfo methodGetType = typeof(object).GetMethod("GetType");
+		/// <summary>
+		/// 表示 MethodSwitcher.GetMethod 方法。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private static readonly MethodInfo methodGetMethod = typeof(MethodSwitcher).GetMethod("GetMethod", TypeExt.StaticFlag);
 		/// <summary>
 		/// 特定类型中的所有标记为处理器的方法，及其元数据。
 		/// </summary>
-		private static Dictionary<string, Tuple<bool, Type, Dictionary<Type, Delegate>>> methodDict =
-			new Dictionary<string, Tuple<bool, Type, Dictionary<Type, Delegate>>>();
+		private static readonly ConcurrentDictionary<string, ProcessorData> methodDict =
+			new ConcurrentDictionary<string, ProcessorData>();
 
 		#region 返回方法切换器
 
 		/// <summary>
-		/// 返回 <paramref name="type"/> 中与默认标识符相关的静态方法切换器。
-		/// 多次获取特定类型中同一标识符的方法切换器，必须使用相同的 
-		/// <typeparamref name="TDelegate"/> 和 <paramref name="index"/>。
+		/// 创建与指定委托列表相关的方法切换器，会自动推断关键参数（使用不同子类的参数，必须是唯一的）。
 		/// </summary>
-		/// <typeparam name="TDelegate">使用基类型调用方法的委托。</typeparam>
-		/// <param name="type">在其中查找静态方法的类型。</param>
-		/// <param name="index">方法的关键参数索引。</param>
-		/// <returns><paramref name="type"/> 中与默认标识符相关的静态方法切换器。</returns>
+		/// <typeparam name="TDelegate">使用基类型调用方法的委托类型。</typeparam>
+		/// <param name="delegates">使用不同子类作为参数的委托列表。</param>
+		/// <returns>与 <paramref name="delegates"/> 相关的方法切换器。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="delegates"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="delegates"/> 中存在为 <c>null</c> 的委托。</exception>
+		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentException">委托类型与处理器不匹配。</exception>
+		/// <exception cref="ArgumentException">处理器的参数不匹配。</exception>
+		/// <exception cref="ArgumentException">没有找到唯一的关键参数。</exception>
 		/// <overloads>
 		/// <summary>
-		/// 返回特定类型或对象中与特定标识符相关的静态或实例方法切换器。
-		/// 多次获取特定类型中同一标识符的方法切换器，必须使用相同的 
-		/// <typeparamref name="TDelegate"/> 和 <paramref name="index"/>。
+		/// 创建方法切换器，会自动推断关键参数（使用不同子类的参数，必须是唯一的）。
 		/// </summary>
 		/// </overloads>
-		public static TDelegate GetSwitcher<TDelegate>(Type type, int index)
+		public static TDelegate Create<TDelegate>(params Delegate[] delegates)
 			where TDelegate : class
 		{
-			return GetSwitcher<TDelegate>(type, index, ProcessorAttribute.DefaultId);
+			if (delegates == null)
+			{
+				throw CommonExceptions.ArgumentNull("delegates");
+			}
+			if (delegates.Any(d => d == null))
+			{
+				throw CommonExceptions.CollectionItemNull("delegates");
+			}
+			Contract.Ensures(Contract.Result<TDelegate>() != null);
+			if (!typeof(TDelegate).IsSubclassOf(typeof(Delegate)))
+			{
+				throw CommonExceptions.MustBeDelegate("TDelegate", typeof(TDelegate));
+			}
+			ProcessorData data = new ProcessorData(delegates);
+			CheckDelegateType<TDelegate>(data);
+			return CreateSwitcher<TDelegate>(data, null, null);
 		}
 		/// <summary>
-		/// 返回 <paramref name="type"/> 中与指定标识符相关的静态方法切换器。
-		/// 多次获取特定类型中同一标识符的方法切换器，必须使用相同的 
-		/// <typeparamref name="TDelegate"/> 和 <paramref name="index"/>。
+		/// 创建指定类型中与默认标识相关的静态方法切换器，会自动推断关键参数（使用不同子类的参数，必须是唯一的）。
 		/// </summary>
 		/// <typeparam name="TDelegate">使用基类型调用方法的委托。</typeparam>
 		/// <param name="type">在其中查找静态方法的类型。</param>
-		/// <param name="index">方法的关键参数索引。</param>
-		/// <param name="id">方法切换器的标识符。</param>
-		/// <returns><paramref name="type"/> 中与指定标识符相关的静态方法切换器。</returns>
-		public static TDelegate GetSwitcher<TDelegate>(Type type, int index, string id)
+		/// <returns><paramref name="type"/> 中与默认标识相关的静态方法切换器。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentException">委托类型与处理器不匹配。</exception>
+		/// <exception cref="ArgumentException">处理器的参数不匹配。</exception>
+		/// <exception cref="ArgumentException">没有找到唯一的关键参数。</exception>
+		public static TDelegate Create<TDelegate>(Type type)
 			where TDelegate : class
 		{
-			CommonExceptions.CheckArgumentNull(type, "type");
-			Type dlgType = typeof(TDelegate);
-			CommonExceptions.CheckDelegateType(dlgType, "TDelegate");
-			Dictionary<Type, Delegate> methods = GetMethods<TDelegate>(type, id, index, true);
-			MethodInfo invoke = dlgType.GetMethod("Invoke");
-			// 构造委托。
-			ParameterExpression[] paramList = invoke.GetParameters().ToExpressions();
-			// 取得关键类型。
-			Expression getType = Expression.Call(paramList[index], typeof(object).GetMethod("GetType"));
-			// 从字典取得相应委托。
-			Expression getDlg = Expression.Invoke(
-				Expression.Constant((Func<Dictionary<Type, Delegate>, Type, Delegate>)GetMethod),
-				Expression.Constant(methods), getType);
-			getDlg = Expression.Convert(getDlg, dlgType);
-			// 调用委托。
-			Expression invokeDlg = Expression.Invoke(getDlg, paramList);
-			return Expression.Lambda<TDelegate>(invokeDlg, paramList).Compile() as TDelegate;
-		}
-		/// <summary>
-		/// 返回指定对象中与默认标识符相关的实例方法切换器。
-		/// 多次获取特定类型中同一标识符的方法切换器，必须使用相同的 
-		/// <typeparamref name="TDelegate"/> 和 <paramref name="index"/>。
-		/// </summary>
-		/// <typeparam name="TDelegate">使用基类型调用方法的委托。</typeparam>
-		/// <param name="target">实例方法的目标对象。</param>
-		/// <param name="index">方法的关键参数索引。</param>
-		/// <returns>指定对象中与默认标识符相关的实例方法切换器。</returns>
-		public static TDelegate GetSwitcher<TDelegate>(object target, int index)
-			where TDelegate : class
-		{
-			return GetSwitcher<TDelegate>(target, index, ProcessorAttribute.DefaultId);
-		}
-		/// <summary>
-		/// 返回指定对象中与指定标识符相关的实例方法切换器。
-		/// 多次获取特定类型中同一标识符的方法切换器，必须使用相同的 
-		/// <typeparamref name="TDelegate"/> 和 <paramref name="index"/>。
-		/// </summary>
-		/// <typeparam name="TDelegate">使用基类型调用方法的委托。</typeparam>
-		/// <param name="target">实例方法的目标对象。</param>
-		/// <param name="index">方法的关键参数索引。</param>
-		/// <param name="id">方法切换器的标识符。</param>
-		/// <returns>指定对象中与指定标识符相关的实例方法切换器。</returns>
-		public static TDelegate GetSwitcher<TDelegate>(object target, int index, string id)
-			where TDelegate : class
-		{
-			CommonExceptions.CheckArgumentNull(target, "target");
-			Type dlgType = typeof(TDelegate);
-			CommonExceptions.CheckDelegateType(dlgType, "TDelegate");
-			Dictionary<Type, Delegate> methods = GetMethods<TDelegate>(target.GetType(), id, index, false);
-			MethodInfo invoke = dlgType.GetMethod("Invoke");
-			// 构造委托。
-			ParameterExpression[] paramList = invoke.GetParameters().ToExpressions();
-			// 取得关键类型。
-			Expression getType = Expression.Call(paramList[index], typeof(object).GetMethod("GetType"));
-			// 从字典取得相应委托。
-			Expression getDlg = Expression.Invoke(
-				Expression.Constant((Func<Dictionary<Type, Delegate>, Type, Delegate>)GetMethod),
-				Expression.Constant(methods), getType);
-			// 调用实例方法委托。
-			Type insDlgType = GetInstanceDlgType(dlgType);
-			getDlg = Expression.Convert(getDlg, insDlgType);
-			Expression[] invokeArgs = new Expression[paramList.Length + 1];
-			invokeArgs[0] = Expression.Constant(target);
-			for (int i = 0; i < paramList.Length; i++)
+			if (type == null)
 			{
-				invokeArgs[i + 1] = paramList[i];
+				throw CommonExceptions.ArgumentNull("type");
 			}
-			// 调用委托。
-			Expression invokeDlg = Expression.Invoke(getDlg, invokeArgs);
-			return Expression.Lambda<TDelegate>(invokeDlg, paramList).Compile() as TDelegate;
+			Contract.Ensures(Contract.Result<TDelegate>() != null);
+			if (!typeof(TDelegate).IsSubclassOf(typeof(Delegate)))
+			{
+				throw CommonExceptions.MustBeDelegate("TDelegate", typeof(TDelegate));
+			}
+			ProcessorData data = GetMethods<TDelegate>(type, ProcessorAttribute.DefaultId, true);
+			return CreateSwitcher<TDelegate>(data, ProcessorAttribute.DefaultId, null);
+		}
+		/// <summary>
+		/// 创建指定类型中与标识指定相关的静态方法切换器，会自动推断关键参数（使用不同子类的参数，必须是唯一的）。
+		/// </summary>
+		/// <typeparam name="TDelegate">使用基类型调用方法的委托。</typeparam>
+		/// <param name="type">在其中查找静态方法的类型。</param>
+		/// <param name="id">处理器的标识。</param>
+		/// <returns><paramref name="type"/> 中与指定标识相关的静态方法切换器。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="id"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="id"/> 为空字符串。</exception>
+		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentException">委托类型与处理器不匹配。</exception>
+		/// <exception cref="ArgumentException">处理器的参数不匹配。</exception>
+		/// <exception cref="ArgumentException">没有找到唯一的关键参数。</exception>
+		public static TDelegate Create<TDelegate>(Type type, string id)
+			where TDelegate : class
+		{
+			if (type == null)
+			{
+				throw CommonExceptions.ArgumentNull("type");
+			}
+			if (string.IsNullOrEmpty(id))
+			{
+				throw CommonExceptions.StringEmpty("id");
+			}
+			Contract.Ensures(Contract.Result<TDelegate>() != null);
+			if (!typeof(TDelegate).IsSubclassOf(typeof(Delegate)))
+			{
+				throw CommonExceptions.MustBeDelegate("TDelegate", typeof(TDelegate));
+			}
+			ProcessorData data = GetMethods<TDelegate>(type, id, true);
+			return CreateSwitcher<TDelegate>(data, id, null);
+		}
+		/// <summary>
+		/// 创建指定对象中与默认指定相关的实例方法切换器，会自动推断关键参数（使用不同子类的参数，必须是唯一的）。
+		/// </summary>
+		/// <typeparam name="TDelegate">使用基类型调用方法的委托。</typeparam>
+		/// <param name="target">在其中查找实例方法的对象。</param>
+		/// <returns><paramref name="target"/> 中与默认标识相关的实例方法切换器。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentException">委托类型与处理器不匹配。</exception>
+		/// <exception cref="ArgumentException">处理器的参数不匹配。</exception>
+		/// <exception cref="ArgumentException">没有找到唯一的关键参数。</exception>
+		public static TDelegate Create<TDelegate>(object target)
+			where TDelegate : class
+		{
+			if (target == null)
+			{
+				throw CommonExceptions.ArgumentNull("target");
+			}
+			Contract.Ensures(Contract.Result<TDelegate>() != null);
+			if (!typeof(TDelegate).IsSubclassOf(typeof(Delegate)))
+			{
+				throw CommonExceptions.MustBeDelegate("TDelegate", typeof(TDelegate));
+			}
+			ProcessorData data = GetMethods<TDelegate>(target.GetType(), ProcessorAttribute.DefaultId, false);
+			return CreateSwitcher<TDelegate>(data, ProcessorAttribute.DefaultId, target);
+		}
+		/// <summary>
+		/// 创建指定对象中与标识指定相关的实例方法切换器，会自动推断关键参数（使用不同子类的参数，必须是唯一的）。
+		/// </summary>
+		/// <typeparam name="TDelegate">使用基类型调用方法的委托。</typeparam>
+		/// <param name="target">在其中查找实例方法的对象。</param>
+		/// <param name="id">处理器的标识。</param>
+		/// <returns><paramref name="target"/> 中与指定标识相关的实例方法切换器。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="id"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="id"/> 为空字符串。</exception>
+		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentException">委托类型与处理器不匹配。</exception>
+		/// <exception cref="ArgumentException">处理器的参数不匹配。</exception>
+		/// <exception cref="ArgumentException">没有找到唯一的关键参数。</exception>
+		public static TDelegate Create<TDelegate>(object target, string id)
+			where TDelegate : class
+		{
+			if (target == null)
+			{
+				throw CommonExceptions.ArgumentNull("target");
+			}
+			if (string.IsNullOrEmpty(id))
+			{
+				throw CommonExceptions.StringEmpty("id");
+			}
+			Contract.Ensures(Contract.Result<TDelegate>() != null);
+			if (!typeof(TDelegate).IsSubclassOf(typeof(Delegate)))
+			{
+				throw CommonExceptions.MustBeDelegate("TDelegate", typeof(TDelegate));
+			}
+			ProcessorData data = GetMethods<TDelegate>(target.GetType(), id, false);
+			return CreateSwitcher<TDelegate>(data, id, target);
+		}
+		/// <summary>
+		/// 返回与指定处理器数据相关的指定类型的委托。
+		/// </summary>
+		/// <typeparam name="TDelegate">委托的类型。</typeparam>
+		/// <param name="data">处理器数据。</param>
+		/// <param name="id">处理器标识。</param>
+		/// <param name="instance">处理器要绑定到的实例。</param>
+		/// <returns>与 <paramref name="data"/> 相关的 <typeparamref name="TDelegate"/> 类型的委托。</returns>
+		private static TDelegate CreateSwitcher<TDelegate>(ProcessorData data, string id, object instance)
+			where TDelegate : class
+		{
+			Contract.Requires(data != null);
+			MethodInfo invoke = typeof(TDelegate).GetInvokeMethod();
+			Type[] paramTypes = invoke.GetParameterTypes();
+			object closure;
+			if (data.IsStatic)
+			{
+				closure = data.Processors;
+			}
+			else
+			{
+				closure = new Closure(new[] { instance, data.Processors }, null);
+			}
+			DynamicMethod method = new DynamicMethod("MethodSwitcher", invoke.ReturnType,
+				paramTypes.Insert(0, closure.GetType()), true);
+			ILGenerator il = method.GetILGenerator();
+			// 静态方法中，arg_0 用作存储处理器委托字典。
+			il.Emit(OpCodes.Ldarg_0);
+			if (!data.IsStatic)
+			{
+				// 实例方法中，arg_0.Constants[1] 用作存储处理器委托字典。
+				il.Emit(OpCodes.Ldfld, Reflections.ClosureConstants);
+				il.EmitInt(1);
+				il.Emit(OpCodes.Ldelem_Ref);
+				il.Emit(OpCodes.Castclass, typeof(Dictionary<Type, Delegate>));
+			}
+			// 判断关键参数是否为 null。
+			il.EmitLoadArg(data.KeyIndex + 1);
+			Label keyNullCase = il.DefineLabel();
+			il.Emit(OpCodes.Brtrue, keyNullCase);
+			// 关键参数为 null，将 object 作为查找类型。
+			il.EmitConstant(typeof(object));
+			Label endKeyNull = il.DefineLabel();
+			il.Emit(OpCodes.Br, endKeyNull);
+			// 关键参数不为 null，将参数类型作为查找类型。
+			il.MarkLabel(keyNullCase);
+			il.EmitLoadArg(data.KeyIndex + 1);
+			il.Emit(OpCodes.Call, methodGetType);
+			il.MarkLabel(endKeyNull);
+			// 调用 GetMethod 方法，取得方法委托。
+			il.EmitConstant(id);
+			il.Emit(OpCodes.Call, methodGetMethod);
+			il.Emit(OpCodes.Castclass, data.DelegateType);
+			//// 载入参数，调用委托。
+			Type[] originParamTypes = data.DelegateParamTypes;
+			if (!data.IsStatic)
+			{
+				// 载入实例。
+				il.Emit(OpCodes.Ldarg_0);
+				il.Emit(OpCodes.Ldfld, Reflections.ClosureConstants);
+				il.EmitInt(0);
+				il.Emit(OpCodes.Ldelem_Ref);
+				il.EmitConversion(typeof(object), instance.GetType(), true);
+			}
+			int offset = data.IsStatic ? 0 : 1;
+			for (int i = 0; i < paramTypes.Length; i++)
+			{
+				Type targetType = originParamTypes[i + offset];
+				Contract.Assume(targetType != null);
+				il.EmitLoadArg(i + 1, paramTypes[i], targetType);
+			}
+			il.Emit(OpCodes.Callvirt, data.DelegateType.GetInvokeMethod());
+			Type returnType = originParamTypes[originParamTypes.Length - 1];
+			Type targetReturnType = invoke.ReturnType;
+			// 转换返回类型。
+			if (returnType == typeof(void))
+			{
+				if (targetReturnType != typeof(void))
+				{
+					il.EmitConstant(null, targetReturnType);
+				}
+			}
+			else
+			{
+				if (targetReturnType == typeof(void))
+				{
+					il.Emit(OpCodes.Pop);
+				}
+				else if (returnType != targetReturnType)
+				{
+					il.EmitConversion(returnType, targetReturnType, true);
+				}
+			}
+			il.Emit(OpCodes.Ret);
+			return method.CreateDelegate(typeof(TDelegate), closure) as TDelegate;
 		}
 
 		#endregion // 返回方法切换器
@@ -174,145 +345,300 @@ namespace Cyjb
 		#region 查找方法
 
 		/// <summary>
-		/// 返回与指定标识符相关的处理器方法集合。
+		/// 返回与指定类型和标识相关的处理器数据。
 		/// </summary>
-		/// <typeparam name="TDelegate">使用基类型调用方法的委托。</typeparam>
-		/// <param name="type">在其中查找静态或实例方法的类型。</param>
-		/// <param name="id">方法切换器的标识符。</param>
-		/// <param name="index">方法的关键参数索引。</param>
-		/// <param name="queryStatic">是否请求的是静态方法。</param>
-		/// <returns>与指定标识符相关的处理器方法集合。</returns>
-		private static Dictionary<Type, Delegate> GetMethods<TDelegate>(Type type, string id, int index, bool queryStatic)
+		/// <typeparam name="TDelegate">调用委托的类型。</typeparam>
+		/// <param name="type">处理器所属的类型。</param>
+		/// <param name="id">处理器的标识。</param>
+		/// <param name="needStatic">需要的是否是静态方法。</param>
+		/// <returns>与指定类型和标识相关的处理器数据。</returns>
+		/// <exception cref="ArgumentException">委托类型与处理器不匹配。</exception>
+		private static ProcessorData GetMethods<TDelegate>(Type type, string id, bool needStatic)
 		{
+			Contract.Requires(type != null && id != null);
+			Contract.Ensures(Contract.Result<ProcessorData>() != null);
+			ProcessorData data = methodDict.GetOrAdd(string.Concat(type.FullName, "_", id),
+				key => new ProcessorData(type, id));
+			if (data.IsStatic != needStatic)
+			{
+				throw CommonExceptions.ProcessorMismatch(type, id);
+			}
+			CheckDelegateType<TDelegate>(data);
+			return data;
+		}
+		/// <summary>
+		/// 检查委托类型是否与处理器兼容。
+		/// </summary>
+		/// <typeparam name="TDelegate">调用委托的类型。</typeparam>
+		/// <param name="data">处理器的数据。</param>
+		/// <exception cref="ArgumentException">委托类型与处理器不匹配。</exception>
+		private static void CheckDelegateType<TDelegate>(ProcessorData data)
+		{
+			Contract.Requires(data != null);
 			Type dlgType = typeof(TDelegate);
-			Tuple<bool, Type, Dictionary<Type, Delegate>> data;
-			string key = string.Concat(type.FullName, "_", id);
-			if (!methodDict.TryGetValue(key, out data))
+			if (data.IsStatic)
 			{
-				MethodInfo[] methods = type.GetMethods(MethodFlags);
-				List<MethodInfo> list = new List<MethodInfo>();
-				for (int i = 0; i < methods.Length; i++)
+				if (data.DelegateType != dlgType)
 				{
-					if (methods[i].GetCustomAttributes(typeof(ProcessorAttribute), true)
-						.Cast<ProcessorAttribute>().Any(s => s.Id == id))
+					// 检查静态委托参数。
+					ParameterInfo[] paramInfos = data.DelegateType.GetMethod("Invoke").GetParametersNoCopy();
+					ParameterInfo[] dlgParamInfos = dlgType.GetMethod("Invoke").GetParametersNoCopy();
+					if (paramInfos.Length != dlgParamInfos.Length)
 					{
-						list.Add(methods[i]);
+						throw CommonExceptions.DelegateCompatible(data.DelegateType, dlgType);
 					}
-				}
-				int cnt = list.Count;
-				if (cnt == 0)
-				{
-					throw CommonExceptions.ProcessorNotFound("type", type, id);
-				}
-				bool isStatic = list[0].IsStatic;
-				for (int i = 1; i < cnt; i++)
-				{
-					if (list[i].IsStatic != isStatic)
+					if (paramInfos.Where((param, idx) => !param.ParameterType.IsExplicitFrom(dlgParamInfos[idx].ParameterType))
+						.Any())
 					{
-						throw CommonExceptions.ProcessorMixed("type", type, id);
-					}
-				}
-				Dictionary<Type, Delegate> dict = new Dictionary<Type, Delegate>();
-				Type newDlgType = dlgType;
-				if (!isStatic)
-				{
-					newDlgType = GetInstanceDlgType(newDlgType);
-				}
-				for (int i = 0; i < cnt; i++)
-				{
-					Type keyType = list[i].GetParameters()[index].ParameterType;
-					Delegate dlg = DelegateBuilder.CreateDelegate(newDlgType, list[i], false);
-					if (dlg == null)
-					{
-						throw CommonExceptions.DelegateCompatible(list[i].ToString(), dlgType);
-					}
-					dict.Add(keyType, dlg);
-				}
-				data = new Tuple<bool, Type, Dictionary<Type, Delegate>>(isStatic, dlgType, dict);
-				methodDict.Add(key, data);
-			}
-			if (data.Item1 != queryStatic)
-			{
-				throw CommonExceptions.ProcessorMismatch("type", type, id);
-			}
-			if (data.Item2 != dlgType)
-			{
-				// 检查委托参数。
-				ParameterInfo[] paramInfos = data.Item2.GetMethod("Invoke").GetParameters();
-				ParameterInfo[] dlgParamInfos = dlgType.GetMethod("Invoke").GetParameters();
-				if (paramInfos.Length != dlgParamInfos.Length)
-				{
-					throw CommonExceptions.DelegateCompatible("TDelegate", dlgType);
-				}
-				for (int i = 0; i < paramInfos.Length; i++)
-				{
-					if (paramInfos[i].ParameterType != dlgParamInfos[i].ParameterType)
-					{
-						throw CommonExceptions.DelegateCompatible("TDelegate", dlgType);
+						throw CommonExceptions.DelegateCompatible(data.DelegateType, dlgType);
 					}
 				}
 			}
-			return data.Item3;
+			else
+			{
+				// 检查实例委托参数，要考虑实例对应的参数。
+				ParameterInfo[] paramInfos = data.DelegateType.GetMethod("Invoke").GetParametersNoCopy();
+				ParameterInfo[] dlgParamInfos = dlgType.GetMethod("Invoke").GetParametersNoCopy();
+				if (paramInfos.Length != dlgParamInfos.Length + 1)
+				{
+					throw CommonExceptions.DelegateCompatible(data.DelegateType, dlgType);
+				}
+				for (int i = 1; i < paramInfos.Length; i++)
+				{
+					if (!paramInfos[i].ParameterType.IsExplicitFrom(dlgParamInfos[i - 1].ParameterType))
+					{
+						throw CommonExceptions.DelegateCompatible(data.DelegateType, dlgType);
+					}
+				}
+			}
 		}
 		/// <summary>
-		/// 返回实例方法对应的委托类型，需要将实例对象作为第一个参数。
+		/// 返回与指定类型相关的处理器委托。
 		/// </summary>
-		/// <param name="type">原始的委托类型。</param>
-		/// <returns>实例方法对应的委托类型。</returns>
-		private static Type GetInstanceDlgType(Type type)
+		/// <param name="dict">处理器的委托字典。</param>
+		/// <param name="type">要获取处理器委托的类型。</param>
+		/// <param name="id">处理器的标识。</param>
+		/// <returns>与指定类型相关的处理器委托。</returns>
+		private static Delegate GetMethod(Dictionary<Type, Delegate> dict, Type type, string id)
 		{
-			MethodInfo invoke = type.GetMethod("Invoke");
-			ParameterInfo[] paramInfos = invoke.GetParameters();
-			Type[] types = new Type[paramInfos.Length + 2];
-			types[0] = typeof(object);
-			for (int i = 0; i < paramInfos.Length; i++)
-			{
-				types[i + 1] = paramInfos[i].ParameterType;
-			}
-			types[types.Length - 1] = invoke.ReturnType;
-			return Expression.GetDelegateType(types);
-		}
-		/// <summary>
-		/// 返回与指定类型相关的处理器方法委托。
-		/// </summary>
-		/// <param name="dict">要获取处理器方法的字典。</param>
-		/// <param name="type">要获取处理器方法的类型。</param>
-		/// <returns>与指定类型相关的处理器方法委托。</returns>
-		private static Delegate GetMethod(Dictionary<Type, Delegate> dict, Type type)
-		{
+			Contract.Requires(dict != null && type != null);
+			Contract.Ensures(Contract.Result<Delegate>() != null);
 			Delegate dlg = GetMethodUnderlying(dict, type);
 			if (dlg == null)
 			{
-				throw CommonExceptions.ProcessorNotFound("type", type);
+				throw CommonExceptions.ProcessorNotFound(type, id);
 			}
 			return dlg;
 		}
 		/// <summary>
-		/// 返回与指定类型相关的处理器方法委托。
+		/// 返回与指定类型相关的处理器委托。
 		/// </summary>
-		/// <param name="dict">要获取处理器方法的字典。</param>
-		/// <param name="type">要获取处理器方法的类型。</param>
-		/// <returns>与指定类型相关的处理器方法委托。</returns>
-		private static Delegate GetMethodUnderlying(Dictionary<Type, Delegate> dict, Type type)
+		/// <param name="dict">处理器的委托字典。</param>
+		/// <param name="type">要获取处理器委托的类型。</param>
+		/// <returns>与指定类型相关的处理器委托。</returns>
+		private static Delegate GetMethodUnderlying(IDictionary<Type, Delegate> dict, Type type)
 		{
+			Contract.Requires(dict != null && type != null);
 			Delegate dlg;
 			if (dict.TryGetValue(type, out dlg))
 			{
 				return dlg;
 			}
-			else if (type.BaseType == null)
+			if (type.BaseType == null)
 			{
 				return null;
 			}
-			else
-			{
-				dlg = GetMethodUnderlying(dict, type.BaseType);
-				dict.Add(type, dlg);
-				return dlg;
-			}
+			dlg = GetMethodUnderlying(dict, type.BaseType);
+			dict.Add(type, dlg);
+			return dlg;
 		}
 
 		#endregion // 查找方法
+
+		#region 处理器
+
+		/// <summary>
+		/// 与特定类型相关的处理器数据。
+		/// </summary>
+		private class ProcessorData
+		{
+			/// <summary>
+			/// 委托方法是否是静态方法（无需传入实例）。
+			/// </summary>
+			public readonly bool IsStatic;
+			/// <summary>
+			/// 关键参数的索引。
+			/// </summary>
+			public readonly int KeyIndex;
+			/// <summary>
+			/// 字典中委托的类型。
+			/// </summary>
+			public readonly Type DelegateType;
+			/// <summary>
+			/// 委托的参数类型，最后一个参数表示返回值类型。
+			/// </summary>
+			public readonly Type[] DelegateParamTypes;
+			/// <summary>
+			/// 与类型相关的委托，委托的实际类型是 <see cref="DelegateType"/>。
+			/// </summary>
+			public readonly Dictionary<Type, Delegate> Processors;
+			/// <summary>
+			/// 使用处理器的委托列表初始化 <see cref="ProcessorData"/> 类的新实例。 
+			/// </summary>
+			/// <param name="delegates">使用不同子类作为参数的委托列表。</param>
+			/// <exception cref="ArgumentException">处理器的参数不匹配。</exception>
+			/// <exception cref="ArgumentException">没有找到唯一的关键参数。</exception>
+			public ProcessorData(Delegate[] delegates)
+			{
+				Contract.Requires(delegates != null && delegates.All(d => d != null));
+				this.IsStatic = true;
+				List<MethodInfo> list = new List<MethodInfo>(delegates.Length);
+				list.AddRange(delegates.Select(d => d.GetInvokeMethod()));
+				int cnt = list.Count;
+				// 发现关键参数，所有处理器各不相同的参数就认为是关键参数。
+				List<Type[]> paramTypes = new List<Type[]>(cnt);
+				for (int i = 0; i < cnt; i++)
+				{
+					paramTypes.Add(list[i].GetParameterTypesWithReturn());
+				}
+				this.KeyIndex = FindKeyIndex(null, null, paramTypes);
+				// 构造委托类型。
+				this.DelegateParamTypes = FindDelegateType(paramTypes, null);
+				this.DelegateType = Expression.GetDelegateType(this.DelegateParamTypes);
+				this.Processors = new Dictionary<Type, Delegate>(cnt);
+				for (int i = 0; i < cnt; i++)
+				{
+					Type keyType = list[i].GetParameters()[this.KeyIndex].ParameterType;
+					// 经过前面的类型检查，包装委托时应当总是会成功。
+					this.Processors.Add(keyType, DelegateBuilder.Wrap(this.DelegateType, delegates[i]));
+				}
+			}
+			/// <summary>
+			/// 使用处理器所属的类型和标识初始化 <see cref="ProcessorData"/> 类的新实例。
+			/// </summary>
+			/// <param name="type">处理器所属的类型。</param>
+			/// <param name="id">处理器的标识。</param>
+			/// <exception cref="ArgumentException">没有找到处理器。</exception>
+			/// <exception cref="ArgumentException">处理器中混杂着静态和动态方法。</exception>
+			/// <exception cref="ArgumentException">处理器的参数不匹配。</exception>
+			/// <exception cref="ArgumentException">没有找到唯一的关键参数。</exception>
+			public ProcessorData(Type type, string id)
+			{
+				Contract.Requires(type != null && id != null);
+				// 寻找处理器。
+				MethodInfo[] methods = type.GetMethods(TypeExt.AllMemberFlag);
+				List<MethodInfo> list = new List<MethodInfo>(methods.Length);
+				list.AddRange(methods.Where(m => m.GetCustomAttributes(typeof(ProcessorAttribute), true)
+					.Cast<ProcessorAttribute>().Any(p => p.Id == id)));
+				int cnt = list.Count;
+				if (cnt == 0)
+				{
+					throw CommonExceptions.ProcessorNotFound(type, id);
+				}
+				// 判断是静态方法还是动态方法。
+				this.IsStatic = list[0].IsStatic;
+				if (list.Any(m => m.IsStatic != IsStatic))
+				{
+					throw CommonExceptions.ProcessorMixed(type, id);
+				}
+				// 发现关键参数，所有处理器各不相同的参数就认为是关键参数。
+				List<Type[]> paramTypes = new List<Type[]>(cnt);
+				for (int i = 0; i < cnt; i++)
+				{
+					paramTypes.Add(list[i].GetParameterTypesWithReturn());
+				}
+				this.KeyIndex = FindKeyIndex(type, id, paramTypes);
+				// 构造委托类型。
+				this.DelegateParamTypes = FindDelegateType(paramTypes, this.IsStatic ? null : type);
+				this.DelegateType = Expression.GetDelegateType(this.DelegateParamTypes);
+				this.Processors = new Dictionary<Type, Delegate>(cnt);
+				for (int i = 0; i < cnt; i++)
+				{
+					Type keyType = list[i].GetParameters()[this.KeyIndex].ParameterType;
+					// 经过前面的类型检查，创建委托时应当总是会成功。
+					this.Processors.Add(keyType, DelegateBuilder.CreateDelegate(this.DelegateType, list[i]));
+				}
+			}
+			/// <summary>
+			/// 找到方法参数中的关键参数。
+			/// </summary>
+			/// <param name="type">处理器所属的类型。</param>
+			/// <param name="id">处理器的标识。</param>
+			/// <param name="paramTypes">处理器参数类型列表。</param>
+			/// <returns>关键参数的索引。</returns>
+			/// <exception cref="ArgumentException">处理器的参数不匹配。</exception>
+			/// <exception cref="ArgumentException">没有找到唯一的关键参数。</exception>
+			private static int FindKeyIndex(Type type, string id, List<Type[]> paramTypes)
+			{
+				Contract.Requires(paramTypes != null && paramTypes.Count > 0);
+				int cnt = paramTypes.Count;
+				int paramCnt = -1;
+				for (int i = 0; i < cnt; i++)
+				{
+					if (paramCnt == -1)
+					{
+						paramCnt = paramTypes[i].Length;
+					}
+					else if (paramCnt != paramTypes[i].Length)
+					{
+						throw CommonExceptions.ProcessorParameterMismatch(type, id);
+					}
+				}
+				UniqueValue<int> keyIdx = new UniqueValue<int>();
+				// 不考虑最后的返回值类型。
+				for (int i = paramCnt - 2; i >= 0; i--)
+				{
+					var idx = i;
+					if (!paramTypes.Select(types => types[idx]).Iterative().Any())
+					{
+						keyIdx.Value = idx;
+					}
+				}
+				if (keyIdx.IsAmbig)
+				{
+					throw CommonExceptions.ProcessorKeyAmbigus(type, id);
+				}
+				if (keyIdx.IsEmpty)
+				{
+					throw CommonExceptions.ProcessorKeyNotFound(type, id);
+				}
+				return keyIdx.Value;
+			}
+			/// <summary>
+			/// 找到委托的参数列表，最后一个参数总是表示返回类型。
+			/// </summary>
+			/// <param name="paramTypes">处理器参数类型列表。</param>
+			/// <param name="instanceType">实例的类型，如果不需要传入实例则为 <c>null</c>。</param>
+			/// <returns>委托的参数列表。</returns>
+			private static Type[] FindDelegateType(List<Type[]> paramTypes, Type instanceType)
+			{
+				Contract.Requires(paramTypes != null && paramTypes.Count > 0);
+				int len = paramTypes[0].Length;
+				Type[] types;
+				if (instanceType == null)
+				{
+					types = new Type[len];
+				}
+				else
+				{
+					len++;
+					types = new Type[len];
+					types[0] = instanceType;
+				}
+				int paramsIdx = paramTypes[0].Length - 1, typesIdx = len - 1;
+				Contract.Assume(paramsIdx >= 0);
+				int returnIdx = paramsIdx;
+				types[typesIdx] = TypeExt.GetEncompassedType(paramTypes.Select(t => t[returnIdx])) ?? typeof(object);
+				for (; paramsIdx >= 0; paramsIdx--, typesIdx--)
+				{
+					int idx = paramsIdx;
+					types[typesIdx] = TypeExt.GetEncompassingType(paramTypes.Select(t => t[idx])) ?? typeof(object);
+				}
+				return types;
+			}
+		}
+
+		#endregion // 处理器
 
 	}
 }
