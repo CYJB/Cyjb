@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Threading;
 
 namespace Cyjb.Collections.ObjectModel
@@ -11,6 +12,7 @@ namespace Cyjb.Collections.ObjectModel
 	/// </summary>
 	/// <typeparam name="T">迭代的元素类型。</typeparam>
 	[Serializable]
+	[ContractClass(typeof(ContractsForIteratorBase<>))]
 	public abstract class IteratorBase<T> : IEnumerator<T>, IEnumerable<T>
 	{
 		/// <summary>
@@ -168,5 +170,25 @@ namespace Cyjb.Collections.ObjectModel
 
 		#endregion // 迭代器的状态
 
+	}
+	/// <summary>
+	/// 表示 <see cref="IteratorBase{T}"/> 接口的协定。
+	/// </summary>
+	[ContractClassFor(typeof(IteratorBase<>))]
+	internal abstract class ContractsForIteratorBase<T> : IteratorBase<T>
+	{
+		/// <summary>
+		/// 初始化 <see cref="ContractsForIteratorBase{T}"/> 类的新实例。
+		/// </summary>
+		private ContractsForIteratorBase() { }
+		/// <summary>
+		/// 创建一个与当前迭代器相同的示例。
+		/// </summary>
+		/// <returns>与当前迭代器相同的示例。</returns>
+		protected override IteratorBase<T> Clone()
+		{
+			Contract.Ensures(Contract.Result<IteratorBase<T>>() != null);
+			return null;
+		}
 	}
 }

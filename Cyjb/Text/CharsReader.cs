@@ -206,7 +206,7 @@ namespace Cyjb.Text
 		{
 			if (this.chars == null)
 			{
-				throw CommonExceptions.TextReaderClosed();
+				throw CommonExceptions.StreamClosed(typeof(CharsReader));
 			}
 		}
 	}

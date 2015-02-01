@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace Cyjb
 {
@@ -14,7 +15,7 @@ namespace Cyjb
 		/// <summary>
 		/// 用于计算以 2 为底的对数值的数组。
 		/// </summary>
-		private static readonly int[] LogBase2_32 =
+		private static readonly int[] logBase2_32 =
 		{ 
 			0,  9,  1, 10, 13, 21,  2, 29, 11, 14, 16, 18, 22, 25, 3, 30, 
 			8, 12, 20, 28, 15, 17, 24,  7, 19, 27, 23,  6, 26,  5, 4, 31 
@@ -29,10 +30,15 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="source">要执行操作的次数。</param>
 		/// <param name="action">要执行的操作。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="action"/> 为 <c>null</c>。</exception>
 		[CLSCompliant(false)]
 		public static void Times(this uint source, Action action)
 		{
-			CommonExceptions.CheckArgumentNull(action, "action");
+			if (action == null)
+			{
+				throw CommonExceptions.ArgumentNull("action");
+			}
+			Contract.EndContractBlock();
 			for (uint i = 0; i < source; i++)
 			{
 				action();
@@ -43,10 +49,15 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="source">要执行操作的次数。</param>
 		/// <param name="action">要执行的操作，参数为当前执行的次数。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="action"/> 为 <c>null</c>。</exception>
 		[CLSCompliant(false)]
 		public static void Times(this uint source, Action<uint> action)
 		{
-			CommonExceptions.CheckArgumentNull(action, "action");
+			if (action == null)
+			{
+				throw CommonExceptions.ArgumentNull("action");
+			}
+			Contract.EndContractBlock();
 			for (uint i = 0; i < source; i++)
 			{
 				action(i);
@@ -62,6 +73,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static IEnumerable<T> Times<T>(this uint source, T value)
 		{
+			Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 			for (uint i = 0; i < source; i++)
 			{
 				yield return value;
@@ -74,10 +86,15 @@ namespace Cyjb
 		/// <param name="source">要重复的次数。</param>
 		/// <param name="value">返回要重复的值的函数。</param>
 		/// <returns>将指定函数的返回值重复多次的序列。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="value"/> 为 <c>null</c>。</exception>
 		[CLSCompliant(false)]
 		public static IEnumerable<T> Times<T>(this uint source, Func<T> value)
 		{
-			CommonExceptions.CheckArgumentNull(value, "value");
+			if (value == null)
+			{
+				throw CommonExceptions.ArgumentNull("value");
+			}
+			Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 			for (uint i = 0; i < source; i++)
 			{
 				yield return value();
@@ -90,10 +107,15 @@ namespace Cyjb
 		/// <param name="source">要重复的次数。</param>
 		/// <param name="value">返回要重复的值的函数，参数为当前执行的次数。</param>
 		/// <returns>将指定函数的返回值重复多次的序列。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="value"/> 为 <c>null</c>。</exception>
 		[CLSCompliant(false)]
 		public static IEnumerable<T> Times<T>(this uint source, Func<uint, T> value)
 		{
-			CommonExceptions.CheckArgumentNull(value, "value");
+			if (value == null)
+			{
+				throw CommonExceptions.ArgumentNull("value");
+			}
+			Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 			for (uint i = 0; i < source; i++)
 			{
 				yield return value(i);
@@ -113,6 +135,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static IEnumerable<uint> To(this uint source, uint destination)
 		{
+			Contract.Ensures(Contract.Result<IEnumerable<uint>>() != null);
 			if (source < destination)
 			{
 				while (source < destination)
@@ -138,10 +161,15 @@ namespace Cyjb
 		/// <param name="source">要执行操作的起始值。</param>
 		/// <param name="destination">要执行操作的目标值。</param>
 		/// <param name="action">要执行的操作，参数为当前的值。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="action"/> 为 <c>null</c>。</exception>
 		[CLSCompliant(false)]
 		public static void To(this uint source, uint destination, Action<uint> action)
 		{
-			CommonExceptions.CheckArgumentNull(action, "action");
+			if (action == null)
+			{
+				throw CommonExceptions.ArgumentNull("action");
+			}
+			Contract.EndContractBlock();
 			if (source < destination)
 			{
 				while (source < destination)
@@ -185,10 +213,13 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static int CountBits(this uint value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 32);
 			value -= (value >> 1) & 0x55555555U;
 			value = (value & 0x33333333U) + ((value >> 2) & 0x33333333U);
 			value = (value + (value >> 4)) & 0x0F0F0F0FU;
-			return (int)((value * 0x01010101U) >> 24);
+			value = (value * 0x01010101U) >> 24;
+			Contract.Assume(value <= 32);
+			return (int)value;
 		}
 		/// <summary>
 		/// 计算指定整数的偶校验位。
@@ -199,6 +230,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static int Parity(this uint value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 1);
 			value ^= value >> 16;
 			value ^= value >> 8;
 			value ^= value >> 4;
@@ -229,12 +261,13 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static int LogBase2(this uint value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 32);
 			value |= value >> 1;
 			value |= value >> 2;
 			value |= value >> 4;
 			value |= value >> 8;
 			value |= value >> 16;
-			return LogBase2_32[(value * 0x07C4ACDDU) >> 27];
+			return logBase2_32[(value * 0x07C4ACDDU) >> 27];
 		}
 		/// <summary>
 		/// 计算指定正整数以 <c>10</c> 为底的对数值，得到的结果是大于等于当前值的最小对数值。
@@ -245,6 +278,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static int LogBase10(this uint value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 9);
 			if (value >= 1000000000U) { return 9; }
 			if (value >= 100000000U) { return 8; }
 			if (value >= 10000000U) { return 7; }
@@ -263,6 +297,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static int CountTrailingZeroBits(this uint value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 32);
 			return CountTrailingZeroBits((int)value);
 		}
 		/// <summary>
@@ -273,6 +308,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static int CountTrailingBits(this uint value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 32);
 			return ((value ^ (value + 1U)) >> 1).CountBits();
 		}
 		/// <summary>

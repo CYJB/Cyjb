@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace Cyjb
 {
@@ -14,7 +14,7 @@ namespace Cyjb
 		/// <summary>
 		/// 用于计算以 2 为底的对数值的数组。
 		/// </summary>
-		private static readonly int[] LogBase2_64 =
+		private static readonly int[] logBase2_64 =
 		{ 
 			63,  0, 58,  1, 59, 47, 53,  2, 60, 39, 48, 27, 54, 33, 42,  3,
 			61, 51, 37, 40, 49, 18, 28, 20, 55, 30, 34, 11, 43, 14, 22,  4,
@@ -23,148 +23,6 @@ namespace Cyjb
 		};
 
 		#endregion // 常量定义
-
-		#region Times
-
-		/// <summary>
-		/// 将指定操作执行多次。
-		/// </summary>
-		/// <param name="source">要执行操作的次数。</param>
-		/// <param name="action">要执行的操作。</param>
-		[CLSCompliant(false)]
-		public static void Times(this ulong source, Action action)
-		{
-			CommonExceptions.CheckArgumentNull(action, "action");
-			for (ulong i = 0; i < source; i++)
-			{
-				action();
-			}
-		}
-		/// <summary>
-		/// 将指定操作执行多次。
-		/// </summary>
-		/// <param name="source">要执行操作的次数。</param>
-		/// <param name="action">要执行的操作，参数为当前执行的次数。</param>
-		[CLSCompliant(false)]
-		public static void Times(this ulong source, Action<ulong> action)
-		{
-			CommonExceptions.CheckArgumentNull(action, "action");
-			for (ulong i = 0; i < source; i++)
-			{
-				action(i);
-			}
-		}
-		/// <summary>
-		/// 返回将指定值重复多次的序列。
-		/// </summary>
-		/// <typeparam name="T">要重复的值的类型。</typeparam>
-		/// <param name="source">要重复的次数。</param>
-		/// <param name="value">要重复的值。</param>
-		/// <returns>将指定值重复多次的序列。</returns>
-		[CLSCompliant(false)]
-		public static IEnumerable<T> Times<T>(this ulong source, T value)
-		{
-			for (ulong i = 0; i < source; i++)
-			{
-				yield return value;
-			}
-		}
-		/// <summary>
-		/// 返回将指定函数的返回值重复多次的序列。
-		/// </summary>
-		/// <typeparam name="T">要重复的值的类型。</typeparam>
-		/// <param name="source">要重复的次数。</param>
-		/// <param name="value">返回要重复的值的函数。</param>
-		/// <returns>将指定函数的返回值重复多次的序列。</returns>
-		[CLSCompliant(false)]
-		public static IEnumerable<T> Times<T>(this ulong source, Func<T> value)
-		{
-			CommonExceptions.CheckArgumentNull(value, "value");
-			for (ulong i = 0; i < source; i++)
-			{
-				yield return value();
-			}
-		}
-		/// <summary>
-		/// 返回将指定函数的返回值重复多次的序列。
-		/// </summary>
-		/// <typeparam name="T">要重复的值的类型。</typeparam>
-		/// <param name="source">要重复的次数。</param>
-		/// <param name="value">返回要重复的值的函数，参数为当前执行的次数。</param>
-		/// <returns>将指定函数的返回值重复多次的序列。</returns>
-		[CLSCompliant(false)]
-		public static IEnumerable<T> Times<T>(this uint source, Func<ulong, T> value)
-		{
-			CommonExceptions.CheckArgumentNull(value, "value");
-			for (ulong i = 0; i < source; i++)
-			{
-				yield return value(i);
-			}
-		}
-
-		#endregion // Times
-
-		#region To
-
-		/// <summary>
-		/// 返回从当前值递增（递减）到指定值的序列。
-		/// </summary>
-		/// <param name="source">要执行操作的起始值。</param>
-		/// <param name="destination">要执行操作的目标值。</param>
-		/// <returns>数值递增（递减）的序列。</returns>
-		[CLSCompliant(false)]
-		public static IEnumerable<ulong> To(this ulong source, ulong destination)
-		{
-			if (source < destination)
-			{
-				while (source < destination)
-				{
-					yield return source;
-					source++;
-				}
-				yield return source;
-			}
-			else
-			{
-				while (source > destination)
-				{
-					yield return source;
-					source--;
-				}
-				yield return source;
-			}
-		}
-		/// <summary>
-		/// 从当前值递增（递减）到指定值并执行操作。
-		/// </summary>
-		/// <param name="source">要执行操作的起始值。</param>
-		/// <param name="destination">要执行操作的目标值。</param>
-		/// <param name="action">要执行的操作，参数为当前的值。</param>
-		[CLSCompliant(false)]
-		public static void To(this ulong source, ulong destination, Action<ulong> action)
-		{
-			CommonExceptions.CheckArgumentNull(action, "action");
-			if (source < destination)
-			{
-				while (source < destination)
-				{
-					action(source);
-					source++;
-				}
-				action(source);
-			}
-			else
-			{
-				while (source > destination)
-				{
-					action(source);
-					source--;
-				}
-				action(source);
-			}
-		}
-
-		#endregion // To
 
 		#region 位运算
 
@@ -187,6 +45,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static int CountBits(this ulong value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 64);
 			value -= (value >> 1) & 0x5555555555555555UL;
 			value = (value & 0x3333333333333333UL) + ((value >> 2) & 0x3333333333333333UL);
 			value = (value + (value >> 4)) & 0x0F0F0F0F0F0F0F0FUL;
@@ -201,6 +60,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static int Parity(this ulong value)
 		{
+			Contract.Ensures(Contract.Result<int>() == 0 || Contract.Result<int>() == 1);
 			value ^= value >> 1;
 			value ^= value >> 2;
 			value = (value & 0x1111111111111111UL) * 0x1111111111111111UL;
@@ -231,13 +91,14 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static int LogBase2(this ulong value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 64);
 			value |= value >> 1;
 			value |= value >> 2;
 			value |= value >> 4;
 			value |= value >> 8;
 			value |= value >> 16;
 			value |= value >> 32;
-			return LogBase2_64[((value - (value >> 1)) * 0x07EDD5E59A4E28C2UL) >> 58];
+			return logBase2_64[((value - (value >> 1)) * 0x07EDD5E59A4E28C2UL) >> 58];
 		}
 		/// <summary>
 		/// 计算指定正整数以 <c>10</c> 为底的对数值，得到的结果是大于等于当前值的最小对数值。
@@ -248,6 +109,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static int LogBase10(this ulong value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 19);
 			if (value >= 10000000000000000000UL) { return 19; }
 			if (value >= 1000000000000000000UL) { return 18; }
 			if (value >= 100000000000000000UL) { return 17; }
@@ -276,6 +138,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static int CountTrailingZeroBits(this ulong value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 64);
 			return CountTrailingZeroBits((long)value);
 		}
 		/// <summary>
@@ -286,6 +149,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static int CountTrailingBits(this ulong value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 64);
 			return ((value ^ (value + 1)) >> 1).CountBits();
 		}
 		/// <summary>

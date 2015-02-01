@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Diagnostics.Contracts;
 
 namespace Cyjb
 {
@@ -14,7 +13,7 @@ namespace Cyjb
 		/// <summary>
 		/// 用于计算末尾连续零的个数的数组。
 		/// </summary>
-		private static readonly int[] MultiplyDeBruijnBitPosition_64 =
+		private static readonly int[] multiplyDeBruijnBitPosition64 =
 		{
 			0, 1, 2, 56, 3, 32, 57, 46, 29, 4, 20, 33, 7, 58, 11, 47, 
 			62, 30, 18, 5, 16, 21, 34, 23, 53, 8, 59, 36, 25, 12, 48, 39,
@@ -23,137 +22,6 @@ namespace Cyjb
 		};
 
 		#endregion // 常量定义
-
-		#region Times
-
-		/// <summary>
-		/// 将指定操作执行多次。
-		/// </summary>
-		/// <param name="source">要执行操作的次数。只有大于<c>0</c>时才有效。</param>
-		/// <param name="action">要执行的操作。</param>
-		public static void Times(this long source, Action action)
-		{
-			CommonExceptions.CheckArgumentNull(action, "action");
-			for (long i = 0; i < source; i++)
-			{
-				action();
-			}
-		}
-		/// <summary>
-		/// 将指定操作执行多次。
-		/// </summary>
-		/// <param name="source">要执行操作的次数。只有大于<c>0</c>时才有效。</param>
-		/// <param name="action">要执行的操作，参数为当前执行的次数。</param>
-		public static void Times(this long source, Action<long> action)
-		{
-			CommonExceptions.CheckArgumentNull(action, "action");
-			for (long i = 0; i < source; i++)
-			{
-				action(i);
-			}
-		}
-		/// <summary>
-		/// 返回将指定值重复多次的序列。
-		/// </summary>
-		/// <typeparam name="T">要重复的值的类型。</typeparam>
-		/// <param name="source">要重复的次数。只有大于<c>0</c>时才有效。</param>
-		/// <param name="value">要重复的值。</param>
-		/// <returns>将指定值重复多次的序列。</returns>
-		public static IEnumerable<T> Times<T>(this long source, T value)
-		{
-			for (long i = 0; i < source; i++)
-			{
-				yield return value;
-			}
-		}
-		/// <summary>
-		/// 返回将指定函数的返回值重复多次的序列。
-		/// </summary>
-		/// <typeparam name="T">要重复的值的类型。</typeparam>
-		/// <param name="source">要重复的次数。只有大于<c>0</c>时才有效。</param>
-		/// <param name="value">返回要重复的值的函数。</param>
-		/// <returns>将指定函数的返回值重复多次的序列。</returns>
-		public static IEnumerable<T> Times<T>(this long source, Func<T> value)
-		{
-			CommonExceptions.CheckArgumentNull(value, "value");
-			for (long i = 0; i < source; i++)
-			{
-				yield return value();
-			}
-		}
-		/// <summary>
-		/// 返回将指定函数的返回值重复多次的序列。
-		/// </summary>
-		/// <typeparam name="T">要重复的值的类型。</typeparam>
-		/// <param name="source">要重复的次数。只有大于<c>0</c>时才有效。</param>
-		/// <param name="value">返回要重复的值的函数，参数为当前执行的次数。</param>
-		/// <returns>将指定函数的返回值重复多次的序列。</returns>
-		public static IEnumerable<T> Times<T>(this long source, Func<long, T> value)
-		{
-			CommonExceptions.CheckArgumentNull(value, "value");
-			for (long i = 0; i < source; i++)
-			{
-				yield return value(i);
-			}
-		}
-
-		#endregion // Times
-
-		#region To
-
-		/// <summary>
-		/// 返回从当前值递增（递减）到指定值的序列。
-		/// </summary>
-		/// <param name="source">要执行操作的起始值。</param>
-		/// <param name="destination">要执行操作的目标值。</param>
-		/// <returns>数值递增（递减）的序列。</returns>
-		public static IEnumerable<long> To(this long source, long destination)
-		{
-			if (source < destination)
-			{
-				while (source <= destination)
-				{
-					yield return source;
-					source++;
-				}
-			}
-			else
-			{
-				while (source >= destination)
-				{
-					yield return source;
-					source--;
-				}
-			}
-		}
-		/// <summary>
-		/// 从当前值递增（递减）到指定值并执行操作。
-		/// </summary>
-		/// <param name="source">要执行操作的起始值。</param>
-		/// <param name="destination">要执行操作的目标值。</param>
-		/// <param name="action">要执行的操作，参数为当前的值。</param>
-		public static void To(this long source, long destination, Action<long> action)
-		{
-			CommonExceptions.CheckArgumentNull(action, "action");
-			if (source < destination)
-			{
-				while (source <= destination)
-				{
-					action(source);
-					source++;
-				}
-			}
-			else
-			{
-				while (source >= destination)
-				{
-					action(source);
-					source--;
-				}
-			}
-		}
-
-		#endregion // To
 
 		#region 位运算
 
@@ -174,6 +42,7 @@ namespace Cyjb
 		/// <returns>指定整数的二进制表示中 <c>1</c> 的个数。</returns>
 		public static int CountBits(this long value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 64);
 			value -= (value >> 1) & 0x5555555555555555L;
 			value = (value & 0x3333333333333333L) + ((value >> 2) & 0x3333333333333333L);
 			value = (value + (value >> 4)) & 0x0F0F0F0F0F0F0F0FL;
@@ -187,6 +56,7 @@ namespace Cyjb
 		/// 否则为 <c>0</c>。</returns>
 		public static int Parity(this long value)
 		{
+			Contract.Ensures(Contract.Result<int>() == 0 || Contract.Result<int>() == 1);
 			value ^= value >> 1;
 			value ^= value >> 2;
 			value = (value & 0x1111111111111111L) * 0x1111111111111111L;
@@ -215,6 +85,7 @@ namespace Cyjb
 		/// 如果 <paramref name="value"/> 小于等于 <c>0</c>，则结果未知。</returns>
 		public static int LogBase2(this long value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 64);
 			return LogBase2((ulong)value);
 		}
 		/// <summary>
@@ -225,6 +96,7 @@ namespace Cyjb
 		/// 如果 <paramref name="value"/> 小于等于 <c>10</c>，则结果未知。</returns>
 		public static int LogBase10(this long value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 18);
 			if (value >= 1000000000000000000L) { return 18; }
 			if (value >= 100000000000000000L) { return 17; }
 			if (value >= 10000000000000000L) { return 16; }
@@ -251,7 +123,8 @@ namespace Cyjb
 		/// <returns>指定整数的二进制表示中末尾连续 <c>0</c> 的个数。</returns>
 		public static int CountTrailingZeroBits(this long value)
 		{
-			return MultiplyDeBruijnBitPosition_64[((ulong)((value & -value) * 0x26752B916FC7B0DL)) >> 58];
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 64);
+			return multiplyDeBruijnBitPosition64[((ulong)((value & -value) * 0x26752B916FC7B0DL)) >> 58];
 		}
 		/// <summary>
 		/// 计算指定整数的二进制表示中末尾连续 <c>1</c> 的个数。
@@ -260,6 +133,7 @@ namespace Cyjb
 		/// <returns>指定整数的二进制表示中末尾连续 <c>1</c> 的个数。</returns>
 		public static int CountTrailingBits(this long value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 64);
 			return ((value ^ (value + 1)) >> 1).CountBits();
 		}
 		/// <summary>

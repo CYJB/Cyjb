@@ -117,21 +117,221 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AggregateSourceException_DefaultMessage" xml:space="preserve">
-    <value>存在一个或多个错误。</value>
-    <comment>源文件异常集合的默认消息。</comment>
-  </data>
-  <data name="AggregateSourceException_ToString" xml:space="preserve">
+  <data name="AggregateSourceException_InnerException" xml:space="preserve">
     <value>---&gt;（内部异常 #{0}）{1} &lt;---</value>
-    <comment>源文件异常集合的字符串表示。</comment>
+    <comment>内部异常的字符串表示。</comment>
+  </data>
+  <data name="ArgumentMustBePositive" xml:space="preserve">
+    <value>参数值必须大于 0。</value>
+    <comment>参数值必须大于 0。</comment>
+  </data>
+  <data name="ArgumentNegative" xml:space="preserve">
+    <value>参数值不能为负。</value>
+    <comment>参数值不能为负。</comment>
+  </data>
+  <data name="ArgumentOutOfRange" xml:space="preserve">
+    <value>参数值超出了有效范围。</value>
+    <comment>参数超出范围。</comment>
+  </data>
+  <data name="ArgumentOutOfRangeBetween" xml:space="preserve">
+    <value>参数值必须位于 '{0}' 和 '{1}' 之间。</value>
+    <comment>参数超出范围。</comment>
+  </data>
+  <data name="ArgumentWrongType" xml:space="preserve">
+    <value>参数的值不是有效的类型。</value>
+    <comment>参数值不是有效类型。</comment>
+  </data>
+  <data name="ArgumentWrongType_Specific" xml:space="preserve">
+    <value>参数的值 '{0}' 不是 '{1}' 类型。</value>
+    <comment>参数值不是特定类型。</comment>
+  </data>
+  <data name="ArrayNonZeroLowerBound" xml:space="preserve">
+    <value>数组的下限必须为 0。</value>
+    <comment>数组的下限必须为 0。</comment>
+  </data>
+  <data name="ArrayTooSmall" xml:space="preserve">
+    <value>目标数组的长度不足，请检查数组索引和长度。</value>
+    <comment>目标数组太小。</comment>
   </data>
   <data name="AtText" xml:space="preserve">
     <value>  在</value>
     <comment>所在位置的文本。</comment>
   </data>
+  <data name="CannotCastNullToValueType" xml:space="preserve">
+    <value>null 不能转换为值类型。</value>
+    <comment>null 不能转换为值类型。</comment>
+  </data>
+  <data name="CollectionCountDiffer" xml:space="preserve">
+    <value>集合的元素数必须与当前集合相同。</value>
+    <comment>集合元素数必须与当前集合相同。</comment>
+  </data>
+  <data name="CollectionEmpty" xml:space="preserve">
+    <value>集合不能为空。</value>
+    <comment>集合不能为空。</comment>
+  </data>
+  <data name="CollectionFixedSize" xml:space="preserve">
+    <value>集合是固定大小的。</value>
+    <comment>集合是固定大小的。</comment>
+  </data>
+  <data name="CollectionItemCompareFailed" xml:space="preserve">
+    <value>未能比较集合中的两个元素。</value>
+    <comment>比较集合元素失败。</comment>
+  </data>
+  <data name="CollectionItemNotExist" xml:space="preserve">
+    <value>集合中不存在指定的项。</value>
+    <comment>集合中不存在指定的项。</comment>
+  </data>
+  <data name="CollectionItemNull" xml:space="preserve">
+    <value>集合中存在 null 元素。</value>
+    <comment>集合中存在 null 元素。</comment>
+  </data>
+  <data name="CollectionReadOnly" xml:space="preserve">
+    <value>集合是只读的。</value>
+    <comment>集合是只读的。</comment>
+  </data>
+  <data name="EnumerationFailed" xml:space="preserve">
+    <value>集合已修改，无法继续执行枚举操作。</value>
+    <comment>无法执行枚举操作。</comment>
+  </data>
+  <data name="EnumTypeDoesNotMatch" xml:space="preserve">
+    <value>参数类型 '{0}' 与枚举类型 '{1}' 不相同。</value>
+    <comment>枚举参数类型不匹配。</comment>
+  </data>
+  <data name="EnumValueNotFound" xml:space="preserve">
+    <value>在枚举 '{0}‘ 中未找到请求的值 '{1}'。</value>
+    <comment>未识别的枚举值。</comment>
+  </data>
   <data name="ErrorText" xml:space="preserve">
     <value>[错误] </value>
     <comment>错误的文本。</comment>
+  </data>
+  <data name="ExtraJunkAtEnd" xml:space="preserve">
+    <value>字符串的末尾有其他无法分析的字符。</value>
+    <comment>字符串的末尾有其他无法分析的字符。</comment>
+  </data>
+  <data name="InvalidBase" xml:space="preserve">
+    <value>基不在 2 至 36 之间。</value>
+    <comment>无效的基。</comment>
+  </data>
+  <data name="InvalidCast" xml:space="preserve">
+    <value>指定的转换无效。</value>
+    <comment>一种类型不能转换为另一种类型。</comment>
+  </data>
+  <data name="InvalidCast_FromTo" xml:space="preserve">
+    <value>从 '{0}' 到 '{1}' 的类型转换无效。</value>
+    <comment>一种类型不能转换为另一种类型。</comment>
+  </data>
+  <data name="InvalidElementType" xml:space="preserve">
+    <value>目标元素类型与集合项的类型不兼容。</value>
+    <comment>目标元素类型与集合项的类型不兼容。</comment>
+  </data>
+  <data name="InvalidOffsetLength" xml:space="preserve">
+    <value>偏移量和长度超出集合的界限。</value>
+    <comment>偏移量和长度超出界限。</comment>
+  </data>
+  <data name="KeyDuplicate" xml:space="preserve">
+    <value>已添加了具有相同键的项。</value>
+    <comment>已添加了具有相同键的项。</comment>
+  </data>
+  <data name="KeyNotFound" xml:space="preserve">
+    <value>指定的键不存在。</value>
+    <comment>指定的键不存在。</comment>
+  </data>
+  <data name="KeyNotFound_Key" xml:space="preserve">
+    <value>指定的键 '{0}' 不存在。</value>
+    <comment>指定的键不存在。</comment>
+  </data>
+  <data name="MethodNotSupported" xml:space="preserve">
+    <value>不支持所指定的方法。</value>
+    <comment>方法不被支持。</comment>
+  </data>
+  <data name="MultidimensionalArrayNotSupported" xml:space="preserve">
+    <value>只支持一维数组。</value>
+    <comment>多维数组不被支持。</comment>
+  </data>
+  <data name="MultidimensionalArrayNotSupported_Param" xml:space="preserve">
+    <value>参数 '{0}' 只支持一维数组。</value>
+    <comment>多维数组不被支持。</comment>
+  </data>
+  <data name="MustBeDelegate" xml:space="preserve">
+    <value>提供的类型必须从委托派生。</value>
+    <comment>类型必须从委托派生。</comment>
+  </data>
+  <data name="MustBeDelegate_Type" xml:space="preserve">
+    <value>提供的类型 '{0}' 必须从委托派生。</value>
+    <comment>类型必须从委托派生。</comment>
+  </data>
+  <data name="MustBeEnum" xml:space="preserve">
+    <value>提供的类型必须是枚举类型。</value>
+    <comment>必须是枚举类型。</comment>
+  </data>
+  <data name="MustBeEnum_Type" xml:space="preserve">
+    <value>提供的类型 '{0}' 必须是枚举类型。</value>
+    <comment>必须是枚举类型。</comment>
+  </data>
+  <data name="NegativeUnsigned" xml:space="preserve">
+    <value>该字符串正被当作无符号数字进行分析，因此不能带有负号。</value>
+    <comment>无符号数的字符串不能包含负号。</comment>
+  </data>
+  <data name="NoParsibleDigits" xml:space="preserve">
+    <value>未能找到任何可识别的数字。</value>
+    <comment>未能找到任何可识别的数字。</comment>
+  </data>
+  <data name="ObjectDisposed" xml:space="preserve">
+    <value>已释放该对象。</value>
+    <comment>对象已释放资源。</comment>
+  </data>
+  <data name="OneOrMoreErrorsExisted" xml:space="preserve">
+    <value>存在一个或多个错误。</value>
+    <comment>存在一个或多个错误。</comment>
+  </data>
+  <data name="OverflowByte" xml:space="preserve">
+    <value>值对于 Byte 太大或太小。</value>
+    <comment>值对于 Byte 太大或太小。</comment>
+  </data>
+  <data name="OverflowInt16" xml:space="preserve">
+    <value>值对于 Int16 太大或太小。</value>
+    <comment>值对于 Int16 太大或太小。</comment>
+  </data>
+  <data name="OverflowInt32" xml:space="preserve">
+    <value>值对于 Int32 太大或太小。</value>
+    <comment>值对于 Int32 太大或太小。</comment>
+  </data>
+  <data name="OverflowInt64" xml:space="preserve">
+    <value>值对于 Int64 太大或太小。</value>
+    <comment>值对于 Int64 太大或太小。</comment>
+  </data>
+  <data name="OverflowSByte" xml:space="preserve">
+    <value>值对于 SByte 太大或太小。</value>
+    <comment>值对于 SByte 太大或太小。</comment>
+  </data>
+  <data name="OverflowUInt16" xml:space="preserve">
+    <value>值对于 UInt16 太大或太小。</value>
+    <comment>值对于 UInt16 太大或太小。</comment>
+  </data>
+  <data name="OverflowUInt32" xml:space="preserve">
+    <value>值对于 UInt32 太大或太小。</value>
+    <comment>值对于 UInt32 太大或太小。</comment>
+  </data>
+  <data name="OverflowUInt64" xml:space="preserve">
+    <value>值对于 UInt64 太大或太小。</value>
+    <comment>值对于 UInt64 太大或太小。</comment>
+  </data>
+  <data name="ReversedArgument" xml:space="preserve">
+    <value>参数 '{0}' 和 '{1}' 的顺序颠倒。</value>
+    <comment>参数顺序颠倒。</comment>
+  </data>
+  <data name="StreamClosed" xml:space="preserve">
+    <value>不能从关闭的 '{0]' 中读取。</value>
+    <comment>流已关闭。</comment>
+  </data>
+  <data name="StringEmpty" xml:space="preserve">
+    <value>字符串不能为空。</value>
+    <comment>参数需要非空的字符串。</comment>
+  </data>
+  <data name="StringWhiteSpace" xml:space="preserve">
+    <value>字符串不能是空白的。</value>
+    <comment>参数需要非空白的字符串。</comment>
   </data>
   <data name="Tristate_False" xml:space="preserve">
     <value>否</value>
@@ -160,5 +360,69 @@
   <data name="WarningText" xml:space="preserve">
     <value>[警告] </value>
     <comment>警告的文本。</comment>
+  </data>
+  <data name="PropertyNoGetter" xml:space="preserve">
+    <value>属性 '{0}' 不存在 get 访问器。</value>
+    <comment>属性不存在 get 访问器。</comment>
+  </data>
+  <data name="PropertyNoSetter" xml:space="preserve">
+    <value>属性 '{0}' 不存在 set 访问器。</value>
+    <comment>属性不存在 set 访问器。</comment>
+  </data>
+  <data name="PropertyOrFieldNotFound" xml:space="preserve">
+    <value>找不到名为 '{0}' 的公共属性或字段。</value>
+    <comment>找不到公共属性或字段。</comment>
+  </data>
+  <data name="PropertyOrFieldNotFound_NonPublic" xml:space="preserve">
+    <value>找不到名为 '{0}' 的属性或字段。</value>
+    <comment>找不到属性或字段。</comment>
+  </data>
+  <data name="TypeMemberNotFound" xml:space="preserve">
+    <value>找不到类型成员 '{0}'。</value>
+    <comment>找不到类型成员。</comment>
+  </data>
+  <data name="DelegateIncompatible" xml:space="preserve">
+    <value>委托类型 '{0}' 与 '{1}' 不兼容。</value>
+    <comment>委托的类型不兼容。</comment>
+  </data>
+  <data name="ProcessorNotFound" xml:space="preserve">
+    <value>找不到与类型 '{0}' 相关的处理器。</value>
+    <comment>与特定类型相关的处理器未能找到。</comment>
+  </data>
+  <data name="ProcessorKeyAmbigus_TypeId" xml:space="preserve">
+    <value>与类型 '{0}' 相关的标识为 '{1}' 的处理器中，找到了多个关键参数。</value>
+    <comment>处理器找到多个关键参数。</comment>
+  </data>
+  <data name="ProcessorKeyNotFound_TypeId" xml:space="preserve">
+    <value>与类型 '{0}' 相关的标识为 '{1}' 的处理器中，没有找到关键参数。</value>
+    <comment>处理器找不到关键参数。</comment>
+  </data>
+  <data name="ProcessorMismatch" xml:space="preserve">
+    <value>与类型 '{0}' 相关的标识为 '{1}' 的处理器，与需要的静态/实例类型不匹配。</value>
+    <comment>处理器静态/实例不匹配。</comment>
+  </data>
+  <data name="ProcessorMixed" xml:space="preserve">
+    <value>与类型 '{0}' 相关的标识为 '{1}' 的处理器中，既有静态方法，也有实例方法。</value>
+    <comment>处理器中混杂着静态和实例方法。</comment>
+  </data>
+  <data name="ProcessorParameterMismatch_TypeId" xml:space="preserve">
+    <value>与类型 '{0}' 相关的标识为 '{1}' 的处理器中，参数个数或类型不匹配。</value>
+    <comment>处理器参数不匹配。</comment>
+  </data>
+  <data name="ProcessorKeyAmbigus" xml:space="preserve">
+    <value>处理器中找到了多个关键参数。</value>
+    <comment>处理器找到多个关键参数。</comment>
+  </data>
+  <data name="ProcessorKeyNotFound" xml:space="preserve">
+    <value>处理器中没有找到关键参数。</value>
+    <comment>处理器找不到关键参数。</comment>
+  </data>
+  <data name="ProcessorParameterMismatch" xml:space="preserve">
+    <value>处理器的参数个数或类型不匹配。</value>
+    <comment>处理器参数不匹配。</comment>
+  </data>
+  <data name="ProcessorNotFound_Id" xml:space="preserve">
+    <value>找不到与类型 '{0}' 相关的标识为 '{1}' 的处理器。</value>
+    <comment>与特定类型相关的处理器未能找到。</comment>
   </data>
 </root>

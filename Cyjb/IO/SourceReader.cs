@@ -565,7 +565,7 @@ namespace Cyjb.IO
 		{
 			if (this.reader == null)
 			{
-				throw CommonExceptions.SourceReaderClosed();
+				throw CommonExceptions.StreamClosed(typeof(SourceReader));
 			}
 		}
 		/// <summary>

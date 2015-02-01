@@ -808,7 +808,7 @@ namespace Cyjb.Collections
 			}
 			if (list.count != this.count)
 			{
-				throw CommonExceptions.ArrayLengthsDiffer("list");
+				throw CommonExceptions.CollectionCountDiffer("list");
 			}
 			Contract.EndContractBlock();
 			int cnt = this.count >> IndexShift;
@@ -839,7 +839,7 @@ namespace Cyjb.Collections
 			}
 			if (list.count != this.count)
 			{
-				throw CommonExceptions.ArrayLengthsDiffer("list");
+				throw CommonExceptions.CollectionCountDiffer("list");
 			}
 			Contract.EndContractBlock();
 			int cnt = this.count >> IndexShift;
@@ -870,7 +870,7 @@ namespace Cyjb.Collections
 			}
 			if (list.count != this.count)
 			{
-				throw CommonExceptions.ArrayLengthsDiffer("list");
+				throw CommonExceptions.CollectionCountDiffer("list");
 			}
 			Contract.EndContractBlock();
 			int cnt = this.count >> IndexShift;
@@ -1122,7 +1122,7 @@ namespace Cyjb.Collections
 			}
 			if (array.Rank != 1)
 			{
-				throw CommonExceptions.ArrayRankMultiDimNotSupported();
+				throw CommonExceptions.MultidimensionalArrayNotSupported("array");
 			}
 			if (array.GetLowerBound(0) != 0)
 			{
@@ -1193,7 +1193,7 @@ namespace Cyjb.Collections
 				}
 				return;
 			}
-			throw CommonExceptions.InvalidArrayType();
+			throw CommonExceptions.InvalidElementType();
 		}
 
 		#endregion // ICollection 成员

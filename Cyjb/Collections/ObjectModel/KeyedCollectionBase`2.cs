@@ -12,6 +12,7 @@ namespace Cyjb.Collections.ObjectModel
 	/// <typeparam name="TItem">集合中的元素的类型。</typeparam>
 	/// <remarks>集合中存储的元素都不能为 <c>null</c>，相应的键也不能为 <c>null</c>。</remarks>
 	[Serializable]
+	[ContractClass(typeof(ContractsForKeyedCollectionBase<,>))]
 	public abstract class KeyedCollectionBase<TKey, TItem> : CollectionBase<TItem>
 	{
 		/// <summary>
@@ -84,7 +85,9 @@ namespace Cyjb.Collections.ObjectModel
 					throw CommonExceptions.ArgumentNull("key");
 				}
 				Contract.Ensures(Contract.Result<TItem>() != null);
-				return this.dict[key];
+				TItem item = this.dict[key];
+				Contract.Assume(item != null);
+				return item;
 			}
 		}
 		/// <summary>
@@ -148,9 +151,8 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentException"><paramref name="newKey"/> 在字典中已存在。</exception>
 		protected void ChangeItemKey(TItem item, TKey newKey)
 		{
-			Contract.Requires(this.Contains(item));
+			Contract.Requires(item != null && this.Contains(item));
 			TKey key = this.GetKeyForItem(item);
-			Contract.Assert(key != null);
 			if (EqualityComparer<TKey>.Default.Equals(key, newKey))
 			{
 				return;
@@ -177,7 +179,6 @@ namespace Cyjb.Collections.ObjectModel
 			}
 			Contract.EndContractBlock();
 			TKey key = this.GetKeyForItem(item);
-			Contract.Assert(key != null);
 			this.dict.Add(key, item);
 		}
 		/// <summary>
@@ -200,7 +201,6 @@ namespace Cyjb.Collections.ObjectModel
 				return false;
 			}
 			TKey key = this.GetKeyForItem(item);
-			Contract.Assert(key != null);
 			TItem newItem;
 			return this.dict.TryGetValue(key, out newItem) &&
 				EqualityComparer<TItem>.Default.Equals(newItem, item);
@@ -221,7 +221,6 @@ namespace Cyjb.Collections.ObjectModel
 			}
 			Contract.EndContractBlock();
 			TKey key = this.GetKeyForItem(item);
-			Contract.Assert(key != null);
 			TItem oldItem;
 			if (this.dict.TryGetValue(key, out oldItem) &&
 				EqualityComparer<TItem>.Default.Equals(item, oldItem))
@@ -233,5 +232,28 @@ namespace Cyjb.Collections.ObjectModel
 
 		#endregion // ICollection<TItem> 成员
 
+	}
+	/// <summary>
+	/// 表示 <see cref="ContractsForKeyedCollectionBase{TKey, TItem}"/> 接口的协定。
+	/// </summary>
+	[ContractClassFor(typeof(KeyedCollectionBase<,>))]
+	internal abstract class ContractsForKeyedCollectionBase<TKey, TItem> : KeyedCollectionBase<TKey, TItem>
+	{
+		/// <summary>
+		/// 初始化 <see cref="ContractsForKeyedCollectionBase{TKey, TItem}"/> 类的新实例。
+		/// </summary>
+		private ContractsForKeyedCollectionBase() { }
+		/// <summary>
+		/// 在派生类中实现时，将从指定元素提取键。
+		/// </summary>
+		/// <param name="item">从中提取键的元素。</param>
+		/// <returns>指定元素的键。</returns>
+		[Pure]
+		protected override TKey GetKeyForItem(TItem item)
+		{
+			Contract.Requires(item != null);
+			Contract.Ensures(Contract.Result<TKey>() != null);
+			return default(TKey);
+		}
 	}
 }

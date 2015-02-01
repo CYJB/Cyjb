@@ -124,105 +124,6 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 Parameter values must be greater than zero. 的本地化字符串。
-        /// </summary>
-        internal static string ArgumentMustBePositive {
-            get {
-                return ResourceManager.GetString("ArgumentMustBePositive", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Parameter values can not be negative. 的本地化字符串。
-        /// </summary>
-        internal static string ArgumentNegative {
-            get {
-                return ResourceManager.GetString("ArgumentNegative", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Parameter values was out of range. 的本地化字符串。
-        /// </summary>
-        internal static string ArgumentOutOfRange {
-            get {
-                return ResourceManager.GetString("ArgumentOutOfRange", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Parameter values must be between {1} and {2}. 的本地化字符串。
-        /// </summary>
-        internal static string ArgumentOutOfRangeBetween {
-            get {
-                return ResourceManager.GetString("ArgumentOutOfRangeBetween", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 The value &apos;{1}&apos; of parameter &apos;{0}&apos; is not of type &apos;{2}&apos;. 的本地化字符串。
-        /// </summary>
-        internal static string ArgumentWrongType {
-            get {
-                return ResourceManager.GetString("ArgumentWrongType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 The value of parameter &apos;{0}&apos; is not valid type. 的本地化字符串。
-        /// </summary>
-        internal static string ArgumentWrongType_Specific {
-            get {
-                return ResourceManager.GetString("ArgumentWrongType_Specific", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Array may not be empty. 的本地化字符串。
-        /// </summary>
-        internal static string ArrayEmpty {
-            get {
-                return ResourceManager.GetString("ArrayEmpty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Array lengths must be the same. 的本地化字符串。
-        /// </summary>
-        internal static string ArrayLengthsDiffer {
-            get {
-                return ResourceManager.GetString("ArrayLengthsDiffer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 The lower bound of target array must be zero. 的本地化字符串。
-        /// </summary>
-        internal static string ArrayNonZeroLowerBound {
-            get {
-                return ResourceManager.GetString("ArrayNonZeroLowerBound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Only single-dimensional arrays are supported. 的本地化字符串。
-        /// </summary>
-        internal static string ArrayRankMultiDimNotSupported {
-            get {
-                return ResourceManager.GetString("ArrayRankMultiDimNotSupported", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Destination array is not long enough, check array index and length. 的本地化字符串。
-        /// </summary>
-        internal static string ArrayTooSmall {
-            get {
-                return ResourceManager.GetString("ArrayTooSmall", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Cannot bind to the target field because its type or security transparency is not compatible with that of the delegate type. 的本地化字符串。
         /// </summary>
         internal static string BindTargetField {
@@ -268,29 +169,11 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 Null object cannot be converted to a value type. 的本地化字符串。
-        /// </summary>
-        internal static string CannotCastNullToValueType {
-            get {
-                return ResourceManager.GetString("CannotCastNullToValueType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Can not infer type argument of {0} from parameters. 的本地化字符串。
         /// </summary>
         internal static string CannotInferGenericArguments {
             get {
                 return ResourceManager.GetString("CannotInferGenericArguments", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Failed to compare two elements in the array. 的本地化字符串。
-        /// </summary>
-        internal static string ComparerFailed {
-            get {
-                return ResourceManager.GetString("ComparerFailed", resourceCulture);
             }
         }
         
@@ -322,87 +205,6 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 Delegate type not compatible with {0}. 的本地化字符串。
-        /// </summary>
-        internal static string DelegateCompatible {
-            get {
-                return ResourceManager.GetString("DelegateCompatible", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Collection was modified; enumeration operation may not execute. 的本地化字符串。
-        /// </summary>
-        internal static string EnumFailedVersion {
-            get {
-                return ResourceManager.GetString("EnumFailedVersion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 The argument type &apos;{0}&apos; is not the same as the enum type &apos;{1}&apos;. 的本地化字符串。
-        /// </summary>
-        internal static string EnumTypeDoesNotMatch {
-            get {
-                return ResourceManager.GetString("EnumTypeDoesNotMatch", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Requested value &apos;{1}&apos; was not found in enum type &apos;{0}&apos;. 的本地化字符串。
-        /// </summary>
-        internal static string EnumValueNotFound {
-            get {
-                return ResourceManager.GetString("EnumValueNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Additional non-parsable characters are at the end of the string. 的本地化字符串。
-        /// </summary>
-        internal static string ExtraJunkAtEnd {
-            get {
-                return ResourceManager.GetString("ExtraJunkAtEnd", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Collection was of a fixed size. 的本地化字符串。
-        /// </summary>
-        internal static string FixedSizeCollection {
-            get {
-                return ResourceManager.GetString("FixedSizeCollection", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 An element of innerExceptions was null. 的本地化字符串。
-        /// </summary>
-        internal static string InnerExceptionNull {
-            get {
-                return ResourceManager.GetString("InnerExceptionNull", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Target array type is not compatible with the type of items in the collection. 的本地化字符串。
-        /// </summary>
-        internal static string InvalidArrayType {
-            get {
-                return ResourceManager.GetString("InvalidArrayType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Base is not between 2 and 36. 的本地化字符串。
-        /// </summary>
-        internal static string InvalidBase {
-            get {
-                return ResourceManager.GetString("InvalidBase", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Can not find constructor matchs options in type &apos;{0}&apos;. 的本地化字符串。
         /// </summary>
         internal static string InvalidCacheOptions {
@@ -430,15 +232,6 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 Invalid cast from &apos;{0}&apos; to &apos;{1}&apos;. 的本地化字符串。
-        /// </summary>
-        internal static string InvalidCastFromTo {
-            get {
-                return ResourceManager.GetString("InvalidCastFromTo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 The specified threshold for creating dictionary is out of range. 的本地化字符串。
         /// </summary>
         internal static string InvalidDictionaryThreshold {
@@ -457,74 +250,11 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection. 的本地化字符串。
-        /// </summary>
-        internal static string InvalidOffsetLength {
-            get {
-                return ResourceManager.GetString("InvalidOffsetLength", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 From {0} to {1} is not a valid source range. 的本地化字符串。
         /// </summary>
         internal static string InvalidSourceRange {
             get {
                 return ResourceManager.GetString("InvalidSourceRange", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 The specified item does not exist. 的本地化字符串。
-        /// </summary>
-        internal static string ItemNotExist {
-            get {
-                return ResourceManager.GetString("ItemNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 An item with the same key has already been added. 的本地化字符串。
-        /// </summary>
-        internal static string KeyDuplicate {
-            get {
-                return ResourceManager.GetString("KeyDuplicate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Key &apos;{0}&apos; is not exists. 的本地化字符串。
-        /// </summary>
-        internal static string KeyNotFound {
-            get {
-                return ResourceManager.GetString("KeyNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Specified method is not supported. 的本地化字符串。
-        /// </summary>
-        internal static string MethodNotSupported {
-            get {
-                return ResourceManager.GetString("MethodNotSupported", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Type must derive from Delegate. 的本地化字符串。
-        /// </summary>
-        internal static string MustBeDelegate {
-            get {
-                return ResourceManager.GetString("MustBeDelegate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Type &apos;{0}&apos; must be an Enum. 的本地化字符串。
-        /// </summary>
-        internal static string MustBeEnum {
-            get {
-                return ResourceManager.GetString("MustBeEnum", resourceCulture);
             }
         }
         
@@ -538,164 +268,11 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 The string was being parsed as an unsigned number and could not have a negative sign. 的本地化字符串。
-        /// </summary>
-        internal static string NegativeUnsigned {
-            get {
-                return ResourceManager.GetString("NegativeUnsigned", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Could not find any recognizable digits. 的本地化字符串。
-        /// </summary>
-        internal static string NoParsibleDigits {
-            get {
-                return ResourceManager.GetString("NoParsibleDigits", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 {0} is not a GenericMethodDefinition. {1} may only be called on a method for which MethodBase.IsGenericMethodDefinition is true. 的本地化字符串。
         /// </summary>
         internal static string NotGenericMethodDefinition {
             get {
                 return ResourceManager.GetString("NotGenericMethodDefinition", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 The object has been disposed. 的本地化字符串。
-        /// </summary>
-        internal static string ObjectDisposed {
-            get {
-                return ResourceManager.GetString("ObjectDisposed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Value was either too large or too small for a Byte. 的本地化字符串。
-        /// </summary>
-        internal static string OverflowByte {
-            get {
-                return ResourceManager.GetString("OverflowByte", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Value was either too large or too small for an Int16. 的本地化字符串。
-        /// </summary>
-        internal static string OverflowInt16 {
-            get {
-                return ResourceManager.GetString("OverflowInt16", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Value was either too large or too small for an Int32. 的本地化字符串。
-        /// </summary>
-        internal static string OverflowInt32 {
-            get {
-                return ResourceManager.GetString("OverflowInt32", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Value was either too large or too small for an Int64. 的本地化字符串。
-        /// </summary>
-        internal static string OverflowInt64 {
-            get {
-                return ResourceManager.GetString("OverflowInt64", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Value was either too large or too small for a SByte. 的本地化字符串。
-        /// </summary>
-        internal static string OverflowSByte {
-            get {
-                return ResourceManager.GetString("OverflowSByte", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Value was either too large or too small for a UInt16. 的本地化字符串。
-        /// </summary>
-        internal static string OverflowUInt16 {
-            get {
-                return ResourceManager.GetString("OverflowUInt16", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Value was either too large or too small for a UInt32. 的本地化字符串。
-        /// </summary>
-        internal static string OverflowUInt32 {
-            get {
-                return ResourceManager.GetString("OverflowUInt32", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Value was either too large or too small for a UInt64. 的本地化字符串。
-        /// </summary>
-        internal static string OverflowUInt64 {
-            get {
-                return ResourceManager.GetString("OverflowUInt64", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Method processor identified &apos;{1}&apos; of type &apos;{0}&apos;, mismatch with requested static or instance. 的本地化字符串。
-        /// </summary>
-        internal static string ProcessorMismatch {
-            get {
-                return ResourceManager.GetString("ProcessorMismatch", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Existing static and instance method in method processors identified &apos;{1}&apos; of type &apos;{0}&apos;. 的本地化字符串。
-        /// </summary>
-        internal static string ProcessorMixed {
-            get {
-                return ResourceManager.GetString("ProcessorMixed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Can not find method processor identified &apos;{1}&apos; of type &apos;{0}&apos;. 的本地化字符串。
-        /// </summary>
-        internal static string ProcessorNotFound {
-            get {
-                return ResourceManager.GetString("ProcessorNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Can not find method processor for type &apos;{0}&apos;. 的本地化字符串。
-        /// </summary>
-        internal static string ProcessorNotFound_Type {
-            get {
-                return ResourceManager.GetString("ProcessorNotFound_Type", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Collection is read-only. 的本地化字符串。
-        /// </summary>
-        internal static string ReadOnlyCollection {
-            get {
-                return ResourceManager.GetString("ReadOnlyCollection", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 The parameter &apos;{0}&apos; and &apos;{1}&apos; in reverse order. 的本地化字符串。
-        /// </summary>
-        internal static string ReversedArgument {
-            get {
-                return ResourceManager.GetString("ReversedArgument", resourceCulture);
             }
         }
         
@@ -714,24 +291,6 @@ namespace Cyjb {
         internal static string SourceReaderClosed {
             get {
                 return ResourceManager.GetString("SourceReaderClosed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Expecting non-empty string for &apos;{0}&apos; parameter. 的本地化字符串。
-        /// </summary>
-        internal static string StringEmpty {
-            get {
-                return ResourceManager.GetString("StringEmpty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Expecting non-whitespace string for &apos;{0}&apos; parameter. 的本地化字符串。
-        /// </summary>
-        internal static string StringWhiteSpace {
-            get {
-                return ResourceManager.GetString("StringWhiteSpace", resourceCulture);
             }
         }
         

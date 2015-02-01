@@ -36,7 +36,7 @@ namespace Cyjb.Collections.ObjectModel
 			}
 			if (array.Rank != 1)
 			{
-				throw CommonExceptions.ArrayRankMultiDimNotSupported();
+				throw CommonExceptions.MultidimensionalArrayNotSupported("array");
 			}
 			if (array.GetLowerBound(0) != 0)
 			{
@@ -70,7 +70,7 @@ namespace Cyjb.Collections.ObjectModel
 				}
 				catch (InvalidCastException ex)
 				{
-					throw CommonExceptions.InvalidArrayType(ex);
+					throw CommonExceptions.InvalidElementType(ex);
 				}
 			}
 		}

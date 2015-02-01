@@ -192,6 +192,7 @@ namespace Cyjb.Collections
 				while (low <= high)
 				{
 					int mid = low + ((high - low) >> 1);
+					Contract.Assume(mid >= 0);
 					int cmp = comparer.Compare(list[mid], value);
 					if (cmp == 0)
 					{
@@ -210,7 +211,7 @@ namespace Cyjb.Collections
 			}
 			catch (Exception ex)
 			{
-				throw CommonExceptions.ComparerFailed(ex);
+				throw CommonExceptions.CollectionItemCompareFailed(ex);
 			}
 		}
 
@@ -426,6 +427,7 @@ namespace Cyjb.Collections
 				while (low <= high)
 				{
 					int mid = low + ((high - low) >> 1);
+					Contract.Assume(mid >= 0);
 					int cmp = comparer.Compare(keySelector(list[mid]), value);
 					if (cmp == 0)
 					{
@@ -444,7 +446,7 @@ namespace Cyjb.Collections
 			}
 			catch (Exception ex)
 			{
-				throw CommonExceptions.ComparerFailed(ex);
+				throw CommonExceptions.CollectionItemCompareFailed(ex);
 			}
 		}
 

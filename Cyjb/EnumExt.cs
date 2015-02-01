@@ -195,7 +195,7 @@ namespace Cyjb
 			Contract.Requires(enumType != null);
 			Contract.Ensures(Contract.Result<string>() != null);
 			// 最高位不为 0，需要根据原先的类型是否是有符号数字，决定是否输出负号。
-			if (value <= 0x8000000000000000UL || enumType.IsUnsigned())
+			if ((value >> 63) > 0 || enumType.IsUnsigned())
 			{
 				return value.ToString(CultureInfo.InvariantCulture);
 			}
@@ -596,6 +596,7 @@ namespace Cyjb
 				int nIdx = idx - 1;
 				// 去除后面的空白。
 				while (char.IsWhiteSpace(value, nIdx)) { nIdx--; }
+				Contract.Assume(nIdx >= start);
 				string str = value.Substring(start, nIdx - start + 1);
 				start = idx + 1;
 				// 尝试识别为名称、描述或数字。
@@ -616,7 +617,7 @@ namespace Cyjb
 		/// <returns>数字字符串的解析是否成功。</returns>
 		private static bool TryParseString(string str, out ulong value)
 		{
-			Contract.Requires(str != null & str.Length > 0);
+			Contract.Requires(!string.IsNullOrEmpty(str));
 			char firstChar = str[0];
 			if (char.IsDigit(firstChar) || firstChar == '+')
 			{

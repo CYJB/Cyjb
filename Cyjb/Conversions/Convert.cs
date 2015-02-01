@@ -222,44 +222,16 @@ namespace Cyjb
 				ConversionFactory.GetConversion(inputType, outputType), inputType, outputType, false, false));
 		}
 		/// <summary>
-		/// 获取将对象从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 类型的转换器类型。
-		/// </summary>
-		/// <param name="inputType">要转换的对象的类型。</param>
-		/// <param name="outputType">要将输入对象转换到的类型。</param>
-		/// <returns>将对象从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 
-		/// 类型的转换器类型。</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="inputType"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="outputType"/> 为 <c>null</c>。</exception>
-		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-		public static ConversionType GetConvertType(Type inputType, Type outputType)
-		{
-			if (inputType == null)
-			{
-				throw CommonExceptions.ArgumentNull("inputType");
-			}
-			if (outputType == null)
-			{
-				throw CommonExceptions.ArgumentNull("outputType");
-			}
-			Contract.EndContractBlock();
-			try
-			{
-				Conversion conversion = ConversionFactory.GetConversion(inputType, outputType);
-				if (conversion != null)
-				{
-					return conversion.ConversionType;
-				}
-			}
-			catch { }
-			return ConversionType.None;
-		}
-		/// <summary>
-		/// 返回表示对象能否从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 类型的布尔值。
+		/// 返回对象能否从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 类型。
 		/// </summary>
 		/// <param name="inputType">要转换的对象的类型。</param>
 		/// <param name="outputType">要将输入对象转换到的类型。</param>
 		/// <returns>如果对象能够从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 类型，
 		/// 则为 <c>true</c>。否则为 <c>false</c>。</returns>
+		/// <remarks>与 <see cref="TypeExt.IsImplicitFrom"/> 或 <see cref="TypeExt.IsExplicitFrom"/> 不同，
+		/// 这里会考虑预定义的隐式、显式类型转换，用户自定义的类型转换（包括 <c>implicit</c> 和 <c>explicit</c>），
+		/// 以及通过 <see cref="AddConverter{TInput, TOutput}"/> 和 <see cref="AddConverterProvider"/> 
+		/// 方法注册的类型转换方法。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="inputType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="outputType"/> 为 <c>null</c>。</exception>
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -336,7 +308,7 @@ namespace Cyjb
 			Converter<TInput, TOutput> converter = GetConverter<TInput, TOutput>();
 			if (converter == null)
 			{
-				throw CommonExceptions.InvalidCastFromTo(typeof(TInput), typeof(TOutput));
+				throw CommonExceptions.InvalidCast(typeof(TInput), typeof(TOutput));
 			}
 			return converter(value);
 		}
@@ -364,7 +336,7 @@ namespace Cyjb
 			Converter<object, object> converter = GetConverter(value.GetType(), typeof(TOutput));
 			if (converter == null)
 			{
-				throw CommonExceptions.InvalidCastFromTo(value.GetType(), typeof(TOutput));
+				throw CommonExceptions.InvalidCast(value.GetType(), typeof(TOutput));
 			}
 			return (TOutput)converter(value);
 		}
@@ -398,7 +370,7 @@ namespace Cyjb
 			Converter<object, object> converter = GetConverter(value.GetType(), outputType);
 			if (converter == null)
 			{
-				throw CommonExceptions.InvalidCastFromTo(value.GetType(), outputType);
+				throw CommonExceptions.InvalidCast(value.GetType(), outputType);
 			}
 			return converter(value);
 		}

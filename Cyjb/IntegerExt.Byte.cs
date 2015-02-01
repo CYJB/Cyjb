@@ -1,4 +1,6 @@
-﻿namespace Cyjb
+﻿using System.Diagnostics.Contracts;
+
+namespace Cyjb
 {
 	/// <summary>
 	/// 提供对整数的扩展方法。
@@ -15,6 +17,7 @@
 		/// <returns>指定整数的二进制表示中 <c>1</c> 的个数。</returns>
 		public static int CountBits(this byte value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 8);
 			int iValue = value;
 			iValue -= (iValue >> 1) & 0x55;
 			iValue = (iValue & 0x33) + ((iValue >> 2) & 0x33);
@@ -28,6 +31,7 @@
 		/// 否则为 <c>0</c>。</returns>
 		public static int Parity(this byte value)
 		{
+			Contract.Ensures(Contract.Result<int>() == 0 || Contract.Result<int>() == 1);
 			int iValue = value;
 			iValue = (iValue ^ (iValue >> 4)) & 0xF;
 			return (0x6996 >> iValue) & 1;
@@ -50,6 +54,7 @@
 		/// 如果 <paramref name="value"/> 等于 <c>0</c>，则结果未知。</returns>
 		public static int LogBase2(this byte value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 7);
 			if (value >= 128) { return 7; }
 			if (value >= 64) { return 6; }
 			if (value >= 32) { return 5; }
@@ -66,6 +71,7 @@
 		/// 如果 <paramref name="value"/> 等于 <c>10</c>，则结果未知。</returns>
 		public static int LogBase10(this byte value)
 		{
+			Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 2);
 			if (value >= 100) { return 2; }
 			return (value >= 10) ? 1 : 0;
 		}

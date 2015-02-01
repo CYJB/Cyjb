@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Reflection;
+using Cyjb.Reflection;
 
 namespace Cyjb
 {
@@ -12,18 +14,10 @@ namespace Cyjb
 	public sealed class MemberAccessor<TTarget, TValue>
 	{
 		/// <summary>
-		/// 表示公共实例属性或方法的标志。
-		/// </summary>
-		private const BindingFlags Public = BindingFlags.Instance | BindingFlags.Public;
-		/// <summary>
-		/// 表示非公共实例属性或方法的标志。
-		/// </summary>
-		private const BindingFlags NonPublic = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-		/// <summary>
 		/// 实例属性或字段的名称。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private string name;
+		private readonly string name;
 		/// <summary>
 		/// 获取实例属性或字段的委托。
 		/// </summary>
@@ -38,28 +32,30 @@ namespace Cyjb
 		#region 从委托创建
 
 		/// <summary>
-		/// 使用指定的访问委托，初始化 <see cref="MemberAccessor{T}"/> 类的新实例。
-		/// </summary>
-		/// <param name="getDelegate">用于获取实例属性或字段的委托。</param>
-		/// <param name="setDelegate">用于设置实例属性或字段的委托。</param>
-		/// <overloads>
-		/// <summary>
-		/// 初始化 <see cref="MemberAccessor{T}"/> 类的新实例。
-		/// </summary>
-		/// </overloads>
-		public MemberAccessor(Func<TTarget, TValue> getDelegate, Action<TTarget, TValue> setDelegate)
-		{
-			this.getDelegate = getDelegate;
-			this.setDelegate = setDelegate;
-		}
-		/// <summary>
-		/// 使用指定的名字和访问委托，初始化 <see cref="MemberAccessor{T}"/> 类的新实例。
+		/// 使用指定的名字和访问委托，初始化 <see cref="MemberAccessor{TTarget, TValue}"/> 类的新实例。
 		/// </summary>
 		/// <param name="name">实例属性或字段的名字。</param>
 		/// <param name="getDelegate">用于获取实例属性或字段的委托。</param>
 		/// <param name="setDelegate">用于设置实例属性或字段的委托。</param>
+		/// <exception cref="ArgumentException"><paramref name="name"/> 为 <c>null</c> 或空字符串。</exception>
+		/// <exception cref="ArgumentException"><paramref name="getDelegate"/> 和 <paramref name="setDelegate"/> 
+		/// 全部为 <c>null</c>。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="MemberAccessor{TTarget, TValue}"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		public MemberAccessor(string name, Func<TTarget, TValue> getDelegate, Action<TTarget, TValue> setDelegate)
 		{
+			if (string.IsNullOrEmpty(name))
+			{
+				throw CommonExceptions.StringEmpty("name");
+			}
+			if (getDelegate == null && setDelegate == null)
+			{
+				throw CommonExceptions.ArgumentNull("getDelegate");
+			}
+			Contract.EndContractBlock();
 			this.name = name;
 			this.getDelegate = getDelegate;
 			this.setDelegate = setDelegate;
@@ -70,87 +66,132 @@ namespace Cyjb
 		#region 从类型创建
 
 		/// <summary>
-		/// 使用实例属性或字段的名称，初始化 <see cref="MemberAccessor{T}"/> 类的新实例，
+		/// 使用实例属性或字段的名称，初始化 <see cref="MemberAccessor{TTarget, TValue}"/> 类的新实例，
 		/// 表示 <typeparamref name="TTarget"/> 中的的实例属性或字段。
 		/// </summary>
 		/// <param name="name">实例属性或字段的名称。</param>
+		/// <exception cref="ArgumentException"><paramref name="name"/> 为 <c>null</c> 或空字符串。</exception>
 		public MemberAccessor(string name)
-			: this(typeof(TTarget), name, false)
-		{ }
-		/// <summary>
-		/// 使用实例属性或字段的名称，初始化 <see cref="MemberAccessor{T}"/> 类的新实例，
-		/// 表示 <typeparamref name="TTarget"/> 中的的实例属性或字段。
-		/// </summary>
-		/// <param name="name">实例属性或字段的名称。</param>
-		/// <param name="nonPublic">指示是否应访问非公共实例属性或字段。
-		/// 如果要访问非公共实例属性或字段，则为 <c>true</c>；否则为 <c>false</c>。</param>
-		public MemberAccessor(string name, bool nonPublic)
-			: this(typeof(TTarget), name, nonPublic)
-		{ }
-		/// <summary>
-		/// 使用包含实例属性或字段的类型和名称，初始化 <see cref="MemberAccessor{T}"/> 类的新实例，
-		/// 表示指定的实例属性或字段。
-		/// </summary>
-		/// <param name="targetType">包含实例属性或字段的类型。</param>
-		/// <param name="name">实例属性或字段的名称。</param>
-		public MemberAccessor(Type targetType, string name)
-			: this(targetType, name, false)
-		{ }
-		/// <summary>
-		/// 使用包含实例属性或字段的类型和名称，初始化 <see cref="MemberAccessor{T}"/> 类的新实例，
-		/// 表示指定的实例属性或字段。
-		/// </summary>
-		/// <param name="targetType">包含实例属性或字段的类型。</param>
-		/// <param name="name">实例属性或字段的名称。</param>
-		/// <param name="nonPublic">指示是否应访问非公共实例属性或字段。
-		/// 如果要访问非公共实例属性或字段，则为 <c>true</c>；否则为 <c>false</c>。</param>
-		public MemberAccessor(Type targetType, string name, bool nonPublic)
 		{
-			CommonExceptions.CheckArgumentNull(targetType, "targetType");
+			if (string.IsNullOrEmpty(name))
+			{
+				throw CommonExceptions.StringEmpty("name");
+			}
+			Contract.EndContractBlock();
 			this.name = name;
-			PropertyInfo property = targetType.GetProperty(name, nonPublic ? NonPublic : Public);
-			if (property != null)
-			{
-				Init(property, nonPublic);
-			}
-			else
-			{
-				FieldInfo field = targetType.GetField(name, nonPublic ? NonPublic : Public);
-				if (field != null)
-				{
-					Init(field);
-				}
-			}
+			this.Init(typeof(TTarget), false);
 		}
 		/// <summary>
-		/// 使用指定的实例属性，初始化 <see cref="MemberAccessor{T}"/> 类的新实例，
+		/// 使用实例属性或字段的名称，初始化 <see cref="MemberAccessor{TTarget, TValue}"/> 类的新实例，
+		/// 表示 <typeparamref name="TTarget"/> 中的的实例属性或字段。
+		/// </summary>
+		/// <param name="name">实例属性或字段的名称。</param>
+		/// <param name="nonPublic">指示是否应访问非公共实例属性或字段。
+		/// 如果要访问非公共实例属性或字段，则为 <c>true</c>；否则为 <c>false</c>。</param>
+		/// <exception cref="ArgumentException"><paramref name="name"/> 为 <c>null</c> 或空字符串。</exception>
+		public MemberAccessor(string name, bool nonPublic)
+		{
+			if (string.IsNullOrEmpty(name))
+			{
+				throw CommonExceptions.StringEmpty("name");
+			}
+			Contract.EndContractBlock();
+			this.name = name;
+			this.Init(typeof(TTarget), nonPublic);
+		}
+		/// <summary>
+		/// 使用包含实例属性或字段的类型和名称，初始化 <see cref="MemberAccessor{TTarget, TValue}"/> 类的新实例，
+		/// 表示指定的实例属性或字段。
+		/// </summary>
+		/// <param name="targetType">包含实例属性或字段的类型。</param>
+		/// <param name="name">实例属性或字段的名称。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="targetType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="name"/> 为 <c>null</c> 或空字符串。</exception>
+		public MemberAccessor(Type targetType, string name)
+		{
+			if (targetType == null)
+			{
+				throw CommonExceptions.ArgumentNull("targetType");
+			}
+			if (string.IsNullOrEmpty(name))
+			{
+				throw CommonExceptions.StringEmpty("name");
+			}
+			Contract.EndContractBlock();
+			this.name = name;
+			this.Init(targetType, false);
+		}
+		/// <summary>
+		/// 使用包含实例属性或字段的类型和名称，初始化 <see cref="MemberAccessor{TTarget, TValue}"/> 类的新实例，
+		/// 表示指定的实例属性或字段。
+		/// </summary>
+		/// <param name="targetType">包含实例属性或字段的类型。</param>
+		/// <param name="name">实例属性或字段的名称。</param>
+		/// <param name="nonPublic">指示是否应访问非公共实例属性或字段。
+		/// 如果要访问非公共实例属性或字段，则为 <c>true</c>；否则为 <c>false</c>。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="targetType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="name"/> 为 <c>null</c> 或空字符串。</exception>
+		public MemberAccessor(Type targetType, string name, bool nonPublic)
+		{
+			if (targetType == null)
+			{
+				throw CommonExceptions.ArgumentNull("targetType");
+			}
+			if (string.IsNullOrEmpty(name))
+			{
+				throw CommonExceptions.StringEmpty("name");
+			}
+			Contract.EndContractBlock();
+			this.name = name;
+			this.Init(targetType, nonPublic);
+		}
+		/// <summary>
+		/// 使用指定的实例属性，初始化 <see cref="MemberAccessor{TTarget, TValue}"/> 类的新实例，
 		/// 表示指定的实例属性。
 		/// </summary>
 		/// <param name="property">要访问的实例属性。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
 		public MemberAccessor(PropertyInfo property)
-			: this(property, false)
-		{ }
+		{
+			if (property == null)
+			{
+				throw CommonExceptions.ArgumentNull("property");
+			}
+			Contract.EndContractBlock();
+			this.name = property.Name;
+			Init(property, false);
+		}
 		/// <summary>
-		/// 使用指定的实例属性，初始化 <see cref="MemberAccessor{T}"/> 类的新实例，
+		/// 使用指定的实例属性，初始化 <see cref="MemberAccessor{TTarget, TValue}"/> 类的新实例，
 		/// 表示指定的实例属性。
 		/// </summary>
 		/// <param name="property">要访问的实例属性。</param>
 		/// <param name="nonPublic">指示是否应访问非公共实例属性。
 		/// 如果要访问非公共实例属性，则为 <c>true</c>；否则为 <c>false</c>。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
 		public MemberAccessor(PropertyInfo property, bool nonPublic)
 		{
-			CommonExceptions.CheckArgumentNull(property, "property");
+			if (property == null)
+			{
+				throw CommonExceptions.ArgumentNull("property");
+			}
+			Contract.EndContractBlock();
 			this.name = property.Name;
 			Init(property, nonPublic);
 		}
 		/// <summary>
-		/// 使用指定的字段，初始化 <see cref="MemberAccessor{T}"/> 类的新实例，
+		/// 使用指定的字段，初始化 <see cref="MemberAccessor{TTarget, TValue}"/> 类的新实例，
 		/// 表示指定的字段。
 		/// </summary>
 		/// <param name="field">要访问的字段。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="field"/> 为 <c>null</c>。</exception>
 		public MemberAccessor(FieldInfo field)
 		{
-			CommonExceptions.CheckArgumentNull(field, "field");
+			if (field == null)
+			{
+				throw CommonExceptions.ArgumentNull("field");
+			}
+			Contract.EndContractBlock();
 			this.name = field.Name;
 			Init(field);
 		}
@@ -160,6 +201,29 @@ namespace Cyjb
 		#region 初始化
 
 		/// <summary>
+		/// 使用指定的搜索类型初始化当前实例。
+		/// </summary>
+		/// <param name="type">要搜索的类型。</param>
+		/// <param name="nonPublic">指示是否应访问非公共属性或字段。
+		/// 如果要访问非公共属性或字段，则为 <c>true</c>；否则为 <c>false</c>。</param>
+		private void Init(Type type, bool nonPublic)
+		{
+			Contract.Requires(type != null);
+			BindingFlags flags = nonPublic ? TypeExt.AllMemberFlag : TypeExt.PublicFlag;
+			PropertyInfo property = type.GetProperty(this.name, flags);
+			if (property != null)
+			{
+				Init(property, nonPublic);
+				return;
+			}
+			FieldInfo field = type.GetField(this.name, flags);
+			if (field != null)
+			{
+				Init(field);
+			}
+			throw CommonExceptions.PropertyOrFieldNotFound(this.name, nonPublic);
+		}
+		/// <summary>
 		/// 使用指定的实例属性初始化当前实例。
 		/// </summary>
 		/// <param name="property">要访问的实例属性。</param>
@@ -167,6 +231,7 @@ namespace Cyjb
 		/// 如果要访问非公共实例属性，则为 <c>true</c>；否则为 <c>false</c>。</param>
 		private void Init(PropertyInfo property, bool nonPublic)
 		{
+			Contract.Requires(property != null);
 			MethodInfo method = property.GetGetMethod(nonPublic);
 			if (method != null)
 			{
@@ -184,6 +249,7 @@ namespace Cyjb
 		/// <param name="field">要访问的字段。</param>
 		private void Init(FieldInfo field)
 		{
+			Contract.Requires(field != null);
 			this.getDelegate = field.CreateDelegate<Func<TTarget, TValue>>(false);
 			this.setDelegate = field.CreateDelegate<Action<TTarget, TValue>>(false);
 		}
@@ -194,7 +260,14 @@ namespace Cyjb
 		/// 获取实例属性或字段的名称。
 		/// </summary>
 		/// <value>实例属性或字段的名称。</value>
-		public string Name { get { return this.name; } }
+		public string Name
+		{
+			get
+			{
+				Contract.Ensures(!string.IsNullOrEmpty(Contract.Result<string>()));
+				return this.name;
+			}
+		}
 		/// <summary>
 		/// 获取指定对象的实例属性或字段的值。
 		/// </summary>
@@ -204,7 +277,7 @@ namespace Cyjb
 		{
 			if (this.getDelegate == null)
 			{
-				throw CommonExceptions.BindTargetPropertyNoGet(this.name);
+				throw CommonExceptions.PropertyNoGetter(this.name);
 			}
 			return this.getDelegate(target);
 		}
@@ -217,7 +290,7 @@ namespace Cyjb
 		{
 			if (this.setDelegate == null)
 			{
-				throw CommonExceptions.BindTargetPropertyNoSet(this.name);
+				throw CommonExceptions.PropertyNoSetter(this.name);
 			}
 			this.setDelegate(target, value);
 		}

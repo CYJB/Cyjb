@@ -31,13 +31,13 @@ namespace Cyjb.Collections
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private readonly int count;
 		/// <summary>
-		/// 使用给定的数组初始化 <see cref="Cyjb.Collections.ArrayAdapter{T}"/> 类的新实例。
+		/// 使用给定的数组初始化 <see cref="ArrayAdapter{T}"/> 类的新实例。
 		/// </summary>
 		/// <param name="array">初始化使用的数组。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
 		/// <overloads>
 		/// <summary>
-		/// 初始化 <see cref="Cyjb.Collections.ArrayAdapter{T}"/> 类的新实例。
+		/// 初始化 <see cref="ArrayAdapter{T}"/> 类的新实例。
 		/// </summary>
 		/// </overloads>
 		public ArrayAdapter(params T[] array)
@@ -52,7 +52,7 @@ namespace Cyjb.Collections
 			this.count = array.Length;
 		}
 		/// <summary>
-		/// 使用给定的数组初始化 <see cref="Cyjb.Collections.ArrayAdapter{T}"/> 类的新实例。
+		/// 使用给定的数组初始化 <see cref="ArrayAdapter{T}"/> 类的新实例。
 		/// 它分割指定数组中指定的元素范围。
 		/// </summary>
 		/// <param name="array">初始化使用的数组。</param>
@@ -109,7 +109,7 @@ namespace Cyjb.Collections
 		/// <param name="item">要插入的对象。</param>
 		protected override void InsertItem(int index, T item)
 		{
-			throw CommonExceptions.FixedSizeCollection();
+			throw CommonExceptions.CollectionFixedSize();
 		}
 		/// <summary>
 		/// 移除 <see cref="ArrayAdapter{T}"/> 的指定索引处的元素。
@@ -117,7 +117,7 @@ namespace Cyjb.Collections
 		/// <param name="index">要移除的元素的从零开始的索引。</param>
 		protected override void RemoveItem(int index)
 		{
-			throw CommonExceptions.FixedSizeCollection();
+			throw CommonExceptions.CollectionFixedSize();
 		}
 		/// <summary>
 		/// 替换指定索引处的元素。
@@ -181,13 +181,12 @@ namespace Cyjb.Collections
 			get { return this.count; }
 		}
 		/// <summary>
-		/// 从 <see cref="ArrayAdapter{T}"/> 中移除所有元素。
-		/// 此实现总是引发 <see cref="NotSupportedException"/>。
+		/// 从 <see cref="ArrayAdapter{T}"/> 中移除所有元素。此实现总是引发 <see cref="NotSupportedException"/>。
 		/// </summary>
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		public override void Clear()
 		{
-			throw CommonExceptions.FixedSizeCollection();
+			throw CommonExceptions.CollectionFixedSize();
 		}
 
 		#endregion // ICollection<T> 成员
@@ -197,7 +196,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 返回一个循环访问集合的枚举器。
 		/// </summary>
-		/// <returns>可用于循环访问集合的 <see cref="System.Collections.Generic.IEnumerator{T}"/>。</returns>
+		/// <returns>可用于循环访问集合的 <see cref="IEnumerator{T}"/>。</returns>
 		public override IEnumerator<T> GetEnumerator()
 		{
 			for (int i = offset, len = offset + count; i < len; i++)

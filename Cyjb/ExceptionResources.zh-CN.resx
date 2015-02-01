@@ -145,50 +145,6 @@
     <value>参数 '{0}' 不能大于 '{1}'。</value>
     <comment>最小值大于最大值。</comment>
   </data>
-  <data name="ArgumentMustBePositive" xml:space="preserve">
-    <value>参数值必须大于 0。</value>
-    <comment>参数小于等于零。</comment>
-  </data>
-  <data name="ArgumentNegative" xml:space="preserve">
-    <value>参数值不能为负。</value>
-    <comment>参数小于零。</comment>
-  </data>
-  <data name="ArgumentOutOfRange" xml:space="preserve">
-    <value>参数值超出了有效范围。</value>
-    <comment>参数超出范围。</comment>
-  </data>
-  <data name="ArgumentOutOfRangeBetween" xml:space="preserve">
-    <value>参数值必须位于 {1} 和 {2} 之间。</value>
-    <comment>参数超出范围。</comment>
-  </data>
-  <data name="ArgumentWrongType" xml:space="preserve">
-    <value>参数 '{0}' 的值 '{1}' 不是 '{2}' 类型。</value>
-    <comment>参数值不是特定类型。</comment>
-  </data>
-  <data name="ArgumentWrongType_Specific" xml:space="preserve">
-    <value>参数 '{0}' 的值不是有效的类型。</value>
-    <comment>参数值不是有效类型。</comment>
-  </data>
-  <data name="ArrayEmpty" xml:space="preserve">
-    <value>数组不得为空。</value>
-    <comment>数组为空。</comment>
-  </data>
-  <data name="ArrayLengthsDiffer" xml:space="preserve">
-    <value>数组长度必须相同。</value>
-    <comment>数组长度必须相同。</comment>
-  </data>
-  <data name="ArrayNonZeroLowerBound" xml:space="preserve">
-    <value>目标数组的下限必须为 0。</value>
-    <comment>数组的下限必须为 0。</comment>
-  </data>
-  <data name="ArrayRankMultiDimNotSupported" xml:space="preserve">
-    <value>只支持一维数组。</value>
-    <comment>多维数组不被支持。</comment>
-  </data>
-  <data name="ArrayTooSmall" xml:space="preserve">
-    <value>目标数组的长度不足，请检查数组索引和长度。</value>
-    <comment>目标数组太小。</comment>
-  </data>
   <data name="BindTargetField" xml:space="preserve">
     <value>无法绑定到目标字段，因其类型或安全透明度与委托类型的签名或安全透明度不兼容。</value>
     <comment>绑定到目标字段时出错。</comment>
@@ -209,17 +165,9 @@
     <value>无法绑定到目标属性，因其不存在 set 访问器。</value>
     <comment>绑定到目标属性时出错。</comment>
   </data>
-  <data name="CannotCastNullToValueType" xml:space="preserve">
-    <value>空对象不能转换为值类型。</value>
-    <comment>空对象不能转换为值类型。</comment>
-  </data>
   <data name="CannotInferGenericArguments" xml:space="preserve">
     <value>无法从参数中推导出方法 {0} 的类型实参。</value>
     <comment>无效的泛型参数推断。</comment>
-  </data>
-  <data name="ComparerFailed" xml:space="preserve">
-    <value>未能比较数组中的两个元素。</value>
-    <comment>比较数组元素失败。</comment>
   </data>
   <data name="ConflictingAcceptAction" xml:space="preserve">
     <value>接受动作与拒绝动作冲突。</value>
@@ -233,42 +181,6 @@
     <value>'{0}' 不是 '{1}' 的有效值。</value>
     <comment>转换无效。</comment>
   </data>
-  <data name="DelegateCompatible" xml:space="preserve">
-    <value>委托的类型与 {0} 不兼容。</value>
-    <comment>委托的类型不兼容。</comment>
-  </data>
-  <data name="EnumFailedVersion" xml:space="preserve">
-    <value>集合已修改；可能无法执行枚举操作。</value>
-    <comment>无法执行枚举操作。</comment>
-  </data>
-  <data name="EnumTypeDoesNotMatch" xml:space="preserve">
-    <value>参数类型 '{0}' 与枚举类型 '{1}' 不相同。</value>
-    <comment>枚举参数类型不匹配。</comment>
-  </data>
-  <data name="EnumValueNotFound" xml:space="preserve">
-    <value>在枚举 '{0}‘ 中未找到请求的值 '{1}'。</value>
-    <comment>未识别的枚举值。</comment>
-  </data>
-  <data name="ExtraJunkAtEnd" xml:space="preserve">
-    <value>字符串的末尾有其他无法分析的字符。</value>
-    <comment>字符串的末尾有其他无法分析的字符。</comment>
-  </data>
-  <data name="FixedSizeCollection" xml:space="preserve">
-    <value>集合是固定大小的。</value>
-    <comment>集合是固定大小的。</comment>
-  </data>
-  <data name="InnerExceptionNull" xml:space="preserve">
-    <value>innerExceptions 的一个元素为 null。</value>
-    <comment>内部异常之一为 null。</comment>
-  </data>
-  <data name="InvalidArrayType" xml:space="preserve">
-    <value>目标数组类型与集合中项的类型不兼容。</value>
-    <comment>目标数组类型与集合中项的类型不兼容。</comment>
-  </data>
-  <data name="InvalidBase" xml:space="preserve">
-    <value>基不在 2 至 36 之间。</value>
-    <comment>无效的基。</comment>
-  </data>
   <data name="InvalidCacheOptions" xml:space="preserve">
     <value>在缓冲池类型 '{0}' 中找不到与选项匹配的构造函数。</value>
     <comment>缓冲池选项无效。</comment>
@@ -281,10 +193,6 @@
     <value>无效的缓冲池类型 '{0}'，没有实现 ICache{TKey, TValue} 接口。</value>
     <comment>缓冲池类型无效-未实现 ICache 接口。</comment>
   </data>
-  <data name="InvalidCastFromTo" xml:space="preserve">
-    <value>从 '{0}' 到 '{1}' 的类型转换无效。</value>
-    <comment>一种类型不能转换为另一种类型。</comment>
-  </data>
   <data name="InvalidDictionaryThreshold" xml:space="preserve">
     <value>指定的用于创建字典的阈值超出范围。</value>
     <comment>用于创建字典的阈值超出范围。</comment>
@@ -293,113 +201,17 @@
     <value>无效的词法分析上下文 '{0}'。</value>
     <comment>无效的词法分析上下文。</comment>
   </data>
-  <data name="InvalidOffsetLength" xml:space="preserve">
-    <value>偏移量和长度超出数组的界限，或者计数大于从索引到源集合结尾处的元素数量。</value>
-    <comment>偏移量和长度超出界限。</comment>
-  </data>
   <data name="InvalidSourceRange" xml:space="preserve">
     <value>从 {0} 到 {1} 不是有效的源文件范围。</value>
     <comment>不是有效的源文件范围。</comment>
-  </data>
-  <data name="ItemNotExist" xml:space="preserve">
-    <value>指定的项不存在。</value>
-    <comment>指定的项不存在。</comment>
-  </data>
-  <data name="KeyDuplicate" xml:space="preserve">
-    <value>已添加了具有相同键的项。</value>
-    <comment>键重复。</comment>
-  </data>
-  <data name="KeyNotFound" xml:space="preserve">
-    <value>指定的键 '{0}' 不存在。</value>
-    <comment>指定的键不存在。</comment>
-  </data>
-  <data name="MethodNotSupported" xml:space="preserve">
-    <value>不支持所指定的方法。</value>
-    <comment>方法不支持。</comment>
-  </data>
-  <data name="MustBeDelegate" xml:space="preserve">
-    <value>类型必须从委托派生。</value>
-    <comment>类型必须从委托派生。</comment>
-  </data>
-  <data name="MustBeEnum" xml:space="preserve">
-    <value>提供的类型 '{0}' 必须是 Enum。</value>
-    <comment>必须是枚举。</comment>
   </data>
   <data name="MustContainEnumInfo" xml:space="preserve">
     <value>要在此字符串中进行分析，必须指定有效信息。</value>
     <comment>必须包含枚举信息。</comment>
   </data>
-  <data name="NegativeUnsigned" xml:space="preserve">
-    <value>该字符串正被当作无符号数字进行分析，因此不能带有负号。</value>
-    <comment>无符号数的字符串不能包含负号。</comment>
-  </data>
-  <data name="NoParsibleDigits" xml:space="preserve">
-    <value>未能找到任何可识别的数字。</value>
-    <comment>未能找到任何可识别的数字。</comment>
-  </data>
   <data name="NotGenericMethodDefinition" xml:space="preserve">
     <value>{0} 不是 GenericMethodDefinition。只能对 MethodBase.IsGenericMethodDefinition 为 True 的方法调用 {1}。</value>
     <comment>不表示泛型方法定义。</comment>
-  </data>
-  <data name="ObjectDisposed" xml:space="preserve">
-    <value>已释放该对象。</value>
-    <comment>对象已释放资源。</comment>
-  </data>
-  <data name="OverflowByte" xml:space="preserve">
-    <value>值对于 Byte 太大或太小。</value>
-    <comment>值对于 Byte 太大或太小。</comment>
-  </data>
-  <data name="OverflowInt16" xml:space="preserve">
-    <value>值对于 Int16 太大或太小。</value>
-    <comment>值对于 Int16 太大或太小。</comment>
-  </data>
-  <data name="OverflowInt32" xml:space="preserve">
-    <value>值对于 Int32 太大或太小。</value>
-    <comment>值对于 Int32 太大或太小。</comment>
-  </data>
-  <data name="OverflowInt64" xml:space="preserve">
-    <value>值对于 Int64 太大或太小。</value>
-    <comment>值对于 Int64 太大或太小。</comment>
-  </data>
-  <data name="OverflowSByte" xml:space="preserve">
-    <value>值对于 SByte 太大或太小。</value>
-    <comment>值对于 SByte 太大或太小。</comment>
-  </data>
-  <data name="OverflowUInt16" xml:space="preserve">
-    <value>值对于 UInt16 太大或太小。</value>
-    <comment>值对于 UInt16 太大或太小。</comment>
-  </data>
-  <data name="OverflowUInt32" xml:space="preserve">
-    <value>值对于 UInt32 太大或太小。</value>
-    <comment>值对于 UInt32 太大或太小。</comment>
-  </data>
-  <data name="OverflowUInt64" xml:space="preserve">
-    <value>值对于 UInt64 太大或太小。</value>
-    <comment>值对于 UInt64 太大或太小。</comment>
-  </data>
-  <data name="ProcessorMismatch" xml:space="preserve">
-    <value>类型 '{0}' 中标识符为 '{1}' 的方法处理器，与请求的静态/实例类型不匹配。</value>
-    <comment>方法处理器不匹配。</comment>
-  </data>
-  <data name="ProcessorMixed" xml:space="preserve">
-    <value>在类型 '{0}' 上方法处理器标识符为 '{1}' 的方法中，既有静态方法，也有实例方法。</value>
-    <comment>方法处理器中混杂着静态和实例方法。</comment>
-  </data>
-  <data name="ProcessorNotFound" xml:space="preserve">
-    <value>在类型 '{0}' 上找不到方法处理器标识符为 '{1}' 的方法。</value>
-    <comment>找不到方法处理器。</comment>
-  </data>
-  <data name="ProcessorNotFound_Type" xml:space="preserve">
-    <value>找不到类型 '{0}' 对应的方法处理器。</value>
-    <comment>特定类型的方法处理器未能找到。</comment>
-  </data>
-  <data name="ReadOnlyCollection" xml:space="preserve">
-    <value>集合是只读的。</value>
-    <comment>集合是只读的。</comment>
-  </data>
-  <data name="ReversedArgument" xml:space="preserve">
-    <value>参数 '{0}' 和 '{1}' 的顺序颠倒。</value>
-    <comment>参数顺序颠倒。</comment>
   </data>
   <data name="SameParameterName" xml:space="preserve">
     <value>两个参数的名称不能是相同的。</value>
@@ -408,18 +220,6 @@
   <data name="SourceReaderClosed" xml:space="preserve">
     <value>无法从已关闭的 SourceReader 中读取。</value>
     <comment>不能从关闭的 SourceReader 中读取。</comment>
-  </data>
-  <data name="StringEmpty" xml:space="preserve">
-    <value>参数 '{0}' 需要一个非空的字符串。</value>
-    <comment>参数需要非空的字符串。</comment>
-  </data>
-  <data name="StringWhiteSpace" xml:space="preserve">
-    <value>参数 '{0}' 需要一个非空白的字符串。</value>
-    <comment>参数需要非空白的字符串。</comment>
-  </data>
-  <data name="TextReaderClosed" xml:space="preserve">
-    <value>不能从关闭的 TextReader 中读取。</value>
-    <comment>不能从关闭的 TextReader 中读取。</comment>
   </data>
   <data name="UnboundGenParam" xml:space="preserve">
     <value>不能对 ContainssGenericParameters 为 True 的类型或方法执行后期绑定操作。</value>

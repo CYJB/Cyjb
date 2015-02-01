@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
+using System.Diagnostics.Contracts;
 
 namespace Cyjb
 {
@@ -10,28 +11,21 @@ namespace Cyjb
 	public sealed class FloatComparer : Comparer<float>
 	{
 		/// <summary>
-		/// 默认的单精度浮点数比较器。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static FloatComparer defaultComparer;
-		/// <summary>
 		/// 比较时使用的默认精度。
 		/// </summary>
 		public const float DefaultEpsilon = 1e-7F;
+		/// <summary>
+		/// 默认的单精度浮点数比较器。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private static readonly FloatComparer defaultComparer = new FloatComparer(DefaultEpsilon);
 		/// <summary>
 		/// 获取默认的单精度浮点数比较器。
 		/// </summary>
 		/// <value>默认的单精度浮点数比较器。</value>
 		public new static FloatComparer Default
 		{
-			get
-			{
-				if (defaultComparer == null)
-				{
-					Interlocked.CompareExchange(ref defaultComparer, new FloatComparer(DefaultEpsilon), null);
-				}
-				return defaultComparer;
-			}
+			get { return defaultComparer; }
 		}
 		/// <summary>
 		/// 比较时使用的精度。
@@ -41,12 +35,14 @@ namespace Cyjb
 		/// 使用比较时要使用的精度，初始化 <see cref="FloatComparer"/> 类的新实例。
 		/// </summary>
 		/// <param name="epsilon">比较时使用的精度。</param>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="epsilon"/> 小于 <c>0</c>。</exception>
 		public FloatComparer(float epsilon)
 		{
 			if (epsilon <= 0)
 			{
 				throw CommonExceptions.ArgumentMustBePositive("epsilon", epsilon);
 			}
+			Contract.EndContractBlock();
 			this.epsilon = epsilon;
 		}
 

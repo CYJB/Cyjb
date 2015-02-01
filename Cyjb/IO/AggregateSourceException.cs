@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -40,7 +40,7 @@ namespace Cyjb.IO
 		/// </summary>
 		/// </overloads>
 		public AggregateSourceException()
-			: base(Resources.AggregateSourceException_DefaultMessage)
+			: base(Resources.OneOrMoreErrorsExisted)
 		{ }
 		/// <summary>
 		/// 使用对导致此异常的内部异常的引用来初始化 <see cref="AggregateSourceException"/> 类的新实例。
@@ -49,9 +49,8 @@ namespace Cyjb.IO
 		/// <exception cref="ArgumentNullException"><paramref name="innerExceptions"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="innerExceptions"/> 的元素为 <c>null</c>。</exception>
 		public AggregateSourceException(IEnumerable<SourceException> innerExceptions)
-			: this(Resources.AggregateSourceException_DefaultMessage, innerExceptions)
-		{
-		}
+			: this(Resources.OneOrMoreErrorsExisted, innerExceptions)
+		{ }
 		/// <summary>
 		/// 使用对导致此异常的内部异常的引用来初始化 <see cref="AggregateSourceException"/> 类的新实例。
 		/// </summary>
@@ -59,7 +58,7 @@ namespace Cyjb.IO
 		/// <exception cref="ArgumentNullException"><paramref name="innerExceptions"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="innerExceptions"/> 的元素为 <c>null</c>。</exception>
 		public AggregateSourceException(params SourceException[] innerExceptions)
-			: this(Resources.AggregateSourceException_DefaultMessage, innerExceptions as IList<SourceException>)
+			: this(Resources.OneOrMoreErrorsExisted, innerExceptions as IList<SourceException>)
 		{ }
 		/// <summary>
 		/// 使用指定的错误消息初始化 <see cref="AggregateSourceException"/> 类的新实例。
@@ -89,7 +88,7 @@ namespace Cyjb.IO
 				SourceException sourceExp = innerException as SourceException;
 				if (sourceExp == null)
 				{
-					throw CommonExceptions.InvalidCastFromTo(innerException.GetType(), typeof(SourceException));
+					throw CommonExceptions.InvalidCast(innerException.GetType(), typeof(SourceException));
 				}
 				this.innerExps = new[] { sourceExp };
 				this.innerExpsCollection = new ReadOnlyCollection<SourceException>(innerExps);
@@ -130,7 +129,7 @@ namespace Cyjb.IO
 			}
 			if (innerExceptions.Any(ex => ex == null))
 			{
-				throw CommonExceptions.InnerExceptionNull("innerExceptions");
+				throw CommonExceptions.CollectionItemNull("innerExceptions");
 			}
 			int cnt = innerExceptions.Count;
 			this.innerExps = new SourceException[cnt];
@@ -253,7 +252,7 @@ namespace Cyjb.IO
 			for (int i = 0; i < this.innerExps.Length; i++)
 			{
 				text.AppendLine();
-				text.AppendFormat(Resources.AggregateSourceException_ToString, i, this.innerExps[i]);
+				text.AppendFormat(Resources.AggregateSourceException_InnerException, i, this.innerExps[i]);
 			}
 			return text.ToString();
 		}

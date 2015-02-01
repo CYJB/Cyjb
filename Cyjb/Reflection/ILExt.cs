@@ -87,6 +87,11 @@ namespace Cyjb.Reflection
 		/// <remarks>会根据 <paramref name="index"/> 的值，选择最合适的 IL 指令。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
+		/// <overloads>
+		/// /// <summary>
+		/// 加载指定索引的参数。
+		/// </summary>
+		/// </overloads>
 		public static void EmitLoadArg(this ILGenerator il, int index)
 		{
 			if (il == null)
@@ -152,6 +157,77 @@ namespace Cyjb.Reflection
 			}
 		}
 		/// <summary>
+		/// 加载指定索引的参数，并转换为指定类型。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="index">要加载的参数索引。</param>
+		/// <param name="paramType">要加载的参数类型。</param>
+		/// <param name="targetType">要转换到的类型。</param>
+		/// <remarks>会根据 <paramref name="index"/> 的值，选择最合适的 IL 指令。</remarks>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="targetType"/> 为 <c>null</c>。</exception>
+		public static void EmitLoadArg(this ILGenerator il, int index, Type paramType, Type targetType)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (index < 0)
+			{
+				throw CommonExceptions.ArgumentNegative("index", index);
+			}
+			if (targetType == null)
+			{
+				throw CommonExceptions.ArgumentNull("targetType");
+			}
+			Contract.EndContractBlock();
+			EmitLoadArg(il, index, paramType, targetType, true);
+		}
+		/// <summary>
+		/// 加载指定索引的参数，并转换为指定类型。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="index">要加载的参数索引。</param>
+		/// <param name="paramType">要加载的参数类型。</param>
+		/// <param name="targetType">要转换到的类型。</param>
+		/// <param name="isChecked">是否执行溢出检查。</param>
+		/// <remarks>会根据 <paramref name="index"/> 的值，选择最合适的 IL 指令。</remarks>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="targetType"/> 为 <c>null</c>。</exception>
+		public static void EmitLoadArg(this ILGenerator il, int index, Type paramType, Type targetType, bool isChecked)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (index < 0)
+			{
+				throw CommonExceptions.ArgumentNegative("index", index);
+			}
+			if (targetType == null)
+			{
+				throw CommonExceptions.ArgumentNull("targetType");
+			}
+			Contract.EndContractBlock();
+			if (paramType == targetType)
+			{
+				il.EmitLoadArg(index);
+				return;
+			}
+			Converter converter = il.GetConversion(paramType, targetType);
+			if (converter.PassByAddr)
+			{
+				il.EmitLoadArgAddress(index);
+			}
+			else
+			{
+				il.EmitLoadArg(index);
+			}
+			converter.Emit(isChecked);
+		}
+		/// <summary>
 		/// 获取栈顶的值转换为相应的地址。
 		/// </summary>
 		/// <param name="il">IL 指令生成器。</param>
@@ -176,6 +252,135 @@ namespace Cyjb.Reflection
 		}
 
 		#endregion // 加载参数
+
+		#region 数组元素
+
+		/// <summary>
+		/// 将栈顶数据作为索引，加载数组元素。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="elementType">要加载的数组元素类型。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="elementType"/> 为 <c>null</c>。</exception>
+		public static void EmitLoadElement(this ILGenerator il, Type elementType)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (elementType == null)
+			{
+				throw CommonExceptions.ArgumentNull("elementType");
+			}
+			Contract.EndContractBlock();
+			if (!elementType.IsValueType)
+			{
+				il.Emit(OpCodes.Ldelem_Ref);
+			}
+			else if (elementType.IsEnum)
+			{
+				il.Emit(OpCodes.Ldelem, elementType);
+			}
+			else
+			{
+				switch (Type.GetTypeCode(elementType))
+				{
+					case TypeCode.Boolean:
+					case TypeCode.SByte:
+						il.Emit(OpCodes.Ldelem_I1);
+						break;
+					case TypeCode.Byte:
+						il.Emit(OpCodes.Ldelem_U1);
+						break;
+					case TypeCode.Int16:
+						il.Emit(OpCodes.Ldelem_I2);
+						break;
+					case TypeCode.Char:
+					case TypeCode.UInt16:
+						il.Emit(OpCodes.Ldelem_U2);
+						break;
+					case TypeCode.Int32:
+						il.Emit(OpCodes.Ldelem_I4);
+						break;
+					case TypeCode.UInt32:
+						il.Emit(OpCodes.Ldelem_U4);
+						break;
+					case TypeCode.Int64:
+					case TypeCode.UInt64:
+						il.Emit(OpCodes.Ldelem_I8);
+						break;
+					case TypeCode.Single:
+						il.Emit(OpCodes.Ldelem_R4);
+						break;
+					case TypeCode.Double:
+						il.Emit(OpCodes.Ldelem_R8);
+						break;
+					default:
+						il.Emit(OpCodes.Ldelem, elementType);
+						break;
+				}
+			}
+		}
+		/// <summary>
+		/// 将栈顶数据作为索引和值，替换给数组元素。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="elementType">要替换的数组元素类型。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="elementType"/> 为 <c>null</c>。</exception>
+		public static void EmitStoreElement(this ILGenerator il, Type elementType)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (elementType == null)
+			{
+				throw CommonExceptions.ArgumentNull("elementType");
+			}
+			Contract.EndContractBlock();
+			if (!elementType.IsValueType)
+			{
+				il.Emit(OpCodes.Stelem_Ref);
+			}
+			if (elementType.IsEnum)
+			{
+				il.Emit(OpCodes.Stelem, elementType);
+				return;
+			}
+			switch (Type.GetTypeCode(elementType))
+			{
+				case TypeCode.Boolean:
+				case TypeCode.SByte:
+				case TypeCode.Byte:
+					il.Emit(OpCodes.Stelem_I1);
+					break;
+				case TypeCode.Char:
+				case TypeCode.Int16:
+				case TypeCode.UInt16:
+					il.Emit(OpCodes.Stelem_I2);
+					break;
+				case TypeCode.Int32:
+				case TypeCode.UInt32:
+					il.Emit(OpCodes.Stelem_I4);
+					break;
+				case TypeCode.Int64:
+				case TypeCode.UInt64:
+					il.Emit(OpCodes.Stelem_I8);
+					break;
+				case TypeCode.Single:
+					il.Emit(OpCodes.Stelem_R4);
+					break;
+				case TypeCode.Double:
+					il.Emit(OpCodes.Stelem_R8);
+					break;
+				default:
+					il.Emit(OpCodes.Stelem, elementType);
+					break;
+			}
+		}
+
+		#endregion // 数组元素
 
 		#region 类型转换
 
@@ -207,7 +412,7 @@ namespace Cyjb.Reflection
 			Conversion conversion = ConversionFactory.GetConversion(inputType, outputType);
 			if (conversion == null)
 			{
-				throw CommonExceptions.InvalidCastFromTo(inputType, outputType);
+				throw CommonExceptions.InvalidCast(inputType, outputType);
 			}
 			if (conversion is FromNullableConversion)
 			{
@@ -243,7 +448,7 @@ namespace Cyjb.Reflection
 			Conversion conversion = ConversionFactory.GetConversion(inputType, outputType);
 			if (conversion == null)
 			{
-				throw CommonExceptions.InvalidCastFromTo(inputType, outputType);
+				throw CommonExceptions.InvalidCast(inputType, outputType);
 			}
 			return new Converter(conversion, il, inputType, outputType);
 		}

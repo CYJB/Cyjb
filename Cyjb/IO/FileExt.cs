@@ -28,6 +28,15 @@ namespace Cyjb.IO
 		/// </overloads>
 		public static string GetCultureSpecifiedFile(string path, string fileName)
 		{
+			if (path == null)
+			{
+				throw CommonExceptions.ArgumentNull("path");
+			}
+			if (fileName == null)
+			{
+				throw CommonExceptions.ArgumentNull("fileName");
+			}
+			Contract.EndContractBlock();
 			return GetCultureSpecifiedFile(path, fileName, CultureInfo.CurrentCulture);
 		}
 		/// <summary>
@@ -44,6 +53,14 @@ namespace Cyjb.IO
 		/// 中包含一个或多个无效字符。</exception>
 		public static string GetCultureSpecifiedFile(string path, string fileName, CultureInfo culture)
 		{
+			if (path == null)
+			{
+				throw CommonExceptions.ArgumentNull("path");
+			}
+			if (fileName == null)
+			{
+				throw CommonExceptions.ArgumentNull("fileName");
+			}
 			if (culture == null)
 			{
 				throw CommonExceptions.ArgumentNull("culture");

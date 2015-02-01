@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
+using System.Diagnostics.Contracts;
 
 namespace Cyjb
 {
@@ -10,28 +11,21 @@ namespace Cyjb
 	public sealed class DoubleComparer : Comparer<double>
 	{
 		/// <summary>
-		/// 默认的双精度浮点数比较器。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static DoubleComparer defaultComparer;
-		/// <summary>
 		/// 比较时使用的默认精度。
 		/// </summary>
 		public const double DefaultEpsilon = 1e-15;
+		/// <summary>
+		/// 默认的双精度浮点数比较器。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private static readonly DoubleComparer defaultComparer = new DoubleComparer(DefaultEpsilon);
 		/// <summary>
 		/// 获取默认的双精度浮点数比较器。
 		/// </summary>
 		/// <value>默认的双精度浮点数比较器。</value>
 		public new static DoubleComparer Default
 		{
-			get
-			{
-				if (defaultComparer == null)
-				{
-					Interlocked.CompareExchange(ref defaultComparer, new DoubleComparer(DefaultEpsilon), null);
-				}
-				return defaultComparer;
-			}
+			get { return defaultComparer; }
 		}
 		/// <summary>
 		/// 比较时使用的精度。
@@ -41,12 +35,14 @@ namespace Cyjb
 		/// 使用比较时要使用的精度，初始化 <see cref="DoubleComparer"/> 类的新实例。
 		/// </summary>
 		/// <param name="epsilon">比较时使用的精度。</param>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="epsilon"/> 小于 <c>0</c>。</exception>
 		public DoubleComparer(double epsilon)
 		{
 			if (epsilon <= 0)
 			{
 				throw CommonExceptions.ArgumentMustBePositive("epsilon", epsilon);
 			}
+			Contract.EndContractBlock();
 			this.epsilon = epsilon;
 		}
 
