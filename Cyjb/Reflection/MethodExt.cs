@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Threading;
 
 namespace Cyjb.Reflection
@@ -20,26 +21,95 @@ namespace Cyjb.Reflection
 		/// </summary>
 		internal const string ExplicitMethodName = "op_Explicit";
 
-		#region 无复制方法参数
+		#region 方法参数
 
 		/// <summary>
 		/// 获取参数列表而不复制的委托。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static readonly Func<MethodInfo, ParameterInfo[]> getParametersNoCopy =
-			typeof(MethodInfo).CreateDelegate<Func<MethodInfo, ParameterInfo[]>>("GetParametersNoCopy");
+		private static readonly Func<MethodBase, ParameterInfo[]> getParametersNoCopy = BuildGetParametersNoCopy();
+		/// <summary>
+		/// 构造获取参数列表而不复制的委托，兼容 Mono 运行时。
+		/// </summary>
+		/// <returns>获取参数列表而不复制的委托。</returns>
+		private static Func<MethodBase, ParameterInfo[]> BuildGetParametersNoCopy()
+		{
+			if (!TypeExt.IsMonoRuntime)
+			{
+				// 为了防止 DelegateBuilder 里调用 GetParametersNoCopy 而导致死循环，这里必须使用 Delegate.CreateDelegate 方法。
+				MethodInfo methodGetParametersNoCopy = typeof(MethodBase).GetMethod("GetParametersNoCopy", TypeExt.InstanceFlag);
+				return (Func<MethodBase, ParameterInfo[]>)Delegate.CreateDelegate(typeof(Func<MethodBase, ParameterInfo[]>),
+					methodGetParametersNoCopy);
+			}
+			Type monoMethodInfo = Type.GetType("System.Reflection.MonoMethodInfo");
+			Contract.Assume(monoMethodInfo != null);
+			MethodInfo getParamsInfoMethod = monoMethodInfo.GetMethod("GetParametersInfo", TypeExt.StaticFlag);
+			Type monoMethod = Type.GetType("System.Reflection.MonoMethod");
+			Contract.Assume(monoMethod != null);
+			FieldInfo mhandleField = monoMethod.GetField("mhandle", TypeExt.InstanceFlag);
+			Contract.Assume(mhandleField != null);
+			DynamicMethod method = new DynamicMethod("GetParametersNoCopy", typeof(ParameterInfo[]),
+				new[] { typeof(MethodBase) }, true);
+			ILGenerator il = method.GetILGenerator();
+			il.Emit(OpCodes.Ldarg_0);
+			il.Emit(OpCodes.Ldfld, mhandleField);
+			il.Emit(OpCodes.Ldarg_0);
+			il.Emit(OpCodes.Call, getParamsInfoMethod);
+			il.Emit(OpCodes.Ret);
+			return (Func<MethodBase, ParameterInfo[]>)method.CreateDelegate(typeof(Func<MethodBase, ParameterInfo[]>));
+		}
 		/// <summary>
 		/// 返回当前方法的参数列表，而不会复制参数列表。
 		/// </summary>
 		/// <param name="method">要获取参数列表的方法。</param>
 		/// <returns>方法的参数列表。</returns>
 		[Pure]
-		public static ParameterInfo[] GetParametersNoCopy(this MethodInfo method)
+		public static ParameterInfo[] GetParametersNoCopy(this MethodBase method)
 		{
 			return getParametersNoCopy(method);
 		}
+		/// <summary>
+		/// 返回当前方法的参数类型列表。
+		/// </summary>
+		/// <param name="method">要获取参数类型列表的方法。</param>
+		/// <returns>方法的参数类型列表。</returns>
+		public static Type[] GetParameterTypes(this MethodBase method)
+		{
+			ParameterInfo[] parameters = method.GetParametersNoCopy();
+			if (parameters.Length == 0)
+			{
+				return Type.EmptyTypes;
+			}
+			Type[] types = new Type[parameters.Length];
+			for (int i = 0; i < types.Length; i++)
+			{
+				types[i] = parameters[i].ParameterType;
+			}
+			return types;
+		}
+		/// <summary>
+		/// 返回当前方法的参数类型列表，那么最后一个类型表示返回值类型。
+		/// </summary>
+		/// <param name="method">要获取参数类型列表的方法。</param>
+		/// <returns>方法的参数类型列表。</returns>
+		public static Type[] GetParameterTypesWithReturn(this MethodInfo method)
+		{
+			ParameterInfo[] parameters = method.GetParametersNoCopy();
+			if (parameters.Length == 0)
+			{
+				return new[] { method.ReturnType };
+			}
+			Type[] types = new Type[parameters.Length + 1];
+			int i = 0;
+			for (; i < parameters.Length; i++)
+			{
+				types[i] = parameters[i].ParameterType;
+			}
+			types[i] = method.ReturnType;
+			return types;
+		}
 
-		#endregion // 无复制方法参数
+		#endregion // 方法参数
 
 		#region 参数顺序
 
