@@ -64,6 +64,7 @@
     <Compile Include="IO\UnitTestSourceRange.cs" />
     <Compile Include="UnitTestConvert.cs" />
     <Compile Include="UnitTestDelegateBuilder.cs" />
+    <Compile Include="UnitTestMethodSwitcher.cs" />
     <Compile Include="UnitTestMethodExt.cs" />
     <Compile Include="UnitTestTextValuePair`1.cs" />
     <Compile Include="UnitTestEnumExt.cs" />
