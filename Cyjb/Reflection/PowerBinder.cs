@@ -197,7 +197,7 @@ namespace Cyjb.Reflection
 			}
 			if (match.Length == 0)
 			{
-				throw CommonExceptions.ArrayEmpty("match");
+				throw CommonExceptions.CollectionEmpty("match");
 			}
 			// 检查参数名称数组，不能出现名称相同的两个参数。
 			if (names != null)
@@ -299,7 +299,7 @@ namespace Cyjb.Reflection
 			}
 			if (match.Length == 0)
 			{
-				throw CommonExceptions.ArrayEmpty("match");
+				throw CommonExceptions.CollectionEmpty("match");
 			}
 			// 构造方法信息数组。
 			MatchInfo[] infos = new MatchInfo[match.Length];
@@ -1002,16 +1002,16 @@ namespace Cyjb.Reflection
 			if (allowCast)
 			{
 				// 可以从 type 隐式转换的类型会更匹配，仅当允许强制类型转换时才需要检测。
-				t1FromT = Convert.GetConvertType(type, type1).IsImplicit();
-				bool t2FromT = Convert.GetConvertType(type, type2).IsImplicit();
+				t1FromT = type1.IsImplicitFrom(type);
+				bool t2FromT = type2.IsImplicitFrom(type);
 				if (t1FromT != t2FromT)
 				{
 					return t1FromT ? 1 : 2;
 				}
 			}
 			// 判断 type1 和 type2 间的隐式类型转换关系。
-			bool t1FromT2 = Convert.GetConvertType(type2, type1).IsImplicit();
-			bool t2FromT1 = Convert.GetConvertType(type1, type2).IsImplicit();
+			bool t1FromT2 = type1.IsImplicitFrom(type2);
+			bool t2FromT1 = type2.IsImplicitFrom(type1);
 			if (t1FromT2 == t2FromT1)
 			{
 				return 0;

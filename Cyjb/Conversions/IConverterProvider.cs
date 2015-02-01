@@ -56,7 +56,7 @@ namespace Cyjb
 			{
 				return false;
 			}
-			MethodInfo method = dlg.GetType().GetMethod("Invoke");
+			MethodInfo method = dlg.GetInvokeMethod();
 			if (method.ReturnType != outputType)
 			{
 				return false;
@@ -79,7 +79,7 @@ namespace Cyjb
 			{
 				return false;
 			}
-			MethodInfo method = dlg.GetType().GetMethod("Invoke");
+			MethodInfo method = dlg.GetInvokeMethod();
 			if (method.ReturnType != provider.OriginType)
 			{
 				return false;

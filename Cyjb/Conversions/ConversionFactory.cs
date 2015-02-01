@@ -613,7 +613,9 @@ namespace Cyjb.Conversions
 				case ConversionType.ExplicitNullableConversion:
 					// 包含部分转换，需要判断是否存在反向隐式转换。
 					// 此时 inputType 和 outputType 一定都是值类型。
-					return GetBetweenValueTypeConversion(outputType, inputType).ConversionType.IsImplicit() ?
+					Conversion reversedConversion = GetBetweenValueTypeConversion(outputType, inputType);
+					Contract.Assume(reversedConversion != null);
+					return reversedConversion.ConversionType.IsImplicit() ?
 						conversion.ConversionType : ConversionType.None;
 				case ConversionType.ExplicitReferenceConversion:
 					// 包含部分转换，需要判断是否存在反向转换。

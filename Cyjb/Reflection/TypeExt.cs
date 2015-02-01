@@ -5,6 +5,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Cyjb.Conversions;
 
 namespace Cyjb.Reflection
 {
@@ -14,15 +15,40 @@ namespace Cyjb.Reflection
 	public static class TypeExt
 	{
 		/// <summary>
-		/// 搜索公共静态方法的绑定标志。
+		/// 搜索公共静态成员的绑定标志。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		internal const BindingFlags PublicStaticFlag = BindingFlags.Public | BindingFlags.Static;
 		/// <summary>
-		/// 搜索公共或私有静态方法的绑定标志。
+		/// 搜索公共或私有静态成员的绑定标志。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		internal const BindingFlags StaticFlag = BindingFlags.NonPublic | PublicStaticFlag;
+		/// <summary>
+		/// 搜索公共实例成员的绑定标志。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		internal const BindingFlags PublicInstanceFlag = BindingFlags.Public | BindingFlags.Instance;
+		/// <summary>
+		/// 搜索公共或私有实例成员的绑定标志。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		internal const BindingFlags InstanceFlag = BindingFlags.NonPublic | PublicInstanceFlag;
+		/// <summary>
+		/// 搜索公共实例或静态成员的绑定标志。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		internal const BindingFlags PublicFlag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
+		/// <summary>
+		/// 搜索公共或私有实例或静态成员的绑定标志。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		internal const BindingFlags AllMemberFlag = BindingFlags.NonPublic | PublicFlag;
+		/// <summary>
+		/// 是否运行在 Mono 运行时中。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		internal static readonly bool IsMonoRuntime = Type.GetType("Mono.Runtime") != null;
 
 		#region 类型判断
 
@@ -134,6 +160,184 @@ namespace Cyjb.Reflection
 		}
 
 		#endregion // 类型判断
+
+		#region 类型转换
+
+		/// <summary>
+		/// 确定当前 <see cref="Type"/> 的实例是否可以从 <paramref name="fromType"/> 的实例隐式类型转换得到。
+		/// 这里仅考虑预定义的隐式类型转换，不考虑由 <c>implicit</c> 运算符指定的转换。
+		/// </summary>
+		/// <param name="type">当前类型。</param>
+		/// <param name="fromType">要判断能否隐式类型转换得到的类型。</param>
+		/// <returns>如果当前 <see cref="Type"/> 的实例是否可以从 <paramref name="fromType"/> 
+		/// 的实例隐式类型转换得到，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="fromType"/> 为 <c>null</c>。</exception>
+		/// <remarks>
+		/// 判断类型间能否进行隐式类型转换的算法来自于 《CSharp Language Specification》v5.0 
+		/// 的第 6.1 节。</remarks>
+		/// <example>
+		/// 下面是 <see cref="IsImplicitFrom"/> 方法与 <see cref="Type.IsAssignableFrom"/> 方法的一些对比。
+		/// <code>
+		/// Console.WriteLine(typeof(object).IsAssignableFrom(typeof(uint))); // True 
+		/// Console.WriteLine(typeof(object).IsImplicitFrom(typeof(uint))); // True
+		/// Console.WriteLine(typeof(int).IsAssignableFrom(typeof(short))); // False
+		/// Console.WriteLine(typeof(int).IsImplicitFrom(typeof(short))); // True
+		/// Console.WriteLine(typeof(long?).IsAssignableFrom(typeof(int?))); // False
+		/// Console.WriteLine(typeof(long?).IsImplicitFrom(typeof(int?))); // True
+		/// </code>
+		/// </example>
+		/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/TypeAssignableFrom.html">
+		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</seealso>
+		public static bool IsImplicitFrom(this Type type, Type fromType)
+		{
+			if (type == null)
+			{
+				throw CommonExceptions.ArgumentNull("type");
+			}
+			if (fromType == null)
+			{
+				throw CommonExceptions.ArgumentNull("otherType");
+			}
+			Contract.EndContractBlock();
+			Conversion conversion = ConversionFactory.GetPreDefinedConversion(fromType, type);
+			return conversion != null && conversion.ConversionType.IsImplicit();
+		}
+		/// <summary>
+		/// 确定当前 <see cref="Type"/> 的实例是否可以从 <paramref name="fromType"/> 的实例显式类型转换得到。
+		/// 这里仅考虑预定义的显式类型转换，不考虑由 <c>implicit</c> 运算符和 <c>explicit</c> 运算符指定的转换。
+		/// </summary>
+		/// <param name="type">当前类型。</param>
+		/// <param name="fromType">要判断能否显式类型转换得到的类型。</param>
+		/// <returns>如果当前 <see cref="Type"/> 的实例是否可以从 <paramref name="fromType"/> 
+		/// 的实例显式类型转换得到，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="fromType"/> 为 <c>null</c>。</exception>
+		/// <remarks>
+		/// 判断类型间能否进行显式类型转换的算法来自于 《CSharp Language Specification》v5.0 
+		/// 的第 6.1 节。</remarks>
+		/// <example>
+		/// 下面是 <see cref="IsImplicitFrom"/> 方法的一些实例。
+		/// <code>
+		/// Console.WriteLine(typeof(uint).IsExplicitFrom(typeof(object))); // True
+		/// Console.WriteLine(typeof(short).IsExplicitFrom(typeof(int))); // True
+		/// Console.WriteLine(typeof(int).IsExplicitFrom(typeof(long?))); // True
+		/// </code>
+		/// </example>
+		/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/TypeAssignableFrom.html">
+		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</seealso>
+		public static bool IsExplicitFrom(this Type type, Type fromType)
+		{
+			if (type == null)
+			{
+				throw CommonExceptions.ArgumentNull("type");
+			}
+			if (fromType == null)
+			{
+				throw CommonExceptions.ArgumentNull("otherType");
+			}
+			Contract.EndContractBlock();
+			Conversion conversion = ConversionFactory.GetPreDefinedConversion(fromType, type);
+			return conversion != null && conversion.ConversionType != ConversionType.None;
+		}
+		/// <summary>
+		/// 返回 <paramref name="types"/> 中能够包含其它所有类型的类型。
+		/// </summary>
+		/// <param name="types">类型集合。</param>
+		/// <returns><paramref name="types"/> 中能够包含其它所有类型的类型，如果不存在则为 <c>null</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="types"/> 为 <c>null</c>。</exception>
+		/// <remarks>若 A 类型可以隐式类型转换（指预定义的类型转换）为 B 类型，那么就称 A 被 B 包含，而 B 包含 A。</remarks>
+		public static Type GetEncompassingType(IEnumerable<Type> types)
+		{
+			if (types == null)
+			{
+				throw CommonExceptions.ArgumentNull("types");
+			}
+			Contract.EndContractBlock();
+			Type encompassingType = null;
+			foreach (Type type in types)
+			{
+				if (type == null)
+				{
+					continue;
+				}
+				if (encompassingType == null)
+				{
+					encompassingType = type;
+				}
+				else if (encompassingType != type)
+				{
+					// 这里剔除 void 类型，但若 types 全部是 void，能够使得结果是 void。
+					if (encompassingType == typeof(void))
+					{
+						encompassingType = type;
+					}
+					else if (type != typeof(void))
+					{
+						ConversionType convType = ConversionFactory.GetStandardConversion(type, encompassingType);
+						if (convType == ConversionType.None)
+						{
+							return null;
+						}
+						if (convType.IsExplicit())
+						{
+							encompassingType = type;
+						}
+					}
+				}
+			}
+			return encompassingType;
+		}
+		/// <summary>
+		/// 返回 <paramref name="types"/> 中能够被其它所有类型包含的类型。
+		/// </summary>
+		/// <param name="types">类型集合。</param>
+		/// <returns><paramref name="types"/> 中能够被其它所有类型包含的类型，如果不存在则为 <c>null</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="types"/> 为 <c>null</c>。</exception>
+		/// <remarks>若 A 类型可以隐式类型转换（指预定义的类型转换）为 B 类型，那么就称 A 被 B 包含，而 B 包含 A。</remarks>
+		public static Type GetEncompassedType(IEnumerable<Type> types)
+		{
+			if (types == null)
+			{
+				throw CommonExceptions.ArgumentNull("types");
+			}
+			Contract.EndContractBlock();
+			Type encompassedType = null;
+			foreach (Type type in types)
+			{
+				if (type == null)
+				{
+					continue;
+				}
+				if (encompassedType == null)
+				{
+					encompassedType = type;
+				}
+				else if (encompassedType != type)
+				{
+					// 这里剔除 void 类型，但若 types 全部是 void，能够使得结果是 void。
+					if (encompassedType == typeof(void))
+					{
+						encompassedType = type;
+					}
+					else if (type != typeof(void))
+					{
+						ConversionType convType = ConversionFactory.GetStandardConversion(encompassedType, type);
+						if (convType == ConversionType.None)
+						{
+							return null;
+						}
+						if (convType.IsExplicit())
+						{
+							encompassedType = type;
+						}
+					}
+				}
+			}
+			return encompassedType;
+		}
+
+		#endregion // 类型转换
 
 		#region 返回泛型类型定义的封闭构造类型
 
@@ -683,7 +887,7 @@ namespace Cyjb.Reflection
 				{
 					lowerBounds.Add(type);
 				}
-				else if (!Convert.GetConvertType(type, exactBound).IsImplicit())
+				else if (!exactBound.IsImplicitFrom(type))
 				{
 					// 与精确界限冲突。
 					return false;
@@ -701,7 +905,7 @@ namespace Cyjb.Reflection
 				{
 					upperBounds.Add(type);
 				}
-				else if (!Convert.GetConvertType(exactBound, type).IsImplicit())
+				else if (!type.IsImplicitFrom(exactBound))
 				{
 					// 与精确界限冲突。
 					return false;
@@ -760,7 +964,7 @@ namespace Cyjb.Reflection
 							for (; k < cnt; k++)
 							{
 								if (k == j) { continue; }
-								if (!Convert.GetConvertType(list[k], list[j]).IsImplicit())
+								if (!list[j].IsImplicitFrom(list[k]))
 								{
 									break;
 								}
@@ -798,11 +1002,11 @@ namespace Cyjb.Reflection
 			{
 				foreach (Type type in lowerBounds)
 				{
-					if (!Convert.GetConvertType(type, testType).IsImplicit()) { return false; }
+					if (!testType.IsImplicitFrom(type)) { return false; }
 				}
 				foreach (Type type in upperBounds)
 				{
-					if (!Convert.GetConvertType(testType, type).IsImplicit()) { return false; }
+					if (!testType.IsImplicitFrom(type)) { return false; }
 				}
 				return true;
 			}
@@ -840,10 +1044,31 @@ namespace Cyjb.Reflection
 				{
 					text.Append(',');
 				}
+				Contract.Assume(args[i] != null);
 				text.Append(args[i].FullName());
 			}
 			text.Append(']');
 			return text.ToString();
+		}
+		/// <summary>
+		/// 获取委托类型的 Invoke 方法。
+		/// </summary>
+		/// <param name="dlg">委托。</param>
+		/// <returns>委托类型的 Invoke 方法。</returns>
+		internal static MethodInfo GetInvokeMethod(this Delegate dlg)
+		{
+			Contract.Requires(dlg != null);
+			return dlg.GetType().GetMethod("Invoke");
+		}
+		/// <summary>
+		/// 获取委托类型的 Invoke 方法。
+		/// </summary>
+		/// <param name="type">委托类型。</param>
+		/// <returns>委托类型的 Invoke 方法。</returns>
+		internal static MethodInfo GetInvokeMethod(this Type type)
+		{
+			Contract.Requires(type != null && type.IsSubclassOf(typeof(Delegate)));
+			return type.GetMethod("Invoke");
 		}
 		/// <summary>
 		/// 返回获取类型的数组深度。

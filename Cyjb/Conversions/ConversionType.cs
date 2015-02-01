@@ -6,7 +6,7 @@ namespace Cyjb
 	/// 表示类型转换的类型。
 	/// </summary>
 	[SuppressMessage("Microsoft.Design", "CA1028:EnumStorageShouldBeInt32")]
-	public enum ConversionType : byte
+	internal enum ConversionType : byte
 	{
 		/// <summary>
 		/// 表示不存在预定义转换。
@@ -58,9 +58,9 @@ namespace Cyjb
 		UserDefinedConversion,
 	}
 	/// <summary>
-	/// 提供 <see cref="ConversionType"/> 类的扩展方法。
+	/// 提供 <see cref="ConversionType"/> 枚举的扩展方法。
 	/// </summary>
-	public static class ConversionTypeExt
+	internal static class ConversionTypeExt
 	{
 		/// <summary>
 		/// 获取当前类型转换是否是隐式类型转换。

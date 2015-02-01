@@ -657,7 +657,9 @@ namespace Cyjb
 			do
 			{
 				uint quot = value / uBase;
-				buffer[idx--] = CharExt.BaseDigits[value - quot * uBase];
+				int rem = (int)(value - quot * uBase);
+				Contract.Assume(rem >= 0);
+				buffer[idx--] = CharExt.BaseDigits[rem];
 				value = quot;
 			} while (value > 0);
 			return idx + 1;
@@ -680,7 +682,9 @@ namespace Cyjb
 			do
 			{
 				ulong quot = value / ulBase;
-				buffer[idx--] = CharExt.BaseDigits[value - quot * ulBase];
+				int rem = (int)(value - quot * ulBase);
+				Contract.Assume(rem >= 0);
+				buffer[idx--] = CharExt.BaseDigits[rem];
 				value = quot;
 			} while (value > 0);
 			return idx + 1;

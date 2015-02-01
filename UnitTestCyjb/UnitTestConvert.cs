@@ -25,18 +25,87 @@ namespace UnitTestCyjb
 		public void TestIdentityConversion()
 		{
 			TestChangeType(-42341, -42341);
-			Assert.AreEqual(ConversionType.IdentityConversion, Convert.GetConvertType(typeof(int), typeof(int)));
+			Assert.AreEqual(ConversionType.IdentityConversion, GetConverterType(typeof(int), typeof(int)));
 			int[] arr = { 10, 20, 30 };
 			TestChangeType(arr, arr);
-			Assert.AreEqual(ConversionType.IdentityConversion, Convert.GetConvertType(typeof(int[]), typeof(int[])));
+			Assert.AreEqual(ConversionType.IdentityConversion, GetConverterType(typeof(int[]), typeof(int[])));
 			List<int> list = new List<int>();
 			TestChangeType(list, list);
-			Assert.AreEqual(ConversionType.IdentityConversion, Convert.GetConvertType(typeof(List<int>), typeof(List<int>)));
+			Assert.AreEqual(ConversionType.IdentityConversion, GetConverterType(typeof(List<int>), typeof(List<int>)));
 		}
 		private static void TestChangeType<TInput, TOutput>(TInput value, TOutput expected)
 		{
 			Assert.AreEqual(expected, Convert.ChangeType<TInput, TOutput>(value));
 			Assert.AreEqual(expected, Convert.GetConverter(typeof(TInput), typeof(TOutput))(value));
+		}
+		private static readonly Func<Type, Type, object> getConversion = Type.GetType(
+			"Cyjb.Conversions.ConversionFactory, Cyjb, Version=0.1.0.0, Culture=neutral, PublicKeyToken=40880b37bef542a8")
+			.CreateDelegate<Func<Type, Type, object>>("GetConversion");
+		private static readonly Func<object, ConversionType> getConversionType = Type.GetType(
+			"Cyjb.Conversions.Conversion, Cyjb, Version=0.1.0.0, Culture=neutral, PublicKeyToken=40880b37bef542a8")
+			.CreateDelegate<Func<object, ConversionType>>("ConversionType");
+		private static ConversionType GetConverterType(Type inputType, Type outputType)
+		{
+			object conversion = getConversion(inputType, outputType);
+			if (conversion == null)
+			{
+				return ConversionType.None;
+			}
+			return getConversionType(conversion);
+		}
+		/// <summary>
+		/// 表示类型转换的类型。
+		/// </summary>
+		private enum ConversionType
+		{
+			/// <summary>
+			/// 表示不存在预定义转换。
+			/// </summary>
+			None,
+			/// <summary>
+			/// 表示标识转换。
+			/// </summary>
+			IdentityConversion,
+			/// <summary>
+			/// 表示隐式数值转换。
+			/// </summary>
+			ImplicitNumericConversion,
+			/// <summary>
+			/// 表示可空类型的隐式转换。
+			/// </summary>
+			ImplicitNullableConversion,
+			/// <summary>
+			/// 表示装箱转换。
+			/// </summary>
+			BoxConversion,
+			/// <summary>
+			/// 表示隐式引用转换。
+			/// </summary>
+			ImplicitReferenceConversion,
+			/// <summary>
+			/// 表示显式数值转换。
+			/// </summary>
+			ExplicitNumericConversion,
+			/// <summary>
+			/// 表示显式枚举转换。
+			/// </summary>
+			EnumConversion,
+			/// <summary>
+			/// 表示可空类型的显式转换。
+			/// </summary>
+			ExplicitNullableConversion,
+			/// <summary>
+			/// 表示拆箱转换。
+			/// </summary>
+			UnboxConversion,
+			/// <summary>
+			/// 表示显式引用转换。
+			/// </summary>
+			ExplicitReferenceConversion,
+			/// <summary>
+			/// 表示用户定义的转换。
+			/// </summary>
+			UserDefinedConversion,
 		}
 
 		#endregion // 测试相等转换
@@ -71,315 +140,315 @@ namespace UnitTestCyjb
 		{
 			// SByte
 			TestConverter(sbyteValues, v => checked(v), v => unchecked(v));
-			Assert.AreEqual(ConversionType.IdentityConversion, Convert.GetConvertType(typeof(sbyte), typeof(sbyte)));
+			Assert.AreEqual(ConversionType.IdentityConversion, GetConverterType(typeof(sbyte), typeof(sbyte)));
 			TestConverter(sbyteValues, v => checked((byte)v), v => unchecked((byte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(sbyte), typeof(byte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(sbyte), typeof(byte)));
 			TestConverter(sbyteValues, v => checked((short)v), v => unchecked((short)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(sbyte), typeof(short)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(sbyte), typeof(short)));
 			TestConverter(sbyteValues, v => checked((ushort)v), v => unchecked((ushort)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(sbyte), typeof(ushort)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(sbyte), typeof(ushort)));
 			TestConverter(sbyteValues, v => checked((int)v), v => unchecked((int)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(sbyte), typeof(int)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(sbyte), typeof(int)));
 			TestConverter(sbyteValues, v => checked((uint)v), v => unchecked((uint)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(sbyte), typeof(uint)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(sbyte), typeof(uint)));
 			TestConverter(sbyteValues, v => checked((long)v), v => unchecked((long)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(sbyte), typeof(long)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(sbyte), typeof(long)));
 			TestConverter(sbyteValues, v => checked((ulong)v), v => unchecked((ulong)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(sbyte), typeof(ulong)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(sbyte), typeof(ulong)));
 			TestConverter(sbyteValues, v => checked((char)v), v => unchecked((char)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(sbyte), typeof(char)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(sbyte), typeof(char)));
 			TestConverter(sbyteValues, v => checked((float)v), v => unchecked((float)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(sbyte), typeof(float)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(sbyte), typeof(float)));
 			TestConverter(sbyteValues, v => checked((double)v), v => unchecked((double)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(sbyte), typeof(double)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(sbyte), typeof(double)));
 			TestConverter(sbyteValues, v => checked((decimal)v), v => unchecked((decimal)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(sbyte), typeof(decimal)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(sbyte), typeof(decimal)));
 
 			// Byte
 			TestConverter(byteValues, v => checked((sbyte)v), v => unchecked((sbyte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(byte), typeof(sbyte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(byte), typeof(sbyte)));
 			TestConverter(byteValues, v => checked(v), v => unchecked(v));
-			Assert.AreEqual(ConversionType.IdentityConversion, Convert.GetConvertType(typeof(byte), typeof(byte)));
+			Assert.AreEqual(ConversionType.IdentityConversion, GetConverterType(typeof(byte), typeof(byte)));
 			TestConverter(byteValues, v => checked((short)v), v => unchecked((short)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(byte), typeof(short)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(byte), typeof(short)));
 			TestConverter(byteValues, v => checked((ushort)v), v => unchecked((ushort)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(byte), typeof(ushort)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(byte), typeof(ushort)));
 			TestConverter(byteValues, v => checked((int)v), v => unchecked((int)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(byte), typeof(int)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(byte), typeof(int)));
 			TestConverter(byteValues, v => checked((uint)v), v => unchecked((uint)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(byte), typeof(uint)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(byte), typeof(uint)));
 			TestConverter(byteValues, v => checked((long)v), v => unchecked((long)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(byte), typeof(long)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(byte), typeof(long)));
 			TestConverter(byteValues, v => checked((ulong)v), v => unchecked((ulong)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(byte), typeof(ulong)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(byte), typeof(ulong)));
 			TestConverter(byteValues, v => checked((char)v), v => unchecked((char)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(byte), typeof(char)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(byte), typeof(char)));
 			TestConverter(byteValues, v => checked((float)v), v => unchecked((float)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(byte), typeof(float)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(byte), typeof(float)));
 			TestConverter(byteValues, v => checked((double)v), v => unchecked((double)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(byte), typeof(double)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(byte), typeof(double)));
 			TestConverter(byteValues, v => checked((decimal)v), v => unchecked((decimal)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(byte), typeof(decimal)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(byte), typeof(decimal)));
 
 			// Int16
 			TestConverter(shortValues, v => checked((sbyte)v), v => unchecked((sbyte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(short), typeof(sbyte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(short), typeof(sbyte)));
 			TestConverter(shortValues, v => checked((byte)v), v => unchecked((byte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(short), typeof(byte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(short), typeof(byte)));
 			TestConverter(shortValues, v => checked(v), v => unchecked(v));
-			Assert.AreEqual(ConversionType.IdentityConversion, Convert.GetConvertType(typeof(short), typeof(short)));
+			Assert.AreEqual(ConversionType.IdentityConversion, GetConverterType(typeof(short), typeof(short)));
 			TestConverter(shortValues, v => checked((ushort)v), v => unchecked((ushort)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(short), typeof(ushort)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(short), typeof(ushort)));
 			TestConverter(shortValues, v => checked((int)v), v => unchecked((int)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(short), typeof(int)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(short), typeof(int)));
 			TestConverter(shortValues, v => checked((uint)v), v => unchecked((uint)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(short), typeof(uint)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(short), typeof(uint)));
 			TestConverter(shortValues, v => checked((long)v), v => unchecked((long)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(short), typeof(long)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(short), typeof(long)));
 			TestConverter(shortValues, v => checked((ulong)v), v => unchecked((ulong)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(short), typeof(ulong)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(short), typeof(ulong)));
 			TestConverter(shortValues, v => checked((char)v), v => unchecked((char)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(short), typeof(char)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(short), typeof(char)));
 			TestConverter(shortValues, v => checked((float)v), v => unchecked((float)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(short), typeof(float)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(short), typeof(float)));
 			TestConverter(shortValues, v => checked((double)v), v => unchecked((double)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(short), typeof(double)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(short), typeof(double)));
 			TestConverter(shortValues, v => checked((decimal)v), v => unchecked((decimal)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(short), typeof(decimal)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(short), typeof(decimal)));
 
 			// UInt16
 			TestConverter(ushortValues, v => checked((sbyte)v), v => unchecked((sbyte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(ushort), typeof(sbyte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(ushort), typeof(sbyte)));
 			TestConverter(ushortValues, v => checked((byte)v), v => unchecked((byte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(ushort), typeof(byte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(ushort), typeof(byte)));
 			TestConverter(ushortValues, v => checked((short)v), v => unchecked((short)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(ushort), typeof(short)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(ushort), typeof(short)));
 			TestConverter(ushortValues, v => checked(v), v => unchecked(v));
-			Assert.AreEqual(ConversionType.IdentityConversion, Convert.GetConvertType(typeof(ushort), typeof(ushort)));
+			Assert.AreEqual(ConversionType.IdentityConversion, GetConverterType(typeof(ushort), typeof(ushort)));
 			TestConverter(ushortValues, v => checked((int)v), v => unchecked((int)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(ushort), typeof(int)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(ushort), typeof(int)));
 			TestConverter(ushortValues, v => checked((uint)v), v => unchecked((uint)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(ushort), typeof(uint)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(ushort), typeof(uint)));
 			TestConverter(ushortValues, v => checked((long)v), v => unchecked((long)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(ushort), typeof(long)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(ushort), typeof(long)));
 			TestConverter(ushortValues, v => checked((ulong)v), v => unchecked((ulong)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(ushort), typeof(ulong)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(ushort), typeof(ulong)));
 			TestConverter(ushortValues, v => checked((char)v), v => unchecked((char)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(ushort), typeof(char)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(ushort), typeof(char)));
 			TestConverter(ushortValues, v => checked((float)v), v => unchecked((float)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(ushort), typeof(float)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(ushort), typeof(float)));
 			TestConverter(ushortValues, v => checked((double)v), v => unchecked((double)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(ushort), typeof(double)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(ushort), typeof(double)));
 			TestConverter(ushortValues, v => checked((decimal)v), v => unchecked((decimal)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(ushort), typeof(decimal)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(ushort), typeof(decimal)));
 
 			// Int32
 			TestConverter(intValues, v => checked((sbyte)v), v => unchecked((sbyte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(int), typeof(sbyte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(int), typeof(sbyte)));
 			TestConverter(intValues, v => checked((byte)v), v => unchecked((byte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(int), typeof(byte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(int), typeof(byte)));
 			TestConverter(intValues, v => checked((short)v), v => unchecked((short)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(int), typeof(short)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(int), typeof(short)));
 			TestConverter(intValues, v => checked((ushort)v), v => unchecked((ushort)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(int), typeof(ushort)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(int), typeof(ushort)));
 			TestConverter(intValues, v => checked(v), v => unchecked(v));
-			Assert.AreEqual(ConversionType.IdentityConversion, Convert.GetConvertType(typeof(int), typeof(int)));
+			Assert.AreEqual(ConversionType.IdentityConversion, GetConverterType(typeof(int), typeof(int)));
 			TestConverter(intValues, v => checked((uint)v), v => unchecked((uint)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(int), typeof(uint)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(int), typeof(uint)));
 			TestConverter(intValues, v => checked((long)v), v => unchecked((long)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(int), typeof(long)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(int), typeof(long)));
 			TestConverter(intValues, v => checked((ulong)v), v => unchecked((ulong)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(int), typeof(ulong)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(int), typeof(ulong)));
 			TestConverter(intValues, v => checked((char)v), v => unchecked((char)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(int), typeof(char)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(int), typeof(char)));
 			TestConverter(intValues, v => checked((float)v), v => unchecked((float)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(int), typeof(float)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(int), typeof(float)));
 			TestConverter(intValues, v => checked((double)v), v => unchecked((double)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(int), typeof(double)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(int), typeof(double)));
 			TestConverter(intValues, v => checked((decimal)v), v => unchecked((decimal)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(int), typeof(decimal)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(int), typeof(decimal)));
 
 			// UInt32
 			TestConverter(uintValues, v => checked((sbyte)v), v => unchecked((sbyte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(uint), typeof(sbyte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(uint), typeof(sbyte)));
 			TestConverter(uintValues, v => checked((byte)v), v => unchecked((byte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(uint), typeof(byte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(uint), typeof(byte)));
 			TestConverter(uintValues, v => checked((short)v), v => unchecked((short)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(uint), typeof(short)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(uint), typeof(short)));
 			TestConverter(uintValues, v => checked((ushort)v), v => unchecked((ushort)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(uint), typeof(ushort)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(uint), typeof(ushort)));
 			TestConverter(uintValues, v => checked((int)v), v => unchecked((int)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(uint), typeof(int)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(uint), typeof(int)));
 			TestConverter(uintValues, v => checked(v), v => unchecked(v));
-			Assert.AreEqual(ConversionType.IdentityConversion, Convert.GetConvertType(typeof(uint), typeof(uint)));
+			Assert.AreEqual(ConversionType.IdentityConversion, GetConverterType(typeof(uint), typeof(uint)));
 			TestConverter(uintValues, v => checked((long)v), v => unchecked((long)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(uint), typeof(long)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(uint), typeof(long)));
 			TestConverter(uintValues, v => checked((ulong)v), v => unchecked((ulong)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(uint), typeof(ulong)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(uint), typeof(ulong)));
 			TestConverter(uintValues, v => checked((char)v), v => unchecked((char)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(uint), typeof(char)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(uint), typeof(char)));
 			TestConverter(uintValues, v => checked((float)v), v => unchecked((float)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(uint), typeof(float)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(uint), typeof(float)));
 			TestConverter(uintValues, v => checked((double)v), v => unchecked((double)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(uint), typeof(double)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(uint), typeof(double)));
 			TestConverter(uintValues, v => checked((decimal)v), v => unchecked((decimal)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(uint), typeof(decimal)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(uint), typeof(decimal)));
 
 			// Int64
 			TestConverter(longValues, v => checked((sbyte)v), v => unchecked((sbyte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(long), typeof(sbyte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(long), typeof(sbyte)));
 			TestConverter(longValues, v => checked((byte)v), v => unchecked((byte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(long), typeof(byte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(long), typeof(byte)));
 			TestConverter(longValues, v => checked((short)v), v => unchecked((short)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(long), typeof(short)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(long), typeof(short)));
 			TestConverter(longValues, v => checked((ushort)v), v => unchecked((ushort)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(long), typeof(ushort)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(long), typeof(ushort)));
 			TestConverter(longValues, v => checked((int)v), v => unchecked((int)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(long), typeof(int)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(long), typeof(int)));
 			TestConverter(longValues, v => checked((uint)v), v => unchecked((uint)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(long), typeof(uint)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(long), typeof(uint)));
 			TestConverter(longValues, v => checked(v), v => unchecked(v));
-			Assert.AreEqual(ConversionType.IdentityConversion, Convert.GetConvertType(typeof(long), typeof(long)));
+			Assert.AreEqual(ConversionType.IdentityConversion, GetConverterType(typeof(long), typeof(long)));
 			TestConverter(longValues, v => checked((ulong)v), v => unchecked((ulong)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(long), typeof(ulong)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(long), typeof(ulong)));
 			TestConverter(longValues, v => checked((char)v), v => unchecked((char)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(long), typeof(char)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(long), typeof(char)));
 			TestConverter(longValues, v => checked((float)v), v => unchecked((float)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(long), typeof(float)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(long), typeof(float)));
 			TestConverter(longValues, v => checked((double)v), v => unchecked((double)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(long), typeof(double)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(long), typeof(double)));
 			TestConverter(longValues, v => checked((decimal)v), v => unchecked((decimal)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(long), typeof(decimal)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(long), typeof(decimal)));
 
 			// UInt64
 			TestConverter(ulongValues, v => checked((sbyte)v), v => unchecked((sbyte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(ulong), typeof(sbyte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(ulong), typeof(sbyte)));
 			TestConverter(ulongValues, v => checked((byte)v), v => unchecked((byte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(ulong), typeof(byte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(ulong), typeof(byte)));
 			TestConverter(ulongValues, v => checked((short)v), v => unchecked((short)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(ulong), typeof(short)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(ulong), typeof(short)));
 			TestConverter(ulongValues, v => checked((ushort)v), v => unchecked((ushort)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(ulong), typeof(ushort)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(ulong), typeof(ushort)));
 			TestConverter(ulongValues, v => checked((int)v), v => unchecked((int)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(ulong), typeof(int)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(ulong), typeof(int)));
 			TestConverter(ulongValues, v => checked((uint)v), v => unchecked((uint)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(ulong), typeof(uint)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(ulong), typeof(uint)));
 			TestConverter(ulongValues, v => checked((long)v), v => unchecked((long)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(ulong), typeof(long)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(ulong), typeof(long)));
 			TestConverter(ulongValues, v => checked(v), v => unchecked(v));
-			Assert.AreEqual(ConversionType.IdentityConversion, Convert.GetConvertType(typeof(ulong), typeof(ulong)));
+			Assert.AreEqual(ConversionType.IdentityConversion, GetConverterType(typeof(ulong), typeof(ulong)));
 			TestConverter(ulongValues, v => checked((char)v), v => unchecked((char)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(ulong), typeof(char)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(ulong), typeof(char)));
 			TestConverter(ulongValues, v => checked((float)v), v => unchecked((float)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(ulong), typeof(float)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(ulong), typeof(float)));
 			TestConverter(ulongValues, v => checked((double)v), v => unchecked((double)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(ulong), typeof(double)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(ulong), typeof(double)));
 			TestConverter(ulongValues, v => checked((decimal)v), v => unchecked((decimal)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(ulong), typeof(decimal)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(ulong), typeof(decimal)));
 
 			// Char
 			TestConverter(charValues, v => checked((sbyte)v), v => unchecked((sbyte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(char), typeof(sbyte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(char), typeof(sbyte)));
 			TestConverter(charValues, v => checked((byte)v), v => unchecked((byte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(char), typeof(byte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(char), typeof(byte)));
 			TestConverter(charValues, v => checked((short)v), v => unchecked((short)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(char), typeof(short)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(char), typeof(short)));
 			TestConverter(charValues, v => checked((ushort)v), v => unchecked((ushort)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(char), typeof(ushort)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(char), typeof(ushort)));
 			TestConverter(charValues, v => checked((int)v), v => unchecked((int)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(char), typeof(int)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(char), typeof(int)));
 			TestConverter(charValues, v => checked((uint)v), v => unchecked((uint)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(char), typeof(uint)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(char), typeof(uint)));
 			TestConverter(charValues, v => checked((long)v), v => unchecked((long)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(char), typeof(long)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(char), typeof(long)));
 			TestConverter(charValues, v => checked((ulong)v), v => unchecked((ulong)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(char), typeof(ulong)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(char), typeof(ulong)));
 			TestConverter(charValues, v => checked(v), v => unchecked(v));
-			Assert.AreEqual(ConversionType.IdentityConversion, Convert.GetConvertType(typeof(char), typeof(char)));
+			Assert.AreEqual(ConversionType.IdentityConversion, GetConverterType(typeof(char), typeof(char)));
 			TestConverter(charValues, v => checked((float)v), v => unchecked((float)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(char), typeof(float)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(char), typeof(float)));
 			TestConverter(charValues, v => checked((double)v), v => unchecked((double)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(char), typeof(double)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(char), typeof(double)));
 			TestConverter(charValues, v => checked((decimal)v), v => unchecked((decimal)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(char), typeof(decimal)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(char), typeof(decimal)));
 
 			// Single
 			TestConverter(floatValues, v => checked((sbyte)v), v => unchecked((sbyte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(float), typeof(sbyte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(float), typeof(sbyte)));
 			TestConverter(floatValues, v => checked((byte)v), v => unchecked((byte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(float), typeof(byte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(float), typeof(byte)));
 			TestConverter(floatValues, v => checked((short)v), v => unchecked((short)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(float), typeof(short)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(float), typeof(short)));
 			TestConverter(floatValues, v => checked((ushort)v), v => unchecked((ushort)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(float), typeof(ushort)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(float), typeof(ushort)));
 			TestConverter(floatValues, v => checked((int)v), v => unchecked((int)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(float), typeof(int)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(float), typeof(int)));
 			TestConverter(floatValues, v => checked((uint)v), v => unchecked((uint)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(float), typeof(uint)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(float), typeof(uint)));
 			TestConverter(floatValues, v => checked((long)v), v => unchecked((long)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(float), typeof(long)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(float), typeof(long)));
 			TestConverter(floatValues, v => checked((ulong)v), v => unchecked((ulong)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(float), typeof(ulong)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(float), typeof(ulong)));
 			TestConverter(floatValues, v => checked((char)v), v => unchecked((char)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(float), typeof(char)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(float), typeof(char)));
 			TestConverter(floatValues, v => checked(v), v => unchecked(v));
-			Assert.AreEqual(ConversionType.IdentityConversion, Convert.GetConvertType(typeof(float), typeof(float)));
+			Assert.AreEqual(ConversionType.IdentityConversion, GetConverterType(typeof(float), typeof(float)));
 			TestConverter(floatValues, v => checked((double)v), v => unchecked((double)v));
-			Assert.AreEqual(ConversionType.ImplicitNumericConversion, Convert.GetConvertType(typeof(float), typeof(double)));
+			Assert.AreEqual(ConversionType.ImplicitNumericConversion, GetConverterType(typeof(float), typeof(double)));
 			TestConverter(floatValues, v => checked((decimal)v), v => unchecked((decimal)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(float), typeof(decimal)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(float), typeof(decimal)));
 
 			// Double
 			TestConverter(doubleValues, v => checked((sbyte)v), v => unchecked((sbyte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(double), typeof(sbyte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(double), typeof(sbyte)));
 			TestConverter(doubleValues, v => checked((byte)v), v => unchecked((byte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(double), typeof(byte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(double), typeof(byte)));
 			TestConverter(doubleValues, v => checked((short)v), v => unchecked((short)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(double), typeof(short)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(double), typeof(short)));
 			TestConverter(doubleValues, v => checked((ushort)v), v => unchecked((ushort)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(double), typeof(ushort)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(double), typeof(ushort)));
 			TestConverter(doubleValues, v => checked((int)v), v => unchecked((int)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(double), typeof(int)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(double), typeof(int)));
 			TestConverter(doubleValues, v => checked((uint)v), v => unchecked((uint)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(double), typeof(uint)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(double), typeof(uint)));
 			TestConverter(doubleValues, v => checked((long)v), v => unchecked((long)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(double), typeof(long)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(double), typeof(long)));
 			TestConverter(doubleValues, v => checked((ulong)v), v => unchecked((ulong)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(double), typeof(ulong)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(double), typeof(ulong)));
 			TestConverter(doubleValues, v => checked((char)v), v => unchecked((char)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(double), typeof(char)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(double), typeof(char)));
 			TestConverter(doubleValues, v => checked((float)v), v => unchecked((float)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(double), typeof(float)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(double), typeof(float)));
 			TestConverter(doubleValues, v => checked(v), v => unchecked(v));
-			Assert.AreEqual(ConversionType.IdentityConversion, Convert.GetConvertType(typeof(double), typeof(double)));
+			Assert.AreEqual(ConversionType.IdentityConversion, GetConverterType(typeof(double), typeof(double)));
 			TestConverter(doubleValues, v => checked((decimal)v), v => unchecked((decimal)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(double), typeof(decimal)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(double), typeof(decimal)));
 
 			// Decimal
 			TestConverter(decimalValues, v => checked((sbyte)v), v => unchecked((sbyte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(decimal), typeof(sbyte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(decimal), typeof(sbyte)));
 			TestConverter(decimalValues, v => checked((byte)v), v => unchecked((byte)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(decimal), typeof(byte)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(decimal), typeof(byte)));
 			TestConverter(decimalValues, v => checked((short)v), v => unchecked((short)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(decimal), typeof(short)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(decimal), typeof(short)));
 			TestConverter(decimalValues, v => checked((ushort)v), v => unchecked((ushort)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(decimal), typeof(ushort)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(decimal), typeof(ushort)));
 			TestConverter(decimalValues, v => checked((int)v), v => unchecked((int)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(decimal), typeof(int)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(decimal), typeof(int)));
 			TestConverter(decimalValues, v => checked((uint)v), v => unchecked((uint)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(decimal), typeof(uint)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(decimal), typeof(uint)));
 			TestConverter(decimalValues, v => checked((long)v), v => unchecked((long)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(decimal), typeof(long)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(decimal), typeof(long)));
 			TestConverter(decimalValues, v => checked((ulong)v), v => unchecked((ulong)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(decimal), typeof(ulong)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(decimal), typeof(ulong)));
 			TestConverter(decimalValues, v => checked((char)v), v => unchecked((char)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(float), typeof(char)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(float), typeof(char)));
 			TestConverter(decimalValues, v => checked((float)v), v => unchecked((float)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(decimal), typeof(float)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(decimal), typeof(float)));
 			TestConverter(decimalValues, v => checked((double)v), v => unchecked((double)v));
-			Assert.AreEqual(ConversionType.ExplicitNumericConversion, Convert.GetConvertType(typeof(decimal), typeof(double)));
+			Assert.AreEqual(ConversionType.ExplicitNumericConversion, GetConverterType(typeof(decimal), typeof(double)));
 			TestConverter(decimalValues, v => checked(v), v => unchecked(v));
-			Assert.AreEqual(ConversionType.IdentityConversion, Convert.GetConvertType(typeof(decimal), typeof(decimal)));
+			Assert.AreEqual(ConversionType.IdentityConversion, GetConverterType(typeof(decimal), typeof(decimal)));
 		}
 		private static void TestConverter<TInput, TOutput>(TInput[] inputValues,
 			Func<TInput, TOutput> checkedConverter, Func<TInput, TOutput> uncheckedConverter)
@@ -387,9 +456,6 @@ namespace UnitTestCyjb
 			TestConverter(inputValues, true, checkedConverter);
 			TestConverter(inputValues, false, uncheckedConverter);
 		}
-		private static readonly Func<Type, Type, object> getConversion = Type.GetType(
-			"Cyjb.Conversions.ConversionFactory, Cyjb, Version=0.1.0.0, Culture=neutral, PublicKeyToken=40880b37bef542a8")
-			.CreateDelegate<Func<Type, Type, object>>("GetConversion");
 		private static readonly Func<object, Type, Type, bool, bool, Delegate> buildConverter =
 			typeof(Convert).CreateDelegate<Func<object, Type, Type, bool, bool, Delegate>>("BuildConverter");
 		private static void TestConverter<TInput, TOutput>(TInput[] inputValues, bool isChecked,
@@ -403,7 +469,7 @@ namespace UnitTestCyjb
 			for (int i = 0; i < inputValues.Length; i++)
 			{
 				TInput input = inputValues[i];
-				TOutput expected = default(TOutput);
+				TOutput expected;
 				try
 				{
 					expected = standardConverter(input);
@@ -437,60 +503,60 @@ namespace UnitTestCyjb
 		public void TestEnumConversion()
 		{
 			TestConverter(sbyteValues, v => checked((BindingFlags)v), v => unchecked((BindingFlags)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(sbyte), typeof(BindingFlags)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(sbyte), typeof(BindingFlags)));
 			TestConverter(byteValues, v => checked((BindingFlags)v), v => unchecked((BindingFlags)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(byte), typeof(BindingFlags)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(byte), typeof(BindingFlags)));
 			TestConverter(shortValues, v => checked((BindingFlags)v), v => unchecked((BindingFlags)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(short), typeof(BindingFlags)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(short), typeof(BindingFlags)));
 			TestConverter(ushortValues, v => checked((BindingFlags)v), v => unchecked((BindingFlags)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(ushort), typeof(BindingFlags)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(ushort), typeof(BindingFlags)));
 			TestConverter(intValues, v => checked((BindingFlags)v), v => unchecked((BindingFlags)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(int), typeof(BindingFlags)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(int), typeof(BindingFlags)));
 			TestConverter(uintValues, v => checked((BindingFlags)v), v => unchecked((BindingFlags)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(uint), typeof(BindingFlags)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(uint), typeof(BindingFlags)));
 			TestConverter(longValues, v => checked((BindingFlags)v), v => unchecked((BindingFlags)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(long), typeof(BindingFlags)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(long), typeof(BindingFlags)));
 			TestConverter(ulongValues, v => checked((BindingFlags)v), v => unchecked((BindingFlags)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(ulong), typeof(BindingFlags)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(ulong), typeof(BindingFlags)));
 			TestConverter(charValues, v => checked((BindingFlags)v), v => unchecked((BindingFlags)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(char), typeof(BindingFlags)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(char), typeof(BindingFlags)));
 			TestConverter(floatValues, v => checked((BindingFlags)v), v => unchecked((BindingFlags)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(float), typeof(BindingFlags)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(float), typeof(BindingFlags)));
 			TestConverter(doubleValues, v => checked((BindingFlags)v), v => unchecked((BindingFlags)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(double), typeof(BindingFlags)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(double), typeof(BindingFlags)));
 			TestConverter(decimalValues, v => checked((BindingFlags)v), v => unchecked((BindingFlags)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(decimal), typeof(BindingFlags)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(decimal), typeof(BindingFlags)));
 
 			TestConverter(bindingFlagsValues, v => checked((sbyte)v), v => unchecked((sbyte)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(BindingFlags), typeof(sbyte)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(BindingFlags), typeof(sbyte)));
 			TestConverter(bindingFlagsValues, v => checked((byte)v), v => unchecked((byte)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(BindingFlags), typeof(byte)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(BindingFlags), typeof(byte)));
 			TestConverter(bindingFlagsValues, v => checked((short)v), v => unchecked((short)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(BindingFlags), typeof(short)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(BindingFlags), typeof(short)));
 			TestConverter(bindingFlagsValues, v => checked((ushort)v), v => unchecked((ushort)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(BindingFlags), typeof(ushort)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(BindingFlags), typeof(ushort)));
 			TestConverter(bindingFlagsValues, v => checked((int)v), v => unchecked((int)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(BindingFlags), typeof(int)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(BindingFlags), typeof(int)));
 			TestConverter(bindingFlagsValues, v => checked((uint)v), v => unchecked((uint)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(BindingFlags), typeof(uint)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(BindingFlags), typeof(uint)));
 			TestConverter(bindingFlagsValues, v => checked((long)v), v => unchecked((long)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(BindingFlags), typeof(long)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(BindingFlags), typeof(long)));
 			TestConverter(bindingFlagsValues, v => checked((ulong)v), v => unchecked((ulong)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(BindingFlags), typeof(ulong)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(BindingFlags), typeof(ulong)));
 			TestConverter(bindingFlagsValues, v => checked((char)v), v => unchecked((char)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(BindingFlags), typeof(char)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(BindingFlags), typeof(char)));
 			TestConverter(bindingFlagsValues, v => checked((float)v), v => unchecked((float)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(BindingFlags), typeof(float)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(BindingFlags), typeof(float)));
 			TestConverter(bindingFlagsValues, v => checked((double)v), v => unchecked((double)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(BindingFlags), typeof(double)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(BindingFlags), typeof(double)));
 			TestConverter(bindingFlagsValues, v => checked((decimal)v), v => unchecked((decimal)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(BindingFlags), typeof(decimal)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(BindingFlags), typeof(decimal)));
 
 			TestConverter(bindingFlagsValues, v => checked((Tristate)v), v => unchecked((Tristate)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(Tristate), typeof(BindingFlags)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(Tristate), typeof(BindingFlags)));
 			TestConverter(new[] { Tristate.False, Tristate.True, Tristate.NotSure }, v => checked((BindingFlags)v),
 				v => unchecked((BindingFlags)v));
-			Assert.AreEqual(ConversionType.EnumConversion, Convert.GetConvertType(typeof(BindingFlags), typeof(Tristate)));
+			Assert.AreEqual(ConversionType.EnumConversion, GetConverterType(typeof(BindingFlags), typeof(Tristate)));
 		}
 
 		#endregion // 测试枚举转换
@@ -505,24 +571,24 @@ namespace UnitTestCyjb
 		{
 			// 从 S 到 T? 的隐式转换。
 			TestConverter(intValues, v => checked((int?)v), v => unchecked((int?)v));
-			Assert.AreEqual(ConversionType.ImplicitNullableConversion, Convert.GetConvertType(typeof(int), typeof(int?)));
+			Assert.AreEqual(ConversionType.ImplicitNullableConversion, GetConverterType(typeof(int), typeof(int?)));
 			TestConverter(intValues, v => checked((long?)v), v => unchecked((long?)v));
-			Assert.AreEqual(ConversionType.ImplicitNullableConversion, Convert.GetConvertType(typeof(int), typeof(long?)));
+			Assert.AreEqual(ConversionType.ImplicitNullableConversion, GetConverterType(typeof(int), typeof(long?)));
 			// 从 S? 到 T? 的隐式转换。
 			int?[] intNValues = { -2147483648, -32768, -128, 0, 127, 255, 32767, 65535, 2147483647, null };
 			TestConverter(intNValues, v => checked((long?)v), v => unchecked((long?)v));
-			Assert.AreEqual(ConversionType.ImplicitNullableConversion, Convert.GetConvertType(typeof(int?), typeof(long?)));
+			Assert.AreEqual(ConversionType.ImplicitNullableConversion, GetConverterType(typeof(int?), typeof(long?)));
 			// 从 S 到 T? 的显式转换。
 			TestConverter(longValues, v => checked((int?)v), v => unchecked((int?)v));
-			Assert.AreEqual(ConversionType.ExplicitNullableConversion, Convert.GetConvertType(typeof(long), typeof(int?)));
+			Assert.AreEqual(ConversionType.ExplicitNullableConversion, GetConverterType(typeof(long), typeof(int?)));
 			// 从 S? 到 T? 的显式转换。
 			long?[] longNValues = { -9223372036854775808, -2147483648, -32768, -128, 0, 127, 255, 32767, 65535, 2147483647, 
 										4294967295, 9223372036854775807, null };
 			TestConverter(longNValues, v => checked((int?)v), v => unchecked((int?)v));
-			Assert.AreEqual(ConversionType.ExplicitNullableConversion, Convert.GetConvertType(typeof(long?), typeof(int?)));
+			Assert.AreEqual(ConversionType.ExplicitNullableConversion, GetConverterType(typeof(long?), typeof(int?)));
 			// 从 S? 到 T 的显式转换。
 			TestConverter(longNValues, v => checked((int)v), v => unchecked((int)v));
-			Assert.AreEqual(ConversionType.ExplicitNullableConversion, Convert.GetConvertType(typeof(long?), typeof(int)));
+			Assert.AreEqual(ConversionType.ExplicitNullableConversion, GetConverterType(typeof(long?), typeof(int)));
 		}
 
 		#endregion // 测试可空类型转换
@@ -538,24 +604,24 @@ namespace UnitTestCyjb
 			// 从任何 reference-type 到 object。
 			string str = "abc";
 			TestChangeType(str, (object)str);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(string), typeof(object)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(string), typeof(object)));
 			AnyReferenceClass anyReferenceClass = new AnyReferenceClass();
 			TestChangeType(anyReferenceClass, (object)anyReferenceClass);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(AnyReferenceClass), typeof(object)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(AnyReferenceClass), typeof(object)));
 
 			// 从任何 class-type S 到任何 class-type T（前提是 S 是从 T 派生的）。
 			AnySubClass anySubClass = new AnySubClass();
 			TestChangeType(anySubClass, (AnyBaseClass)anySubClass);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(AnySubClass), typeof(AnyBaseClass)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(AnySubClass), typeof(AnyBaseClass)));
 
 			// 从任何 class-type S 到任何 interface-type T（前提是 S 实现了 T）。
 			List<int> intList = new List<int>();
 			TestChangeType(intList, (IList<int>)intList);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(List<int>), typeof(IList<int>)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(List<int>), typeof(IList<int>)));
 
 			// 从任何 interface-type S 到任何 interface-type T（前提是 S 是从 T 派生的）。
 			TestChangeType((IList<int>)intList, (ICollection<int>)intList);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(IList<int>), typeof(ICollection<int>)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(IList<int>), typeof(ICollection<int>)));
 
 			// 从元素类型为 SE 的 array-type S 到元素类型为 TE 的 array-type T（前提是以下所列条件均成立）：
 			//   o S 和 T 只有元素类型不同。换言之，S 和 T 具有相同的维数。
@@ -563,66 +629,66 @@ namespace UnitTestCyjb
 			//   o 存在从 SE 到 TE 的隐式引用转换。
 			string[] strArr = new string[0];
 			TestChangeType(strArr, (object[])strArr);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(string[]), typeof(object[])));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(string[]), typeof(object[])));
 			AnySubClass[] anySubArr = new AnySubClass[0];
 			TestChangeType(anySubArr, (AnyBaseClass[])anySubArr);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(AnySubClass[]), typeof(AnyBaseClass[])));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(AnySubClass[]), typeof(AnyBaseClass[])));
 			List<string>[] stringListArray = new List<string>[0];
 			TestChangeType(stringListArray, (IList[])stringListArray);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(List<string>[]), typeof(IList[])));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(List<string>[]), typeof(IList[])));
 			TestChangeType(stringListArray, (IEnumerable<object>[])stringListArray);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(List<string>[]), typeof(IEnumerable<object>[])));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(List<string>[]), typeof(IEnumerable<object>[])));
 
 			// 从任何 array-type 到 System.Array 及其实现的接口。
 			int[] intArr = new int[0];
 			TestChangeType(intArr, (Array)intArr);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(int[]), typeof(Array)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(int[]), typeof(Array)));
 			TestChangeType(intArr, (IStructuralComparable)intArr);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(int[]), typeof(IStructuralComparable)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(int[]), typeof(IStructuralComparable)));
 
 			// 从一维数组类型 S[] 到 System.Collections.Generic.IList<T> 及其基接口（前提是存在从 S 到 T 的隐式标识或引用转换）。
 			TestChangeType(strArr, (IList<object>)strArr);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(string[]), typeof(IList<object>)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(string[]), typeof(IList<object>)));
 
 			// 从任何 delegate-type 到 System.Delegate 及其实现的接口。
 			Func<int> intFunc = () => 0;
 			TestChangeType(intFunc, (Delegate)intFunc);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(Func<int>), typeof(Delegate)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(Func<int>), typeof(Delegate)));
 
 			// 从任何 reference-type 到接口或委托类型 T
 			// （前提是它具有到接口或委托类型 T0 的隐式标识或引用转换，且 T0 可变化转换为T）。
 			// 这里的变化转换在规范的 13.1.3.2 节，就是泛型的协变和逆变。
 			// 协变。
 			TestChangeType(strArr, (IEnumerable<object>)strArr);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(string[]), typeof(IEnumerable<object>)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(string[]), typeof(IEnumerable<object>)));
 			IEnumerable<string> strEnum = Enumerable.Empty<string>();
 			TestChangeType(strEnum, (IEnumerable<object>)strEnum);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(IEnumerable<string>), typeof(IEnumerable<object>)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(IEnumerable<string>), typeof(IEnumerable<object>)));
 
 			IEqualityComparer<object>[][] nestArr = new IEqualityComparer<object>[0][];
 			TestChangeType(nestArr, (IEnumerable<IEqualityComparer<string>[]>)nestArr);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(IEqualityComparer<object>[][]), typeof(IEnumerable<IEqualityComparer<string>[]>)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(IEqualityComparer<object>[][]), typeof(IEnumerable<IEqualityComparer<string>[]>)));
 			IEnumerable<IEqualityComparer<object>[]> nestArrEnum = Enumerable.Empty<IEqualityComparer<object>[]>();
 			TestChangeType(nestArrEnum, (IEnumerable<IEqualityComparer<string>[]>)nestArrEnum);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(IEnumerable<IEqualityComparer<object>[]>), typeof(IEnumerable<IEqualityComparer<string>[]>)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(IEnumerable<IEqualityComparer<object>[]>), typeof(IEnumerable<IEqualityComparer<string>[]>)));
 
 			object[][][] nestArr2 = new object[0][][];
 			TestChangeType(nestArr2, (IEnumerable<IList<IList<object>>>)nestArr2);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(object[][][]), typeof(IEnumerable<IList<IList<object>>>)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(object[][][]), typeof(IEnumerable<IList<IList<object>>>)));
 			IEnumerable<object[][]> nestArrEnum2 = Enumerable.Empty<object[][]>();
 			TestChangeType(nestArrEnum2, (IEnumerable<IList<IList<object>>>)nestArrEnum2);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(IEnumerable<object[][]>), typeof(IEnumerable<IList<IList<object>>>)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(IEnumerable<object[][]>), typeof(IEnumerable<IList<IList<object>>>)));
 			// 逆变。
 			EqualityComparer<object> objCmp = EqualityComparer<object>.Default;
 			TestChangeType(objCmp, (IEqualityComparer<string>)objCmp);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(EqualityComparer<object>), typeof(IEqualityComparer<string>)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(EqualityComparer<object>), typeof(IEqualityComparer<string>)));
 
 			EqualityComparer<IEnumerable<object>[]> objEnumCmp = EqualityComparer<IEnumerable<object>[]>.Default;
 			TestChangeType(objEnumCmp, (IEqualityComparer<IEnumerable<string>[]>)objEnumCmp);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(EqualityComparer<IEnumerable<object>[]>), typeof(IEqualityComparer<IEnumerable<string>[]>)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(EqualityComparer<IEnumerable<object>[]>), typeof(IEqualityComparer<IEnumerable<string>[]>)));
 
 			TestChangeType(objEnumCmp, (IEqualityComparer<string[][]>)objEnumCmp);
-			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, Convert.GetConvertType(typeof(EqualityComparer<IEnumerable<object>[]>), typeof(IEqualityComparer<string[][]>)));
+			Assert.AreEqual(ConversionType.ImplicitReferenceConversion, GetConverterType(typeof(EqualityComparer<IEnumerable<object>[]>), typeof(IEqualityComparer<string[][]>)));
 		}
 		private class AnyReferenceClass { }
 		private class AnyBaseClass { }
@@ -640,45 +706,45 @@ namespace UnitTestCyjb
 		{
 			// 从 non-nullable-value-type 到 object。
 			TestChangeType(10, (object)10);
-			Assert.AreEqual(ConversionType.BoxConversion, Convert.GetConvertType(typeof(int), typeof(object)));
+			Assert.AreEqual(ConversionType.BoxConversion, GetConverterType(typeof(int), typeof(object)));
 			AnyValueType anyValueType = new AnyValueType();
 			TestChangeType(anyValueType, (object)anyValueType);
-			Assert.AreEqual(ConversionType.BoxConversion, Convert.GetConvertType(typeof(AnyValueType), typeof(object)));
+			Assert.AreEqual(ConversionType.BoxConversion, GetConverterType(typeof(AnyValueType), typeof(object)));
 
 			// 从 non-nullable-value-type 到 System.ValueType。
 			TestChangeType(10, (ValueType)10);
-			Assert.AreEqual(ConversionType.BoxConversion, Convert.GetConvertType(typeof(int), typeof(ValueType)));
+			Assert.AreEqual(ConversionType.BoxConversion, GetConverterType(typeof(int), typeof(ValueType)));
 			TestChangeType(anyValueType, (ValueType)anyValueType);
-			Assert.AreEqual(ConversionType.BoxConversion, Convert.GetConvertType(typeof(AnyValueType), typeof(ValueType)));
+			Assert.AreEqual(ConversionType.BoxConversion, GetConverterType(typeof(AnyValueType), typeof(ValueType)));
 
 			// 从 non-nullable-value-type 到其实现的接口。
 			TestChangeType(10, (IComparable<int>)10);
-			Assert.AreEqual(ConversionType.BoxConversion, Convert.GetConvertType(typeof(int), typeof(IComparable<int>)));
+			Assert.AreEqual(ConversionType.BoxConversion, GetConverterType(typeof(int), typeof(IComparable<int>)));
 
 			// 从 enum-type 转换为 System.Enum 类型。
 			TestChangeType(Tristate.True, (Enum)Tristate.True);
-			Assert.AreEqual(ConversionType.BoxConversion, Convert.GetConvertType(typeof(Tristate), typeof(Enum)));
+			Assert.AreEqual(ConversionType.BoxConversion, GetConverterType(typeof(Tristate), typeof(Enum)));
 
 			// 从 nullable-type 到 non-nullable-value-type 到该引用类型的装箱转换。
 			TestChangeType((int?)10, (object)(int?)10);
 			TestChangeType((int?)null, (object)(int?)null);
-			Assert.AreEqual(ConversionType.BoxConversion, Convert.GetConvertType(typeof(int?), typeof(object)));
+			Assert.AreEqual(ConversionType.BoxConversion, GetConverterType(typeof(int?), typeof(object)));
 			TestChangeType((int?)10, (ValueType)(int?)10);
 			TestChangeType((int?)null, (ValueType)(int?)null);
-			Assert.AreEqual(ConversionType.BoxConversion, Convert.GetConvertType(typeof(int?), typeof(ValueType)));
+			Assert.AreEqual(ConversionType.BoxConversion, GetConverterType(typeof(int?), typeof(ValueType)));
 			TestChangeType((int?)10, (IComparable<int>)(int?)10);
 			TestChangeType((int?)null, (IComparable<int>)(int?)null);
-			Assert.AreEqual(ConversionType.BoxConversion, Convert.GetConvertType(typeof(int?), typeof(IComparable<int>)));
+			Assert.AreEqual(ConversionType.BoxConversion, GetConverterType(typeof(int?), typeof(IComparable<int>)));
 			TestChangeType((Tristate?)Tristate.True, (Enum)(Tristate?)Tristate.True);
 			TestChangeType((Tristate?)null, (Enum)(Tristate?)null);
-			Assert.AreEqual(ConversionType.BoxConversion, Convert.GetConvertType(typeof(Tristate?), typeof(Enum)));
+			Assert.AreEqual(ConversionType.BoxConversion, GetConverterType(typeof(Tristate?), typeof(Enum)));
 
 			// 如果值类型具有到接口或委托类型 I0 的装箱转换，且 I0 变化转换为接口类型 I，则值类型具有到 I 的装箱转换。
 			StringEnumStruct stringEnumStruct = new StringEnumStruct();
 			TestChangeType(stringEnumStruct, (IEnumerable<object>)stringEnumStruct);
-			Assert.AreEqual(ConversionType.BoxConversion, Convert.GetConvertType(typeof(StringEnumStruct), typeof(IEnumerable<object>)));
+			Assert.AreEqual(ConversionType.BoxConversion, GetConverterType(typeof(StringEnumStruct), typeof(IEnumerable<object>)));
 			TestChangeType((StringEnumStruct?)null, (IEnumerable<object>)null);
-			Assert.AreEqual(ConversionType.BoxConversion, Convert.GetConvertType(typeof(StringEnumStruct?), typeof(IEnumerable<object>)));
+			Assert.AreEqual(ConversionType.BoxConversion, GetConverterType(typeof(StringEnumStruct?), typeof(IEnumerable<object>)));
 		}
 		private struct AnyValueType { }
 		private struct StringEnumStruct : IEnumerable<string>
@@ -701,32 +767,32 @@ namespace UnitTestCyjb
 			// 从 object 到任何其他 reference-type。
 			string str = "abc";
 			TestChangeType((object)str, str);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(object), typeof(string)));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(object), typeof(string)));
 			AnyReferenceClass anyReferenceClass = new AnyReferenceClass();
 			TestChangeType((object)anyReferenceClass, anyReferenceClass);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(object), typeof(AnyReferenceClass)));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(object), typeof(AnyReferenceClass)));
 
 			// 从任何 class-type S 到任何 class-type T（前提是 S 为 T 的基类）。
 			AnySubClass anySubClass = new AnySubClass();
 			TestChangeType((AnyBaseClass)anySubClass, anySubClass);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(AnyBaseClass), typeof(AnySubClass)));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(AnyBaseClass), typeof(AnySubClass)));
 
 			// 从任何 class-type S 到任何 interface-type T（前提是 S 未密封并且 S 未实现 T）。
 			InterfaceSubClass interfaceSubClass = new InterfaceSubClass();
 			TestChangeType((AnyBaseClass)interfaceSubClass, (IEnumerable)interfaceSubClass);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(AnyBaseClass), typeof(IEnumerable)));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(AnyBaseClass), typeof(IEnumerable)));
 
 			// 从任何 interface-type S 到任何 class-type T（前提是 T 未密封或 T 实现 S）。
 			TestChangeType((IEnumerable)interfaceSubClass, (AnyBaseClass)interfaceSubClass);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(IEnumerable), typeof(AnyBaseClass)));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(IEnumerable), typeof(AnyBaseClass)));
 			TestChangeType((IEnumerable)interfaceSubClass, interfaceSubClass);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(IEnumerable), typeof(InterfaceSubClass)));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(IEnumerable), typeof(InterfaceSubClass)));
 
 			// 从任何 interface-type S 到任何 interface-type T（前提是 S 不是从 T 派生的）。
 			TestChangeType((IEnumerable)interfaceSubClass, (IComparable)interfaceSubClass);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(IEnumerable), typeof(IComparable)));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(IEnumerable), typeof(IComparable)));
 			TestChangeType((IComparable)interfaceSubClass, (IEnumerable)interfaceSubClass);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(IComparable), typeof(IEnumerable)));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(IComparable), typeof(IEnumerable)));
 
 			// 从元素类型为 SE 的 array-type S 到元素类型为 TE 的 array-type T（前提是以下所列条件均成立）：
 			//   o	S 和 T 只有元素类型不同。换言之，S 和 T 具有相同的维数。
@@ -734,41 +800,41 @@ namespace UnitTestCyjb
 			//   o	存在从 SE 到 TE 的显式引用转换。
 			string[] strArr = new string[0];
 			TestChangeType((object[])strArr, strArr);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(object[]), typeof(string[])));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(object[]), typeof(string[])));
 			AnySubClass[] anySubArr = new AnySubClass[0];
 			TestChangeType((AnyBaseClass[])anySubArr, anySubArr);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(AnyBaseClass[]), typeof(AnySubClass[])));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(AnyBaseClass[]), typeof(AnySubClass[])));
 			List<string>[] stringListArray = new List<string>[0];
 			TestChangeType((IList[])stringListArray, stringListArray);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(IList[]), typeof(List<string>[])));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(IList[]), typeof(List<string>[])));
 			TestChangeType((IEnumerable<object>[])stringListArray, stringListArray);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(IEnumerable<object>[]), typeof(List<string>[])));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(IEnumerable<object>[]), typeof(List<string>[])));
 			IEnumerable[] enumArr = new InterfaceSubClass[0];
 			TestChangeType((IComparable[])enumArr, enumArr);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(IComparable[]), typeof(IEnumerable[])));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(IComparable[]), typeof(IEnumerable[])));
 
 			// 从 System.Array 及其实现的接口到任何 array-type。
 			int[] intArr = new int[0];
 			TestChangeType((Array)intArr, intArr);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(Array), typeof(int[])));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(Array), typeof(int[])));
 			TestChangeType((IStructuralComparable)intArr, intArr);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(IStructuralComparable), typeof(int[])));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(IStructuralComparable), typeof(int[])));
 
 			// 从一维数组类型 S[] 到 System.Collections.Generic.IList<T> 及其基接口（前提是存在从 S 到 T 的显式标识或引用转换）。
 			TestChangeType((object[])strArr, (IList<string>)strArr);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(object[]), typeof(IList<string>)));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(object[]), typeof(IList<string>)));
 
 			// 从 System.Collections.Generic.IList<S> 及其基接口到一维数组类型 T[]（前提是存在从 S 到 T 的显式标识或引用转换）。
 			TestChangeType((IList<string>)strArr, (object[])strArr);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(IList<string>), typeof(object[])));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(IList<string>), typeof(object[])));
 
 			// 从 System.Delegate 及其实现的接口到任何 delegate-type。
 			Func<int> intFunc = () => 0;
 			TestChangeType((Delegate)intFunc, intFunc);
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(Delegate), typeof(Func<int>)));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(Delegate), typeof(Func<int>)));
 
 			// 委托类型间的协变和逆变。
-			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, Convert.GetConvertType(typeof(Converter<string, string>), typeof(Converter<object, object>)));
+			Assert.AreEqual(ConversionType.ExplicitReferenceConversion, GetConverterType(typeof(Converter<string, string>), typeof(Converter<object, object>)));
 		}
 		private class InterfaceSubClass : AnyBaseClass, IEnumerable, IComparable
 		{
@@ -788,45 +854,45 @@ namespace UnitTestCyjb
 		{
 			// 从 object 和 System.ValueType 到任何 non-nullable-value-type。
 			TestChangeType((object)10, 10);
-			Assert.AreEqual(ConversionType.UnboxConversion, Convert.GetConvertType(typeof(object), typeof(int)));
+			Assert.AreEqual(ConversionType.UnboxConversion, GetConverterType(typeof(object), typeof(int)));
 			AnyValueType anyValueType = new AnyValueType();
 			TestChangeType((object)anyValueType, anyValueType);
-			Assert.AreEqual(ConversionType.UnboxConversion, Convert.GetConvertType(typeof(object), typeof(AnyValueType)));
+			Assert.AreEqual(ConversionType.UnboxConversion, GetConverterType(typeof(object), typeof(AnyValueType)));
 
 			TestChangeType((ValueType)10, 10);
-			Assert.AreEqual(ConversionType.UnboxConversion, Convert.GetConvertType(typeof(ValueType), typeof(int)));
+			Assert.AreEqual(ConversionType.UnboxConversion, GetConverterType(typeof(ValueType), typeof(int)));
 			TestChangeType((ValueType)anyValueType, anyValueType);
-			Assert.AreEqual(ConversionType.UnboxConversion, Convert.GetConvertType(typeof(ValueType), typeof(AnyValueType)));
+			Assert.AreEqual(ConversionType.UnboxConversion, GetConverterType(typeof(ValueType), typeof(AnyValueType)));
 
 			// 从任何 interface-type 到实现 interface-type 的任何 non-nullable-value-type。
 			TestChangeType((IComparable<int>)10, 10);
-			Assert.AreEqual(ConversionType.UnboxConversion, Convert.GetConvertType(typeof(IComparable<int>), typeof(int)));
+			Assert.AreEqual(ConversionType.UnboxConversion, GetConverterType(typeof(IComparable<int>), typeof(int)));
 
 			// 从 System.Enum 类型到任何 enum-type。
 			TestChangeType((Enum)Tristate.True, Tristate.True);
-			Assert.AreEqual(ConversionType.UnboxConversion, Convert.GetConvertType(typeof(Enum), typeof(Tristate)));
+			Assert.AreEqual(ConversionType.UnboxConversion, GetConverterType(typeof(Enum), typeof(Tristate)));
 
 			// 从引用类型到 non-nullable-value-type 到 nullable-type 的装箱转换。
 			TestChangeType((object)10, (int?)10);
 			TestChangeType((object)null, (int?)null);
-			Assert.AreEqual(ConversionType.UnboxConversion, Convert.GetConvertType(typeof(object), typeof(int?)));
+			Assert.AreEqual(ConversionType.UnboxConversion, GetConverterType(typeof(object), typeof(int?)));
 			TestChangeType((ValueType)10, (int?)10);
 			TestChangeType((ValueType)null, (int?)null);
-			Assert.AreEqual(ConversionType.UnboxConversion, Convert.GetConvertType(typeof(ValueType), typeof(int?)));
+			Assert.AreEqual(ConversionType.UnboxConversion, GetConverterType(typeof(ValueType), typeof(int?)));
 			TestChangeType((IComparable<int>)10, (int?)10);
 			TestChangeType((IComparable<int>)null, (int?)null);
-			Assert.AreEqual(ConversionType.UnboxConversion, Convert.GetConvertType(typeof(IComparable<int>), typeof(int?)));
+			Assert.AreEqual(ConversionType.UnboxConversion, GetConverterType(typeof(IComparable<int>), typeof(int?)));
 			TestChangeType((Enum)Tristate.True, (Tristate?)Tristate.True);
 			TestChangeType((Enum)null, (Tristate?)null);
-			Assert.AreEqual(ConversionType.UnboxConversion, Convert.GetConvertType(typeof(Enum), typeof(Tristate?)));
+			Assert.AreEqual(ConversionType.UnboxConversion, GetConverterType(typeof(Enum), typeof(Tristate?)));
 
 			// 如果值类型 S 具有来自接口或委托类型 I0 的取消装箱转换，且 I0 可变化转换为 I 或 I 可变化转换为 I0，
 			// 则它具有来自 I 的取消装箱转换。。
 			StringEnumStruct stringEnumStruct = new StringEnumStruct();
 			TestChangeType(stringEnumStruct, (IEnumerable<object>)stringEnumStruct);
-			Assert.AreEqual(ConversionType.BoxConversion, Convert.GetConvertType(typeof(StringEnumStruct), typeof(IEnumerable<object>)));
+			Assert.AreEqual(ConversionType.BoxConversion, GetConverterType(typeof(StringEnumStruct), typeof(IEnumerable<object>)));
 			TestChangeType((StringEnumStruct?)null, (IEnumerable<object>)null);
-			Assert.AreEqual(ConversionType.BoxConversion, Convert.GetConvertType(typeof(StringEnumStruct?), typeof(IEnumerable<object>)));
+			Assert.AreEqual(ConversionType.BoxConversion, GetConverterType(typeof(StringEnumStruct?), typeof(IEnumerable<object>)));
 		}
 
 		#endregion // 测试拆箱转换
