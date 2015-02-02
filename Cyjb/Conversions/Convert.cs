@@ -137,8 +137,7 @@ namespace Cyjb
 		{
 			Contract.Requires(conversion != null && inputType != null && outputType != null);
 			Contract.Ensures(Contract.Result<Delegate>() != null);
-			string methodName = string.Concat("Converter_", inputType.FullName(), "_To_", outputType.FullName());
-			DynamicMethod method = new DynamicMethod(methodName, buildGeneric ? outputType : typeof(object),
+			DynamicMethod method = new DynamicMethod("Converter", buildGeneric ? outputType : typeof(object),
 				new[] { buildGeneric ? inputType : typeof(object) }, true);
 			ILGenerator il = method.GetILGenerator();
 			bool passByAddress = conversion is FromNullableConversion;
