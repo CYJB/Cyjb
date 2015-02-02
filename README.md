@@ -16,7 +16,7 @@ Cyjb
   - 对输入输出类的扩展。
 - 完整的类型转换解决方案：
   - 支持隐式、显式和自定义类型转换。
-  - 支持 `System.Converter<TInput, TOutput>` 接口，能够直接用在泛型类型中。
+  - 支持 [System.Converter<TInput, TOutput>](https://msdn.microsoft.com/zh-cn/library/kt456a2y.aspx) 接口，能够直接用在泛型类型中。
   - 能够动态添加额外的类型转换。
   - 能够在 IL 中使用类型转换功能。
 - 对反射的高级支持：
