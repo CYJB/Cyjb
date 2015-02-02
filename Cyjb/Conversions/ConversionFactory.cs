@@ -74,15 +74,11 @@ namespace Cyjb.Conversions
 					converterDelegate = dlg;
 				}
 			}
-			if (providers.TryGetValue(outputType, out provider))
+			if (converterDelegate == null && providers.TryGetValue(outputType, out provider))
 			{
 				Delegate dlg = provider.GetConverterFrom(inputType);
 				if (provider.IsValidConverterFrom(dlg, inputType))
 				{
-					if (converterDelegate != null)
-					{
-						throw CommonExceptions.AmbiguousUserDefinedConverter(inputType, outputType);
-					}
 					converterDelegate = dlg;
 				}
 			}

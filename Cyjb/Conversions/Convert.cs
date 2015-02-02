@@ -260,6 +260,9 @@ namespace Cyjb
 		/// <param name="converter">将对象从 <typeparamref name="TInput"/> 类型转换为 
 		/// <typeparamref name="TOutput"/> 类型的转换器。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="converter"/> 为 <c>null</c>。</exception>
+		/// <remarks><paramref name="converter"/> 不会覆盖预定义的隐式、显式类型转换和用户自定义的类型转换。
+		/// 对于相同输入/输出类型的 <paramref name="converter"/>，后设置的会覆盖先设置的，以及任何 
+		/// <see cref="IConverterProvider"/> 提供的类型转换方法。</remarks>
 		public static void AddConverter<TInput, TOutput>(Converter<TInput, TOutput> converter)
 		{
 			if (converter == null)
@@ -275,6 +278,10 @@ namespace Cyjb
 		/// <param name="provider">要添加的类型转换器提供者。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="provider"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="provider"/> 的源类型为 <c>null</c>。</exception>
+		/// <remarks><paramref name="provider"/> 提供的类型转换方法不会覆盖预定义的隐式、显式类型转换和用户自定义的类型转换，
+		/// 以及任何通过 <see cref="AddConverter{TInput, TOutput}"/> 方法设置的类型转换方法。
+		/// 对于相同源类型的 <see cref="IConverterProvider"/>，<see cref="IConverterProvider.GetConverterTo"/> 
+		/// 方法提供的类型转换方法优先级更高，且后设置的优先级更高。</remarks>
 		public static void AddConverterProvider(IConverterProvider provider)
 		{
 			if (provider == null)
