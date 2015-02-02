@@ -54,6 +54,7 @@ namespace Cyjb.Reflection
 		/// 获取要转换的参数是否需要从值转换为其地址。
 		/// </summary>
 		/// <value>要转换的参数是否需要从值转换为其地址。</value>
+		/// <remarks>一般将参数从值转换为地址的方法，是使用 stloc 指令和 ldloca 指令。</remarks>
 		public bool PassByAddr
 		{
 			get { return this.passByAddr; }

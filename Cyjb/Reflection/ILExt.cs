@@ -227,29 +227,6 @@ namespace Cyjb.Reflection
 			}
 			converter.Emit(isChecked);
 		}
-		/// <summary>
-		/// 获取栈顶的值转换为相应的地址。
-		/// </summary>
-		/// <param name="il">IL 指令生成器。</param>
-		/// <param name="valueType">栈顶值的类型。</param>
-		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="valueType"/> 为 <c>null</c>。</exception>
-		public static void EmitGetAddress(this ILGenerator il, Type valueType)
-		{
-			if (il == null)
-			{
-				throw CommonExceptions.ArgumentNull("il");
-			}
-			if (valueType == null)
-			{
-				throw CommonExceptions.ArgumentNull("valueType");
-			}
-			Contract.EndContractBlock();
-			LocalBuilder locFrom = il.GetManager().GetLocal(valueType);
-			il.Emit(OpCodes.Stloc, locFrom);
-			il.Emit(OpCodes.Ldloca, locFrom);
-			il.GetManager().FreeLocal(locFrom);
-		}
 
 		#endregion // 加载参数
 
@@ -455,6 +432,29 @@ namespace Cyjb.Reflection
 
 		#endregion // 类型转换
 
+		/// <summary>
+		/// 将栈顶的值转换为相应的地址。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="valueType">栈顶值的类型。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="valueType"/> 为 <c>null</c>。</exception>
+		public static void EmitGetAddress(this ILGenerator il, Type valueType)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (valueType == null)
+			{
+				throw CommonExceptions.ArgumentNull("valueType");
+			}
+			Contract.EndContractBlock();
+			LocalBuilder locFrom = il.GetManager().GetLocal(valueType);
+			il.Emit(OpCodes.Stloc, locFrom);
+			il.Emit(OpCodes.Ldloca, locFrom);
+			il.GetManager().FreeLocal(locFrom);
+		}
 		/// <summary>
 		/// 将指定的方法或构造函数的指定指令和元数据标记放到 Microsoft 中间语言 (MSIL) 指令流上。
 		/// </summary>
