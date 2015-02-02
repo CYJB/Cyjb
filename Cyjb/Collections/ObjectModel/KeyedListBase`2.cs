@@ -106,7 +106,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			if (dictionaryCreationThreshold < -1)
 			{
-				throw CommonExceptions.InvalidDictionaryThreshold("dictionaryCreationThreshold", dictionaryCreationThreshold);
+				throw CommonExceptions.InvalidThreshold("dictionaryCreationThreshold", dictionaryCreationThreshold);
 			}
 			this.comparer = comparer ?? EqualityComparer<TKey>.Default;
 			this.threshold = dictionaryCreationThreshold == -1 ? int.MaxValue : dictionaryCreationThreshold;

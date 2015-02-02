@@ -425,4 +425,16 @@
     <value>Can not find processor of type '{0}'.</value>
     <comment>与特定类型相关的处理器未能找到。</comment>
   </data>
+  <data name="AmbiguousUserDefinedConverter" xml:space="preserve">
+    <value>Ambiguous user-defined converter found when convert '{0}' to '{1}'.</value>
+    <comment>找到多个用户自定义的类型转换。</comment>
+  </data>
+  <data name="MustContainValidInfo" xml:space="preserve">
+    <value>Must specify valid information for parsing in the string.</value>
+    <comment>字符串不包含可用信息。</comment>
+  </data>
+  <data name="InvalidThreshold" xml:space="preserve">
+    <value>The specified threshold is out of range.</value>
+    <comment>阈值超出范围。</comment>
+  </data>
 </root>

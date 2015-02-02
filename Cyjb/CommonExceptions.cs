@@ -242,6 +242,17 @@ namespace Cyjb
 		#region 类型异常
 
 		/// <summary>
+		/// 返回找到多个用户自定义类型转换的异常。
+		/// </summary>
+		/// <param name="inputType">输入类型。</param>
+		/// <param name="outputType">输出类型。</param>
+		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
+		internal static InvalidOperationException AmbiguousUserDefinedConverter(Type inputType, Type outputType)
+		{
+			Contract.Requires(inputType != null && outputType != null);
+			return new InvalidOperationException(Format(Resources.AmbiguousUserDefinedConverter, inputType, outputType));
+		}
+		/// <summary>
 		/// 返回参数类型错误的异常。
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
@@ -495,6 +506,16 @@ namespace Cyjb
 			return new ArgumentOutOfRangeException(paramName, actualBase, Resources.InvalidBase);
 		}
 		/// <summary>
+		/// 返回阈值超出范围的异常。
+		/// </summary>
+		/// <param name="paramName">超出范围的参数名称</param>
+		/// <param name="actualThreshold">导致此异常的阈值。</param>
+		/// <returns><see cref="ArgumentOutOfRangeException"/> 对象。</returns>
+		public static ArgumentOutOfRangeException InvalidThreshold(string paramName, object actualThreshold)
+		{
+			return new ArgumentOutOfRangeException(paramName, actualThreshold, Resources.InvalidThreshold);
+		}
+		/// <summary>
 		/// 返回值超出 <see cref="Byte"/> 范围的异常。
 		/// </summary>
 		/// <returns><see cref="OverflowException"/> 对象。</returns>
@@ -631,6 +652,15 @@ namespace Cyjb
 		public static FormatException ExtraJunkAtEnd()
 		{
 			return new FormatException(Resources.ExtraJunkAtEnd);
+		}
+		/// <summary>
+		/// 返回字符串不包含可用信息的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		public static ArgumentException MustContainValidInfo(string paramName)
+		{
+			return new ArgumentException(Resources.MustContainValidInfo, paramName);
 		}
 		/// <summary>
 		/// 返回无符号数的字符串包含负号的异常。
@@ -790,11 +820,6 @@ namespace Cyjb
 
 		#endregion // MethodSwitcher 异常
 
-
-
-
-
-
 		/// <summary>
 		/// 返回未能推导类型参数的异常。
 		/// </summary>
@@ -806,41 +831,7 @@ namespace Cyjb
 			return new ArgumentException(paramName);//, ExceptionResources.CannotInferGenericArguments, method);
 		}
 
-		/// <summary>
-		/// 返回必须包含枚举信息的异常。
-		/// </summary>
-		/// <param name="paramName">产生异常的参数名称。</param>
-		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		public static ArgumentException MustContainEnumInfo(string paramName)
-		{
-			return new ArgumentException(ExceptionResources.MustContainEnumInfo, paramName);
-		}
-
-		/// <summary>
-		/// 返回用于创建字典的阈值超出范围的异常。
-		/// </summary>
-		/// <param name="paramName">超出范围的参数名称</param>
-		/// <param name="actualThresholdd">导致此异常的阈值。</param>
-		/// <returns><see cref="ArgumentOutOfRangeException"/> 对象。</returns>
-		internal static ArgumentOutOfRangeException InvalidDictionaryThreshold(string paramName, int actualThresholdd)
-		{
-			return new ArgumentOutOfRangeException(paramName, actualThresholdd, ExceptionResources.InvalidDictionaryThreshold);
-		}
-
 		#region  InvalidOperationException
-
-		/// <summary>
-		/// 返回找到多个用户自定义类型转换的异常。
-		/// </summary>
-		/// <param name="inputType">输入类型。</param>
-		/// <param name="outputType">输出类型。</param>
-		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
-		internal static InvalidOperationException AmbiguousUserDefinedConverter(Type inputType, Type outputType)
-		{
-			Contract.Requires(inputType != null && outputType != null);
-			return new InvalidOperationException(
-				Format(ExceptionResources.AmbiguousUserDefinedConverter, inputType.FullName(), outputType.FullName()));
-		}
 
 		/// <summary>
 		/// 返回不表示泛型方法定义的异常。
@@ -854,7 +845,6 @@ namespace Cyjb
 		}
 
 		#endregion
-
 
 		#region SerializationException
 
@@ -1109,11 +1099,11 @@ namespace Cyjb
 		}
 		internal static void CheckDelegateType(Type type, string paramName)
 		{
-			CommonExceptions.CheckArgumentNull(type, paramName);
+			CheckArgumentNull(type, paramName);
 			Type baseType = type.BaseType;
 			if (baseType != typeof(MulticastDelegate))
 			{
-				throw CommonExceptions.MustBeDelegate(paramName);
+				throw MustBeDelegate(paramName);
 			}
 		}
 

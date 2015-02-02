@@ -97,15 +97,6 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 Ambiguous user-defined converter found when convert &apos;{0}&apos; to &apos;{1}&apos;. 的本地化字符串。
-        /// </summary>
-        internal static string AmbiguousUserDefinedConverter {
-            get {
-                return ResourceManager.GetString("AmbiguousUserDefinedConverter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 At least one object must implement IComparable. 的本地化字符串。
         /// </summary>
         internal static string ArgumentImplementIComparable {
@@ -232,15 +223,6 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 The specified threshold for creating dictionary is out of range. 的本地化字符串。
-        /// </summary>
-        internal static string InvalidDictionaryThreshold {
-            get {
-                return ResourceManager.GetString("InvalidDictionaryThreshold", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Invalid lexer context &apos;{0}&apos;. 的本地化字符串。
         /// </summary>
         internal static string InvalidLexerContext {
@@ -255,15 +237,6 @@ namespace Cyjb {
         internal static string InvalidSourceRange {
             get {
                 return ResourceManager.GetString("InvalidSourceRange", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Must specify valid information for parsing in the string. 的本地化字符串。
-        /// </summary>
-        internal static string MustContainEnumInfo {
-            get {
-                return ResourceManager.GetString("MustContainEnumInfo", resourceCulture);
             }
         }
         

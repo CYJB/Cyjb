@@ -133,10 +133,6 @@
     <value>More than one property is found with the specified name and matching the specified binding constraints.</value>
     <comment>找到多个有指定名称且与指定绑定约束匹配的属性。</comment>
   </data>
-  <data name="AmbiguousUserDefinedConverter" xml:space="preserve">
-    <value>Ambiguous user-defined converter found when convert '{0}' to '{1}'.</value>
-    <comment>找到多个用户自定义的类型转换。</comment>
-  </data>
   <data name="ArgumentImplementIComparable" xml:space="preserve">
     <value>At least one object must implement IComparable.</value>
     <comment>必须至少有一个对象实现 IComparable。</comment>
@@ -193,10 +189,6 @@
     <value>Invalid cache type '{0}', did not implement ICache{TKey, TValue}.</value>
     <comment>缓冲池类型无效-未实现 ICache 接口。</comment>
   </data>
-  <data name="InvalidDictionaryThreshold" xml:space="preserve">
-    <value>The specified threshold for creating dictionary is out of range.</value>
-    <comment>用于创建字典的阈值超出范围。</comment>
-  </data>
   <data name="InvalidLexerContext" xml:space="preserve">
     <value>Invalid lexer context '{0}'.</value>
     <comment>无效的词法分析上下文。</comment>
@@ -204,10 +196,6 @@
   <data name="InvalidSourceRange" xml:space="preserve">
     <value>From {0} to {1} is not a valid source range.</value>
     <comment>不是有效的源文件范围。</comment>
-  </data>
-  <data name="MustContainEnumInfo" xml:space="preserve">
-    <value>Must specify valid information for parsing in the string.</value>
-    <comment>必须包含枚举信息。</comment>
   </data>
   <data name="NotGenericMethodDefinition" xml:space="preserve">
     <value>{0} is not a GenericMethodDefinition. {1} may only be called on a method for which MethodBase.IsGenericMethodDefinition is true.</value>

@@ -569,7 +569,7 @@ namespace Cyjb
 			value = value.Trim();
 			if (value.Length == 0)
 			{
-				throw CommonExceptions.MustContainEnumInfo("value");
+				throw CommonExceptions.MustContainValidInfo("value");
 			}
 			// 尝试对数字进行解析，这样可避免之后的字符串比较。
 			ulong tmpValue;

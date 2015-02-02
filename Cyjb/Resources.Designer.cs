@@ -70,6 +70,15 @@ namespace Cyjb {
         }
         
         /// <summary>
+        ///   查找类似 Ambiguous user-defined converter found when convert &apos;{0}&apos; to &apos;{1}&apos;. 的本地化字符串。
+        /// </summary>
+        internal static string AmbiguousUserDefinedConverter {
+            get {
+                return ResourceManager.GetString("AmbiguousUserDefinedConverter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Parameter values must be greater than zero. 的本地化字符串。
         /// </summary>
         internal static string ArgumentMustBePositive {
@@ -322,6 +331,15 @@ namespace Cyjb {
         }
         
         /// <summary>
+        ///   查找类似 The specified threshold is out of range. 的本地化字符串。
+        /// </summary>
+        internal static string InvalidThreshold {
+            get {
+                return ResourceManager.GetString("InvalidThreshold", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 An item with the same key has already been added. 的本地化字符串。
         /// </summary>
         internal static string KeyDuplicate {
@@ -408,6 +426,15 @@ namespace Cyjb {
         internal static string MustBeEnum_Type {
             get {
                 return ResourceManager.GetString("MustBeEnum_Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Must specify valid information for parsing in the string. 的本地化字符串。
+        /// </summary>
+        internal static string MustContainValidInfo {
+            get {
+                return ResourceManager.GetString("MustContainValidInfo", resourceCulture);
             }
         }
         

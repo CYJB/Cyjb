@@ -133,10 +133,6 @@
     <value>找到多个有指定名称且与指定绑定约束匹配的属性。</value>
     <comment>找到多个有指定名称且与指定绑定约束匹配的属性。</comment>
   </data>
-  <data name="AmbiguousUserDefinedConverter" xml:space="preserve">
-    <value>将 '{0}' 转换为 '{1}' 时，存在不明确的用户定义转换。</value>
-    <comment>找到多个用户自定义的类型转换。</comment>
-  </data>
   <data name="ArgumentImplementIComparable" xml:space="preserve">
     <value>必须至少有一个对象实现 IComparable。</value>
     <comment>必须至少有一个对象实现 IComparable。</comment>
@@ -193,10 +189,6 @@
     <value>无效的缓冲池类型 '{0}'，没有实现 ICache{TKey, TValue} 接口。</value>
     <comment>缓冲池类型无效-未实现 ICache 接口。</comment>
   </data>
-  <data name="InvalidDictionaryThreshold" xml:space="preserve">
-    <value>指定的用于创建字典的阈值超出范围。</value>
-    <comment>用于创建字典的阈值超出范围。</comment>
-  </data>
   <data name="InvalidLexerContext" xml:space="preserve">
     <value>无效的词法分析上下文 '{0}'。</value>
     <comment>无效的词法分析上下文。</comment>
@@ -204,10 +196,6 @@
   <data name="InvalidSourceRange" xml:space="preserve">
     <value>从 {0} 到 {1} 不是有效的源文件范围。</value>
     <comment>不是有效的源文件范围。</comment>
-  </data>
-  <data name="MustContainEnumInfo" xml:space="preserve">
-    <value>要在此字符串中进行分析，必须指定有效信息。</value>
-    <comment>必须包含枚举信息。</comment>
   </data>
   <data name="NotGenericMethodDefinition" xml:space="preserve">
     <value>{0} 不是 GenericMethodDefinition。只能对 MethodBase.IsGenericMethodDefinition 为 True 的方法调用 {1}。</value>

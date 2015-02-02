@@ -425,4 +425,16 @@
     <value>找不到与类型 '{0}' 相关的标识为 '{1}' 的处理器。</value>
     <comment>与特定类型相关的处理器未能找到。</comment>
   </data>
+  <data name="AmbiguousUserDefinedConverter" xml:space="preserve">
+    <value>将 '{0}' 转换为 '{1}' 时，存在不明确的用户定义转换。</value>
+    <comment>找到多个用户自定义的类型转换。</comment>
+  </data>
+  <data name="MustContainValidInfo" xml:space="preserve">
+    <value>此字符串中必须指定可用于分析的有效信息。</value>
+    <comment>字符串不包含可用信息。</comment>
+  </data>
+  <data name="InvalidThreshold" xml:space="preserve">
+    <value>指定的阈值超出范围。</value>
+    <comment>阈值超出范围。</comment>
+  </data>
 </root>
