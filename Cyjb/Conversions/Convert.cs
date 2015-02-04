@@ -63,8 +63,10 @@ namespace Cyjb
 			public Converter<object, object> ObjectConverter;
 		}
 		/// <summary>
-		/// 直接返回对象的类型转换器，用于隐式引用转换。
+		/// 直接返回对象的类型转换器。
 		/// </summary>
+		/// <remarks>用于标识转换、隐式引用转换，不需要做任何操作；装箱转换，参数已被装箱；
+		/// 拆箱转换，结果拆箱后又会被装箱为 object。</remarks>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private static readonly Converter<object, object> defaultObjectConverter = obj => obj;
 		/// <summary>
@@ -102,9 +104,28 @@ namespace Cyjb
 						return converter;
 					}
 				}
-				if (conversion.ConversionType == ConversionType.ImplicitReferenceConversion)
+				if (conversion.ConversionType == ConversionType.IdentityConversion ||
+					conversion.ConversionType == ConversionType.ImplicitReferenceConversion ||
+					conversion.ConversionType == ConversionType.BoxConversion ||
+					conversion.ConversionType == ConversionType.UnboxConversion)
 				{
 					converter.ObjectConverter = defaultObjectConverter;
+					if (!buildGeneric)
+					{
+						return converter;
+					}
+				}
+				if (conversion.ConversionType == ConversionType.ExplicitReferenceConversion)
+				{
+					// 对于显式引用转换，只需要检查一下实际类型是否是 outputType 即可。
+					converter.ObjectConverter = obj =>
+					{
+						if (obj != null && !outputType.IsInstanceOfType(obj))
+						{
+							throw CommonExceptions.InvalidCast(obj.GetType(), outputType);
+						}
+						return obj;
+					};
 					if (!buildGeneric)
 					{
 						return converter;
