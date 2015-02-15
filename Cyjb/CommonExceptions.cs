@@ -684,6 +684,15 @@ namespace Cyjb
 		#region 动态绑定异常
 
 		/// <summary>
+		/// 返回不能绑定到开放构造方法的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		internal static ArgumentException BindOpenConstructedMethod(string paramName)
+		{
+			return new ArgumentException(Resources.BindOpenConstructedMethod, paramName);
+		}
+		/// <summary>
 		/// 返回委托类型不兼容的异常。
 		/// </summary>
 		/// <param name="sourceDlg">源委托。</param>
@@ -727,6 +736,16 @@ namespace Cyjb
 			return new ArgumentException(Format(message, memberName));
 		}
 		/// <summary>
+		/// 返回类型包含泛型参数的异常。
+		/// </summary>
+		/// <param name="type">没有默认构造函数的类型。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		internal static ArgumentException TypeContainsGenericParameters(Type type)
+		{
+			Contract.Requires(type != null);
+			return new ArgumentException(Format(Resources.TypeContainsGenericParameters, type));
+		}
+		/// <summary>
 		/// 返回找不到类型成员的异常。
 		/// </summary>
 		/// <param name="memberName">成员名称。</param>
@@ -735,6 +754,16 @@ namespace Cyjb
 		{
 			Contract.Requires(memberName != null);
 			return new ArgumentException(Format(Resources.TypeMemberNotFound, memberName));
+		}
+		/// <summary>
+		/// 返回类型不包含默认构造函数的异常。
+		/// </summary>
+		/// <param name="type">没有默认构造函数的类型。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		internal static ArgumentException TypeMissingDefaultConstructor(Type type)
+		{
+			Contract.Requires(type != null);
+			return new ArgumentException(Format(Resources.TypeMissingDefaultConstructor, type));
 		}
 
 		#endregion // 动态绑定异常

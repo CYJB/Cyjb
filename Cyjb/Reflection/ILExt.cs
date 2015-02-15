@@ -205,6 +205,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="targetType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="paramType"/> 包含泛型参数。</exception>
+		/// <exception cref="ArgumentException"><paramref name="targetType"/> 包含泛型参数。</exception>
 		public static void EmitLoadArg(this ILGenerator il, int index, Type paramType, Type targetType, bool isChecked)
 		{
 			if (il == null)
@@ -220,6 +222,14 @@ namespace Cyjb.Reflection
 				throw CommonExceptions.ArgumentNull("targetType");
 			}
 			Contract.EndContractBlock();
+			if (paramType.ContainsGenericParameters)
+			{
+				throw CommonExceptions.TypeContainsGenericParameters(paramType);
+			}
+			if (targetType.ContainsGenericParameters)
+			{
+				throw CommonExceptions.TypeContainsGenericParameters(targetType);
+			}
 			if (paramType == targetType)
 			{
 				il.EmitLoadArg(index);
@@ -407,6 +417,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="inputType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="outputType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="inputType"/> 包含泛型参数。</exception>
+		/// <exception cref="ArgumentException"><paramref name="outputType"/> 包含泛型参数。</exception>
 		public static void EmitConversion(this ILGenerator il, Type inputType, Type outputType, bool isChecked)
 		{
 			if (il == null)
@@ -422,6 +434,14 @@ namespace Cyjb.Reflection
 				throw CommonExceptions.ArgumentNull("outputType");
 			}
 			Contract.EndContractBlock();
+			if (inputType.ContainsGenericParameters)
+			{
+				throw CommonExceptions.TypeContainsGenericParameters(inputType);
+			}
+			if (outputType.ContainsGenericParameters)
+			{
+				throw CommonExceptions.TypeContainsGenericParameters(outputType);
+			}
 			Conversion conversion = ConversionFactory.GetConversion(inputType, outputType);
 			if (conversion == null)
 			{
@@ -443,6 +463,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="inputType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="outputType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="inputType"/> 包含泛型参数。</exception>
+		/// <exception cref="ArgumentException"><paramref name="outputType"/> 包含泛型参数。</exception>
 		public static Converter GetConversion(this ILGenerator il, Type inputType, Type outputType)
 		{
 			if (il == null)
@@ -458,6 +480,14 @@ namespace Cyjb.Reflection
 				throw CommonExceptions.ArgumentNull("outputType");
 			}
 			Contract.EndContractBlock();
+			if (inputType.ContainsGenericParameters)
+			{
+				throw CommonExceptions.TypeContainsGenericParameters(inputType);
+			}
+			if (outputType.ContainsGenericParameters)
+			{
+				throw CommonExceptions.TypeContainsGenericParameters(outputType);
+			}
 			Conversion conversion = ConversionFactory.GetConversion(inputType, outputType);
 			if (conversion == null)
 			{
@@ -794,6 +824,7 @@ namespace Cyjb.Reflection
 		/// <param name="valueType">栈顶值的类型。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="valueType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="valueType"/> 包含泛型参数。</exception>
 		public static void EmitGetAddress(this ILGenerator il, Type valueType)
 		{
 			if (il == null)
@@ -805,10 +836,55 @@ namespace Cyjb.Reflection
 				throw CommonExceptions.ArgumentNull("valueType");
 			}
 			Contract.EndContractBlock();
-			LocalBuilder locFrom = il.GetManager().GetLocal(valueType);
+			ILManager manager = il.GetManager();
+			LocalBuilder locFrom = manager.GetLocal(valueType);
 			il.Emit(OpCodes.Stloc, locFrom);
 			il.Emit(OpCodes.Ldloca, locFrom);
-			il.GetManager().FreeLocal(locFrom);
+			manager.FreeLocal(locFrom);
+		}
+		/// <summary>
+		/// 使用指定类型的无参数构造函数创建实例。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="type">要创建实例的类型。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="type"/> 包含泛型参数。</exception>
+		public static void EmitNew(this ILGenerator il, Type type)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (type == null)
+			{
+				throw CommonExceptions.ArgumentNull("type");
+			}
+			Contract.EndContractBlock();
+			if (type.ContainsGenericParameters)
+			{
+				throw CommonExceptions.TypeContainsGenericParameters(type);
+			}
+			if (type.IsValueType)
+			{
+				// 值类型使用 initobj 指令。
+				ILManager manager = il.GetManager();
+				LocalBuilder local = manager.GetLocal(type);
+				il.Emit(OpCodes.Ldloca, local);
+				il.Emit(OpCodes.Initobj, type);
+				il.Emit(OpCodes.Ldloc, local);
+				manager.FreeLocal(local);
+			}
+			else
+			{
+				// 引用类型调用构造函数。
+				ConstructorInfo ctor = type.GetConstructor(TypeExt.InstanceFlag, null, Type.EmptyTypes, null);
+				if (ctor == null)
+				{
+					throw CommonExceptions.TypeMissingDefaultConstructor(type);
+				}
+				il.Emit(OpCodes.Newobj, ctor);
+			}
 		}
 	}
 }

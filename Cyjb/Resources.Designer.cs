@@ -160,6 +160,15 @@ namespace Cyjb {
         }
         
         /// <summary>
+        ///   查找类似 Cannot bind to open constructed method. 的本地化字符串。
+        /// </summary>
+        internal static string BindOpenConstructedMethod {
+            get {
+                return ResourceManager.GetString("BindOpenConstructedMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 null cannot be converted to a value type. 的本地化字符串。
         /// </summary>
         internal static string CannotCastNullToValueType {
@@ -736,11 +745,29 @@ namespace Cyjb {
         }
         
         /// <summary>
+        ///   查找类似 Type &apos;{0}&apos; contains generic parameters. 的本地化字符串。
+        /// </summary>
+        internal static string TypeContainsGenericParameters {
+            get {
+                return ResourceManager.GetString("TypeContainsGenericParameters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Type member &apos;{0}&apos; not exists. 的本地化字符串。
         /// </summary>
         internal static string TypeMemberNotFound {
             get {
                 return ResourceManager.GetString("TypeMemberNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Type &apos;{0}&apos; does not have a default constructor. 的本地化字符串。
+        /// </summary>
+        internal static string TypeMissingDefaultConstructor {
+            get {
+                return ResourceManager.GetString("TypeMissingDefaultConstructor", resourceCulture);
             }
         }
         

@@ -437,4 +437,16 @@
     <value>指定的阈值超出范围。</value>
     <comment>阈值超出范围。</comment>
   </data>
+  <data name="BindOpenConstructedMethod" xml:space="preserve">
+    <value>不能绑定到开放构造方法。</value>
+    <comment>不能绑定到开放构造方法。</comment>
+  </data>
+  <data name="TypeContainsGenericParameters" xml:space="preserve">
+    <value>类型 '{0}' 包含泛型参数。</value>
+    <comment>类型包含泛型参数。</comment>
+  </data>
+  <data name="TypeMissingDefaultConstructor" xml:space="preserve">
+    <value>类型 '{0}' 没有默认构造函数。</value>
+    <comment>类型不包含默认构造函数。</comment>
+  </data>
 </root>

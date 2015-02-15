@@ -222,6 +222,8 @@ namespace Cyjb
 		/// <remarks>尽可能使用泛型方法 <see cref="GetConverter{TInput,TOutput}"/>，这样可以避免额外的类型转换。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="inputType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="outputType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="inputType"/> 包含泛型参数。</exception>
+		/// <exception cref="ArgumentException"><paramref name="outputType"/> 包含泛型参数。</exception>
 		public static Converter<object, object> GetConverter(Type inputType, Type outputType)
 		{
 			if (inputType == null)
@@ -233,6 +235,14 @@ namespace Cyjb
 				throw CommonExceptions.ArgumentNull("outputType");
 			}
 			Contract.EndContractBlock();
+			if (inputType.ContainsGenericParameters)
+			{
+				throw CommonExceptions.TypeContainsGenericParameters(inputType);
+			}
+			if (outputType.ContainsGenericParameters)
+			{
+				throw CommonExceptions.TypeContainsGenericParameters(outputType);
+			}
 			Converter converter = GetConverterInternal(inputType, outputType, false);
 			if (converter == null)
 			{
@@ -254,6 +264,8 @@ namespace Cyjb
 		/// 方法注册的类型转换方法。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="inputType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="outputType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="inputType"/> 包含泛型参数。</exception>
+		/// <exception cref="ArgumentException"><paramref name="outputType"/> 包含泛型参数。</exception>
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
 		public static bool CanChangeType(Type inputType, Type outputType)
 		{
@@ -266,6 +278,14 @@ namespace Cyjb
 				throw CommonExceptions.ArgumentNull("outputType");
 			}
 			Contract.EndContractBlock();
+			if (inputType.ContainsGenericParameters)
+			{
+				throw CommonExceptions.TypeContainsGenericParameters(inputType);
+			}
+			if (outputType.ContainsGenericParameters)
+			{
+				throw CommonExceptions.TypeContainsGenericParameters(outputType);
+			}
 			try
 			{
 				return ConversionFactory.GetConversion(inputType, outputType) != null;

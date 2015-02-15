@@ -33,16 +33,16 @@ namespace Cyjb
 	/// 	public static void TestMethod{T}(params T[] arg) { }
 	/// 	static void Main(string[] args) {
 	/// 		Type type = typeof(Program);
-	/// 		Action{int} m1 = type.CreateDelegate{Action{int}}("TestMethod");
+	/// 		Action&lt;int&gt; m1 = type.CreateDelegate&lt;Action&lt;int&gt;&gt;("TestMethod");
 	/// 		m1(10);
 	/// 		Program p = new Program();
-	/// 		Action{Program, uint} m2 = type.CreateDelegate{Action{Program, uint}}("TestMethod");
+	/// 		Action&lt;Program, uint&gt; m2 = type.CreateDelegate&lt;Action&lt;Program, uint&gt;&gt;("TestMethod");
 	/// 		m2(p, 10);
-	/// 		Action{object, uint} m3 = type.CreateDelegate{Action{object, uint}}("TestMethod");
+	/// 		Action&lt;object, uint} m3 = type.CreateDelegate&lt;Action&lt;object, uint&gt;&gt;("TestMethod");
 	/// 		m3(p, 10);
-	/// 		Action{uint} m4 = type.CreateDelegate{Action{uint}}("TestMethod", p);
+	/// 		Action&lt;uint} m4 = type.CreateDelegate&lt;Action&lt;uint&gt;&gt;("TestMethod", p);
 	/// 		m4(10);
-	/// 		MyDelegate m5 = type.CreateDelegate{MyDelegate}("TestMethod");
+	/// 		MyDelegate m5 = type.CreateDelegate&lt;MyDelegate&gt;("TestMethod");
 	/// 		m5(0, 1, 2);
 	/// 	}
 	/// }
@@ -50,7 +50,8 @@ namespace Cyjb
 	/// </example>
 	/// <remarks>
 	/// <para><see cref="DelegateBuilder"/> 类提供的 <c>CreateDelegate</c> 方法，其的用法与 
-	/// <c>Delegate.CreateDelegate</c> 完全相同，功能却大大丰富，几乎可以只依靠委托类型、反射类型和成员名称构造出任何需要的委托，
+	/// <c>Delegate.CreateDelegate</c> 完全相同，功能却大大丰富，
+	/// 几乎可以只依靠委托类型、反射类型和成员名称构造出任何需要的委托，
 	/// 省去了自己反射获取类型成员的过程。</para>
 	/// <para>关于对反射创建委托的效率问题，以及该类的实现原理，可以参见我的博文 
 	/// <see href="http://www.cnblogs.com/cyjb/archive/p/DelegateBuilder.html">
@@ -60,11 +61,160 @@ namespace Cyjb
 	public static class DelegateBuilder
 	{
 
+		#region 通用委托
+
+		/// <summary>
+		/// 创建表示指定的静态或实例方法的的委托。如果是实例方法，需要将实例对象作为第一个参数；
+		/// 如果是静态方法，则第一个参数无效。对于可变参数方法，只支持固定参数。
+		/// </summary>
+		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodInfo"/>。</param>
+		/// <returns>表示指定的静态或实例方法的委托。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="method"/> 是开放构造方法。</exception>
+		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
+		public static MethodInvoker CreateDelegate(this MethodInfo method)
+		{
+			if (method == null)
+			{
+				throw CommonExceptions.ArgumentNull("method");
+			}
+			Contract.Ensures(Contract.Result<MethodInvoker>() != null);
+			if (method.ContainsGenericParameters)
+			{
+				// 不能对开放构造方法执行绑定。
+				throw CommonExceptions.BindOpenConstructedMethod("method");
+			}
+			DynamicMethod dlgMethod = new DynamicMethod("MethodInvoker", typeof(object),
+				new[] { typeof(object), typeof(object[]) }, method.Module, true);
+			ILGenerator il = dlgMethod.GetILGenerator();
+			Contract.Assume(il != null);
+			Type declType = method.DeclaringType;
+			ParameterInfo[] parameters = method.GetParametersNoCopy();
+			int len = parameters.Length;
+			// 参数数量检测。
+			if (len > 0)
+			{
+				il.EmitCheckArgumentNull(1, "parameters");
+				il.Emit(OpCodes.Ldarg_1);
+				il.EmitCheckTargetParameterCount(parameters.Length);
+			}
+			// 加载实例对象。
+			if (!method.IsStatic)
+			{
+				il.EmitCheckArgumentNull(0, "instance");
+				il.Emit(OpCodes.Ldarg_0);
+				il.EmitConversion(typeof(object), declType, true);
+				Contract.Assume(declType != null);
+				if (declType.IsValueType)
+				{
+					// 值类型要转换为相应的指针。
+					il.EmitGetAddress(declType);
+				}
+			}
+			// 加载方法参数。
+			for (int i = 0; i < len; i++)
+			{
+				il.Emit(OpCodes.Ldarg_1);
+				il.EmitInt(i);
+				il.Emit(OpCodes.Ldelem_Ref);
+				il.EmitConversion(typeof(object), parameters[i].ParameterType, true);
+			}
+			if (method.ReturnType == typeof(void))
+			{
+				// 无返回值。
+				il.EmitCall(method.DeclaringType, method, Type.EmptyTypes);
+				il.EmitConstant(null);
+			}
+			else
+			{
+				// 对返回值进行类型转换。
+				Converter converter = il.GetConversion(method.ReturnType, typeof(object));
+				il.EmitCall(method.DeclaringType, method, !converter.NeedEmit, Type.EmptyTypes);
+				converter.Emit(true);
+			}
+			il.Emit(OpCodes.Ret);
+			return (MethodInvoker)dlgMethod.CreateDelegate(typeof(MethodInvoker));
+		}
+		/// <summary>
+		/// 创建表示指定的构造函数的的委托。对于可变参数方法，只支持固定参数。
+		/// </summary>
+		/// <param name="ctor">描述委托要表示的构造函数的 <see cref="ConstructorInfo"/>。</param>
+		/// <returns>表示指定的构造函数的委托。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="ctor"/> 为 <c>null</c>。</exception>
+		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="ctor"/>。</exception>
+		public static InstanceCreator CreateDelegate(this ConstructorInfo ctor)
+		{
+			if (ctor == null)
+			{
+				throw CommonExceptions.ArgumentNull("type");
+			}
+			Contract.EndContractBlock();
+			DynamicMethod dlgMethod = new DynamicMethod("InstanceCreator", typeof(object),
+				new[] { typeof(object[]) }, ctor.Module, true);
+			ILGenerator il = dlgMethod.GetILGenerator();
+			Contract.Assume(il != null);
+			ParameterInfo[] parameters = ctor.GetParametersNoCopy();
+			int len = parameters.Length;
+			// 参数数量检测。
+			if (len > 0)
+			{
+				il.EmitCheckArgumentNull(0, "parameters");
+				il.Emit(OpCodes.Ldarg_0);
+				il.EmitCheckTargetParameterCount(parameters.Length);
+			}
+			// 加载方法参数。
+			for (int i = 0; i < len; i++)
+			{
+				il.Emit(OpCodes.Ldarg_0);
+				il.EmitInt(i);
+				il.Emit(OpCodes.Ldelem_Ref);
+				il.EmitConversion(typeof(object), parameters[i].ParameterType, true);
+			}
+			// 对实例进行类型转换。
+			Converter converter = il.GetConversion(ctor.DeclaringType, typeof(object));
+			il.Emit(OpCodes.Newobj, ctor);
+			converter.Emit(true);
+			il.Emit(OpCodes.Ret);
+			return (InstanceCreator)dlgMethod.CreateDelegate(typeof(InstanceCreator));
+		}
+		/// <summary>
+		/// 创建表示指定类型的默认构造函数的的委托。对于可变参数方法，只支持固定参数。
+		/// </summary>
+		/// <param name="type">描述委托要创建的实例的类型。</param>
+		/// <returns>表示指定类型的默认构造函数的委托。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="type"/> 包含泛型参数。</exception>
+		public static InstanceCreator CreateInstanceCreator(this Type type)
+		{
+			if (type == null)
+			{
+				throw CommonExceptions.ArgumentNull("type");
+			}
+			Contract.EndContractBlock();
+			if (type.ContainsGenericParameters)
+			{
+				throw CommonExceptions.TypeContainsGenericParameters(type);
+			}
+			DynamicMethod dlgMethod = new DynamicMethod("InstanceCreator", typeof(object),
+				new[] { typeof(object[]) }, type.Module, true);
+			ILGenerator il = dlgMethod.GetILGenerator();
+			Contract.Assume(il != null);
+			// 对实例进行类型转换。
+			Converter converter = il.GetConversion(type, typeof(object));
+			il.EmitNew(type);
+			converter.Emit(true);
+			il.Emit(OpCodes.Ret);
+			return (InstanceCreator)dlgMethod.CreateDelegate(typeof(InstanceCreator));
+		}
+
+		#endregion // 通用委托
+
 		#region 从 MethodInfo 构造方法委托
 
 		/// <summary>
 		/// 创建用于表示指定静态或实例方法的指定类型的委托。
-		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。支持参数的强制类型转换，参数声明可以与实际类型不同。
+		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodInfo"/>。</param>
@@ -101,7 +251,8 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示指定静态或实例方法的指定类型的委托。
-		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。支持参数的强制类型转换，参数声明可以与实际类型不同。
+		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodInfo"/>。</param>
@@ -135,7 +286,8 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 创建用于表示指定静态或实例方法的指定类型的委托。
-		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。支持参数的强制类型转换，参数声明可以与实际类型不同。
+		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodInfo"/>。</param>
@@ -169,7 +321,8 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示指定静态或实例方法的指定类型的委托。
-		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。支持参数的强制类型转换，参数声明可以与实际类型不同。
+		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodInfo"/>。</param>
@@ -205,61 +358,8 @@ namespace Cyjb
 			return dlg;
 		}
 		/// <summary>
-		/// 创建表示指定的静态或实例方法的的委托。如果是实例方法，需要将实例对象作为第一个参数；如果是静态方法，则第一个参数无效。
-		/// </summary>
-		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodInfo"/>。</param>
-		/// <returns>表示指定的静态或实例方法的委托。</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentException"><paramref name="method"/> 是开放的泛型方法。</exception>
-		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
-		public static MethodInvoker CreateDelegate(this MethodInfo method)
-		{
-			if (method == null)
-			{
-				throw CommonExceptions.ArgumentNull("method");
-			}
-			if (method.IsGenericMethodDefinition)
-			{
-				// TODO: 修改异常文本：不能绑定到开放的fanxingfangfa
-				// 不对开放的泛型方法执行绑定。
-				throw CommonExceptions.BindTargetMethod("method");
-			}
-			Contract.Ensures(Contract.Result<MethodInvoker>() != null);
-			DynamicMethod dlgMethod = new DynamicMethod("MethodInvoker", typeof(object), new[] { typeof(object[]) });
-			ILGenerator il = dlgMethod.GetILGenerator();
-			// 加载实例对象。
-			if (!method.IsStatic)
-			{
-				il.Emit(OpCodes.Ldarg_0);
-				il.EmitInt(0);
-				il.Emit(OpCodes.Ldelem_Ref);
-				il.EmitLoadArg(0, typeof(object), method.DeclaringType);
-			}
-			//			Expression instanceCast = method.IsStatic ? null :
-			//				instanceParam.ConvertType(method.DeclaringType);
-
-			// 构造参数列表。
-			//			ParameterInfo[] methodParams = method.GetParameters();
-			//			Expression[] paramExps = new Expression[methodParams.Length];
-			//			for (int i = 0; i < methodParams.Length; i++)
-			//			{
-			//				// (Ti)parameters[i]
-			//				paramExps[i] = Expression.ArrayIndex(parametersParam, Expression.Constant(i))
-			//					.ConvertType(methodParams[i].ParameterType);
-			//			}
-			//			// 静态方法不需要实例，实例方法需要 (TInstance)instance
-			//			Expression instanceCast = method.IsStatic ? null :
-			//				instanceParam.ConvertType(method.DeclaringType);
-			//			// 调用方法。
-			//			Expression methodCall = Expression.Call(instanceCast, method, paramExps);
-			//			// 添加参数数量检测。
-			//			methodCall = Expression.Block(GetCheckParameterExp(parametersParam, methodParams.Length), methodCall);
-			//			return Expression.Lambda<MethodInvoker>(GetReturn(methodCall, typeof(object)),
-			//				instanceParam, parametersParam).Compile();
-			return null;
-		}
-		/// <summary>
-		/// 创建指定的静态或实例方法的指定类型的开放方法委托。如果是实例方法，需要将实例对象作为委托的第一个参数。
+		/// 创建指定的静态或实例方法的指定类型的开放方法委托。
+		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
@@ -674,7 +774,7 @@ namespace Cyjb
 		/// <paramref name="ctor"/>。</exception>
 		public static Delegate CreateDelegate(Type type, ConstructorInfo ctor, bool throwOnBindFailure)
 		{
-			CommonExceptions.CheckArgumentNull(ctor, "ctor");
+			CommonExceptions.CheckArgumentNull(ctor, "type");
 			CommonExceptions.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			ParameterInfo[] invokeParams = invoke.GetParameters();
@@ -698,41 +798,11 @@ namespace Cyjb
 			}
 			if (throwOnBindFailure)
 			{
-				throw CommonExceptions.BindTargetMethod("ctor");
+				throw CommonExceptions.BindTargetMethod("type");
 			}
 			return null;
 		}
-		/// <summary>
-		/// 创建表示指定的构造函数的的委托。
-		/// </summary>
-		/// <param name="ctor">描述委托要表示的构造函数的 
-		/// <see cref="System.Reflection.ConstructorInfo"/>。</param>
-		/// <returns>表示指定的构造函数的委托。</returns>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="ctor"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.MethodAccessException">调用方无权访问
-		/// <paramref name="ctor"/>。</exception>
-		public static InstanceCreator CreateDelegate(this ConstructorInfo ctor)
-		{
-			CommonExceptions.CheckArgumentNull(ctor, "ctor");
-			// 构造函数的参数。
-			ParameterExpression parametersParam = Expression.Parameter(typeof(object[]));
-			// 构造参数列表。
-			ParameterInfo[] methodParams = ctor.GetParameters();
-			Expression[] paramExps = new Expression[methodParams.Length];
-			for (int i = 0; i < methodParams.Length; i++)
-			{
-				// (Ti)parameters[i]
-				paramExps[i] = Expression.ArrayIndex(parametersParam, Expression.Constant(i))
-					.ConvertType(methodParams[i].ParameterType);
-			}
-			// 新建实例。
-			Expression methodCall = Expression.New(ctor, paramExps);
-			// 添加参数数量检测。
-			methodCall = Expression.Block(GetCheckParameterExp(parametersParam, methodParams.Length), methodCall);
-			return Expression.Lambda<InstanceCreator>(GetReturn(methodCall, typeof(object)),
-				parametersParam).Compile();
-		}
+
 
 		#endregion // 从 ConstructorInfo 构造构造函数委托
 
@@ -1371,7 +1441,7 @@ namespace Cyjb
 		/// <summary>
 		/// 构造函数的名称。
 		/// </summary>
-		private const string ConstructorName = ".ctor";
+		private const string ConstructorName = ".type";
 		/// <summary>
 		/// 默认的绑定设置值。
 		/// </summary>

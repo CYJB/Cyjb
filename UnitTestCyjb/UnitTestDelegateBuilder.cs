@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Text;
 using Cyjb;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -11,6 +12,99 @@ namespace UnitTestCyjb
 	[TestClass]
 	public class UnitTestDelegateBuilder
 	{
+
+		#region 测试通用委托
+
+		/// <summary>
+		/// 测试构造 MethodInvoker 委托。
+		/// </summary>
+		[TestMethod]
+		public void TestMethodInvoker()
+		{
+			Type type = typeof(TestClass);
+
+			// 静态方法
+			MethodInfo method = type.GetMethod("TestStaticMethod", Type.EmptyTypes);
+			MethodInfo methodStr = type.GetMethod("TestStaticMethod", new[] { typeof(string) });
+			MethodInfo methodInt = type.GetMethod("TestStaticMethod", new[] { typeof(int) });
+			// 无参数
+			Assert.AreEqual("StaticMethod", method.CreateDelegate()("NoUse"));
+			Assert.AreEqual("StaticMethod", method.CreateDelegate()(null));
+			// 字符串参数
+			Assert.AreEqual("Test_StaticMethod", methodStr.CreateDelegate()("NoUse", "Test"));
+			Assert.AreEqual("Test_StaticMethod", methodStr.CreateDelegate()(null, "Test"));
+			AssertExt.ThrowsException(() => methodStr.CreateDelegate()("NoUse", null),
+				typeof(ArgumentNullException));
+			AssertExt.ThrowsException(() => methodStr.CreateDelegate()("NoUse"),
+				typeof(TargetParameterCountException));
+			AssertExt.ThrowsException(() => methodStr.CreateDelegate()("NoUse", "Test", "more args"),
+				typeof(TargetParameterCountException));
+			// 整数参数
+			Assert.AreEqual("10_StaticMethod", methodInt.CreateDelegate()("NoUse", 10));
+			Assert.AreEqual("10_StaticMethod", methodInt.CreateDelegate()(null, 10));
+
+			// 可变参数
+			method = type.GetMethod("TestVarargsMethod", Type.EmptyTypes);
+			methodStr = type.GetMethod("TestVarargsMethod", new[] { typeof(string) });
+			Assert.AreEqual("VarargsMethod", method.CreateDelegate()(null));
+			Assert.AreEqual("Test_VarargsMethod", methodStr.CreateDelegate()(null, "Test"));
+
+			// 实例方法
+			method = type.GetMethod("TestInstanceMethod", Type.EmptyTypes);
+			methodStr = type.GetMethod("TestInstanceMethod", new[] { typeof(string) });
+			methodInt = type.GetMethod("TestInstanceMethod", new[] { typeof(int) });
+			TestClass instance = new TestClass {Text = "Instance"};
+			// 无参数
+			Assert.AreEqual("Instance_InstanceMethod", method.CreateDelegate()(instance));
+			AssertExt.ThrowsException(() => method.CreateDelegate()(null),
+				typeof(ArgumentNullException));
+			// 字符串参数
+			Assert.AreEqual("Test_Instance_InstanceMethod", methodStr.CreateDelegate()(instance, "Test"));
+			AssertExt.ThrowsException(() => methodStr.CreateDelegate()(instance, null),
+				typeof(ArgumentNullException));
+			AssertExt.ThrowsException(() => methodStr.CreateDelegate()(instance),
+				typeof(TargetParameterCountException));
+			AssertExt.ThrowsException(() => methodStr.CreateDelegate()(instance, "Test", "more args"),
+				typeof(TargetParameterCountException));
+			// 整数参数
+			Assert.AreEqual("10_Instance_InstanceMethod", methodInt.CreateDelegate()(instance, 10));
+
+			// ToString
+			method = typeof(object).GetMethod("ToString", Type.EmptyTypes);
+			methodStr = typeof(string).GetMethod("ToString", Type.EmptyTypes);
+			methodInt = typeof(int).GetMethod("ToString", Type.EmptyTypes);
+			Assert.AreEqual("10", method.CreateDelegate()(10));
+			Assert.AreEqual("10", method.CreateDelegate()("10"));
+			Assert.AreEqual("10", methodStr.CreateDelegate()("10"));
+			Assert.AreEqual("10", methodInt.CreateDelegate()(10));
+		}
+		/// <summary>
+		/// 测试构造 InstanceCreator 委托。
+		/// </summary>
+		[TestMethod]
+		public void TestInstanceCreator()
+		{
+			Type type = typeof(TestClass);
+
+			ConstructorInfo method0 = type.GetConstructor(Type.EmptyTypes);
+			ConstructorInfo methodStr = type.GetConstructor(new[] { typeof(string) });
+			ConstructorInfo methodInt = type.GetConstructor(new[] { typeof(int) });
+			ConstructorInfo methodStrInt = type.GetConstructor(new[] { typeof(string), typeof(int) });
+
+			Assert.AreEqual("NoParam", ((TestClass)method0.CreateDelegate()()).Text);
+			Assert.AreEqual("Test", ((TestClass)methodStr.CreateDelegate()("Test")).Text);
+			Assert.AreEqual("10", ((TestClass)methodInt.CreateDelegate()(10)).Text);
+			Assert.AreEqual("Test_10", ((TestClass)methodStrInt.CreateDelegate()("Test", 10)).Text);
+			AssertExt.ThrowsException(() => methodStr.CreateDelegate()(null), typeof(ArgumentNullException));
+			AssertExt.ThrowsException(() => methodStr.CreateDelegate()(), typeof(TargetParameterCountException));
+
+			Assert.AreEqual("NoParam", ((TestClass)typeof(TestClass).CreateInstanceCreator()()).Text);
+			Assert.AreEqual(0, typeof(int).CreateInstanceCreator()());
+			Assert.AreEqual(typeof(TestStruct), typeof(TestStruct).CreateInstanceCreator()().GetType());
+		}
+
+		#endregion // 测试通用委托
+
 		/// <summary>
 		/// 测试通过 MethodInfo 构造方法委托。
 		/// </summary>
@@ -47,11 +141,6 @@ namespace UnitTestCyjb
 			Assert.AreEqual("Test10_StaticMethod", method.CreateDelegate<Func<string>>("Test10")());
 			Assert.AreEqual("Test11_StaticMethod", method.CreateDelegate<Func<object>>("Test11")());
 			Assert.AreEqual(null, method.CreateDelegate<Func<int>>("Test11", false));
-			// 通用静态方法。
-			Assert.AreEqual("StaticMethod", method0.CreateDelegate()("NoUse"));
-			Assert.AreEqual("Test12_StaticMethod", method.CreateDelegate()("NoUse", "Test12"));
-			AssertExt.ThrowsException(() => method0.CreateDelegate()("Instance", "more args"), typeof(TargetParameterCountException));
-			AssertExt.ThrowsException(() => method.CreateDelegate()("Instance"), typeof(TargetParameterCountException));
 			// 开放的泛型静态方法。
 			Assert.AreEqual("<System.String>Test13_StaticMethod", method3.CreateDelegate<Func<string, string>>()("Test13"));
 			Assert.AreEqual("<System.Int32>14_StaticMethod", method3.CreateDelegate<Func<int, string>>()(14));
@@ -118,9 +207,6 @@ namespace UnitTestCyjb
 			Assert.AreEqual("Test11_TC_InstanceMethod", method.CreateDelegate<Func<string, object>>(tc)("Test11"));
 			Assert.AreEqual("Test11_TC_InstanceMethod", method.CreateDelegate<Func<object, object>>(tc)("Test11"));
 			Assert.AreEqual(null, method.CreateDelegate<Func<int>>(tc, false));
-			// 通用实例方法。
-			Assert.AreEqual("Test12_TC_InstanceMethod", method.CreateDelegate()(tc, "Test12"));
-			Assert.AreEqual("TC_InstanceMethod", method0.CreateDelegate()(tc));
 			// 开放的泛型实例方法。
 			Assert.AreEqual("<System.String>Test13_TC_InstanceMethod",
 				method3.CreateDelegate<Func<TestClass, string, string>>()(tc, "Test13"));
@@ -191,12 +277,7 @@ namespace UnitTestCyjb
 			Assert.AreEqual("Test4_10", method2.CreateDelegate<Func<string, ulong, TestClass>>()("Test4", 10UL).Text);
 			Assert.AreEqual("Test5_10", method2.CreateDelegate<Func<string, short, TestClass>>()("Test5", (short)10).Text);
 			Assert.AreEqual(null, method2.CreateDelegate<Func<string, string, TestClass>>(false));
-			// 通用构造函数。
-			Assert.AreEqual("NoParam", ((TestClass)method0.CreateDelegate()()).Text);
-			Assert.AreEqual("Test6", ((TestClass)method.CreateDelegate()("Test6")).Text);
-			Assert.AreEqual("Test7_20", ((TestClass)method2.CreateDelegate()("Test7", 20)).Text);
-			AssertExt.ThrowsException(() => method0.CreateDelegate()("more args"), typeof(TargetParameterCountException));
-			AssertExt.ThrowsException(() => method.CreateDelegate()(), typeof(TargetParameterCountException));
+
 		}
 
 		/// <summary>
@@ -430,6 +511,7 @@ namespace UnitTestCyjb
 			Assert.AreEqual(101, value2);
 		}
 		private delegate string TestDelegate(string key, ref string value, out int value2);
+		private class TestStruct { }
 		private class TestClass
 		{
 
@@ -443,9 +525,38 @@ namespace UnitTestCyjb
 			{
 				return key + "_StaticMethod";
 			}
+			public static string TestStaticMethod(int key)
+			{
+				return key + "_StaticMethod";
+			}
+			public static string TestVarargsMethod(__arglist)
+			{
+				ArgIterator args = new ArgIterator(__arglist);
+				StringBuilder text = new StringBuilder(16);
+				while (args.GetRemainingCount() > 0)
+				{
+					text.Append(TypedReference.ToObject(args.GetNextArg()));
+					text.Append('-');
+				}
+				text.Append("VarargsMethod");
+				return text.ToString();
+			}
+			public static string TestVarargsMethod(string key, __arglist)
+			{
+				ArgIterator args = new ArgIterator(__arglist);
+				StringBuilder text = new StringBuilder(16);
+				while (args.GetRemainingCount() > 0)
+				{
+					text.Append(TypedReference.ToObject(args.GetNextArg()));
+					text.Append('-');
+				}
+				text.Append(key);
+				text.Append("_VarargsMethod");
+				return text.ToString();
+			}
 			public static string TestStaticMethod(string key, int value)
 			{
-				return key + "_" + value.ToString() + "_StaticMethod";
+				return key + "_" + value + "_StaticMethod";
 			}
 			public static string TestStaticMethod2<T>(T key)
 			{
@@ -461,18 +572,14 @@ namespace UnitTestCyjb
 			public string Text;
 			public string TestInstanceMethod()
 			{
-				if (this == null)
-				{
-					return "NullThis_InstanceMethod";
-				}
 				return Text + "_InstanceMethod";
 			}
 			public string TestInstanceMethod(string key)
 			{
-				if (this == null)
-				{
-					return key + "_NullThis_InstanceMethod";
-				}
+				return key + "_" + Text + "_InstanceMethod";
+			}
+			public string TestInstanceMethod(int key)
+			{
 				return key + "_" + Text + "_InstanceMethod";
 			}
 			public string TestInstanceMethod(string key, int value)
@@ -507,9 +614,13 @@ namespace UnitTestCyjb
 			{
 				this.Text = key;
 			}
+			public TestClass(int key)
+			{
+				this.Text = key.ToString();
+			}
 			public TestClass(string key, int value)
 			{
-				this.Text = key + "_" + value.ToString();
+				this.Text = key + "_" + value;
 			}
 
 			#endregion // 构造函数
