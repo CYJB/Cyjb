@@ -58,7 +58,7 @@ namespace Cyjb.Conversions
 				}
 				method = UserConversionCache.GetConversionFrom(outputType, inputType);
 			}
-			generator.Emit(OpCodes.Call, method);
+			generator.EmitCall(method);
 		}
 	}
 }

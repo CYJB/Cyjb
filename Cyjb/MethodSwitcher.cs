@@ -270,14 +270,14 @@ namespace Cyjb
 				paramTypes.Insert(0, closure.GetType()), true);
 			ILGenerator il = method.GetILGenerator();
 			// 静态方法中，arg_0 用作存储处理器委托字典。
-			il.Emit(OpCodes.Ldarg_0);
-			if (!data.IsStatic)
+			if (data.IsStatic)
 			{
-				// 实例方法中，arg_0.Constants[1] 用作存储处理器委托字典。
-				il.Emit(OpCodes.Ldfld, Reflections.ClosureConstants);
-				il.EmitInt(1);
-				il.Emit(OpCodes.Ldelem_Ref);
-				il.Emit(OpCodes.Castclass, typeof(Dictionary<Type, Delegate>));
+				il.Emit(OpCodes.Ldarg_0);
+			}
+			else
+			{
+				// 实例方法中，Closure.Constants[1] 用作存储处理器委托字典。
+				il.EmitLoadClosureConstant(1, typeof(Dictionary<Type, Delegate>));
 			}
 			// 判断关键参数是否为 null。
 			il.EmitLoadArg(data.KeyIndex + 1);
@@ -290,22 +290,18 @@ namespace Cyjb
 			// 关键参数不为 null，将参数类型作为查找类型。
 			il.MarkLabel(keyNullCase);
 			il.EmitLoadArg(data.KeyIndex + 1);
-			il.Emit(OpCodes.Call, methodGetType);
+			il.EmitCall(methodGetType);
 			il.MarkLabel(endKeyNull);
 			// 调用 GetMethod 方法，取得方法委托。
 			il.EmitConstant(id);
-			il.Emit(OpCodes.Call, methodGetMethod);
+			il.EmitCall(methodGetMethod);
 			il.Emit(OpCodes.Castclass, data.DelegateType);
 			//// 载入参数，调用委托。
 			Type[] originParamTypes = data.DelegateParamTypes;
 			if (!data.IsStatic)
 			{
-				// 载入实例。
-				il.Emit(OpCodes.Ldarg_0);
-				il.Emit(OpCodes.Ldfld, Reflections.ClosureConstants);
-				il.EmitInt(0);
-				il.Emit(OpCodes.Ldelem_Ref);
-				il.EmitConversion(typeof(object), instance.GetType(), true);
+				// 载入实例，Closure.Constants[0]。
+				il.EmitLoadClosureConstant(0, instance.GetType());
 			}
 			int offset = data.IsStatic ? 0 : 1;
 			for (int i = 0; i < paramTypes.Length; i++)

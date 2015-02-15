@@ -35,8 +35,7 @@ namespace Cyjb.Conversions
 		{
 			Contract.Assume(inputType.IsNullable());
 			Type inputUnderlyingType = Nullable.GetUnderlyingType(inputType);
-			MethodInfo getValueMethod = inputType.GetMethod("get_Value");
-			generator.Emit(OpCodes.Call, getValueMethod);
+			generator.EmitCall(inputType.GetMethod("get_Value"));
 			if (inputUnderlyingType != outputType)
 			{
 				Conversion conversion = ConversionFactory.GetConversion(inputUnderlyingType, outputType);

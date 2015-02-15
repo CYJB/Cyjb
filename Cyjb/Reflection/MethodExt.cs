@@ -54,7 +54,7 @@ namespace Cyjb.Reflection
 			il.Emit(OpCodes.Ldarg_0);
 			il.Emit(OpCodes.Ldfld, mhandleField);
 			il.Emit(OpCodes.Ldarg_0);
-			il.Emit(OpCodes.Call, getParamsInfoMethod);
+			il.EmitCall(getParamsInfoMethod, true);
 			il.Emit(OpCodes.Ret);
 			return (Func<MethodBase, ParameterInfo[]>)method.CreateDelegate(typeof(Func<MethodBase, ParameterInfo[]>));
 		}

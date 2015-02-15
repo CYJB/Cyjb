@@ -14,7 +14,6 @@ namespace Cyjb.Reflection
 		/// <summary>
 		/// 类型转换器。
 		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private readonly Conversion conversion;
 		/// <summary>
 		/// IL 的指令生成器。
@@ -30,11 +29,6 @@ namespace Cyjb.Reflection
 		/// </summary>
 		private readonly Type outputType;
 		/// <summary>
-		/// 要转换的参数是否需要从值转换为其地址。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private readonly bool passByAddr;
-		/// <summary>
 		/// 使用指定的类型转换器、IL 指令生成器和类型初始化 <see cref="Converter"/> 类的新实例。
 		/// </summary>
 		/// <param name="conversion">类型转换器。</param>
@@ -48,16 +42,23 @@ namespace Cyjb.Reflection
 			this.il = il;
 			this.inputType = inputType;
 			this.outputType = outputType;
-			this.passByAddr = conversion is FromNullableConversion;
 		}
 		/// <summary>
 		/// 获取要转换的参数是否需要从值转换为其地址。
 		/// </summary>
 		/// <value>要转换的参数是否需要从值转换为其地址。</value>
-		/// <remarks>一般将参数从值转换为地址的方法，是使用 stloc 指令和 ldloca 指令。</remarks>
+		/// <remarks>一般将参数从值转换为地址的方法，是使用 <c>stloc</c> 指令和 <c>ldloca</c> 指令。</remarks>
 		public bool PassByAddr
 		{
-			get { return this.passByAddr; }
+			get { return conversion is FromNullableConversion; }
+		}
+		/// <summary>
+		/// 获取是否需要写入 IL（一些类型转换并不需要写入 IL）。
+		/// </summary>
+		/// <value>当前转换是否需要写入 IL。</value>
+		public bool NeedEmit
+		{
+			get { return !(conversion is IdentityConversion); }
 		}
 		/// <summary>
 		/// 写入类型转换的 IL 指令。

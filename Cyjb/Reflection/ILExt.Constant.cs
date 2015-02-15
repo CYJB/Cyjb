@@ -6,13 +6,10 @@ using System.Reflection.Emit;
 
 namespace Cyjb.Reflection
 {
-	/// <summary>
-	/// 提供提交 IL 指令的扩展方法。
-	/// </summary>
 	public static partial class ILExt
 	{
 
-		#region 方法信息常量
+		#region 成员反射信息常量
 
 		/// <summary>
 		/// 表示 <see cref="decimal(int)"/>。
@@ -48,7 +45,7 @@ namespace Cyjb.Reflection
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private static readonly MethodInfo getTypeFromHandler = typeof(Type).GetMethod("GetTypeFromHandle");
 
-		#endregion // 方法信息常量
+		#endregion // 成员反射信息常量
 
 		#region 基本类型常量
 
@@ -395,7 +392,7 @@ namespace Cyjb.Reflection
 			if (typeValue != null && (typeValue.IsGenericParameter || typeValue.IsVisible))
 			{
 				il.Emit(OpCodes.Ldtoken, type);
-				il.Emit(OpCodes.Call, getTypeFromHandler);
+				il.EmitCall(getTypeFromHandler);
 				if (type != typeof(Type))
 				{
 					il.Emit(OpCodes.Castclass, type);
@@ -415,12 +412,12 @@ namespace Cyjb.Reflection
 			il.Emit(OpCodes.Ldtoken, method);
 			if (declaringType == null || !declaringType.IsGenericType)
 			{
-				il.Emit(OpCodes.Call, getMethodFromHandle);
+				il.EmitCall(getMethodFromHandle);
 			}
 			else
 			{
 				il.Emit(OpCodes.Ldtoken, declaringType);
-				il.Emit(OpCodes.Call, getMethodFromHandleWithType);
+				il.EmitCall(getMethodFromHandleWithType);
 			}
 			if (type != typeof(MethodBase))
 			{

@@ -4,9 +4,6 @@ using System.Diagnostics.Contracts;
 
 namespace Cyjb
 {
-	/// <summary>
-	/// 提供对整数的扩展方法。
-	/// </summary>
 	public static partial class IntegerExt
 	{
 

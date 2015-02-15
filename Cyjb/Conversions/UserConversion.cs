@@ -37,7 +37,7 @@ namespace Cyjb.Conversions
 			Type methodType = method.GetParametersNoCopy()[0].ParameterType;
 			Conversion conv = ConversionFactory.GetPreDefinedConversion(inputType, methodType);
 			conv.Emit(generator, inputType, methodType, isChecked);
-			generator.Emit(OpCodes.Call, method);
+			generator.EmitCall(method);
 			methodType = method.ReturnType;
 			conv = ConversionFactory.GetPreDefinedConversion(methodType, outputType);
 			if (conv is FromNullableConversion)

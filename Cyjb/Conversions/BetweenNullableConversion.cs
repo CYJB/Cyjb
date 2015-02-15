@@ -48,8 +48,7 @@ namespace Cyjb.Conversions
 			generator.Emit(OpCodes.Stloc, inputLocal);
 			// if (input.HasValue)
 			generator.Emit(OpCodes.Ldloca, inputLocal);
-			MethodInfo hasValue = inputType.GetMethod("get_HasValue");
-			generator.Emit(OpCodes.Call, hasValue);
+			generator.EmitCall(inputType.GetMethod("get_HasValue"));
 			generator.Emit(OpCodes.Brtrue, trueCase);
 			// return null
 			if (outputUnderlyingType != null)
@@ -68,8 +67,7 @@ namespace Cyjb.Conversions
 			// (outputType)input.GetValueOrDefault();
 			generator.Emit(OpCodes.Ldloca, inputLocal);
 			generator.FreeLocal(inputLocal);
-			MethodInfo getValueOrDefault = inputType.GetMethod("GetValueOrDefault", Type.EmptyTypes);
-			generator.Emit(OpCodes.Call, getValueOrDefault);
+			generator.EmitCall(inputType.GetMethod("GetValueOrDefault", Type.EmptyTypes));
 			ConversionFactory.GetConversion(inputUnderlyingType, outputUnderlyingType ?? outputType)
 				.Emit(generator, inputUnderlyingType, outputUnderlyingType ?? outputType, isChecked);
 			if (outputUnderlyingType != null)

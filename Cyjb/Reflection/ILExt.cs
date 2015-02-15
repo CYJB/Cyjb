@@ -14,6 +14,15 @@ namespace Cyjb.Reflection
 	public static partial class ILExt
 	{
 
+		#region 成员反射信息常量
+
+		/// <summary>
+		/// 表示 <see cref="Closure.Constants"/> 字段。
+		/// </summary>
+		private static readonly FieldInfo closureConstants = typeof(Closure).GetField("Constants");
+
+		#endregion // 成员反射信息常量
+
 		#region ILManager
 
 		/// <summary>
@@ -88,7 +97,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
 		/// <overloads>
-		/// /// <summary>
+		/// <summary>
 		/// 加载指定索引的参数。
 		/// </summary>
 		/// </overloads>
@@ -233,7 +242,34 @@ namespace Cyjb.Reflection
 		#region 数组元素
 
 		/// <summary>
-		/// 将栈顶数据作为索引，加载数组元素。
+		/// 加载闭包中指定索引的常量，要求闭包总是作为第一个参数。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="index">要加载的常量索引。</param>
+		/// <param name="constantType">要加载的常量类型。</param>
+		internal static void EmitLoadClosureConstant(this ILGenerator il, int index, Type constantType)
+		{
+			Contract.Requires(il != null && index >= 0 && constantType != null);
+			il.EmitLoadClosureConstant(index, constantType, true);
+		}
+		/// <summary>
+		/// 加载闭包中指定索引的常量，要求闭包总是作为第一个参数。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="index">要加载的常量索引。</param>
+		/// <param name="constantType">要加载的常量类型。</param>
+		/// <param name="isChecked">是否执行溢出检查。</param>
+		internal static void EmitLoadClosureConstant(this ILGenerator il, int index, Type constantType, bool isChecked)
+		{
+			Contract.Requires(il != null && index >= 0 && constantType != null);
+			il.Emit(OpCodes.Ldarg_0);
+			il.Emit(OpCodes.Ldfld, closureConstants);
+			il.EmitInt(index);
+			il.Emit(OpCodes.Ldelem_Ref);
+			il.EmitConversion(typeof(object), constantType, isChecked);
+		}
+		/// <summary>
+		/// 加载数组元素，要求已将数组对象和元素索引压入堆栈。
 		/// </summary>
 		/// <param name="il">IL 指令生成器。</param>
 		/// <param name="elementType">要加载的数组元素类型。</param>
@@ -299,7 +335,7 @@ namespace Cyjb.Reflection
 			}
 		}
 		/// <summary>
-		/// 将栈顶数据作为索引和值，替换给数组元素。
+		/// 替换数组元素，要求已将数组对象、元素索引和元素值压入堆栈。
 		/// </summary>
 		/// <param name="il">IL 指令生成器。</param>
 		/// <param name="elementType">要替换的数组元素类型。</param>
@@ -432,29 +468,8 @@ namespace Cyjb.Reflection
 
 		#endregion // 类型转换
 
-		/// <summary>
-		/// 将栈顶的值转换为相应的地址。
-		/// </summary>
-		/// <param name="il">IL 指令生成器。</param>
-		/// <param name="valueType">栈顶值的类型。</param>
-		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="valueType"/> 为 <c>null</c>。</exception>
-		public static void EmitGetAddress(this ILGenerator il, Type valueType)
-		{
-			if (il == null)
-			{
-				throw CommonExceptions.ArgumentNull("il");
-			}
-			if (valueType == null)
-			{
-				throw CommonExceptions.ArgumentNull("valueType");
-			}
-			Contract.EndContractBlock();
-			LocalBuilder locFrom = il.GetManager().GetLocal(valueType);
-			il.Emit(OpCodes.Stloc, locFrom);
-			il.Emit(OpCodes.Ldloca, locFrom);
-			il.GetManager().FreeLocal(locFrom);
-		}
+		#region 方法
+
 		/// <summary>
 		/// 将指定的方法或构造函数的指定指令和元数据标记放到 Microsoft 中间语言 (MSIL) 指令流上。
 		/// </summary>
@@ -482,6 +497,318 @@ namespace Cyjb.Reflection
 			{
 				il.Emit(opCode, (MethodInfo)method);
 			}
+		}
+		/// <summary>
+		/// 调用指定的方法（call）。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="method">要调用的方法。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		public static void EmitCall(this ILGenerator il, MethodInfo method)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (method == null)
+			{
+				throw CommonExceptions.ArgumentNull("method");
+			}
+			Contract.EndContractBlock();
+			if (method.CallingConvention == CallingConventions.VarArgs)
+			{
+				il.EmitCall(OpCodes.Call, method, Type.EmptyTypes);
+			}
+			else
+			{
+				il.Emit(OpCodes.Call, method);
+			}
+		}
+		/// <summary>
+		/// 调用指定的方法（call）。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="method">要调用的方法。</param>
+		/// <param name="tailCall">是否执行后缀的方法调用。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		public static void EmitCall(this ILGenerator il, MethodInfo method, bool tailCall)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (method == null)
+			{
+				throw CommonExceptions.ArgumentNull("method");
+			}
+			Contract.EndContractBlock();
+			if (tailCall)
+			{
+				il.Emit(OpCodes.Tailcall);
+			}
+			if (method.CallingConvention == CallingConventions.VarArgs)
+			{
+				il.EmitCall(OpCodes.Call, method, Type.EmptyTypes);
+			}
+			else
+			{
+				il.Emit(OpCodes.Call, method);
+			}
+		}
+		/// <summary>
+		/// 调用指定的方法（call）。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="method">要调用的方法。</param>
+		/// <param name="parameterTypes">参数的类型；如果 <paramref name="method"/> 不是可变参数方法，
+		/// 则忽略该参数。</param>>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		public static void EmitCall(this ILGenerator il, MethodInfo method, params Type[] parameterTypes)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (method == null)
+			{
+				throw CommonExceptions.ArgumentNull("method");
+			}
+			Contract.EndContractBlock();
+			if (method.CallingConvention == CallingConventions.VarArgs)
+			{
+				il.EmitCall(OpCodes.Call, method, parameterTypes);
+			}
+			else
+			{
+				il.Emit(OpCodes.Call, method);
+			}
+		}
+		/// <summary>
+		/// 调用指定的方法（call）。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="method">要调用的方法。</param>
+		/// <param name="tailCall">是否执行后缀的方法调用。</param>
+		/// <param name="parameterTypes">参数的类型；如果 <paramref name="method"/> 不是可变参数方法，
+		/// 则忽略该参数。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		public static void EmitCall(this ILGenerator il, MethodInfo method, bool tailCall,
+			params Type[] parameterTypes)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (method == null)
+			{
+				throw CommonExceptions.ArgumentNull("method");
+			}
+			Contract.EndContractBlock();
+			if (tailCall)
+			{
+				il.Emit(OpCodes.Tailcall);
+			}
+			if (method.CallingConvention == CallingConventions.VarArgs)
+			{
+				il.EmitCall(OpCodes.Call, method, parameterTypes);
+			}
+			else
+			{
+				il.Emit(OpCodes.Call, method);
+			}
+		}
+		/// <summary>
+		/// 调用指定的方法（自动决定 call/callvirt）。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="instanceType">要调用方法的实例类型；如果 <paramref name="method"/> 是静态方法，
+		/// 则忽略该参数。</param>
+		/// <param name="method">要调用的方法。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		public static void EmitCall(this ILGenerator il, Type instanceType, MethodInfo method)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (method == null)
+			{
+				throw CommonExceptions.ArgumentNull("method");
+			}
+			Contract.EndContractBlock();
+			il.EmitCallInternal(instanceType, method, false, Type.EmptyTypes);
+		}
+		/// <summary>
+		/// 调用指定的方法（自动决定 call/callvirt）。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="instanceType">要调用方法的实例类型；如果 <paramref name="method"/> 是静态方法，
+		/// 则忽略该参数。</param>
+		/// <param name="method">要调用的方法。</param>
+		/// <param name="tailCall">是否执行后缀的方法调用。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		public static void EmitCall(this ILGenerator il, Type instanceType, MethodInfo method, bool tailCall)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (method == null)
+			{
+				throw CommonExceptions.ArgumentNull("method");
+			}
+			Contract.EndContractBlock();
+			il.EmitCallInternal(instanceType, method, tailCall, Type.EmptyTypes);
+		}
+		/// <summary>
+		/// 调用指定的方法（自动决定 call/callvirt）。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="instanceType">要调用方法的实例类型；如果 <paramref name="method"/> 是静态方法，
+		/// 则忽略该参数。</param>
+		/// <param name="method">要调用的方法。</param>
+		/// <param name="parameterTypes">参数的类型；如果 <paramref name="method"/> 不是可变参数方法，
+		/// 则忽略该参数。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		public static void EmitCall(this ILGenerator il, Type instanceType, MethodInfo method,
+			params Type[] parameterTypes)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (method == null)
+			{
+				throw CommonExceptions.ArgumentNull("method");
+			}
+			Contract.EndContractBlock();
+			il.EmitCallInternal(instanceType, method, false, parameterTypes);
+		}
+		/// <summary>
+		/// 调用指定的方法（自动决定 call/callvirt）。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="instanceType">要调用方法的实例类型；如果 <paramref name="method"/> 是静态方法，
+		/// 则忽略该参数。</param>
+		/// <param name="method">要调用的方法。</param>
+		/// <param name="tailCall">是否执行后缀的方法调用。</param>
+		/// <param name="parameterTypes">参数的类型；如果 <paramref name="method"/> 不是可变参数方法，
+		/// 则忽略该参数。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		public static void EmitCall(this ILGenerator il, Type instanceType, MethodInfo method, bool tailCall,
+			params Type[] parameterTypes)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (method == null)
+			{
+				throw CommonExceptions.ArgumentNull("method");
+			}
+			Contract.EndContractBlock();
+			il.EmitCallInternal(instanceType, method, tailCall, parameterTypes);
+		}
+		/// <summary>
+		/// 调用指定的方法（自动决定 call/callvirt）。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="instanceType">要调用方法的实例类型；如果 <paramref name="method"/> 是静态方法，
+		/// 则忽略该参数。</param>
+		/// <param name="method">要调用的方法。</param>
+		/// <param name="tailCall">是否执行后缀的方法调用。</param>
+		/// <param name="parameterTypes">参数的类型；如果 <paramref name="method"/> 不是可变参数方法，
+		/// 则忽略该参数。</param>
+		private static void EmitCallInternal(this ILGenerator il, Type instanceType, MethodInfo method, bool tailCall,
+			params Type[] parameterTypes)
+		{
+			Contract.Requires(il != null && method != null);
+			OpCode callOp;
+			if (UseVirtual(method))
+			{
+				callOp = OpCodes.Callvirt;
+				if (instanceType != null && instanceType.IsValueType)
+				{
+					il.Emit(OpCodes.Constrained, instanceType);
+				}
+			}
+			else
+			{
+				callOp = OpCodes.Call;
+			}
+			if (tailCall)
+			{
+				il.Emit(OpCodes.Tailcall);
+			}
+			if (method.CallingConvention == CallingConventions.VarArgs)
+			{
+				il.EmitCall(callOp, method, parameterTypes);
+			}
+			else
+			{
+				il.Emit(callOp, method);
+			}
+		}
+		/// <summary>
+		/// 获取指定方法是否需要使用 <c>callvirt</c> 指令调用。
+		/// </summary>
+		/// <param name="method">要判断的方法。</param>
+		/// <returns>如果 <paramref name="method"/> 需要使用 <c>callvirt</c> 指令调用，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
+		private static bool UseVirtual(MethodInfo method)
+		{
+			Contract.Requires(method != null);
+			if (method.IsStatic)
+			{
+				return false;
+			}
+			Type declType = method.DeclaringType;
+			Contract.Assume(declType != null);
+			if (declType.IsValueType)
+			{
+				// 值类型上声明的方法。
+				return false;
+			}
+			if (!method.IsVirtual || method.IsFinal)
+			{
+				// 不可重写的方法。
+				return false;
+			}
+			return true;
+		}
+
+		#endregion // 方法
+
+		/// <summary>
+		/// 将栈顶的值转换为相应的地址。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="valueType">栈顶值的类型。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="valueType"/> 为 <c>null</c>。</exception>
+		public static void EmitGetAddress(this ILGenerator il, Type valueType)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (valueType == null)
+			{
+				throw CommonExceptions.ArgumentNull("valueType");
+			}
+			Contract.EndContractBlock();
+			LocalBuilder locFrom = il.GetManager().GetLocal(valueType);
+			il.Emit(OpCodes.Stloc, locFrom);
+			il.Emit(OpCodes.Ldloca, locFrom);
+			il.GetManager().FreeLocal(locFrom);
 		}
 	}
 }

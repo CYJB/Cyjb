@@ -96,7 +96,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayExt.cs" />
-    <Compile Include="ArrayExt.Fill.cs" />
+    <Compile Include="ArrayExt.Fill.cs">
+      <DependentUpon>ArrayExt.cs</DependentUpon>
+    </Compile>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Collections\BitList.cs" />
     <Compile Include="Collections\CharSet.cs" />
@@ -113,6 +115,7 @@
     <Compile Include="Collections\ObjectModel\ReadOnlySet`1.cs" />
     <Compile Include="Collections\ObjectModel\SetBase`1.cs" />
     <Compile Include="Collections\BitListEqualityComparer.cs" />
+    <Compile Include="ComponentModel\EnumDescConverter.cs" />
     <Compile Include="Conversions\BetweenNullableConversion.cs" />
     <Compile Include="Conversions\BoxConversion.cs" />
     <Compile Include="Conversions\Convert.Base.cs" />
@@ -143,11 +146,22 @@
     </Compile>
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="DoubleComparer.cs" />
-    <Compile Include="IntegerExt.Byte.cs" />
-    <Compile Include="IntegerExt.Int32.cs" />
-    <Compile Include="IntegerExt.Int64.cs" />
-    <Compile Include="IntegerExt.UInt32.cs" />
-    <Compile Include="IntegerExt.UInt64.cs" />
+    <Compile Include="IntegerExt.cs" />
+    <Compile Include="IntegerExt.Byte.cs">
+      <DependentUpon>IntegerExt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IntegerExt.Int32.cs">
+      <DependentUpon>IntegerExt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IntegerExt.Int64.cs">
+      <DependentUpon>IntegerExt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IntegerExt.UInt32.cs">
+      <DependentUpon>IntegerExt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IntegerExt.UInt64.cs">
+      <DependentUpon>IntegerExt.cs</DependentUpon>
+    </Compile>
     <Compile Include="IO\AggregateSourceException.cs" />
     <Compile Include="IO\DirectoryExt.cs" />
     <Compile Include="IO\FileExt.cs" />
@@ -170,7 +184,6 @@
     <Compile Include="Collections\ArrayAdapter`1.cs" />
     <Compile Include="Collections\CollectionDebugView`1.cs" />
     <Compile Include="Collections\ObjectModel\IteratorBase`1.cs" />
-    <Compile Include="ComponentModel\EnumDescConverter.cs" />
     <Compile Include="Configurations\ConfigurationElementCollection`1.cs" />
     <Compile Include="Configurations\ConfigurationElementCollection`2.cs" />
     <Compile Include="EnumerableExt.cs" />
@@ -178,12 +191,16 @@
     <Compile Include="RandomExt.cs" />
     <Compile Include="ProcessorAttribute.cs" />
     <Compile Include="Reflection\Converter.cs" />
-    <Compile Include="Reflection\ILExt.Constant.cs" />
+    <Compile Include="Reflection\ILExt.Constant.cs">
+      <DependentUpon>ILExt.cs</DependentUpon>
+    </Compile>
     <Compile Include="Reflection\ILExt.cs" />
+    <Compile Include="Reflection\ILExt.Exception.cs">
+      <DependentUpon>ILExt.cs</DependentUpon>
+    </Compile>
     <Compile Include="Reflection\ILManager.cs" />
     <Compile Include="Reflection\MethodExt.cs" />
     <Compile Include="Reflection\PowerBinder.cs" />
-    <Compile Include="Reflection\Reflections.cs" />
     <Compile Include="Reflection\TypeExt.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -227,6 +244,7 @@
     <None Include="CYJB_Code_Key.snk" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Collections\ComponentModel\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

@@ -55,12 +55,12 @@ namespace Cyjb.Conversions
 			if (method.IsStatic && method.GetParametersNoCopy().Length == 1)
 			{
 				// 没有闭包的静态方法可以直接调用。
-				generator.Emit(OpCodes.Call, method);
+				generator.EmitCall(method);
 			}
 			else
 			{
 				// 有闭包的静态方法，或实例方法，其参数不能直接写入 IL，因此直接调用 Convert 的 ChangeType 方法。
-				generator.Emit(OpCodes.Call, changeType.MakeGenericMethod(inputType, outputType));
+				generator.EmitCall(changeType.MakeGenericMethod(inputType, outputType));
 			}
 		}
 	}
