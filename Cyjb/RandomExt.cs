@@ -320,5 +320,74 @@ namespace Cyjb
 			Contract.Ensures(Contract.Result<double>() >= 0.0 && Contract.Result<double>() < 1.0);
 			return Random.NextDouble();
 		}
+
+		#region Choose
+
+		/// <summary>
+		/// 从指定的两个值中，随机挑选一个返回。
+		/// </summary>
+		/// <typeparam name="T">要随机挑选的值的类型。</typeparam>
+		/// <param name="item1">第一个可能的值。</param>
+		/// <param name="item2">第二个可能的值。</param>
+		/// <returns>随机挑选的值。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 从指定的多个值中，随机挑选一个返回。
+		/// </summary>
+		/// </overloads>
+		public static T Choose<T>(T item1, T item2)
+		{
+			return NextBoolean() ? item1 : item2;
+		}
+		/// <summary>
+		/// 从指定的三个值中，随机挑选一个返回。
+		/// </summary>
+		/// <typeparam name="T">要随机挑选的值的类型。</typeparam>
+		/// <param name="item1">第一个可能的值。</param>
+		/// <param name="item2">第二个可能的值。</param>
+		/// <param name="item3">第三个可能的值。</param>
+		/// <returns>随机挑选的值。</returns>
+		public static T Choose<T>(T item1, T item2, T item3)
+		{
+			int value = Random.Next(3);
+			if (value == 0)
+			{
+				return item1;
+			}
+			if (value == 1)
+			{
+				return item2;
+			}
+			return item3;
+		}
+		/// <summary>
+		/// 从指定的多个值中，随机挑选一个返回。
+		/// </summary>
+		/// <typeparam name="T">要随机挑选的值的类型。</typeparam>
+		/// <param name="items">要随机挑选的值。</param>
+		/// <returns>随机挑选的值。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="items"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="items"/> 为空数组。</exception>
+		public static T Choose<T>(params T[] items)
+		{
+			if (items == null)
+			{
+				throw CommonExceptions.ArgumentNull("items");
+			}
+			if (items.Length == 0)
+			{
+				throw CommonExceptions.CollectionEmpty("items");
+			}
+			Contract.EndContractBlock();
+			if (items.Length == 1)
+			{
+				return items[0];
+			}
+			int index = Random.Next(items.Length);
+			return items[index];
+		}
+
+		#endregion // Choose
+
 	}
 }
