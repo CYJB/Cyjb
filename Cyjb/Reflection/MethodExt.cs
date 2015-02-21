@@ -143,218 +143,422 @@ namespace Cyjb.Reflection
 
 		/// <summary>
 		/// 根据实参参数类型推断当前泛型方法定义的类型参数，
-		/// 并返回表示结果构造方法的 <see cref="System.Reflection.MethodInfo"/> 对象。
+		/// 并返回表示结果封闭构造方法的 <see cref="MethodInfo"/> 对象。
 		/// </summary>
-		/// <param name="method">要进行类型参数推断的泛型方法。</param>
+		/// <param name="method">要进行类型参数推断的泛型方法定义。</param>
 		/// <param name="types">泛型方法的实参参数数组。</param>
-		/// <returns>一个 <see cref="System.Reflection.MethodInfo"/> 对象，
-		/// 表示通过将当前泛型方法定义的类型参数替换为根据 <paramref name="types"/> 
-		/// 推断得到的元素生成的构造方法。</returns>
-		/// <exception cref="System.InvalidOperationException">
-		/// 当前 <see cref="System.Reflection.MethodBase"/> 不表示泛型方法定义。
-		/// 也就是说，<see cref="System.Reflection.MethodBase.IsGenericMethodDefinition "/> 
-		/// 返回 <c>false</c>。</exception>
-		/// <exception cref="System.ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentNullException"><paramref name="types"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException">不能从 <paramref name="types"/> 推断得到类型参数。</exception>
-		/// <exception cref="System.ArgumentException">根据 <paramref name="types"/>
+		/// <returns>一个 <see cref="MethodInfo"/> 对象，表示通过将当前泛型方法定义的类型参数替换为根据 
+		/// <paramref name="types"/> 推断得到的元素生成的封闭构造方法。</returns>
+		/// <exception cref="InvalidOperationException">当前 <see cref="MethodInfo"/> 不表示泛型方法定义。
+		/// 也就是说，<see cref="MethodInfo.IsGenericMethodDefinition "/> 返回 <c>false</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="types"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException">不能从 <paramref name="types"/> 推断得到类型参数。</exception>
+		/// <exception cref="ArgumentException">根据 <paramref name="types"/>
 		/// 推断出来的类型参数中的某个元素不满足为当前泛型方法定义的相应类型参数指定的约束。</exception>
-		public static MethodInfo MakeGenericMethodFromParams(this MethodInfo method, params Type[] types)
+		public static MethodInfo MakeGenericMethodFromParamTypes(this MethodInfo method, params Type[] types)
 		{
-			Type[] args = GenericArgumentsInferences(method, types);
-			if (args == null)
+			if (method == null)
 			{
-				throw CommonExceptions.CannotInferGenericArguments("types", method);
+				throw CommonExceptions.ArgumentNull("method");
 			}
-			return method.MakeGenericMethod(args);
+			if (types == null)
+			{
+				throw CommonExceptions.ArgumentNull("types");
+			}
+			Contract.EndContractBlock();
+			if (!method.IsGenericMethodDefinition)
+			{
+				throw CommonExceptions.NeedGenericMethodDefinition("method");
+			}
+			var result = GenericArgumentsInferences(method, null, types, null,
+				GenericArgInferenceOptions.OptionalParamBinding);
+			if (result == null)
+			{
+				throw CommonExceptions.CannotInferenceGenericArguments("method");
+			}
+			return method.MakeGenericMethod(result.GenericArguments);
 		}
 		/// <summary>
 		/// 根据实参参数类型推断当前泛型方法定义的类型参数，
-		/// 并返回表示结果构造方法的 <see cref="System.Reflection.MethodInfo"/> 对象。
+		/// 并返回表示结果封闭构造方法的 <see cref="MethodInfo"/> 对象。
 		/// </summary>
-		/// <param name="method">要进行类型参数推断的泛型方法。</param>
-		/// <param name="parameters">泛型方法的形参参数数组。</param>
+		/// <param name="method">要进行类型参数推断的泛型方法定义。</param>
 		/// <param name="types">泛型方法的实参参数数组。</param>
-		/// <returns>一个 <see cref="System.Reflection.MethodInfo"/> 对象，
-		/// 表示通过将当前泛型方法定义的类型参数替换为根据 <paramref name="types"/> 
-		/// 推断得到的元素生成的构造方法。如果构造失败，则为 <c>null</c>。</returns>
-		internal static MethodInfo MakeGenericMethodFromParams(this MethodInfo method,
-			ParameterInfo[] parameters, Type[] types)
+		/// <param name="options">泛型类型推断的选项。</param>
+		/// <returns>一个 <see cref="MethodInfo"/> 对象，表示通过将当前泛型方法定义的类型参数替换为根据 
+		/// <paramref name="types"/> 推断得到的元素生成的封闭构造方法。</returns>
+		/// <exception cref="InvalidOperationException">当前 <see cref="MethodInfo"/> 不表示泛型方法定义。
+		/// 也就是说，<see cref="MethodInfo.IsGenericMethodDefinition "/> 返回 <c>false</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="types"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException">不能从 <paramref name="types"/> 推断得到类型参数。</exception>
+		/// <exception cref="ArgumentException">根据 <paramref name="types"/>
+		/// 推断出来的类型参数中的某个元素不满足为当前泛型方法定义的相应类型参数指定的约束。</exception>
+		public static MethodInfo MakeGenericMethodFromParamTypes(this MethodInfo method, Type[] types,
+			GenericArgInferenceOptions options)
 		{
-			Debug.Assert(method.IsGenericMethodDefinition);
-			Debug.Assert(parameters != null);
-			Debug.Assert(types != null);
-			Type[] args = GenericArgumentsInferences(method, parameters, types);
-			if (args != null)
+			if (method == null)
 			{
-				try
-				{
-					return method.MakeGenericMethod(args);
-				}
-				catch (ArgumentException)
-				{
-					// 不满足方法的约束。
-				}
+				throw CommonExceptions.ArgumentNull("method");
 			}
-			return null;
+			if (types == null)
+			{
+				throw CommonExceptions.ArgumentNull("types");
+			}
+			Contract.EndContractBlock();
+			if (!method.IsGenericMethodDefinition)
+			{
+				throw CommonExceptions.NeedGenericMethodDefinition("method");
+			}
+			var result = GenericArgumentsInferences(method, null, types, null, options);
+			if (result == null)
+			{
+				throw CommonExceptions.CannotInferenceGenericArguments("method");
+			}
+			return method.MakeGenericMethod(result.GenericArguments);
 		}
 		/// <summary>
-		/// 根据给定的类型数组推断泛型方法的类型参数。
+		/// 根据给定的方法实参类型数组推断泛型方法的泛型类型。
 		/// </summary>
-		/// <param name="method">要推断类型参数的泛型方法。</param>
-		/// <param name="types">实参参数数组。</param>
-		/// <returns>如果成功推断泛型方法的类型参数，则为类型参数数组；
-		/// 如果推断失败，则为 <c>null</c>。</returns>
-		/// <exception cref="System.InvalidOperationException">
-		/// 当前 <see cref="System.Reflection.MethodBase"/> 不表示泛型方法定义。
-		/// 也就是说，<see cref="System.Reflection.MethodBase.IsGenericMethodDefinition "/> 
-		/// 返回 <c>false</c>。</exception>
-		/// <exception cref="System.ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentNullException"><paramref name="types"/> 为 <c>null</c>。</exception>
+		/// <param name="method">要推断泛型类型的泛型方法定义。</param>
+		/// <param name="types">方法实参类型数组。</param>
+		/// <returns>如果成功推断泛型方法的类型参数，则为推断结果；否则为 <c>null</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="types"/> 为 <c>null</c>。</exception>
+		/// <exception cref="InvalidOperationException">当前 <see cref="MethodInfo"/> 不表示泛型方法定义。
+		/// 也就是说，<see cref="MethodInfo.IsGenericMethodDefinition "/> 返回 <c>false</c>。</exception>
 		public static Type[] GenericArgumentsInferences(this MethodBase method, params Type[] types)
 		{
-			CommonExceptions.CheckArgumentNull(method, "method");
-			CommonExceptions.CheckArgumentNull(types, "types");
-			if (method.IsGenericMethodDefinition)
+			if (method == null)
 			{
-				ParameterInfo[] parameters = method.GetParameters();
-				return GenericArgumentsInferences(method, parameters, types);
+				throw CommonExceptions.ArgumentNull("method");
 			}
-			else
+			if (types == null)
 			{
-				throw CommonExceptions.NotGenericMethodDefinition(method, "GenericArgumentsInferences");
+				throw CommonExceptions.ArgumentNull("types");
 			}
+			Contract.EndContractBlock();
+			if (!method.IsGenericMethodDefinition)
+			{
+				throw CommonExceptions.NeedGenericMethodDefinition("method");
+			}
+			var result = GenericArgumentsInferences(method, null, types, null,
+				GenericArgInferenceOptions.OptionalParamBinding);
+			return result == null ? null : result.GenericArguments;
 		}
 		/// <summary>
-		/// 根据给定的类型数组推断泛型方法的类型参数。
+		/// 根据给定的方法实参类型数组推断泛型方法的泛型类型。
 		/// </summary>
-		/// <param name="method">要推断类型参数的泛型方法。</param>
-		/// <param name="parameters">泛型方法的形参参数数组。</param>
-		/// <param name="types">实参参数数组。</param>
-		/// <returns>如果成功推断泛型方法的类型参数，则为类型参数数组；
-		/// 如果推断失败或给定的方法不是泛型方法定义，则为 <c>null</c>。</returns>
-		internal static Type[] GenericArgumentsInferences(this MethodBase method,
-			ParameterInfo[] parameters, Type[] types)
+		/// <param name="method">要推断泛型类型的泛型方法定义。</param>
+		/// <param name="types">方法实参类型数组。</param>
+		/// <param name="options">泛型类型推断的选项。</param>
+		/// <returns>如果成功推断泛型方法的类型参数，则为推断结果；否则为 <c>null</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="types"/> 为 <c>null</c>。</exception>
+		/// <exception cref="InvalidOperationException">当前 <see cref="MethodInfo"/> 不表示泛型方法定义。
+		/// 也就是说，<see cref="MethodInfo.IsGenericMethodDefinition "/> 返回 <c>false</c>。</exception>
+		public static Type[] GenericArgumentsInferences(this MethodBase method, Type[] types,
+			GenericArgInferenceOptions options)
 		{
-			Debug.Assert(method.IsGenericMethodDefinition);
-			Debug.Assert(parameters != null);
-			Debug.Assert(types != null);
-			int len = parameters.Length > types.Length ? parameters.Length : types.Length;
-			int[] paramOrder = GetParamOrder(len);
-			Type paramArrayType;
-			if (CheckParameterCount(parameters, types, paramOrder, true, out paramArrayType))
+			if (method == null)
 			{
-				Type[] paramTypes = new Type[parameters.Length];
-				for (int i = 0; i < parameters.Length; i++)
-				{
-					paramTypes[i] = parameters[i].ParameterType;
-				}
-				return TypeExt.GenericArgumentsInferences(method.GetGenericArguments(), paramTypes,
-					ref paramArrayType, types, paramOrder);
+				throw CommonExceptions.ArgumentNull("method");
 			}
-			return null;
+			if (types == null)
+			{
+				throw CommonExceptions.ArgumentNull("types");
+			}
+			Contract.EndContractBlock();
+			if (!method.IsGenericMethodDefinition)
+			{
+				throw CommonExceptions.NeedGenericMethodDefinition("method");
+			}
+			var result = GenericArgumentsInferences(method, null, types, null, options);
+			return result == null ? null : result.GenericArguments;
 		}
 		/// <summary>
-		/// 检测方法的参数数量是否与给定的类型匹配。
+		/// 根据给定的方法实参类型数组推断泛型方法的泛型类型。
 		/// </summary>
-		/// <param name="parameters">方法的形参数组。</param>
-		/// <param name="types">实参数组。</param>
-		/// <param name="paramOrder">实参参数顺序。</param>
-		/// <param name="optionalParamBinding">是否绑定默认值。</param>
-		/// <param name="paramArrayType">方法的 params 参数元素类型。</param>
-		/// <returns>参数数量匹配，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		internal static bool CheckParameterCount(ParameterInfo[] parameters, Type[] types,
-			int[] paramOrder, bool optionalParamBinding, out Type paramArrayType)
+		/// <param name="method">要推断泛型类型的泛型方法定义。</param>
+		/// <param name="returnType">方法的实际返回类型，如果不存在则传入 <c>null</c>。</param>
+		/// <param name="types">方法实参类型数组。</param>
+		/// <param name="paramOrder">方法实参的顺序，它的长度必须大于等于形参个数和实参个数。
+		/// 传入 <c>null</c> 表示使用默认顺序。</param>
+		/// <param name="options">泛型类型推断的选项。</param>
+		/// <returns>如果成功推断泛型方法的类型参数，则为推断结果；否则为 <c>null</c>。</returns>
+		/// <remarks><c>paramOrder = { 1, 2, 0}</c> 表示，实参的顺序为 <c>types[1], types[2], types[0]</c>。</remarks>
+		internal static GenericArgInferenceResult GenericArgumentsInferences(this MethodBase method,
+			Type returnType, Type[] types, int[] paramOrder, GenericArgInferenceOptions options)
 		{
-			paramArrayType = null;
-			int len = parameters.Length;
-			if (len == 0)
+			Contract.Requires(method != null && types != null);
+			bool isExplicit = options.HasFlag(GenericArgInferenceOptions.Explicit);
+			TypeBounds bounds = new TypeBounds(method.GetGenericArguments());
+			if (!CheckReturnType(method, returnType, bounds, isExplicit))
 			{
-				// 判断包含变量参数的方法。
-				return (types.Length == 0);
+				return null;
 			}
-			else if (len > types.Length)
+			// 对方法参数进行类型推断。
+			GenericArgInferenceResult result = new GenericArgInferenceResult();
+			int typeLen = types.Length;
+			ParameterInfo[] parameters = method.GetParametersNoCopy();
+			int paramLen = parameters.Length;
+			if (paramOrder == null)
 			{
-				// 方法形参过多，要求指定可选参数绑定。
-				if (!optionalParamBinding)
-				{
-					return false;
-				}
-				// 没有实参可匹配的参数必须有默认值。
-				// 检查最后一个参数是否有默认值，或者是 params 参数。
-				len--;
-				if (paramOrder[len] >= types.Length && parameters[len].DefaultValue == DBNull.Value)
-				{
-					if ((paramArrayType = GetParamArrayType(parameters[len])) == null)
-					{
-						return false;
-					}
-				}
-				for (len--; len >= 0; len--)
-				{
-					if (paramOrder[len] >= types.Length && parameters[len].DefaultValue == DBNull.Value)
-					{
-						return false;
-					}
-				}
-				return true;
+				paramOrder = GetParamOrder(Math.Max(paramLen, typeLen));
 			}
-			else if (len < types.Length)
+			// 仅当 params 参数类型包含泛型参数时，才不为 null。
+			Type paramArrayType = null;
+			if (method.CallingConvention.HasFlag(CallingConventions.VarArgs))
 			{
-				// 方法形参过多，要求具有 params 参数。
-				return ((paramArrayType = GetParamArrayType(parameters[len - 1])) != null);
+				// 方法具有可变参数。
+				result.OptionalParameterTypes = GetExternalParamTypes(types, paramLen, paramOrder);
 			}
-			else
+			else if (paramLen > 0)
 			{
-				// 参数数量相等。
-				len--;
-				if ((paramArrayType = GetParamArrayType(parameters[len])) != null)
+				ParameterInfo lastParam = parameters[paramLen - 1];
+				if (lastParam.IsParamArray())
 				{
-					// 判断是否需要展开 params 参数。
-					Type paramElementType;
-					int paramDepth = paramArrayType.GetArrayDepth(out paramElementType);
-					int typeDepth = types[paramOrder[len]].GetArrayDepth();
-					if (paramElementType.IsGenericParameter)
+					// 方法具有 params 参数。
+					paramLen--;
+					result.ParamArrayTypes = GetExternalParamTypes(types, paramLen, paramOrder);
+					if (lastParam.ParameterType.ContainsGenericParameters ||
+						CheckParamArrayType(lastParam.ParameterType, result.ParamArrayTypes, isExplicit))
 					{
-						// 如果是 params T 数组，那么不能判定 T 本身的数组层数。
-						if (typeDepth < paramDepth)
-						{
-							// 如果实参数组层数少，那么肯定无法正确匹配。
-							return false;
-						}
+						paramArrayType = lastParam.ParameterType;
 					}
 					else
 					{
-						if (paramDepth + 1 == typeDepth)
-						{
-							// 数组深度相差 1，不需要展开 params 参数。
-							paramArrayType = null;
-						}
-						else if (paramDepth != typeDepth)
-						{
-							// 数组深度不等。
-							return false;
-						}
+						return null;
 					}
 				}
-				return true;
+				else if (typeLen > paramLen)
+				{
+					// 方法实参过多。
+					return null;
+				}
 			}
-		}
-		/// <summary>
-		/// 如果给定的参数信息是 params 参数，则返回对应的数组元素类型；否则为 <c>null</c>。
-		/// </summary>
-		/// <param name="parameter">参数信息。</param>
-		/// <returns>params 参数的元素类型。</returns>
-		internal static Type GetParamArrayType(ParameterInfo parameter)
-		{
-			if (parameter.ParameterType.IsArray && parameter.IsDefined(typeof(ParamArrayAttribute), true))
+			// 检查实参是否与形参对应，未对应的参数是否包含默认值。
+			for (int i = 0; i < paramLen; i++)
 			{
-				return parameter.ParameterType.GetElementType();
+				ParameterInfo parameter = parameters[i];
+				int idx = paramOrder[i];
+				if (idx < typeLen)
+				{
+					// 对参数进行类型推断。
+					if (!CheckParameter(parameter.ParameterType, types[idx], bounds, isExplicit))
+					{
+						return null;
+					}
+				}
+				else if (!options.HasFlag(GenericArgInferenceOptions.OptionalParamBinding) ||
+					parameter.DefaultValue == DBNull.Value)
+				{
+					// 参数不包含默认值。
+					return null;
+				}
+			}
+			Type[] paramTypes = result.ParamArrayTypes;
+			if (paramArrayType == null || paramTypes.Length == 0)
+			{
+				Type[] args = bounds.FixTypeArguments();
+				if (args == null)
+				{
+					return null;
+				}
+				result.GenericArguments = args;
+				return result;
+			}
+			// 对 params 参数进行推断。
+			Type paramElementType = paramArrayType.GetElementType();
+			if (paramTypes.Length > 1)
+			{
+				// 多个实参对应一个形参，做多次类型推断。
+				for (int i = 0; i < paramTypes.Length; i++)
+				{
+					if (!bounds.TypeInferences(paramElementType, paramTypes[i]))
+					{
+						return null;
+					}
+				}
+				Type[] args = bounds.FixTypeArguments();
+				if (args == null)
+				{
+					return null;
+				}
+				result.GenericArguments = args;
+				return result;
+			}
+			// 一个实参对应一个形参，需要判断是否需要展开 params 参数。
+			TypeBounds newBounds = new TypeBounds(bounds);
+			Type type = paramTypes[0];
+			// 首先尝试对 paramArrayType 进行推断。
+			if (bounds.TypeInferences(paramArrayType, type))
+			{
+				Type[] args = bounds.FixTypeArguments();
+				if (args != null)
+				{
+					// 推断成功的话，则无需展开 params 参数。
+					result.ParamArrayTypes = null;
+					result.GenericArguments = args;
+					return result;
+				}
+			}
+			// 然后尝试对 paramElementType 进行推断。
+			if (newBounds.TypeInferences(paramElementType, type))
+			{
+				Type[] args = newBounds.FixTypeArguments();
+				if (args == null)
+				{
+					return null;
+				}
+				result.GenericArguments = args;
+				return result;
 			}
 			return null;
+		}
+		/// <summary>
+		/// 检查方法的返回类型。
+		/// </summary>
+		/// <param name="method">要推断泛型类型的泛型方法定义。</param>
+		/// <param name="returnType">方法的实际返回类型，如果不存在则传入 <c>null</c>。</param>
+		/// <param name="bounds">界限集集合。</param>
+		/// <param name="isExplicit">类型检查时，如果考虑显式类型转换，则为 <c>true</c>；
+		/// 否则只考虑隐式类型转换。</param>
+		/// <returns>如果成功检查返回类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		private static bool CheckReturnType(MethodBase method, Type returnType, TypeBounds bounds, bool isExplicit)
+		{
+			Contract.Requires(method != null && bounds != null);
+			if (returnType == null)
+			{
+				return true;
+			}
+			MethodInfo methodInfo = method as MethodInfo;
+			if (methodInfo == null)
+			{
+				return true;
+			}
+			Type type = methodInfo.ReturnType;
+			if (type.ContainsGenericParameters)
+			{
+				// 对方法返回类型进行上限推断。
+				return bounds.TypeInferences(type, returnType, true);
+			}
+			return returnType.IsConvertFrom(type, isExplicit);
+		}
+		/// <summary>
+		/// 返回非固定参数的类型。
+		/// </summary>
+		/// <param name="types">所有参数类型。</param>
+		/// <param name="index">非固定参数的起始索引。</param>
+		/// <param name="paramOrder">方法实参的顺序。</param>
+		/// <returns>非固定参数的类型。</returns>
+		private static Type[] GetExternalParamTypes(Type[] types, int index, int[] paramOrder)
+		{
+			Contract.Requires(types != null && paramOrder != null);
+			int len = types.Length - index;
+			if (len <= 0)
+			{
+				return Type.EmptyTypes;
+			}
+			Type[] paramTypes = new Type[len];
+			for (int i = 0, j = index; i < len; i++)
+			{
+				paramTypes[i] = types[paramOrder[j]];
+			}
+			return paramTypes;
+		}
+		/// <summary>
+		/// 检查方法的参数类型。
+		/// </summary>
+		/// <param name="paramType">方法形参的类型。</param>
+		/// <param name="type">相应实参的类型，允许使用 <c>null</c> 表示引用类型约束。</param>
+		/// <param name="bounds">界限集集合。</param>
+		/// <param name="isExplicit">类型检查时，如果考虑显式类型转换，则为 <c>true</c>；
+		/// 否则只考虑隐式类型转换。</param>
+		/// <returns>如果成功检查返回类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		private static bool CheckParameter(Type paramType, Type type, TypeBounds bounds, bool isExplicit)
+		{
+			Contract.Requires(paramType != null && bounds != null);
+			if (paramType.ContainsGenericParameters)
+			{
+				return bounds.TypeInferences(paramType, type);
+			}
+			if (type == null)
+			{
+				return !paramType.IsValueType;
+			}
+			return paramType.IsConvertFrom(type, isExplicit);
+		}
+		/// <summary>
+		/// 检查方法的 params 参数类型。
+		/// </summary>
+		/// <param name="paramArrayType">params 形参的类型。</param>
+		/// <param name="types">params 实参的类型。</param>
+		/// <param name="isExplicit">类型检查时，如果考虑显式类型转换，则为 <c>true</c>；
+		/// 否则只考虑隐式类型转换。</param>
+		/// <returns>如果成功检查 params 参数类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		private static bool CheckParamArrayType(Type paramArrayType, Type[] types, bool isExplicit)
+		{
+			Contract.Requires(paramArrayType != null && types != null);
+			if (types.Length == 0)
+			{
+				return true;
+			}
+			Type paramElementType = paramArrayType.GetElementType();
+			if (types.Length == 1)
+			{
+				// 只有一个实参，可能是数组或数组元素。
+				Type type = types[0];
+				return paramArrayType.IsConvertFrom(type, isExplicit) ||
+					paramElementType.IsConvertFrom(type, isExplicit);
+			}
+			// 有多个实参，必须是数组元素。
+			for (int i = 0; i < types.Length; i++)
+			{
+				if (!paramElementType.IsConvertFrom(types[i], isExplicit))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+		/// <summary>
+		/// 获取当前参数是否是 params 参数。
+		/// </summary>
+		/// <param name="parameter">要判断的参数。</param>
+		/// <returns>如果是 params 参数，则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
+		public static bool IsParamArray(this ParameterInfo parameter)
+		{
+			return parameter != null && parameter.ParameterType.IsArray &&
+				parameter.IsDefined(typeof(ParamArrayAttribute), true);
 		}
 
 		#endregion // 泛型参数推断
 
+	}
+
+	/// <summary>
+	/// 泛型参数推断的选项。
+	/// </summary>
+	[Flags]
+	public enum GenericArgInferenceOptions
+	{
+		/// <summary>
+		/// 无任何选项。
+		/// </summary>
+		None,
+		/// <summary>
+		/// 对可选参数进行绑定。
+		/// </summary>
+		OptionalParamBinding,
+		/// <summary>
+		/// 类型检查时，使用显式类型转换，而不是默认的隐式类型转换。
+		/// </summary>
+		Explicit,
+		/// <summary>
+		/// 设置全部选项。
+		/// </summary>
+		All,
 	}
 }

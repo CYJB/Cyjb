@@ -4,9 +4,6 @@ using System.Diagnostics.Contracts;
 
 namespace Cyjb
 {
-	/// <summary>
-	/// 提供数组的扩展方法。
-	/// </summary>
 	public static partial class ArrayExt
 	{
 

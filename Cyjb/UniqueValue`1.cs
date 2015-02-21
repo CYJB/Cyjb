@@ -89,6 +89,14 @@ namespace Cyjb
 			}
 		}
 		/// <summary>
+		/// 获取唯一的值。
+		/// </summary>
+		/// <value>如果值是唯一的，则为唯一的值；否则返回 <typeparamref name="TValue"/> 的默认值。</value>
+		public TValue ValueOrDefault
+		{
+			get { return IsUnique ? uniqueValue : default(TValue); }
+		}
+		/// <summary>
 		/// 获取被设置的值是否是唯一的。
 		/// </summary>
 		/// <value>如果值被设置了，而且是唯一的，则为 <c>true</c>；

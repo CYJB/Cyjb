@@ -445,13 +445,10 @@ namespace Cyjb.Conversions
 			{
 				return false;
 			}
-			Type definition = type.GetGenericTypeDefinition();
-			return definition == typeof(IList<>) ||
-				definition == typeof(ICollection<>) ||
-				definition == typeof(IEnumerable<>);
+			return type.GetGenericTypeDefinition().IsIListOrBase();
 		}
 		/// <summary>
-		/// 获取是否存在从 <paramref name="inputType"/> 到 <paramref name="outputType"/> 的引用转换。
+		/// 获取是否存在从 <paramref name="inputType"/> 到 <paramref name="outputType"/> 的预定义引用转换。
 		/// </summary>
 		/// <param name="inputType">输入类型。</param>
 		/// <param name="outputType">输出类型。</param>>
@@ -463,7 +460,7 @@ namespace Cyjb.Conversions
 			{
 				return false;
 			}
-			Conversion conversion = GetConversion(inputType, outputType);
+			Conversion conversion = GetPreDefinedConversion(inputType, outputType);
 			return conversion != null && conversion.ConversionType.IsReference();
 		}
 		/// <summary>

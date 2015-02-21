@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
-using Cyjb;
 using Cyjb.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace UnitTestCyjb
+namespace UnitTestCyjb.Reflection
 {
 	/// <summary>
 	/// <see cref="TypeExt"/> 类的单元测试。

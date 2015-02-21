@@ -482,15 +482,15 @@ namespace Cyjb.Reflection
 			{
 				MatchInfo info = infos[i];
 				Type paramArrayType;
-				if (MethodExt.CheckParameterCount(info.Parameters, types, info.ParamOrder,
-					optionalParamBinding, out paramArrayType))
-				{
-					info.ParamArrayType = paramArrayType;
-					if (MakeGenericMethod(info, types) && CheckParameterType(info, types, optionalParamBinding))
-					{
-						infos[idx++] = info;
-					}
-				}
+				//if (MethodExt.CheckParameterCount(info.Parameters, types, info.ParamOrder,
+				//	optionalParamBinding, out paramArrayType))
+				//{
+				//	info.ParamArrayType = paramArrayType;
+				//	if (MakeGenericMethod(info, types) && CheckParameterType(info, types, optionalParamBinding))
+				//	{
+				//		infos[idx++] = info;
+				//	}
+				//}
 			}
 			if (idx == 0)
 			{
@@ -634,8 +634,9 @@ namespace Cyjb.Reflection
 				paramTypes[i] = match.Parameters[i].ParameterType;
 			}
 			Type paramArrayType = match.ParamArrayType;
-			Type[] args = TypeExt.GenericArgumentsInferences(method.GetGenericArguments(),
-				paramTypes, ref paramArrayType, types, match.ParamOrder);
+			Type[] args = null;
+			//Type[] args = TypeExt.GenericArgumentsInferences(method.GetGenericArguments(),
+			//	paramTypes, ref paramArrayType, types, match.ParamOrder);
 			match.ParamArrayType = paramArrayType;
 			try
 			{
@@ -652,7 +653,7 @@ namespace Cyjb.Reflection
 			match.GenericArgumentCount = args.Length;
 			if (match.ParamArrayType != null)
 			{
-				match.ParamArrayType = MethodExt.GetParamArrayType(match.Parameters[match.Parameters.Length - 1]);
+				// match.ParamArrayType = MethodExt.GetParamArrayType(match.Parameters[match.Parameters.Length - 1]);
 			}
 			return true;
 		}

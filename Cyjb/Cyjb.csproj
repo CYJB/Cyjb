@@ -191,6 +191,7 @@
     <Compile Include="RandomExt.cs" />
     <Compile Include="ProcessorAttribute.cs" />
     <Compile Include="Reflection\Converter.cs" />
+    <Compile Include="Reflection\GenericArgInferenceResult.cs" />
     <Compile Include="Reflection\ILExt.Constant.cs">
       <DependentUpon>ILExt.cs</DependentUpon>
     </Compile>
@@ -201,6 +202,7 @@
     <Compile Include="Reflection\ILManager.cs" />
     <Compile Include="Reflection\MethodExt.cs" />
     <Compile Include="Reflection\PowerBinder.cs" />
+    <Compile Include="Reflection\TypeBounds.cs" />
     <Compile Include="Reflection\TypeExt.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -241,7 +243,13 @@
     <Compile Include="FloatComparer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArrayExt.Order.cs">
+      <DependentUpon>ArrayExt.cs</DependentUpon>
+    </Compile>
     <None Include="CYJB_Code_Key.snk" />
+    <Compile Include="DelegateBuilder.Method.cs">
+      <DependentUpon>DelegateBuilder.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Collections\ComponentModel\" />

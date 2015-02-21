@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using Cyjb.Conversions;
@@ -217,7 +216,7 @@ namespace Cyjb.Reflection
 		/// 判断类型间能否进行显式类型转换的算法来自于 《CSharp Language Specification》v5.0 
 		/// 的第 6.1 节。</remarks>
 		/// <example>
-		/// 下面是 <see cref="IsImplicitFrom"/> 方法的一些实例。
+		/// 下面是 <see cref="IsExplicitFrom"/> 方法的一些实例。
 		/// <code>
 		/// Console.WriteLine(typeof(uint).IsExplicitFrom(typeof(object))); // True
 		/// Console.WriteLine(typeof(short).IsExplicitFrom(typeof(int))); // True
@@ -241,7 +240,49 @@ namespace Cyjb.Reflection
 			return conversion != null && conversion.ConversionType != ConversionType.None;
 		}
 		/// <summary>
-		/// 返回 <paramref name="types"/> 中能够包含其它所有类型的类型。
+		/// 确定当前 <see cref="Type"/> 的实例是否可以从 <paramref name="fromType"/> 的实例类型转换得到。
+		/// 这里仅考虑预定义的类型转换，不考虑由 <c>implicit</c> 运算符和 <c>explicit</c> 运算符指定的转换。
+		/// </summary>
+		/// <param name="type">当前类型。</param>
+		/// <param name="fromType">要判断能否类型转换得到的类型。</param>
+		/// <param name="isExplicit">如果考虑显式类型转换，则为 <c>true</c>；否则只考虑隐式类型转换。</param>
+		/// <returns>如果当前 <see cref="Type"/> 的实例是否可以从 <paramref name="fromType"/> 
+		/// 的实例类型转换得到，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="fromType"/> 为 <c>null</c>。</exception>
+		/// <remarks>
+		/// 判断类型间能否进行类型转换的算法来自于 《CSharp Language Specification》v5.0 
+		/// 的第 6.1 节。</remarks>
+		/// <example>
+		/// 下面是 <see cref="IsConvertFrom"/> 方法的一些实例。
+		/// <code>
+		/// Console.WriteLine(typeof(object).IsExplicitFrom(typeof(uint), false)); // True
+		/// Console.WriteLine(typeof(int).IsExplicitFrom(typeof(short), false)); // True
+		/// Console.WriteLine(typeof(long?).IsExplicitFrom(typeof(int?), false)); // True
+		/// Console.WriteLine(typeof(uint).IsConvertFrom(typeof(object), true)); // True
+		/// Console.WriteLine(typeof(short).IsConvertFrom(typeof(int), true)); // True
+		/// Console.WriteLine(typeof(int).IsConvertFrom(typeof(long?), true)); // True
+		/// </code>
+		/// </example>
+		/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/TypeAssignableFrom.html">
+		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</seealso>
+		public static bool IsConvertFrom(this Type type, Type fromType, bool isExplicit)
+		{
+			if (type == null)
+			{
+				throw CommonExceptions.ArgumentNull("type");
+			}
+			if (fromType == null)
+			{
+				throw CommonExceptions.ArgumentNull("otherType");
+			}
+			Contract.EndContractBlock();
+			Conversion conversion = ConversionFactory.GetPreDefinedConversion(fromType, type);
+			return conversion != null && conversion.ConversionType != ConversionType.None &&
+				(isExplicit || conversion.ConversionType.IsImplicit());
+		}
+		/// <summary>
+		/// 返回 <paramref name="types"/> 中能够包含其它所有类型的类型（可以从其它所有类型隐式转换而来）。
 		/// </summary>
 		/// <param name="types">类型集合。</param>
 		/// <returns><paramref name="types"/> 中能够包含其它所有类型的类型，如果不存在则为 <c>null</c>。</returns>
@@ -289,7 +330,7 @@ namespace Cyjb.Reflection
 			return encompassingType;
 		}
 		/// <summary>
-		/// 返回 <paramref name="types"/> 中能够被其它所有类型包含的类型。
+		/// 返回 <paramref name="types"/> 中能够被其它所有类型包含的类型（可以隐式转换为其它所有类型）。
 		/// </summary>
 		/// <param name="types">类型集合。</param>
 		/// <returns><paramref name="types"/> 中能够被其它所有类型包含的类型，如果不存在则为 <c>null</c>。</returns>
@@ -375,32 +416,34 @@ namespace Cyjb.Reflection
 			{
 				return null;
 			}
-			if (definition.IsInterface == type.IsInterface)
+			if (!definition.IsInterface && !type.IsInterface)
 			{
 				// 沿继承链向上查找。
 				while (type != null)
 				{
-					if (type.IsGenericType)
+					if (type.IsGenericType && definition == type.GetGenericTypeDefinition())
 					{
-						if (definition == type.GetGenericTypeDefinition())
-						{
-							return type;
-						}
+						return type;
 					}
 					type = type.BaseType;
 				}
 				return null;
 			}
-			if (definition.IsInterface)
+			if (!definition.IsInterface)
 			{
-				// 查找实现的接口。
-				Type[] interfaces = type.GetInterfaces();
-				for (int i = 0; i < interfaces.Length; i++)
+				return null;
+			}
+			if (type.IsGenericType && definition == type.GetGenericTypeDefinition())
+			{
+				return type;
+			}
+			// 查找实现的接口。
+			Type[] interfaces = type.GetInterfaces();
+			for (int i = 0; i < interfaces.Length; i++)
+			{
+				if (interfaces[i].IsGenericType && definition == interfaces[i].GetGenericTypeDefinition())
 				{
-					if (interfaces[i].IsGenericType && definition == interfaces[i].GetGenericTypeDefinition())
-					{
-						return interfaces[i];
-					}
+					return interfaces[i];
 				}
 			}
 			return null;
@@ -439,581 +482,125 @@ namespace Cyjb.Reflection
 			{
 				return null;
 			}
-			if (definition.IsInterface == type.IsInterface)
+			if (!definition.IsInterface && !type.IsInterface)
 			{
 				// 沿继承链向上查找。
 				while (type != null)
 				{
-					if (type.IsGenericType)
+					if (type.IsGenericType && definition == type.GetGenericTypeDefinition())
 					{
-						if (definition == type.GetGenericTypeDefinition())
-						{
-							return type;
-						}
+						return type;
 					}
 					type = type.BaseType;
 				}
 				return null;
 			}
-			if (definition.IsInterface)
+			if (!definition.IsInterface)
 			{
-				// 查找实现的接口。
-				Type[] interfaces = type.GetInterfaces();
-				UniqueValue<Type> unique = new UniqueValue<Type>();
-				for (int i = 0; i < interfaces.Length && !unique.IsAmbig; i++)
+				return null;
+			}
+			if (type.IsGenericType && definition == type.GetGenericTypeDefinition())
+			{
+				return type;
+			}
+			// 查找实现的接口。
+			Type[] interfaces = type.GetInterfaces();
+			UniqueValue<Type> unique = new UniqueValue<Type>();
+			for (int i = 0; i < interfaces.Length && !unique.IsAmbig; i++)
+			{
+				if (interfaces[i].IsGenericType && definition == interfaces[i].GetGenericTypeDefinition())
 				{
-					if (interfaces[i].IsGenericType && definition == interfaces[i].GetGenericTypeDefinition())
-					{
-						unique.Value = interfaces[i];
-					}
-				}
-				if (unique.IsUnique)
-				{
-					return unique.Value;
+					unique.Value = interfaces[i];
 				}
 			}
-			return null;
+			return unique.ValueOrDefault;
 		}
 
 		#endregion // 返回泛型类型定义的封闭构造类型
 
-		#region 泛型参数推断
+		#region Invoke 方法
 
 		/// <summary>
-		/// 根据给定的类型数组推断泛型参数组的类型参数。
-		/// 允许通过为 <paramref name="types"/> 的某一项为 <c>null</c> 
-		/// 来指定对应参数是引用类型，但不会进行其它的推断。
+		/// 获取委托类型的 Invoke 方法。
 		/// </summary>
-		/// <param name="genericArgs">泛型类型参数数组。</param>
-		/// <param name="paramTypes">形参参数数组。</param>
-		/// <param name="paramArrayType">如果形参参数数组的最后一项是 prams 参数，
-		/// 则为相应的数组元素类型；否则为 <c>null</c>。</param>
-		/// <param name="types">实参参数数组。</param>
-		/// <param name="paramOrder">实参参数顺序，这是为了提供对 PowerBinder 的支持。
-		/// 它的长度必须大于等于形参个数和实参个数。</param>
-		/// <returns>如果成功推断泛型参数组的类型参数，则为类型参数数组；
-		/// 如果推断失败，则为 <c>null</c>。</returns>
-		internal static Type[] GenericArgumentsInferences(Type[] genericArgs, Type[] paramTypes,
-			ref Type paramArrayType, Type[] types, int[] paramOrder)
+		/// <param name="dlg">委托。</param>
+		/// <returns>委托类型的 Invoke 方法。</returns>
+		internal static MethodInfo GetInvokeMethod(this Delegate dlg)
 		{
-			Debug.Assert(genericArgs.Length > 0);
-			Debug.Assert(paramTypes.Length > 0);
-			Debug.Assert(types.Length > 0);
-			Debug.Assert(paramOrder.Length >= paramTypes.Length);
-			Debug.Assert(paramOrder.Length >= types.Length);
-			Dictionary<Type, BoundSet> boundSets = new Dictionary<Type, BoundSet>();
-			for (int i = 0; i < genericArgs.Length; i++)
-			{
-				boundSets.Add(genericArgs[i], new BoundSet());
-			}
-			int len = paramTypes.Length;
-			// params T 数组参数。
-			Type paramElementType = null;
-			if (paramArrayType != null)
-			{
-				// 最后一个参数需要对 params 参数进行特殊处理。
-				len--;
-				if (paramTypes[len].ContainsGenericParameters && paramOrder[len] < types.Length)
-				{
-					if (len + 1 == types.Length)
-					{
-						// 如果实参形参数量相等，需要对 params T 数组进行特殊判断。
-						paramArrayType.GetArrayDepth(out paramElementType);
-						if (!paramElementType.IsGenericParameter)
-						{
-							paramElementType = null;
-						}
-					}
-					if (paramElementType == null)
-					{
-						// params 参数需要从数组元素类型到多个实参做类型推断。
-						for (int i = len; i < types.Length; i++)
-						{
-							if (!TypeInferences(paramArrayType, types[paramOrder[len]], boundSets))
-							{
-								// 类型推断失败。
-								return null;
-							}
-						}
-					}
-				}
-			}
-			for (len--; len >= 0; len--)
-			{
-				if (paramTypes[len].ContainsGenericParameters && paramOrder[len] < types.Length)
-				{
-					if (!TypeInferences(paramTypes[len], types[paramOrder[len]], boundSets))
-					{
-						// 类型推断失败。
-						return null;
-					}
-				}
-			}
-			Type[] args = null;
-			if (paramElementType == null)
-			{
-				// 没有 params T 数组参数，直接进行固定。
-				args = FixTypeArguments(genericArgs, boundSets);
-			}
-			else
-			{
-				// 需要复制界限集。
-				Dictionary<Type, BoundSet> boundSetsClone = new Dictionary<Type, BoundSet>();
-				foreach (KeyValuePair<Type, BoundSet> pair in boundSets)
-				{
-					boundSetsClone.Add(pair.Key, pair.Value.Clone());
-				}
-				len = paramTypes.Length - 1;
-				// 首先尝试对 paramArrayType[] 进行推断。
-				if (TypeInferences(paramTypes[len], types[paramOrder[len]], boundSets))
-				{
-					args = FixTypeArguments(genericArgs, boundSets);
-				}
-				if (args != null)
-				{
-					// 推断成功的话，则需要将 paramArrayType 置为 null 以表示无需展开 params 参数。
-					paramArrayType = null;
-				}
-				else
-				{
-					// 失败的话则尝试对 paramArrayType 进行推断。
-					if (TypeInferences(paramArrayType, types[paramOrder[len]], boundSetsClone))
-					{
-						args = FixTypeArguments(genericArgs, boundSetsClone);
-					}
-				}
-			}
-			return args;
+			Contract.Requires(dlg != null);
+			return dlg.GetType().GetMethod("Invoke");
 		}
 		/// <summary>
-		/// 根据给定的界限集固定类型参数。
+		/// 获取委托类型的 Invoke 方法。
 		/// </summary>
-		/// <param name="genericArgs">泛型类型参数数组。</param>
-		/// <param name="boundSets">界限集。</param>
-		/// <returns>如果成功推断泛型参数组的类型参数，则为类型参数数组；
-		/// 如果推断失败，则为 <c>null</c>。</returns>
-		private static Type[] FixTypeArguments(Type[] genericArgs, IDictionary<Type, BoundSet> boundSets)
+		/// <param name="type">委托类型。</param>
+		/// <returns>委托类型的 Invoke 方法。</returns>
+		internal static MethodInfo GetInvokeMethod(this Type type)
 		{
-			Type[] result = new Type[genericArgs.Length];
-			for (int i = 0; i < genericArgs.Length; i++)
-			{
-				result[i] = boundSets[genericArgs[i]].FixTypeArg();
-				if (result[i] == null)
-				{
-					return null;
-				}
-			}
-			return result;
-		}
-		/// <summary>
-		/// 对类型进行推断。
-		/// </summary>
-		/// <param name="paramType">形参类型。</param>
-		/// <param name="type">实参类型。</param>
-		/// <param name="boundSets">泛型形参的界限集。</param>
-		/// <returns>如果类型推断成功，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private static bool TypeInferences(Type paramType, Type type, Dictionary<Type, BoundSet> boundSets)
-		{
-			if (type == null)
-			{
-				if (paramType.IsByRef)
-				{
-					paramType = paramType.GetElementType();
-				}
-				if (paramType.IsGenericParameter)
-				{
-					boundSets[paramType].ReferenceType = true;
-				}
-				return true;
-			}
-			else if (paramType.IsByRef)
-			{
-				return ExactInferences(paramType.GetElementType(), type, boundSets);
-			}
-			else
-			{
-				return LowerBoundInferences(paramType, type, boundSets);
-			}
-		}
-		/// <summary>
-		/// 对类型进行精确推断。
-		/// </summary>
-		/// <param name="paramType">形参类型。</param>
-		/// <param name="type">实参类型。</param>
-		/// <param name="boundSets">泛型形参的界限集。</param>
-		/// <returns>如果精确推断成功，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private static bool ExactInferences(Type paramType, Type type, Dictionary<Type, BoundSet> boundSets)
-		{
-			Type tempParamType;
-			if (paramType.IsGenericParameter)
-			{
-				return boundSets[paramType].AddExactBound(type);
-			}
-			tempParamType = Nullable.GetUnderlyingType(paramType);
-			if (tempParamType != null)
-			{
-				Type tempType = Nullable.GetUnderlyingType(type);
-				if (tempType != null)
-				{
-					return ExactInferences(tempParamType, tempType, boundSets);
-				}
-			}
-			else if (paramType.IsArray)
-			{
-				if (type.IsArray && paramType.GetArrayRank() == type.GetArrayRank())
-				{
-					return LowerBoundInferences(paramType.GetElementType(), type.GetElementType(), boundSets);
-				}
-			}
-			else if (paramType.GetGenericTypeDefinition() == type.GetGenericTypeDefinition())
-			{
-				Type[] paramTypeArgs = paramType.GetGenericArguments();
-				Type[] typeArgs = type.GetGenericArguments();
-				for (int i = 0; i < paramTypeArgs.Length; i++)
-				{
-					if (!ExactInferences(paramTypeArgs[i], typeArgs[i], boundSets))
-					{
-						return false;
-					}
-				}
-			}
-			return true;
-		}
-		/// <summary>
-		/// 对类型进行下限推断。
-		/// </summary>
-		/// <param name="paramType">形参类型。</param>
-		/// <param name="type">实参类型。</param>
-		/// <param name="boundSets">泛型形参的界限集。</param>
-		/// <returns>如果下限推断成功，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private static bool LowerBoundInferences(Type paramType, Type type, Dictionary<Type, BoundSet> boundSets)
-		{
-			Type tempParamType = null, tempType = null;
-			if (paramType.IsGenericParameter)
-			{
-				return boundSets[paramType].AddLowerBound(type);
-			}
-			tempParamType = Nullable.GetUnderlyingType(paramType);
-			if (tempParamType != null)
-			{
-				tempType = Nullable.GetUnderlyingType(type);
-				if (tempType != null)
-				{
-					return LowerBoundInferences(tempParamType, tempType, boundSets);
-				}
-			}
-			else if (type.IsArray)
-			{
-				tempType = type.GetElementType();
-				if (paramType.IsArray)
-				{
-					if (paramType.GetArrayRank() == type.GetArrayRank())
-					{
-						return LowerBoundInferences(paramType.GetElementType(), tempType, boundSets);
-					}
-				}
-				else if (paramType.IsGenericType)
-				{
-					tempParamType = paramType.GetGenericTypeDefinition();
-					if (tempParamType == typeof(IList<>) ||
-						tempParamType == typeof(ICollection<>) ||
-						tempParamType == typeof(IEnumerable<>))
-					{
-						return LowerBoundInferences(paramType.GetGenericArguments()[0], tempType, boundSets);
-					}
-				}
-			}
-			else if (paramType.IsGenericType)
-			{
-				tempParamType = paramType.GetGenericTypeDefinition();
-				if ((tempType = tempParamType.UniqueCloseDefinitionFrom(type)) != null)
-				{
-					Type[] originArgs = tempParamType.GetGenericArguments();
-					Type[] paramTypeArgs = paramType.GetGenericArguments();
-					Type[] typeArgs = tempType.GetGenericArguments();
-					for (int i = 0; i < originArgs.Length; i++)
-					{
-						bool result = true;
-						switch (originArgs[i].GenericParameterAttributes & GenericParameterAttributes.VarianceMask)
-						{
-							case GenericParameterAttributes.None:
-								result = ExactInferences(paramTypeArgs[i], typeArgs[i], boundSets);
-								break;
-							case GenericParameterAttributes.Covariant:
-								result = LowerBoundInferences(paramTypeArgs[i], typeArgs[i], boundSets);
-								break;
-							case GenericParameterAttributes.Contravariant:
-								result = UpperBoundInferences(paramTypeArgs[i], typeArgs[i], boundSets);
-								break;
-						}
-						if (!result)
-						{
-							return false;
-						}
-					}
-				}
-			}
-			return true;
-		}
-		/// <summary>
-		/// 对类型进行上限推断。
-		/// </summary>
-		/// <param name="paramType">形参类型。</param>
-		/// <param name="type">实参类型。</param>
-		/// <param name="boundSets">泛型形参的界限集。</param>
-		/// <returns>如果上限推断成功，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private static bool UpperBoundInferences(Type paramType, Type type, Dictionary<Type, BoundSet> boundSets)
-		{
-			Type tempParamType = null, tempType = null;
-			if (paramType.IsGenericParameter)
-			{
-				return boundSets[paramType].AddUpperBound(type);
-			}
-			tempParamType = Nullable.GetUnderlyingType(paramType);
-			if (tempParamType != null)
-			{
-				tempType = Nullable.GetUnderlyingType(type);
-				if (tempType != null)
-				{
-					return UpperBoundInferences(tempParamType, tempType, boundSets);
-				}
-			}
-			else if (paramType.IsArray)
-			{
-				tempParamType = paramType.GetElementType();
-				if (type.IsArray)
-				{
-					if (paramType.GetArrayRank() == type.GetArrayRank())
-					{
-						return UpperBoundInferences(tempParamType, type.GetElementType(), boundSets);
-					}
-				}
-				else if (type.IsGenericType)
-				{
-					tempType = type.GetGenericTypeDefinition();
-					if (tempType == typeof(IList<>) ||
-						tempType == typeof(ICollection<>) ||
-						tempType == typeof(IEnumerable<>))
-					{
-						return UpperBoundInferences(tempParamType, tempType.GetGenericArguments()[0], boundSets);
-					}
-				}
-			}
-			else if (type.IsGenericType)
-			{
-				tempType = type.GetGenericTypeDefinition();
-				if ((tempParamType = tempType.UniqueCloseDefinitionFrom(paramType)) != null)
-				{
-					Type[] originArgs = tempType.GetGenericArguments();
-					Type[] paramTypeArgs = tempParamType.GetGenericArguments();
-					Type[] typeArgs = type.GetGenericArguments();
-					for (int i = 0; i < originArgs.Length; i++)
-					{
-						bool result = true;
-						switch (originArgs[i].GenericParameterAttributes & GenericParameterAttributes.VarianceMask)
-						{
-							case GenericParameterAttributes.None:
-								result = ExactInferences(paramTypeArgs[i], typeArgs[i], boundSets);
-								break;
-							case GenericParameterAttributes.Covariant:
-								result = UpperBoundInferences(paramTypeArgs[i], typeArgs[i], boundSets);
-								break;
-							case GenericParameterAttributes.Contravariant:
-								result = LowerBoundInferences(paramTypeArgs[i], typeArgs[i], boundSets);
-								break;
-						}
-						if (!result)
-						{
-							return false;
-						}
-					}
-				}
-			}
-			return true;
-		}
-		/// <summary>
-		/// 泛型形参的界限集。
-		/// </summary>
-		private class BoundSet
-		{
-			/// <summary>
-			/// 类型推断的下限界限集。
-			/// </summary>
-			private HashSet<Type> lowerBounds = new HashSet<Type>();
-			/// <summary>
-			/// 类型推断的上限界限集。
-			/// </summary>
-			private HashSet<Type> upperBounds = new HashSet<Type>();
-			/// <summary>
-			/// 类型推断的精确界限（这个需要是唯一的）。
-			/// </summary>
-			private Type exactBound = null;
-			/// <summary>
-			/// 是否要求类型形参必须是泛型类型。
-			/// </summary>
-			public bool ReferenceType = false;
-			/// <summary>
-			/// 向类型推断的精确界限集中添加指定的类型。
-			/// </summary>
-			/// <param name="type">要添加的类型。</param>
-			/// <returns>如果添加成功，则为 <c>true</c>；如果产生了冲突，则为 <c>false</c>。</returns>
-			public bool AddExactBound(Type type)
-			{
-				if (exactBound == null)
-				{
-					if (!CanFixed(type))
-					{
-						// 与现有的界限冲突。
-						return false;
-					}
-					lowerBounds.Clear();
-					upperBounds.Clear();
-					exactBound = type;
-				}
-				else if (exactBound != type)
-				{
-					return false;
-				}
-				return true;
-			}
-			/// <summary>
-			/// 向类型推断的下限界限集中添加指定的类型。
-			/// </summary>
-			/// <param name="type">要添加的类型。</param>
-			/// <returns>如果添加成功，则为 <c>true</c>；如果产生了冲突，则为 <c>false</c>。</returns>
-			public bool AddLowerBound(Type type)
-			{
-				if (exactBound == null)
-				{
-					lowerBounds.Add(type);
-				}
-				else if (!exactBound.IsImplicitFrom(type))
-				{
-					// 与精确界限冲突。
-					return false;
-				}
-				return true;
-			}
-			/// <summary>
-			/// 向类型推断的上限界限集中添加指定的类型。
-			/// </summary>
-			/// <param name="type">要添加的类型。</param>
-			/// <returns>如果添加成功，则为 <c>true</c>；如果产生了冲突，则为 <c>false</c>。</returns>
-			public bool AddUpperBound(Type type)
-			{
-				if (exactBound == null)
-				{
-					upperBounds.Add(type);
-				}
-				else if (!type.IsImplicitFrom(exactBound))
-				{
-					// 与精确界限冲突。
-					return false;
-				}
-				return true;
-			}
-			/// <summary>
-			/// 返回当前类型的复制。
-			/// </summary>
-			/// <returns>当前类型的复制。</returns>
-			public BoundSet Clone()
-			{
-				BoundSet newSet = new BoundSet();
-				if (this.exactBound == null)
-				{
-					newSet.lowerBounds.UnionWith(this.lowerBounds);
-					newSet.upperBounds.UnionWith(this.upperBounds);
-				}
-				else
-				{
-					newSet.exactBound = this.exactBound;
-				}
-				newSet.ReferenceType = this.ReferenceType;
-				return newSet;
-			}
-			/// <summary>
-			/// 固定当前界限集所限定的类型参数。
-			/// </summary>
-			/// <returns>如果成功固定当前界限集的的类型参数，则为类型参数；
-			/// 如果固定失败，则为 <c>null</c>。</returns>
-			public Type FixTypeArg()
-			{
-				Type result = null;
-				if (exactBound == null)
-				{
-					List<Type> list = new List<Type>(new HashSet<Type>(lowerBounds.Concat(upperBounds))
-						.Where(type => this.CanFixed(type)));
-					if (list.Count == 0)
-					{
-						// 没有找到合适的推断结果。
-						return null;
-					}
-					else if (list.Count == 1)
-					{
-						// 找到唯一的推断结果。
-						result = list[0];
-					}
-					else
-					{
-						// 进一步进行推断。
-						UniqueValue<Type> uType = new UniqueValue<Type>();
-						int cnt = list.Count;
-						for (int j = 0; j < cnt; j++)
-						{
-							int k = 0;
-							for (; k < cnt; k++)
-							{
-								if (k == j) { continue; }
-								if (!list[j].IsImplicitFrom(list[k]))
-								{
-									break;
-								}
-							}
-							if (k == cnt) { uType.Value = list[j]; }
-						}
-						if (uType.IsUnique)
-						{
-							result = uType.Value;
-						}
-						else
-						{
-							// 推断失败。
-							return null;
-						}
-					}
-				}
-				else
-				{
-					result = exactBound;
-				}
-				// 判断引用类型约束。
-				if (ReferenceType && result.IsValueType)
-				{
-					return null;
-				}
-				return result;
-			}
-			/// <summary>
-			/// 判断指定的类型能否根据给定的上限集和下限集中被固定。
-			/// </summary>
-			/// <param name="testType">要判断能否固定的类型。</param>
-			/// <returns>如果给定的类型可以固定，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-			private bool CanFixed(Type testType)
-			{
-				foreach (Type type in lowerBounds)
-				{
-					if (!testType.IsImplicitFrom(type)) { return false; }
-				}
-				foreach (Type type in upperBounds)
-				{
-					if (!testType.IsImplicitFrom(type)) { return false; }
-				}
-				return true;
-			}
+			Contract.Requires(type != null && type.IsSubclassOf(typeof(Delegate)));
+			return type.GetMethod("Invoke");
 		}
 
-		#endregion // 泛型参数推断
+		#endregion // Invoke 方法
 
+		#region GetArrayDepth
+
+		/// <summary>
+		/// 返回获取类型的数组深度。
+		/// </summary>
+		/// <param name="type">要获取数组深度的类型。</param>
+		/// <returns>如果给定类型是数组，则为数组的深度；否则为 <c>0</c>。</returns>
+		internal static int GetArrayDepth(this Type type)
+		{
+			Type elementType;
+			return GetArrayDepth(type, out elementType);
+		}
+		/// <summary>
+		/// 返回获取类型的数组深度和数组元素类型。
+		/// </summary>
+		/// <param name="type">要获取数组深度的类型。</param>
+		/// <param name="elementType">数组元素的类型。</param>
+		/// <returns>如果给定类型是数组，则为数组的深度；否则为 <c>0</c>。</returns>
+		internal static int GetArrayDepth(this Type type, out Type elementType)
+		{
+			int depth = 0;
+			while (type.IsArray)
+			{
+				depth++;
+				type = type.GetElementType();
+			}
+			elementType = type;
+			return depth;
+		}
+
+		#endregion // GetArrayDepth
+
+		/// <summary>
+		/// 返回类型的定义层级深度。
+		/// </summary>
+		/// <param name="type">要获取定义层级深度的类型。</param>
+		/// <returns>指定类型的定义层级深度。</returns>
+		internal static int GetHierarchyDepth(this Type type)
+		{
+			int depth = -1;
+			while (type != null)
+			{
+				type = type.BaseType;
+				depth++;
+			}
+			return depth;
+		}
+		/// <summary>
+		/// 返回指定类型是否是 <see cref="IList{T}"/> 或其类型的泛型方法定义。
+		/// </summary>
+		/// <param name="type">要判断的类型。</param>
+		/// <returns>如果是 <see cref="IList{T}"/> 或其类型的泛型方法定义，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
+		internal static bool IsIListOrBase(this Type type)
+		{
+			Contract.Requires(type != null);
+			return type == typeof(IList<>) || type == typeof(ICollection<>) || type == typeof(IEnumerable<>);
+		}
 		/// <summary>
 		/// 获取 <see cref="Type"/> 的完全限定名，包括 <see cref="Type"/> 的命名空间，但不包括程序集。
 		/// </summary>
@@ -1049,68 +636,6 @@ namespace Cyjb.Reflection
 			}
 			text.Append(']');
 			return text.ToString();
-		}
-		/// <summary>
-		/// 获取委托类型的 Invoke 方法。
-		/// </summary>
-		/// <param name="dlg">委托。</param>
-		/// <returns>委托类型的 Invoke 方法。</returns>
-		internal static MethodInfo GetInvokeMethod(this Delegate dlg)
-		{
-			Contract.Requires(dlg != null);
-			return dlg.GetType().GetMethod("Invoke");
-		}
-		/// <summary>
-		/// 获取委托类型的 Invoke 方法。
-		/// </summary>
-		/// <param name="type">委托类型。</param>
-		/// <returns>委托类型的 Invoke 方法。</returns>
-		internal static MethodInfo GetInvokeMethod(this Type type)
-		{
-			Contract.Requires(type != null && type.IsSubclassOf(typeof(Delegate)));
-			return type.GetMethod("Invoke");
-		}
-		/// <summary>
-		/// 返回获取类型的数组深度。
-		/// </summary>
-		/// <param name="type">要获取数组深度的类型。</param>
-		/// <returns>如果给定类型是数组，则为数组的深度；否则为 <c>0</c>。</returns>
-		internal static int GetArrayDepth(this Type type)
-		{
-			Type elementType;
-			return GetArrayDepth(type, out elementType);
-		}
-		/// <summary>
-		/// 返回获取类型的数组深度和数组元素类型。
-		/// </summary>
-		/// <param name="type">要获取数组深度的类型。</param>
-		/// <param name="elementType">数组元素的类型。</param>
-		/// <returns>如果给定类型是数组，则为数组的深度；否则为 <c>0</c>。</returns>
-		internal static int GetArrayDepth(this Type type, out Type elementType)
-		{
-			int depth = 0;
-			while (type.IsArray)
-			{
-				depth++;
-				type = type.GetElementType();
-			}
-			elementType = type;
-			return depth;
-		}
-		/// <summary>
-		/// 返回类型的定义层级深度。
-		/// </summary>
-		/// <param name="type">要获取定义层级深度的类型。</param>
-		/// <returns>指定类型的定义层级深度。</returns>
-		internal static int GetHierarchyDepth(this Type type)
-		{
-			int depth = -1;
-			while (type != null)
-			{
-				type = type.BaseType;
-				depth++;
-			}
-			return depth;
 		}
 	}
 }

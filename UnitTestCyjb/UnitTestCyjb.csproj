@@ -62,14 +62,15 @@
     <Compile Include="Collections\UnitTestCharSet.cs" />
     <Compile Include="IO\UnitTestSourceReader.cs" />
     <Compile Include="IO\UnitTestSourceRange.cs" />
+    <Compile Include="Reflection\UnitTestTypeBounds.cs" />
     <Compile Include="UnitTestConvert.cs" />
     <Compile Include="UnitTestDelegateBuilder.cs" />
     <Compile Include="UnitTestMethodSwitcher.cs" />
-    <Compile Include="UnitTestMethodExt.cs" />
+    <Compile Include="Reflection\UnitTestMethodExt.cs" />
     <Compile Include="UnitTestTextValuePair`1.cs" />
     <Compile Include="UnitTestEnumExt.cs" />
     <Compile Include="UnitTestPowerBinder.cs" />
-    <Compile Include="UnitTestTypeExt.cs" />
+    <Compile Include="Reflection\UnitTestTypeExt.cs" />
     <Compile Include="UnitTestCharExt.cs" />
     <Compile Include="UnitTestStringExt.cs" />
     <Compile Include="UnitTestEnumerableExt.cs" />
