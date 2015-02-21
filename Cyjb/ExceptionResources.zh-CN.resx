@@ -141,30 +141,6 @@
     <value>参数 '{0}' 不能大于 '{1}'。</value>
     <comment>最小值大于最大值。</comment>
   </data>
-  <data name="BindTargetField" xml:space="preserve">
-    <value>无法绑定到目标字段，因其类型或安全透明度与委托类型的签名或安全透明度不兼容。</value>
-    <comment>绑定到目标字段时出错。</comment>
-  </data>
-  <data name="BindTargetMethod" xml:space="preserve">
-    <value>无法绑定到目标方法，因其签名或安全透明度与委托类型的签名或安全透明度不兼容。</value>
-    <comment>绑定到目标方法时出错。</comment>
-  </data>
-  <data name="BindTargetProperty" xml:space="preserve">
-    <value>无法绑定到目标属性，因其签名或安全透明度与委托类型的签名或安全透明度不兼容。</value>
-    <comment>绑定到目标属性时出错。</comment>
-  </data>
-  <data name="BindTargetPropertyNoGet" xml:space="preserve">
-    <value>无法绑定到目标属性，因其不存在 get 访问器。</value>
-    <comment>绑定到目标属性时出错。</comment>
-  </data>
-  <data name="BindTargetPropertyNoSet" xml:space="preserve">
-    <value>无法绑定到目标属性，因其不存在 set 访问器。</value>
-    <comment>绑定到目标属性时出错。</comment>
-  </data>
-  <data name="CannotInferGenericArguments" xml:space="preserve">
-    <value>无法从参数中推导出方法 {0} 的类型实参。</value>
-    <comment>无效的泛型参数推断。</comment>
-  </data>
   <data name="ConflictingAcceptAction" xml:space="preserve">
     <value>接受动作与拒绝动作冲突。</value>
     <comment>冲突的接受动作。</comment>
@@ -196,10 +172,6 @@
   <data name="InvalidSourceRange" xml:space="preserve">
     <value>从 {0} 到 {1} 不是有效的源文件范围。</value>
     <comment>不是有效的源文件范围。</comment>
-  </data>
-  <data name="NotGenericMethodDefinition" xml:space="preserve">
-    <value>{0} 不是 GenericMethodDefinition。只能对 MethodBase.IsGenericMethodDefinition 为 True 的方法调用 {1}。</value>
-    <comment>不表示泛型方法定义。</comment>
   </data>
   <data name="SameParameterName" xml:space="preserve">
     <value>两个参数的名称不能是相同的。</value>

@@ -115,60 +115,6 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 Cannot bind to the target field because its type or security transparency is not compatible with that of the delegate type. 的本地化字符串。
-        /// </summary>
-        internal static string BindTargetField {
-            get {
-                return ResourceManager.GetString("BindTargetField", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Cannot bind to the target method because its signature or security transparency is not compatible with that of the delegate type. 的本地化字符串。
-        /// </summary>
-        internal static string BindTargetMethod {
-            get {
-                return ResourceManager.GetString("BindTargetMethod", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Cannot bind to the target property because its signature or security transparency is not compatible with that of the delegate type. 的本地化字符串。
-        /// </summary>
-        internal static string BindTargetProperty {
-            get {
-                return ResourceManager.GetString("BindTargetProperty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Cannot bind to the target property because no get accessor exists. 的本地化字符串。
-        /// </summary>
-        internal static string BindTargetPropertyNoGet {
-            get {
-                return ResourceManager.GetString("BindTargetPropertyNoGet", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Cannot bind to the target property because no set accessor exists. 的本地化字符串。
-        /// </summary>
-        internal static string BindTargetPropertyNoSet {
-            get {
-                return ResourceManager.GetString("BindTargetPropertyNoSet", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Can not infer type argument of {0} from parameters. 的本地化字符串。
-        /// </summary>
-        internal static string CannotInferGenericArguments {
-            get {
-                return ResourceManager.GetString("CannotInferGenericArguments", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Accept action is conflicted with Reject action. 的本地化字符串。
         /// </summary>
         internal static string ConflictingAcceptAction {
@@ -237,15 +183,6 @@ namespace Cyjb {
         internal static string InvalidSourceRange {
             get {
                 return ResourceManager.GetString("InvalidSourceRange", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 {0} is not a GenericMethodDefinition. {1} may only be called on a method for which MethodBase.IsGenericMethodDefinition is true. 的本地化字符串。
-        /// </summary>
-        internal static string NotGenericMethodDefinition {
-            get {
-                return ResourceManager.GetString("NotGenericMethodDefinition", resourceCulture);
             }
         }
         

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics.Contracts;
 using System.Reflection;
-using System.Runtime.Serialization;
 using Cyjb.IO;
 using Cyjb.Reflection;
 using Cyjb.Utility;
@@ -693,6 +692,60 @@ namespace Cyjb
 			return new ArgumentException(Resources.BindOpenConstructedMethod, paramName);
 		}
 		/// <summary>
+		/// 返回绑定到目标字段出错的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		internal static ArgumentException BindTargetField(string paramName)
+		{
+			return new ArgumentException(Resources.BindTargetField, paramName);
+		}
+		/// <summary>
+		/// 返回绑定到目标方法出错的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		internal static ArgumentException BindTargetMethod(string paramName)
+		{
+			return new ArgumentException(Resources.BindTargetMethod, paramName);
+		}
+		/// <summary>
+		/// 返回绑定到目标属性出错的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		internal static ArgumentException BindTargetProperty(string paramName)
+		{
+			return new ArgumentException(Resources.BindTargetProperty, paramName);
+		}
+		/// <summary>
+		/// 返回绑定到目标属性出错，不存在 get 访问器的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		internal static ArgumentException BindTargetPropertyNoGet(string paramName)
+		{
+			return new ArgumentException(Resources.BindTargetPropertyNoGet, paramName);
+		}
+		/// <summary>
+		/// 返回绑定到目标属性出错，不存在 set 访问器的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		internal static ArgumentException BindTargetPropertyNoSet(string paramName)
+		{
+			return new ArgumentException(Resources.BindTargetPropertyNoSet, paramName);
+		}
+		/// <summary>
+		/// 返回未能推导类型参数的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		internal static ArgumentException CannotInferenceGenericArguments(string paramName)
+		{
+			return new ArgumentException(paramName, Resources.CannotInferenceGenericArguments);
+		}
+		/// <summary>
 		/// 返回委托类型不兼容的异常。
 		/// </summary>
 		/// <param name="sourceDlg">源委托。</param>
@@ -702,6 +755,16 @@ namespace Cyjb
 		{
 			Contract.Requires(sourceDlg != null && targetDlg != null);
 			return new ArgumentException(Format(Resources.DelegateIncompatible, sourceDlg, targetDlg));
+		}
+		/// <summary>
+		/// 返回不表示泛型方法定义的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
+		internal static InvalidOperationException NeedGenericMethodDefinition(string paramName)
+		{
+			Contract.Requires(paramName != null);
+			return new InvalidOperationException(Format(Resources.NeedGenericMethodDefinition, paramName));
 		}
 		/// <summary>
 		/// 返回属性不存在 get 访问器的异常。
@@ -849,44 +912,6 @@ namespace Cyjb
 
 		#endregion // MethodSwitcher 异常
 
-		/// <summary>
-		/// 返回未能推导类型参数的异常。
-		/// </summary>
-		/// <param name="paramName">产生异常的参数名称。</param>
-		/// <param name="method">未能推导参数的方法。</param>
-		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		public static ArgumentException CannotInferGenericArguments(string paramName, MethodBase method)
-		{
-			return new ArgumentException(paramName);//, ExceptionResources.CannotInferGenericArguments, method);
-		}
-
-		#region  InvalidOperationException
-
-		/// <summary>
-		/// 返回不表示泛型方法定义的异常。
-		/// </summary>
-		/// <param name="method">不是泛型方法的方法。</param>
-		/// <param name="operatorName">产生异常的操作名。</param>
-		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
-		public static InvalidOperationException NotGenericMethodDefinition(MethodBase method, string operatorName)
-		{
-			return new InvalidOperationException(Format(ExceptionResources.NotGenericMethodDefinition, method, operatorName));
-		}
-
-		#endregion
-
-		#region SerializationException
-
-		/// <summary>
-		/// 返回异常集合反序列化失败的异常。
-		/// </summary>
-		/// <returns><see cref="SerializationException"/> 对象。</returns>
-		public static SerializationException AggregateExceptionDeserializationFailure()
-		{
-			return new SerializationException(ExceptionResources.AggregateExceptionDeserializationFailure);
-		}
-
-		#endregion // SerializationException
 
 		#region 缓冲池工厂异常
 
@@ -978,51 +1003,7 @@ namespace Cyjb
 
 		#region DelegateBuilder 异常
 
-		/// <summary>
-		/// 返回绑定到目标方法出错的异常。
-		/// </summary>
-		/// <param name="paramName">产生异常的参数名称。</param>
-		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException BindTargetMethod(string paramName)
-		{
-			return new ArgumentException(ExceptionResources.BindTargetMethod, paramName);
-		}
-		/// <summary>
-		/// 返回绑定到目标属性出错的异常。
-		/// </summary>
-		/// <param name="paramName">产生异常的参数名称。</param>
-		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException BindTargetProperty(string paramName)
-		{
-			return new ArgumentException(ExceptionResources.BindTargetProperty, paramName);
-		}
-		/// <summary>
-		/// 返回绑定到目标属性出错，不存在 set 访问器的异常。
-		/// </summary>
-		/// <param name="paramName">产生异常的参数名称。</param>
-		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException BindTargetPropertyNoSet(string paramName)
-		{
-			return new ArgumentException(ExceptionResources.BindTargetPropertyNoSet, paramName);
-		}
-		/// <summary>
-		/// 返回绑定到目标属性出错，不存在 get 访问器的异常。
-		/// </summary>
-		/// <param name="paramName">产生异常的参数名称。</param>
-		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException BindTargetPropertyNoGet(string paramName)
-		{
-			return new ArgumentException(ExceptionResources.BindTargetPropertyNoGet, paramName);
-		}
-		/// <summary>
-		/// 返回绑定到目标字段出错的异常。
-		/// </summary>
-		/// <param name="paramName">产生异常的参数名称。</param>
-		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException BindTargetField(string paramName)
-		{
-			return new ArgumentException(ExceptionResources.BindTargetField, paramName);
-		}
+
 		/// <summary>
 		/// 返回不能是开放泛型类型的异常。
 		/// </summary>

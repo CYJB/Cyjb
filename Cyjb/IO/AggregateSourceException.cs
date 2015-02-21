@@ -156,10 +156,6 @@ namespace Cyjb.IO
 			}
 			Contract.EndContractBlock();
 			this.innerExps = (SourceException[])info.GetValue("InnerExceptions", typeof(SourceException[]));
-			if (innerExps == null)
-			{
-				throw CommonExceptions.AggregateExceptionDeserializationFailure();
-			}
 			innerExpsCollection = new ReadOnlyCollection<SourceException>(innerExps);
 		}
 

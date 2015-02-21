@@ -449,4 +449,32 @@
     <value>Type '{0}' contains generic parameters.</value>
     <comment>类型包含泛型参数。</comment>
   </data>
+  <data name="BindTargetField" xml:space="preserve">
+    <value>Cannot bind to the target field because its type is not compatible with that of the delegate type.</value>
+    <comment>绑定到目标字段时出错。</comment>
+  </data>
+  <data name="BindTargetMethod" xml:space="preserve">
+    <value>Cannot bind to the target method because its signature is not compatible with that of the delegate type.</value>
+    <comment>绑定到目标方法时出错。</comment>
+  </data>
+  <data name="BindTargetProperty" xml:space="preserve">
+    <value>Cannot bind to the target property because its signature is not compatible with that of the delegate type.</value>
+    <comment>绑定到目标属性时出错。</comment>
+  </data>
+  <data name="BindTargetPropertyNoGet" xml:space="preserve">
+    <value>Cannot bind to the target property because no get accessor exists.</value>
+    <comment>绑定到目标属性时出错。</comment>
+  </data>
+  <data name="BindTargetPropertyNoSet" xml:space="preserve">
+    <value>Cannot bind to the target property because no set accessor exists.</value>
+    <comment>绑定到目标属性时出错。</comment>
+  </data>
+  <data name="NeedGenericMethodDefinition" xml:space="preserve">
+    <value>'{0}' is not a generic method definition.</value>
+    <comment>不表示泛型方法定义。</comment>
+  </data>
+  <data name="CannotInferenceGenericArguments" xml:space="preserve">
+    <value>Can not infer type argument from parameters.</value>
+    <comment>无效的泛型参数推断。</comment>
+  </data>
 </root>

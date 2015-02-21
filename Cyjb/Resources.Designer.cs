@@ -169,11 +169,65 @@ namespace Cyjb {
         }
         
         /// <summary>
+        ///   查找类似 Cannot bind to the target field because its type is not compatible with that of the delegate type. 的本地化字符串。
+        /// </summary>
+        internal static string BindTargetField {
+            get {
+                return ResourceManager.GetString("BindTargetField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Cannot bind to the target method because its signature is not compatible with that of the delegate type. 的本地化字符串。
+        /// </summary>
+        internal static string BindTargetMethod {
+            get {
+                return ResourceManager.GetString("BindTargetMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Cannot bind to the target property because its signature is not compatible with that of the delegate type. 的本地化字符串。
+        /// </summary>
+        internal static string BindTargetProperty {
+            get {
+                return ResourceManager.GetString("BindTargetProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Cannot bind to the target property because no get accessor exists. 的本地化字符串。
+        /// </summary>
+        internal static string BindTargetPropertyNoGet {
+            get {
+                return ResourceManager.GetString("BindTargetPropertyNoGet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Cannot bind to the target property because no set accessor exists. 的本地化字符串。
+        /// </summary>
+        internal static string BindTargetPropertyNoSet {
+            get {
+                return ResourceManager.GetString("BindTargetPropertyNoSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 null cannot be converted to a value type. 的本地化字符串。
         /// </summary>
         internal static string CannotCastNullToValueType {
             get {
                 return ResourceManager.GetString("CannotCastNullToValueType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Can not infer type argument from parameters. 的本地化字符串。
+        /// </summary>
+        internal static string CannotInferenceGenericArguments {
+            get {
+                return ResourceManager.GetString("CannotInferenceGenericArguments", resourceCulture);
             }
         }
         
@@ -444,6 +498,15 @@ namespace Cyjb {
         internal static string MustContainValidInfo {
             get {
                 return ResourceManager.GetString("MustContainValidInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 &apos;{0}&apos; is not a generic method definition. 的本地化字符串。
+        /// </summary>
+        internal static string NeedGenericMethodDefinition {
+            get {
+                return ResourceManager.GetString("NeedGenericMethodDefinition", resourceCulture);
             }
         }
         

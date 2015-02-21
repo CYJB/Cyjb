@@ -141,30 +141,6 @@
     <value>'{0}' cannot be greater than '{1}'.</value>
     <comment>最小值大于最大值。</comment>
   </data>
-  <data name="BindTargetField" xml:space="preserve">
-    <value>Cannot bind to the target field because its type or security transparency is not compatible with that of the delegate type.</value>
-    <comment>绑定到目标字段时出错。</comment>
-  </data>
-  <data name="BindTargetMethod" xml:space="preserve">
-    <value>Cannot bind to the target method because its signature or security transparency is not compatible with that of the delegate type.</value>
-    <comment>绑定到目标方法时出错。</comment>
-  </data>
-  <data name="BindTargetProperty" xml:space="preserve">
-    <value>Cannot bind to the target property because its signature or security transparency is not compatible with that of the delegate type.</value>
-    <comment>绑定到目标属性时出错。</comment>
-  </data>
-  <data name="BindTargetPropertyNoGet" xml:space="preserve">
-    <value>Cannot bind to the target property because no get accessor exists.</value>
-    <comment>绑定到目标属性时出错。</comment>
-  </data>
-  <data name="BindTargetPropertyNoSet" xml:space="preserve">
-    <value>Cannot bind to the target property because no set accessor exists.</value>
-    <comment>绑定到目标属性时出错。</comment>
-  </data>
-  <data name="CannotInferGenericArguments" xml:space="preserve">
-    <value>Can not infer type argument of {0} from parameters.</value>
-    <comment>无效的泛型参数推断。</comment>
-  </data>
   <data name="ConflictingAcceptAction" xml:space="preserve">
     <value>Accept action is conflicted with Reject action.</value>
     <comment>冲突的接受动作。</comment>
@@ -196,10 +172,6 @@
   <data name="InvalidSourceRange" xml:space="preserve">
     <value>From {0} to {1} is not a valid source range.</value>
     <comment>不是有效的源文件范围。</comment>
-  </data>
-  <data name="NotGenericMethodDefinition" xml:space="preserve">
-    <value>{0} is not a GenericMethodDefinition. {1} may only be called on a method for which MethodBase.IsGenericMethodDefinition is true.</value>
-    <comment>不表示泛型方法定义。</comment>
   </data>
   <data name="SameParameterName" xml:space="preserve">
     <value>Two parameters can not have same name.</value>
