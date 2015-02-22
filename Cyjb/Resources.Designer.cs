@@ -835,6 +835,15 @@ namespace Cyjb {
         }
         
         /// <summary>
+        ///   查找类似 Late bound operations cannot be performed on types or methods for which ContainsGenericParameters is true. 的本地化字符串。
+        /// </summary>
+        internal static string UnboundGenParam {
+            get {
+                return ResourceManager.GetString("UnboundGenParam", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 [Ambig] 的本地化字符串。
         /// </summary>
         internal static string UniqueValue_Ambig {

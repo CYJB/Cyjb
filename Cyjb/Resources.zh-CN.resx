@@ -477,4 +477,8 @@
     <value>无法从参数中推导出方法的类型实参。</value>
     <comment>无效的泛型参数推断。</comment>
   </data>
+  <data name="UnboundGenParam" xml:space="preserve">
+    <value>不能对 ContainsGenericParameters 为 true 的类型或方法执行后期绑定操作。</value>
+    <comment>不能对包含未赋值的泛型类型参数的类型和方法进行后期绑定。</comment>
+  </data>
 </root>

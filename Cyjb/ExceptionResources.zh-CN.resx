@@ -181,10 +181,6 @@
     <value>无法从已关闭的 SourceReader 中读取。</value>
     <comment>不能从关闭的 SourceReader 中读取。</comment>
   </data>
-  <data name="UnboundGenParam" xml:space="preserve">
-    <value>不能对 ContainssGenericParameters 为 True 的类型或方法执行后期绑定操作。</value>
-    <comment>不能是开放式泛型类型。</comment>
-  </data>
   <data name="UnrecognizedToken" xml:space="preserve">
     <value>未识别的词法单元 '{0}'。</value>
     <comment>未识别的词法单元异常。</comment>

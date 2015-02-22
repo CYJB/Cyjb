@@ -828,6 +828,15 @@ namespace Cyjb
 			Contract.Requires(type != null);
 			return new ArgumentException(Format(Resources.TypeMissingDefaultConstructor, type));
 		}
+		/// <summary>
+		/// 返回不能对包含未赋值的泛型类型参数的类型和方法进行后期绑定的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		internal static ArgumentException UnboundGenParam(string paramName)
+		{
+			return new ArgumentException(Resources.UnboundGenParam, paramName);
+		}
 
 		#endregion // 动态绑定异常
 
@@ -911,6 +920,12 @@ namespace Cyjb
 		}
 
 		#endregion // MethodSwitcher 异常
+
+
+
+
+
+
 
 
 		#region 缓冲池工厂异常
@@ -1000,22 +1015,6 @@ namespace Cyjb
 		}
 
 		#endregion // PowerBinder 异常
-
-		#region DelegateBuilder 异常
-
-
-		/// <summary>
-		/// 返回不能是开放泛型类型的异常。
-		/// </summary>
-		/// <param name="paramName">产生异常的参数名称。</param>
-		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException UnboundGenParam(string paramName)
-		{
-			return new ArgumentException(ExceptionResources.UnboundGenParam, paramName);
-		}
-
-		#endregion // DelegateBuilder 异常
-
 
 		#region 词法分析异常
 

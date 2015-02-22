@@ -61,7 +61,7 @@ namespace UnitTestCyjb.Reflection
 			method = type.GetMethod("TestMethod8");
 			AssertExt.AreEqual(new[] { typeof(int) },
 				method.GenericArgumentsInferences(typeof(int), typeof(int), typeof(int), typeof(int)));
-			AssertExt.AreEqual(new[] { typeof(string) },
+			AssertExt.AreEqual(new[] { typeof(object) },
 				method.GenericArgumentsInferences(typeof(string), typeof(string), typeof(object), typeof(object)));
 			AssertExt.AreEqual(new[] { typeof(string) },
 				method.GenericArgumentsInferences(typeof(string), typeof(string[])));

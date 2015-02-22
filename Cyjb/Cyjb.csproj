@@ -191,7 +191,7 @@
     <Compile Include="RandomExt.cs" />
     <Compile Include="ProcessorAttribute.cs" />
     <Compile Include="Reflection\Converter.cs" />
-    <Compile Include="Reflection\GenericArgInferenceResult.cs" />
+    <Compile Include="Reflection\MethodArgumentsInfo.cs" />
     <Compile Include="Reflection\ILExt.Constant.cs">
       <DependentUpon>ILExt.cs</DependentUpon>
     </Compile>

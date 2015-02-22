@@ -57,6 +57,35 @@ namespace Cyjb.Collections
 		/// </summary>
 		/// <param name="array">初始化使用的数组。</param>
 		/// <param name="offset">相应范围中第一个元素的从零开始的索引。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> 不是 
+		/// <paramref name="array"/> 中的有效索引。</exception>
+		public ArrayAdapter(T[] array, int offset)
+			: base(array)
+		{
+			if (array == null)
+			{
+				throw CommonExceptions.ArgumentNull("array");
+			}
+			if (offset < 0)
+			{
+				throw CommonExceptions.ArgumentNegative("offset", offset);
+			}
+			if (offset > array.Length)
+			{
+				throw CommonExceptions.ArgumentOutOfRange("offset", offset);
+			}
+			Contract.EndContractBlock();
+			this.array = array;
+			this.offset = offset;
+			this.count = array.Length - offset;
+		}
+		/// <summary>
+		/// 使用给定的数组初始化 <see cref="ArrayAdapter{T}"/> 类的新实例。
+		/// 它分割指定数组中指定的元素范围。
+		/// </summary>
+		/// <param name="array">初始化使用的数组。</param>
+		/// <param name="offset">相应范围中第一个元素的从零开始的索引。</param>
 		/// <param name="count">范围中的元素数。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> 或 

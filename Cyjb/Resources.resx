@@ -477,4 +477,8 @@
     <value>Can not infer type argument from parameters.</value>
     <comment>无效的泛型参数推断。</comment>
   </data>
+  <data name="UnboundGenParam" xml:space="preserve">
+    <value>Late bound operations cannot be performed on types or methods for which ContainsGenericParameters is true.</value>
+    <comment>不能对包含未赋值的泛型类型参数的类型和方法进行后期绑定。</comment>
+  </data>
 </root>

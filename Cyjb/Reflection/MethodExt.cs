@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Reflection;
@@ -288,57 +289,35 @@ namespace Cyjb.Reflection
 		/// <param name="options">泛型类型推断的选项。</param>
 		/// <returns>如果成功推断泛型方法的类型参数，则为推断结果；否则为 <c>null</c>。</returns>
 		/// <remarks><c>paramOrder = { 1, 2, 0}</c> 表示，实参的顺序为 <c>types[1], types[2], types[0]</c>。</remarks>
-		internal static GenericArgInferenceResult GenericArgumentsInferences(this MethodBase method,
-			Type returnType, Type[] types, int[] paramOrder, GenericArgInferenceOptions options)
+		internal static MethodArgumentsInfo GenericArgumentsInferences(this MethodBase method,
+			Type returnType, IList<Type> types, int[] paramOrder, GenericArgInferenceOptions options)
 		{
 			Contract.Requires(method != null && types != null);
 			bool isExplicit = options.HasFlag(GenericArgInferenceOptions.Explicit);
+			// 提取方法参数信息。
+			MethodArgumentsInfo result = GetMethodArgumentsInfo(method, types, paramOrder, isExplicit);
+			if (result == null)
+			{
+				return null;
+			}
+			// 对方法返回值进行推断。
 			TypeBounds bounds = new TypeBounds(method.GetGenericArguments());
 			if (!CheckReturnType(method, returnType, bounds, isExplicit))
 			{
 				return null;
 			}
-			// 对方法参数进行类型推断。
-			GenericArgInferenceResult result = new GenericArgInferenceResult();
-			int typeLen = types.Length;
+			// 检查实参是否与形参对应，未对应的参数是否包含默认值。
+			int typeLen = types.Count;
 			ParameterInfo[] parameters = method.GetParametersNoCopy();
 			int paramLen = parameters.Length;
+			if (result.ParamArrayType != null)
+			{
+				paramLen--;
+			}
 			if (paramOrder == null)
 			{
 				paramOrder = GetParamOrder(Math.Max(paramLen, typeLen));
 			}
-			// 仅当 params 参数类型包含泛型参数时，才不为 null。
-			Type paramArrayType = null;
-			if (method.CallingConvention.HasFlag(CallingConventions.VarArgs))
-			{
-				// 方法具有可变参数。
-				result.OptionalParameterTypes = GetExternalParamTypes(types, paramLen, paramOrder);
-			}
-			else if (paramLen > 0)
-			{
-				ParameterInfo lastParam = parameters[paramLen - 1];
-				if (lastParam.IsParamArray())
-				{
-					// 方法具有 params 参数。
-					paramLen--;
-					result.ParamArrayTypes = GetExternalParamTypes(types, paramLen, paramOrder);
-					if (lastParam.ParameterType.ContainsGenericParameters ||
-						CheckParamArrayType(lastParam.ParameterType, result.ParamArrayTypes, isExplicit))
-					{
-						paramArrayType = lastParam.ParameterType;
-					}
-					else
-					{
-						return null;
-					}
-				}
-				else if (typeLen > paramLen)
-				{
-					// 方法实参过多。
-					return null;
-				}
-			}
-			// 检查实参是否与形参对应，未对应的参数是否包含默认值。
 			for (int i = 0; i < paramLen; i++)
 			{
 				ParameterInfo parameter = parameters[i];
@@ -358,8 +337,8 @@ namespace Cyjb.Reflection
 					return null;
 				}
 			}
-			Type[] paramTypes = result.ParamArrayTypes;
-			if (paramArrayType == null || paramTypes.Length == 0)
+			Type[] paramTypes = result.ParamArgumentTypes;
+			if (result.ParamArrayType == null || paramTypes.Length == 0)
 			{
 				Type[] args = bounds.FixTypeArguments();
 				if (args == null)
@@ -370,7 +349,7 @@ namespace Cyjb.Reflection
 				return result;
 			}
 			// 对 params 参数进行推断。
-			Type paramElementType = paramArrayType.GetElementType();
+			Type paramElementType = result.ParamArrayType.GetElementType();
 			if (paramTypes.Length > 1)
 			{
 				// 多个实参对应一个形参，做多次类型推断。
@@ -393,13 +372,13 @@ namespace Cyjb.Reflection
 			TypeBounds newBounds = new TypeBounds(bounds);
 			Type type = paramTypes[0];
 			// 首先尝试对 paramArrayType 进行推断。
-			if (bounds.TypeInferences(paramArrayType, type))
+			if (bounds.TypeInferences(result.ParamArrayType, type))
 			{
 				Type[] args = bounds.FixTypeArguments();
 				if (args != null)
 				{
 					// 推断成功的话，则无需展开 params 参数。
-					result.ParamArrayTypes = null;
+					result.ParamArgumentTypes = null;
 					result.GenericArguments = args;
 					return result;
 				}
@@ -447,24 +426,79 @@ namespace Cyjb.Reflection
 			return returnType.IsConvertFrom(type, isExplicit);
 		}
 		/// <summary>
+		/// 返回方法的参数信息。
+		/// </summary>
+		/// <param name="method">要获取参数信息的方法。</param>
+		/// <param name="types">方法实参类型数组。</param>
+		/// <param name="paramOrder">方法实参的顺序，它的长度必须大于等于形参个数和实参个数。
+		/// 传入 <c>null</c> 表示使用默认顺序。</param>
+		/// <param name="isExplicit">类型检查时，使用显式类型转换，而不是默认的隐式类型转换。</param>
+		/// <returns>方法的参数信息。</returns>
+		internal static MethodArgumentsInfo GetMethodArgumentsInfo(this MethodBase method, IList<Type> types,
+			int[] paramOrder, bool isExplicit)
+		{
+			Contract.Requires(method != null && types != null);
+			ParameterInfo[] parameters = method.GetParametersNoCopy();
+			int paramLen = parameters.Length;
+			MethodArgumentsInfo result = new MethodArgumentsInfo();
+			if (method.CallingConvention.HasFlag(CallingConventions.VarArgs))
+			{
+				result.OptionalArgumentTypes = GetExternalParamTypes(types, paramLen, paramOrder);
+			}
+			else if (paramLen > 0)
+			{
+				ParameterInfo lastParam = parameters[paramLen - 1];
+				if (lastParam.IsParamArray())
+				{
+					Type[] paramArgumentTypes = GetExternalParamTypes(types, paramLen, paramOrder);
+					if (lastParam.ParameterType.ContainsGenericParameters ||
+						CheckParamArrayType(lastParam.ParameterType, paramArgumentTypes, isExplicit))
+					{
+						result.ParamArgumentTypes = paramArgumentTypes;
+						result.ParamArrayType = lastParam.ParameterType;
+					}
+					else
+					{
+						return null;
+					}
+				}
+				else if (types.Count > paramLen)
+				{
+					// 方法实参过多。
+					return null;
+				}
+			}
+			return result;
+		}
+		/// <summary>
 		/// 返回非固定参数的类型。
 		/// </summary>
 		/// <param name="types">所有参数类型。</param>
 		/// <param name="index">非固定参数的起始索引。</param>
 		/// <param name="paramOrder">方法实参的顺序。</param>
 		/// <returns>非固定参数的类型。</returns>
-		private static Type[] GetExternalParamTypes(Type[] types, int index, int[] paramOrder)
+		private static Type[] GetExternalParamTypes(IList<Type> types, int index, int[] paramOrder)
 		{
-			Contract.Requires(types != null && paramOrder != null);
-			int len = types.Length - index;
+			Contract.Requires(types != null);
+			int len = types.Count - index;
 			if (len <= 0)
 			{
 				return Type.EmptyTypes;
 			}
 			Type[] paramTypes = new Type[len];
-			for (int i = 0, j = index; i < len; i++)
+			if (paramOrder == null)
 			{
-				paramTypes[i] = types[paramOrder[j]];
+				for (int i = 0, j = index; i < len; i++)
+				{
+					paramTypes[i] = types[j];
+				}
+			}
+			else
+			{
+				for (int i = 0, j = index; i < len; i++)
+				{
+					paramTypes[i] = types[paramOrder[j]];
+				}
 			}
 			return paramTypes;
 		}

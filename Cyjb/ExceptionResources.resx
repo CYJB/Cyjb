@@ -185,10 +185,6 @@
     <value>Cannot read from a closed TextReader.</value>
     <comment>不能从关闭的 TextReader 中读取。</comment>
   </data>
-  <data name="UnboundGenParam" xml:space="preserve">
-    <value>Late bound operations cannot be performed on types or methods for which ContainssGenericParameters is true.</value>
-    <comment>不能是开放式泛型类型。</comment>
-  </data>
   <data name="UnrecognizedToken" xml:space="preserve">
     <value>Unrecognized token '{0}'.</value>
     <comment>未识别的词法单元异常。</comment>
