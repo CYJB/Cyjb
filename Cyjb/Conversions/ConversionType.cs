@@ -9,53 +9,61 @@ namespace Cyjb
 	internal enum ConversionType : byte
 	{
 		/// <summary>
-		/// 表示不存在预定义转换。
+		/// 表示不存在类型转换。
 		/// </summary>
 		None,
 		/// <summary>
 		/// 表示标识转换。
 		/// </summary>
-		IdentityConversion,
+		Identity,
 		/// <summary>
 		/// 表示隐式数值转换。
 		/// </summary>
-		ImplicitNumericConversion,
+		ImplicitNumeric,
 		/// <summary>
 		/// 表示可空类型的隐式转换。
 		/// </summary>
-		ImplicitNullableConversion,
+		ImplicitNullable,
 		/// <summary>
 		/// 表示装箱转换。
 		/// </summary>
-		BoxConversion,
+		Box,
 		/// <summary>
 		/// 表示隐式引用转换。
 		/// </summary>
-		ImplicitReferenceConversion,
+		ImplicitReference,
+		/// <summary>
+		/// 表示任意隐式类型转换。
+		/// </summary>
+		Implicit = ImplicitReference,
 		/// <summary>
 		/// 表示显式数值转换。
 		/// </summary>
-		ExplicitNumericConversion,
+		ExplicitNumeric,
 		/// <summary>
 		/// 表示显式枚举转换。
 		/// </summary>
-		EnumConversion,
+		Enum,
 		/// <summary>
 		/// 表示可空类型的显式转换。
 		/// </summary>
-		ExplicitNullableConversion,
+		ExplicitNullable,
 		/// <summary>
 		/// 表示拆箱转换。
 		/// </summary>
-		UnboxConversion,
+		Unbox,
 		/// <summary>
 		/// 表示显式引用转换。
 		/// </summary>
-		ExplicitReferenceConversion,
+		ExplicitReference,
+		/// <summary>
+		/// 表示任意显式类型转换。
+		/// </summary>
+		Explicit = ExplicitReference,
 		/// <summary>
 		/// 表示用户定义的转换。
 		/// </summary>
-		UserDefinedConversion,
+		UserDefined,
 	}
 	/// <summary>
 	/// 提供 <see cref="ConversionType"/> 枚举的扩展方法。
@@ -69,8 +77,7 @@ namespace Cyjb
 		/// <returns>如果当前类型转换是隐式类型转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public static bool IsImplicit(this ConversionType conversionType)
 		{
-			return conversionType > ConversionType.None &&
-				conversionType <= ConversionType.ImplicitReferenceConversion;
+			return conversionType > ConversionType.None && conversionType <= ConversionType.Implicit;
 		}
 		/// <summary>
 		/// 获取当前类型转换是否是显式类型转换。
@@ -79,7 +86,7 @@ namespace Cyjb
 		/// <returns>如果当前类型转换是显式类型转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public static bool IsExplicit(this ConversionType conversionType)
 		{
-			return conversionType >= ConversionType.ExplicitNumericConversion;
+			return conversionType >= ConversionType.ExplicitNumeric;
 		}
 		/// <summary>
 		/// 获取当前类型转换是否是标识转换或引用类型转换。
@@ -88,9 +95,9 @@ namespace Cyjb
 		/// <returns>如果当前类型转换是标识转换或引用类型转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public static bool IsReference(this ConversionType conversionType)
 		{
-			return conversionType == ConversionType.IdentityConversion ||
-				conversionType == ConversionType.ImplicitReferenceConversion ||
-					conversionType == ConversionType.ExplicitReferenceConversion;
+			return conversionType == ConversionType.Identity ||
+				conversionType == ConversionType.ImplicitReference ||
+				conversionType == ConversionType.ExplicitReference;
 		}
 	}
 }

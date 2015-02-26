@@ -268,10 +268,10 @@ namespace Cyjb.Conversions
 			Conversion conversion = GetNumericConversion(inputTypeCode, outputTypeCode);
 			if (inputType.IsEnum || outputType.IsEnum)
 			{
-				// 将类型转换的类型修正为 EnumConversion。
+				// 将类型转换的类型修正为 Enum。
 				NumericConversion numericConv = conversion as NumericConversion;
 				return numericConv == null ? IdentityConversion.ExplicitEnum :
-					new NumericConversion(ConversionType.EnumConversion, numericConv);
+					new NumericConversion(ConversionType.Enum, numericConv);
 			}
 			return conversion;
 		}
@@ -596,25 +596,25 @@ namespace Cyjb.Conversions
 			}
 			switch (conversion.ConversionType)
 			{
-				case ConversionType.EnumConversion:
+				case ConversionType.Enum:
 					// 不包含显式枚举转换。
 					return ConversionType.None;
-				case ConversionType.UnboxConversion:
+				case ConversionType.Unbox:
 					// 完整包含拆箱转换。
 					return ConversionType.None;
-				case ConversionType.ExplicitNumericConversion:
-				case ConversionType.ExplicitNullableConversion:
+				case ConversionType.ExplicitNumeric:
+				case ConversionType.ExplicitNullable:
 					// 包含部分转换，需要判断是否存在反向隐式转换。
 					// 此时 inputType 和 outputType 一定都是值类型。
 					Conversion reversedConversion = GetBetweenValueTypeConversion(outputType, inputType);
 					Contract.Assume(reversedConversion != null);
 					return reversedConversion.ConversionType.IsImplicit() ?
 						conversion.ConversionType : ConversionType.None;
-				case ConversionType.ExplicitReferenceConversion:
+				case ConversionType.ExplicitReference:
 					// 包含部分转换，需要判断是否存在反向转换。
 					if (inputType.IsAssignableFrom(outputType))
 					{
-						return ConversionType.ExplicitReferenceConversion;
+						return ConversionType.ExplicitReference;
 					}
 					return ConversionType.None;
 			}

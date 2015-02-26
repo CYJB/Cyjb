@@ -15,7 +15,7 @@ namespace Cyjb.Conversions
 		/// <summary>
 		/// 初始化 <see cref="CastClassConversion"/> 类的新实例。
 		/// </summary>
-		private CastClassConversion() : base(ConversionType.ExplicitReferenceConversion) { }
+		private CastClassConversion() : base(ConversionType.ExplicitReference) { }
 		/// <summary>
 		/// 写入类型转换的 IL 指令。
 		/// </summary>

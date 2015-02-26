@@ -14,11 +14,11 @@ namespace Cyjb.Conversions
 		/// <summary>
 		/// <see cref="FromNullableConversion"/> 的默认实例。
 		/// </summary>
-		public static readonly Conversion Default = new FromNullableConversion(ConversionType.ExplicitNullableConversion);
+		public static readonly Conversion Default = new FromNullableConversion(ConversionType.ExplicitNullable);
 		/// <summary>
 		/// <see cref="FromNullableConversion"/> 的用户自定义类型转换实例。
 		/// </summary>
-		public static readonly Conversion UserDefined = new FromNullableConversion(ConversionType.UserDefinedConversion);
+		public static readonly Conversion UserDefined = new FromNullableConversion(ConversionType.UserDefined);
 		/// <summary>
 		/// 使用指定的转换类型初始化 <see cref="FromNullableConversion"/> 类的新实例。
 		/// </summary>

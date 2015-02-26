@@ -245,7 +245,7 @@ namespace Cyjb.Reflection
 				il.EmitLoadArg(index);
 				return;
 			}
-			Converter converter = il.GetConversion(paramType, targetType);
+			Converter converter = il.GetConversion(paramType, targetType, ConversionType.UserDefined);
 			if (converter == null)
 			{
 				throw CommonExceptions.InvalidCast(paramType, targetType);
@@ -357,7 +357,7 @@ namespace Cyjb.Reflection
 			il.Emit(OpCodes.Ldfld, closureConstants);
 			il.EmitInt(index);
 			il.Emit(OpCodes.Ldelem_Ref);
-			il.EmitConversion(typeof(object), constantType, isChecked);
+			il.EmitConversion(typeof(object), constantType, isChecked, ConversionType.Explicit);
 		}
 		/// <summary>
 		/// 加载数组元素，要求已将数组对象和元素索引压入堆栈。
@@ -523,8 +523,22 @@ namespace Cyjb.Reflection
 			{
 				throw CommonExceptions.TypeContainsGenericParameters(outputType);
 			}
+			EmitConversion(il, inputType, outputType, isChecked, ConversionType.UserDefined);
+		}
+		/// <summary>
+		/// 将栈顶的对象从 <paramref name="inputType"/> 转换为 <paramref name="outputType"/>。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="inputType">要转换的对象的类型。</param>
+		/// <param name="outputType">要将输入对象转换到的类型。</param>
+		/// <param name="isChecked">是否执行溢出检查。</param>
+		/// <param name="conversionType">类型转换类型的限制。</param>
+		internal static void EmitConversion(this ILGenerator il, Type inputType, Type outputType, bool isChecked,
+			ConversionType conversionType)
+		{
+			Contract.Requires(il != null && inputType != null && outputType != null);
 			Conversion conversion = ConversionFactory.GetConversion(inputType, outputType);
-			if (conversion == null)
+			if (conversion == null || conversion.ConversionType > conversionType)
 			{
 				throw CommonExceptions.InvalidCast(inputType, outputType);
 			}
@@ -570,8 +584,23 @@ namespace Cyjb.Reflection
 			{
 				throw CommonExceptions.TypeContainsGenericParameters(outputType);
 			}
+			return GetConversion(il, inputType, outputType, ConversionType.UserDefined);
+		}
+		/// <summary>
+		/// 获取转换类型的指令生成器，能够将栈顶的对象从 <paramref name="inputType"/> 转换为 
+		/// <paramref name="outputType"/>。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="inputType">要转换的对象的类型。</param>
+		/// <param name="outputType">要将输入对象转换到的类型。</param>
+		/// <param name="conversionType">类型转换类型的限制。</param>
+		/// <returns>类型转换的指令生成器，如果不能进行类型转换则返回 <c>null</c>。</returns>
+		internal static Converter GetConversion(this ILGenerator il, Type inputType, Type outputType,
+			ConversionType conversionType)
+		{
+			Contract.Requires(il != null && inputType != null && outputType != null);
 			Conversion conversion = ConversionFactory.GetConversion(inputType, outputType);
-			if (conversion == null)
+			if (conversion == null || conversion.ConversionType > conversionType)
 			{
 				return null;
 			}

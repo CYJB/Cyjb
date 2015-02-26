@@ -17,8 +17,19 @@ namespace Cyjb.Conversions
 		/// 表示 <see cref="Convert.ChangeType{TInput, TOutput}"/>。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static readonly MethodInfo changeType = typeof(Convert).GetMethods().First(
-			m => m.Name == "ChangeType" && m.IsGenericMethodDefinition);
+		private static readonly MethodInfo changeType = typeof(Convert).GetMethods()
+			.First(m => m.Name == "ChangeType" && m.IsGenericMethodDefinition);
+		/// <summary>
+		/// 表示 <c>System.Reflection.Emit.DynamicMethod+RTDynamicMethod</c> 类。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private static readonly Type rtDynamicMethodType = Type.GetType("System.Reflection.Emit.DynamicMethod+RTDynamicMethod");
+		/// <summary>
+		/// 获取 <c>System.Reflection.Emit.DynamicMethod+RTDynamicMethod</c> 类对应的 <see cref="DynamicMethod"/> 的方法。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private static readonly Func<object, DynamicMethod> getDynamicMethod = rtDynamicMethodType
+			.CreateDelegate<Func<object, DynamicMethod>>("m_owner");
 		/// <summary>
 		/// 要调用的类型转换委托。
 		/// </summary>
@@ -29,7 +40,7 @@ namespace Cyjb.Conversions
 		/// </summary>
 		/// <param name="converter">要调用的委托。</param>
 		public DelegateConversion(Delegate converter)
-			: base(ConversionType.UserDefinedConversion)
+			: base(ConversionType.UserDefined)
 		{
 			Contract.Requires(converter != null);
 			this.converter = converter;
@@ -55,6 +66,11 @@ namespace Cyjb.Conversions
 			if (method.IsStatic && method.GetParametersNoCopy().Length == 1)
 			{
 				// 没有闭包的静态方法可以直接调用。
+				if (rtDynamicMethodType.IsInstanceOfType(method))
+				{
+					// RTDynamicMethod 不能直接调用，需要取得相应的 DynamicMethod 才可以。
+					method = getDynamicMethod(method);
+				}
 				generator.EmitCall(method);
 			}
 			else

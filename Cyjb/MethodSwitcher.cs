@@ -306,9 +306,10 @@ namespace Cyjb
 			int offset = data.IsStatic ? 0 : 1;
 			for (int i = 0; i < paramTypes.Length; i++)
 			{
+				Type paramType = paramTypes[i];
 				Type targetType = originParamTypes[i + offset];
-				Contract.Assume(targetType != null);
-				il.EmitLoadArg(i + 1, paramTypes[i], targetType);
+				Contract.Assume(paramType != null && targetType != null);
+				il.EmitLoadArg(i + 1, paramType, targetType);
 			}
 			il.Emit(OpCodes.Callvirt, data.DelegateType.GetInvokeMethod());
 			Type returnType = originParamTypes[originParamTypes.Length - 1];
@@ -329,7 +330,7 @@ namespace Cyjb
 				}
 				else if (returnType != targetReturnType)
 				{
-					il.EmitConversion(returnType, targetReturnType, true);
+					il.EmitConversion(returnType, targetReturnType, true, ConversionType.Explicit);
 				}
 			}
 			il.Emit(OpCodes.Ret);

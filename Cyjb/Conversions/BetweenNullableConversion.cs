@@ -14,15 +14,15 @@ namespace Cyjb.Conversions
 		/// <summary>
 		/// 隐式可空类型转换的实例。
 		/// </summary>
-		public static readonly Conversion Implicit = new BetweenNullableConversion(ConversionType.ImplicitNullableConversion);
+		public static readonly Conversion Implicit = new BetweenNullableConversion(ConversionType.ImplicitNullable);
 		/// <summary>
 		/// 显式可空类型转换的实例。
 		/// </summary>
-		public static readonly Conversion Explicit = new BetweenNullableConversion(ConversionType.ExplicitNullableConversion);
+		public static readonly Conversion Explicit = new BetweenNullableConversion(ConversionType.ExplicitNullable);
 		/// <summary>
 		/// 用户自定义可空类型转换的实例。
 		/// </summary>
-		public static readonly Conversion UserDefined = new BetweenNullableConversion(ConversionType.UserDefinedConversion);
+		public static readonly Conversion UserDefined = new BetweenNullableConversion(ConversionType.UserDefined);
 		/// <summary>
 		/// 使用指定的转换类型初始化 <see cref="BetweenNullableConversion"/> 类的新实例。
 		/// </summary>

@@ -16,7 +16,7 @@ namespace Cyjb.Conversions
 		/// <summary>
 		/// 初始化 <see cref="UnboxConversion"/> 类的新实例。
 		/// </summary>
-		private UnboxConversion() : base(ConversionType.UnboxConversion) { }
+		private UnboxConversion() : base(ConversionType.Unbox) { }
 		/// <summary>
 		/// 写入类型转换的 IL 指令。
 		/// </summary>

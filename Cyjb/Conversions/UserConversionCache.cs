@@ -228,11 +228,11 @@ namespace Cyjb.Conversions
 						TypeRelation inputRelation = (method.InputType == inputType) ?
 							TypeRelation.Best : TypeRelation.Second;
 						TypeRelation outputRelation = TypeRelation.Best;
-						if (ctype >= ConversionType.ExplicitNumericConversion)
+						if (ctype >= ConversionType.ExplicitNumeric)
 						{
 							outputRelation = TypeRelation.Second;
 						}
-						else if (ctype > ConversionType.IdentityConversion)
+						else if (ctype > ConversionType.Identity)
 						{
 							outputRelation = TypeRelation.Thirt;
 						}
@@ -253,11 +253,11 @@ namespace Cyjb.Conversions
 						TypeRelation outputRelation = (method.OutputType == outputType) ?
 							TypeRelation.Best : TypeRelation.Second;
 						TypeRelation inputRelation = TypeRelation.Best;
-						if (ctype >= ConversionType.ExplicitNumericConversion)
+						if (ctype >= ConversionType.ExplicitNumeric)
 						{
 							inputRelation = TypeRelation.Second;
 						}
-						else if (ctype > ConversionType.IdentityConversion)
+						else if (ctype > ConversionType.Identity)
 						{
 							inputRelation = TypeRelation.Thirt;
 						}

@@ -15,131 +15,131 @@ namespace Cyjb.Conversions
 		/// <summary>
 		/// <see cref="sbyte"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion SByte = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion SByte = new NumericConversion(ConversionType.ExplicitNumeric,
 			new[] { OpCodes.Conv_I1 }, new[] { OpCodes.Conv_Ovf_I1 });
 		/// <summary>
 		/// <see cref="sbyte"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion SByteUn = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion SByteUn = new NumericConversion(ConversionType.ExplicitNumeric,
 			new[] { OpCodes.Conv_I1 }, new[] { OpCodes.Conv_Ovf_I1_Un });
 
 		/// <summary>
 		/// <see cref="byte"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion Byte = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion Byte = new NumericConversion(ConversionType.ExplicitNumeric,
 			new[] { OpCodes.Conv_U1 }, new[] { OpCodes.Conv_Ovf_U1 });
 		/// <summary>
 		/// <see cref="byte"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion ByteUn = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion ByteUn = new NumericConversion(ConversionType.ExplicitNumeric,
 			new[] { OpCodes.Conv_U1 }, new[] { OpCodes.Conv_Ovf_U1_Un });
 
 		/// <summary>
 		/// <see cref="short"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion Int16 = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion Int16 = new NumericConversion(ConversionType.ExplicitNumeric,
 			new[] { OpCodes.Conv_I2 }, new[] { OpCodes.Conv_Ovf_I2 });
 		/// <summary>
 		/// <see cref="short"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion Int16Un = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion Int16Un = new NumericConversion(ConversionType.ExplicitNumeric,
 			new[] { OpCodes.Conv_I2 }, new[] { OpCodes.Conv_Ovf_I2_Un });
 
 		/// <summary>
 		/// <see cref="ushort"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion UInt16 = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion UInt16 = new NumericConversion(ConversionType.ExplicitNumeric,
 			new[] { OpCodes.Conv_U2 }, new[] { OpCodes.Conv_Ovf_U2 });
 		/// <summary>
 		/// <see cref="ushort"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion UInt16Un = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion UInt16Un = new NumericConversion(ConversionType.ExplicitNumeric,
 			new[] { OpCodes.Conv_U2 }, new[] { OpCodes.Conv_Ovf_U2_Un });
 
 		/// <summary>
 		/// <see cref="int"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion Int32 = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion Int32 = new NumericConversion(ConversionType.ExplicitNumeric,
 			new[] { OpCodes.Conv_I4 }, new[] { OpCodes.Conv_Ovf_I4 });
 		/// <summary>
 		/// <see cref="int"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion Int32Un = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion Int32Un = new NumericConversion(ConversionType.ExplicitNumeric,
 			new[] { OpCodes.Conv_I4 }, new[] { OpCodes.Conv_Ovf_I4_Un });
 
 		/// <summary>
 		/// <see cref="uint"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion UInt32 = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion UInt32 = new NumericConversion(ConversionType.ExplicitNumeric,
 			new[] { OpCodes.Conv_U4 }, new[] { OpCodes.Conv_Ovf_U4 });
 		/// <summary>
 		/// <see cref="uint"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion UInt32Empty = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion UInt32Empty = new NumericConversion(ConversionType.ExplicitNumeric,
 			ArrayExt.Empty<OpCode>(), new[] { OpCodes.Conv_Ovf_U4 });
 		/// <summary>
 		/// <see cref="uint"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion UInt32Un = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion UInt32Un = new NumericConversion(ConversionType.ExplicitNumeric,
 			new[] { OpCodes.Conv_U4 }, new[] { OpCodes.Conv_Ovf_U4_Un });
 
 		/// <summary>
 		/// <see cref="long"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion Int64Implicit = new NumericConversion(ConversionType.ImplicitNumericConversion,
+		public static readonly Conversion Int64Implicit = new NumericConversion(ConversionType.ImplicitNumeric,
 			OpCodes.Conv_I8);
 		/// <summary>
 		/// <see cref="long"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion Int64Explicit = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion Int64Explicit = new NumericConversion(ConversionType.ExplicitNumeric,
 			new[] { OpCodes.Conv_I8 }, new[] { OpCodes.Conv_Ovf_I8 });
 		/// <summary>
 		/// <see cref="long"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion Int64UnExplicit = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion Int64UnExplicit = new NumericConversion(ConversionType.ExplicitNumeric,
 			ArrayExt.Empty<OpCode>(), new[] { OpCodes.Conv_Ovf_I8_Un });
 
 		/// <summary>
 		/// <see cref="ulong"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion UInt64Implicit = new NumericConversion(ConversionType.ImplicitNumericConversion,
+		public static readonly Conversion UInt64Implicit = new NumericConversion(ConversionType.ImplicitNumeric,
 			OpCodes.Conv_U8);
 		/// <summary>
 		/// <see cref="ulong"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion UInt64Explicit = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion UInt64Explicit = new NumericConversion(ConversionType.ExplicitNumeric,
 			new[] { OpCodes.Conv_I8 }, new[] { OpCodes.Conv_Ovf_U8 });
 		/// <summary>
 		/// <see cref="ulong"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion UInt64UnExplicit = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion UInt64UnExplicit = new NumericConversion(ConversionType.ExplicitNumeric,
 			new[] { OpCodes.Conv_U8 }, new[] { OpCodes.Conv_Ovf_U8 });
 
 		/// <summary>
 		/// <see cref="float"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion SingleImplicit = new NumericConversion(ConversionType.ImplicitNumericConversion,
+		public static readonly Conversion SingleImplicit = new NumericConversion(ConversionType.ImplicitNumeric,
 			OpCodes.Conv_R4);
 		/// <summary>
 		/// <see cref="float"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion SingleExplicit = new NumericConversion(ConversionType.ExplicitNumericConversion,
+		public static readonly Conversion SingleExplicit = new NumericConversion(ConversionType.ExplicitNumeric,
 			OpCodes.Conv_R4);
 		/// <summary>
 		/// <see cref="float"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion SingleUnImplicit = new NumericConversion(ConversionType.ImplicitNumericConversion,
+		public static readonly Conversion SingleUnImplicit = new NumericConversion(ConversionType.ImplicitNumeric,
 			OpCodes.Conv_R_Un, OpCodes.Conv_R4);
 
 		/// <summary>
 		/// <see cref="double"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion Double = new NumericConversion(ConversionType.ImplicitNumericConversion,
+		public static readonly Conversion Double = new NumericConversion(ConversionType.ImplicitNumeric,
 			OpCodes.Conv_R8);
 		/// <summary>
 		/// <see cref="double"/> 类型转换的实例。
 		/// </summary>
-		public static readonly Conversion DoubleUn = new NumericConversion(ConversionType.ImplicitNumericConversion,
+		public static readonly Conversion DoubleUn = new NumericConversion(ConversionType.ImplicitNumeric,
 			OpCodes.Conv_R_Un, OpCodes.Conv_R8);
 
 		#endregion // 静态属性

@@ -15,7 +15,7 @@ namespace Cyjb.Conversions
 		/// <summary>
 		/// 初始化 <see cref="BoxConversion"/> 类的新实例。
 		/// </summary>
-		private BoxConversion() : base(ConversionType.BoxConversion) { }
+		private BoxConversion() : base(ConversionType.Box) { }
 		/// <summary>
 		/// 写入类型转换的 IL 指令。
 		/// </summary>

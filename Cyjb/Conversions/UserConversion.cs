@@ -20,7 +20,7 @@ namespace Cyjb.Conversions
 		/// </summary>
 		/// <param name="method">类型转换方法。</param>
 		public UserConversion(MethodInfo method)
-			: base(ConversionType.UserDefinedConversion)
+			: base(ConversionType.UserDefined)
 		{
 			Contract.Requires(method != null);
 			this.method = method;

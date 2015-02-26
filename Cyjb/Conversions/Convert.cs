@@ -104,10 +104,10 @@ namespace Cyjb
 						return converter;
 					}
 				}
-				if (conversion.ConversionType == ConversionType.IdentityConversion ||
-					conversion.ConversionType == ConversionType.ImplicitReferenceConversion ||
-					conversion.ConversionType == ConversionType.BoxConversion ||
-					conversion.ConversionType == ConversionType.UnboxConversion)
+				if (conversion.ConversionType == ConversionType.Identity ||
+					conversion.ConversionType == ConversionType.ImplicitReference ||
+					conversion.ConversionType == ConversionType.Box ||
+					conversion.ConversionType == ConversionType.Unbox)
 				{
 					converter.ObjectConverter = defaultObjectConverter;
 					if (!buildGeneric)
@@ -115,7 +115,7 @@ namespace Cyjb
 						return converter;
 					}
 				}
-				if (conversion.ConversionType == ConversionType.ExplicitReferenceConversion)
+				if (conversion.ConversionType == ConversionType.ExplicitReference)
 				{
 					// 对于显式引用转换，只需要检查一下实际类型是否是 outputType 即可。
 					converter.ObjectConverter = obj =>

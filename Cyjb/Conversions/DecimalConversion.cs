@@ -14,15 +14,15 @@ namespace Cyjb.Conversions
 		/// <summary>
 		/// 隐式数值转换的实例。
 		/// </summary>
-		public static readonly Conversion ImplicitNumeric = new DecimalConversion(ConversionType.ImplicitNumericConversion);
+		public static readonly Conversion ImplicitNumeric = new DecimalConversion(ConversionType.ImplicitNumeric);
 		/// <summary>
 		/// 显式数值转换的实例。
 		/// </summary>
-		public static readonly Conversion ExplicitNumeric = new DecimalConversion(ConversionType.ExplicitNumericConversion);
+		public static readonly Conversion ExplicitNumeric = new DecimalConversion(ConversionType.ExplicitNumeric);
 		/// <summary>
 		/// 显式枚举转换的实例。
 		/// </summary>
-		public static readonly Conversion ExplicitEnum = new DecimalConversion(ConversionType.EnumConversion);
+		public static readonly Conversion ExplicitEnum = new DecimalConversion(ConversionType.Enum);
 		/// <summary>
 		/// 使用指定的转换类型初始化 <see cref="DecimalConversion"/> 类的新实例。
 		/// </summary>

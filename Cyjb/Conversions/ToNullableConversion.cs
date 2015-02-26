@@ -14,11 +14,11 @@ namespace Cyjb.Conversions
 		/// <summary>
 		/// 隐式可空类型转换的实例。
 		/// </summary>
-		public static readonly Conversion Implicit = new ToNullableConversion(ConversionType.ImplicitNullableConversion);
+		public static readonly Conversion Implicit = new ToNullableConversion(ConversionType.ImplicitNullable);
 		/// <summary>
 		/// 显式可空类型转换的实例。
 		/// </summary>
-		public static readonly Conversion Explicit = new ToNullableConversion(ConversionType.ExplicitNullableConversion);
+		public static readonly Conversion Explicit = new ToNullableConversion(ConversionType.ExplicitNullable);
 		/// <summary>
 		/// 使用指定的转换类型初始化 <see cref="ToNullableConversion"/> 类的新实例。
 		/// </summary>
