@@ -75,7 +75,7 @@ namespace Cyjb.Reflection
 		/// 对类型进行推断，使用下限推断。
 		/// </summary>
 		/// <param name="paramType">形参类型，必须包含泛型参数。</param>
-		/// <param name="type">实参类型，允许使用 <c>null</c> 表示引用类型约束。</param>
+		/// <param name="type">实参类型，允许使用 <see cref="TypeExt.ReferenceTypeMark"/> 表示引用类型约束。</param>
 		/// <returns>如果类型推断成功，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public bool TypeInferences(Type paramType, Type type)
 		{
@@ -85,13 +85,13 @@ namespace Cyjb.Reflection
 		/// 对类型进行推断。
 		/// </summary>
 		/// <param name="paramType">形参类型，必须包含泛型参数。</param>
-		/// <param name="type">实参类型，允许使用 <c>null</c> 表示引用类型约束。</param>
+		/// <param name="type">实参类型，允许使用 <see cref="TypeExt.ReferenceTypeMark"/> 表示引用类型约束。</param>
 		/// <param name="isUpperBound">是否进行上限推断，而不是默认的下限推断。</param>
 		/// <returns>如果类型推断成功，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public bool TypeInferences(Type paramType, Type type, bool isUpperBound)
 		{
-			Contract.Requires(paramType != null);
-			if (type == null)
+			Contract.Requires(paramType != null && type != null);
+			if (type == TypeExt.ReferenceTypeMark)
 			{
 				// 引用类型约束。
 				if (paramType.IsByRef)

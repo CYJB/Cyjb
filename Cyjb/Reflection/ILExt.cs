@@ -175,6 +175,7 @@ namespace Cyjb.Reflection
 		/// <remarks>会根据 <paramref name="index"/> 的值，选择最合适的 IL 指令。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="paramType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="targetType"/> 为 <c>null</c>。</exception>
 		public static void EmitLoadArg(this ILGenerator il, int index, Type paramType, Type targetType)
 		{
@@ -185,6 +186,10 @@ namespace Cyjb.Reflection
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);
+			}
+			if (paramType == null)
+			{
+				throw CommonExceptions.ArgumentNull("paramType");
 			}
 			if (targetType == null)
 			{
@@ -204,6 +209,7 @@ namespace Cyjb.Reflection
 		/// <remarks>会根据 <paramref name="index"/> 的值，选择最合适的 IL 指令。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="paramType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="targetType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="paramType"/> 包含泛型参数。</exception>
 		/// <exception cref="ArgumentException"><paramref name="targetType"/> 包含泛型参数。</exception>
@@ -216,6 +222,10 @@ namespace Cyjb.Reflection
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);
+			}
+			if (paramType == null)
+			{
+				throw CommonExceptions.ArgumentNull("paramType");
 			}
 			if (targetType == null)
 			{
@@ -236,6 +246,10 @@ namespace Cyjb.Reflection
 				return;
 			}
 			Converter converter = il.GetConversion(paramType, targetType);
+			if (converter == null)
+			{
+				throw CommonExceptions.InvalidCast(paramType, targetType);
+			}
 			if (converter.PassByAddr)
 			{
 				il.EmitLoadArgAddress(index);
@@ -248,6 +262,73 @@ namespace Cyjb.Reflection
 		}
 
 		#endregion // 加载参数
+
+		#region 加载值
+
+		/// <summary>
+		/// 加载栈顶地址指向的值。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="type">要间接加载的值的类型。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		public static void EmitLoadIndirect(this ILGenerator il, Type type)
+		{
+			if (il == null)
+			{
+				throw CommonExceptions.ArgumentNull("il");
+			}
+			if (type == null)
+			{
+				throw CommonExceptions.ArgumentNull("type");
+			}
+			Contract.EndContractBlock();
+			switch (Type.GetTypeCode(type))
+			{
+				case TypeCode.Boolean:
+				case TypeCode.SByte:
+					il.Emit(OpCodes.Ldind_I1);
+					break;
+				case TypeCode.Byte:
+					il.Emit(OpCodes.Ldind_U1);
+					break;
+				case TypeCode.Char:
+				case TypeCode.Int16:
+					il.Emit(OpCodes.Ldind_I2);
+					break;
+				case TypeCode.UInt16:
+					il.Emit(OpCodes.Ldind_U2);
+					break;
+				case TypeCode.Int32:
+					il.Emit(OpCodes.Ldind_I4);
+					break;
+				case TypeCode.UInt32:
+					il.Emit(OpCodes.Ldind_U4);
+					break;
+				case TypeCode.Int64:
+				case TypeCode.UInt64:
+					il.Emit(OpCodes.Ldind_I8);
+					break;
+				case TypeCode.Single:
+					il.Emit(OpCodes.Ldind_R4);
+					break;
+				case TypeCode.Double:
+					il.Emit(OpCodes.Ldind_R8);
+					break;
+				default:
+					if (type.IsValueType)
+					{
+						il.Emit(OpCodes.Ldobj, type);
+					}
+					else
+					{
+						il.Emit(OpCodes.Ldind_Ref);
+					}
+					break;
+			}
+		}
+
+		#endregion // 加载值
 
 		#region 数组元素
 
@@ -460,6 +541,7 @@ namespace Cyjb.Reflection
 		/// <param name="il">IL 指令生成器。</param>
 		/// <param name="inputType">要转换的对象的类型。</param>
 		/// <param name="outputType">要将输入对象转换到的类型。</param>
+		/// <returns>类型转换的指令生成器，如果不能进行类型转换则返回 <c>null</c>。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="inputType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="outputType"/> 为 <c>null</c>。</exception>
@@ -491,7 +573,7 @@ namespace Cyjb.Reflection
 			Conversion conversion = ConversionFactory.GetConversion(inputType, outputType);
 			if (conversion == null)
 			{
-				throw CommonExceptions.InvalidCast(inputType, outputType);
+				return null;
 			}
 			return new Converter(conversion, il, inputType, outputType);
 		}
@@ -778,7 +860,7 @@ namespace Cyjb.Reflection
 			{
 				il.Emit(OpCodes.Tailcall);
 			}
-			if (method.CallingConvention == CallingConventions.VarArgs)
+			if (method.CallingConvention.HasFlag(CallingConventions.VarArgs))
 			{
 				il.EmitCall(callOp, method, parameterTypes);
 			}

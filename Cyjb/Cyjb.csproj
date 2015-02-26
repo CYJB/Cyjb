@@ -34,16 +34,16 @@
     <CodeContractsRunCodeAnalysis>True</CodeContractsRunCodeAnalysis>
     <CodeContractsNonNullObligations>True</CodeContractsNonNullObligations>
     <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
-    <CodeContractsArithmeticObligations>False</CodeContractsArithmeticObligations>
-    <CodeContractsEnumObligations>False</CodeContractsEnumObligations>
-    <CodeContractsRedundantAssumptions>False</CodeContractsRedundantAssumptions>
+    <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
+    <CodeContractsEnumObligations>True</CodeContractsEnumObligations>
+    <CodeContractsRedundantAssumptions>True</CodeContractsRedundantAssumptions>
     <CodeContractsMissingPublicRequiresAsWarnings>True</CodeContractsMissingPublicRequiresAsWarnings>
     <CodeContractsInferRequires>True</CodeContractsInferRequires>
-    <CodeContractsInferEnsures>False</CodeContractsInferEnsures>
-    <CodeContractsInferObjectInvariants>False</CodeContractsInferObjectInvariants>
-    <CodeContractsSuggestAssumptions>False</CodeContractsSuggestAssumptions>
+    <CodeContractsInferEnsures>True</CodeContractsInferEnsures>
+    <CodeContractsInferObjectInvariants>True</CodeContractsInferObjectInvariants>
+    <CodeContractsSuggestAssumptions>True</CodeContractsSuggestAssumptions>
     <CodeContractsSuggestRequires>True</CodeContractsSuggestRequires>
-    <CodeContractsSuggestObjectInvariants>False</CodeContractsSuggestObjectInvariants>
+    <CodeContractsSuggestObjectInvariants>True</CodeContractsSuggestObjectInvariants>
     <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
     <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
     <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
@@ -63,12 +63,13 @@
     <Prefer32Bit>false</Prefer32Bit>
     <CodeContractsAssertsToContractsCheckBox>True</CodeContractsAssertsToContractsCheckBox>
     <CodeContractsRedundantTests>True</CodeContractsRedundantTests>
-    <CodeContractsMissingPublicEnsuresAsWarnings>False</CodeContractsMissingPublicEnsuresAsWarnings>
-    <CodeContractsSuggestAssumptionsForCallees>False</CodeContractsSuggestAssumptionsForCallees>
+    <CodeContractsMissingPublicEnsuresAsWarnings>True</CodeContractsMissingPublicEnsuresAsWarnings>
+    <CodeContractsSuggestAssumptionsForCallees>True</CodeContractsSuggestAssumptionsForCallees>
     <CodeContractsNecessaryEnsures>True</CodeContractsNecessaryEnsures>
     <CodeContractsSuggestReadonly>True</CodeContractsSuggestReadonly>
     <CodeContractsSkipAnalysisIfCannotConnectToCache>False</CodeContractsSkipAnalysisIfCannotConnectToCache>
     <CodeContractsBeingOptimisticOnExternal>True</CodeContractsBeingOptimisticOnExternal>
+    <CodeContractsInferEnsuresAutoProperties>True</CodeContractsInferEnsuresAutoProperties>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
