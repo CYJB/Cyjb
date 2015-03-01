@@ -100,7 +100,7 @@ namespace Cyjb
 			// 加载实例对象。
 			if (!method.IsStatic)
 			{
-				EmitLoadInstance(il, method, typeof(object));
+				EmitLoadInstance(il, method, typeof(object), true);
 			}
 			bool optimizeTailcall = true;
 			// 加载方法参数。
@@ -315,7 +315,7 @@ namespace Cyjb
 			CommonExceptions.CheckDelegateType(type, "type");
 			MethodInfo invoke = type.GetMethod("Invoke");
 			// 判断是获取属性还是设置属性。
-			MethodInfo method = null;
+			MethodInfo method;
 			if (invoke.ReturnType == typeof(void))
 			{
 				method = property.GetSetMethod(true);
@@ -336,7 +336,7 @@ namespace Cyjb
 			if (method != null)
 			{
 				// 创建委托。
-				dlg = CreateOpenDelegate(type, invoke, method);
+				dlg = CreateOpenDelegate(type, method);
 			}
 			if (dlg == null && throwOnBindFailure)
 			{
@@ -476,8 +476,7 @@ namespace Cyjb
 			if (method != null)
 			{
 				// 创建委托。
-				dlg = CreateDelegateWithArgument(type, firstArgument,
-					invoke, invoke.GetParameters(), method, method.GetParameters());
+				dlg = CreateClosedDelegate(type, method, firstArgument);
 			}
 			if (dlg == null && throwOnBindFailure)
 			{

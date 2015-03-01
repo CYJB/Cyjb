@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Reflection;
 using Cyjb.Collections;
 
@@ -112,7 +113,7 @@ namespace Cyjb.Reflection
 		/// <summary>
 		/// 获取方法实例实参类型。
 		/// </summary>
-		/// <value>方法实例实参类型。</value>
+		/// <value>方法实例实参类型。<c>null</c> 表示不是实例方法。</value>
 		public Type InstanceType
 		{
 			get { return this.instanceType; }
@@ -122,6 +123,8 @@ namespace Cyjb.Reflection
 		/// </summary>
 		/// <value>方法的固定实参列表。如果 <see cref="ParamArrayType"/> 不为 <c>null</c>，
 		/// 则不包含最后的 params 参数。</value>
+		/// <remarks>列表元素为 <c>null</c> 表示使用参数默认值或空数组（对于 params 参数）；
+		/// 为 <see cref="TypeExt.ReferenceTypeMark"/> 表示实参值是 <c>null</c>，仅具有引用类型的约束。</remarks>
 		public IList<Type> FixedArguments
 		{
 			get { return this.fixedArguments; }
@@ -129,7 +132,7 @@ namespace Cyjb.Reflection
 		/// <summary>
 		/// 获取 params 形参的类型。
 		/// </summary>
-		/// <value>params 形参的类型，如果为 <c>nul</c> 表示无需特殊处理 params 参数。</value>
+		/// <value>params 形参的类型，如果为 <c>null</c> 表示无需特殊处理 params 参数。</value>
 		public Type ParamArrayType
 		{
 			get { return this.paramArrayType; }
@@ -137,7 +140,9 @@ namespace Cyjb.Reflection
 		/// <summary>
 		/// 获取 params 实参的类型列表。
 		/// </summary>
-		/// <value>params 实参的类型列表，如果为 <c>nul</c> 表示无需特殊处理 params 参数。</value>
+		/// <value>params 实参的类型列表，如果为 <c>null</c> 表示无需特殊处理 params 参数。</value>
+		/// <remarks>列表元素为 <see cref="TypeExt.ReferenceTypeMark"/> 表示实参值是 <c>null</c>，
+		/// 仅具有引用类型的约束。</remarks>
 		public IList<Type> ParamArgumentTypes
 		{
 			get { return this.paramArgumentTypes; }
@@ -146,6 +151,8 @@ namespace Cyjb.Reflection
 		/// 获取可变参数的类型。
 		/// </summary>
 		/// <value>可变参数的类型，如果为 <c>null</c> 表示没有可变参数。</value>
+		/// <remarks>列表元素为 <see cref="TypeExt.ReferenceTypeMark"/> 表示实参值是 <c>null</c>，
+		/// 仅具有引用类型的约束。</remarks>
 		public IList<Type> OptionalArgumentTypes
 		{
 			get { return this.optionalArgumentTypes; }
@@ -182,6 +189,16 @@ namespace Cyjb.Reflection
 				return false;
 			}
 			this.instanceType = this.arguments[0];
+			if (this.instanceType == null)
+			{
+				return false;
+			}
+			if (this.instanceType == TypeExt.ReferenceTypeMark)
+			{
+				this.instanceType = this.method.DeclaringType;
+				Contract.Assume(this.instanceType != null);
+				return !this.instanceType.IsValueType;
+			}
 			return method.DeclaringType.IsConvertFrom(this.instanceType, isExplicit);
 		}
 		/// <summary>
@@ -199,7 +216,7 @@ namespace Cyjb.Reflection
 			if (method.CallingConvention.HasFlag(CallingConventions.VarArgs))
 			{
 				this.optionalArgumentTypes = new ArrayAdapter<Type>(this.arguments, offset);
-				return true;
+				return this.optionalArgumentTypes.All(type => type != null);
 			}
 			if (paramLen > 0)
 			{
@@ -253,7 +270,7 @@ namespace Cyjb.Reflection
 						return false;
 					}
 				}
-				else if (type != null && !paramElementType.IsConvertFrom(type, isExplicit))
+				else if (type == null || !paramElementType.IsConvertFrom(type, isExplicit))
 				{
 					return false;
 				}
@@ -327,5 +344,9 @@ namespace Cyjb.Reflection
 		/// 类型检查时，使用显式类型转换，而不是默认的隐式类型转换。
 		/// </summary>
 		Explicit = 4,
+		/// <summary>
+		/// 对可选参数进行绑定，且使用显式类型转换。
+		/// </summary>
+		OptionalAndExplicit = 6,
 	}
 }

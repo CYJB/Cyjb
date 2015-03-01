@@ -372,6 +372,54 @@ namespace Cyjb
 			}
 			return result;
 		}
+		/// <summary>
+		/// 将当前数组扩展到指定长度，并返回新数组。使用 <typeparamref name="T"/> 的默认值填充额外位置。
+		/// </summary>
+		/// <typeparam name="T">数组中元素的类型。</typeparam>
+		/// <param name="array">要扩展的数组。</param>
+		/// <param name="length">要扩展到的长度，如果小于等于当前数组的长度，则什么都不做。</param>
+		/// <returns>扩展得到的新数组；如果 <paramref name="length"/> 小于等于原数组的长度，则返回原数组。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
+		public static T[] Extend<T>(this T[] array, int length)
+		{
+			if (array == null)
+			{
+				throw CommonExceptions.ArgumentNull("array");
+			}
+			Contract.Ensures(Contract.Result<T[]>() != null);
+			if (length <= array.Length)
+			{
+				return array;
+			}
+			T[] result = new T[length];
+			array.CopyTo(result, 0);
+			return result;
+		}
+		/// <summary>
+		/// 将当前数组扩展到指定长度，并返回新数组。使用 <paramref name="value"/> 填充额外位置。
+		/// </summary>
+		/// <typeparam name="T">数组中元素的类型。</typeparam>
+		/// <param name="array">要扩展的数组。</param>
+		/// <param name="length">要扩展到的长度，如果小于等于当前数组的长度，则什么都不做。</param>
+		/// <param name="value">要用于填充额外位置的数据。</param>
+		/// <returns>扩展得到的新数组；如果 <paramref name="length"/> 小于等于原数组的长度，则返回原数组。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
+		public static T[] Extend<T>(this T[] array, int length, T value)
+		{
+			if (array == null)
+			{
+				throw CommonExceptions.ArgumentNull("array");
+			}
+			Contract.Ensures(Contract.Result<T[]>() != null);
+			if (length <= array.Length)
+			{
+				return array;
+			}
+			T[] result = new T[length];
+			array.CopyTo(result, 0);
+			result.FillInternal(value, array.Length, length - array.Length);
+			return result;
+		}
 
 		#endregion // 合并
 

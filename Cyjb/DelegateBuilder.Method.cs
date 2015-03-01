@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using Cyjb.Reflection;
@@ -40,12 +39,16 @@ namespace Cyjb
 				throw CommonExceptions.ArgumentNull("method");
 			}
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
-			if (!typeof(TDelegate).IsSubclassOf(typeof(Delegate)))
+			Type type = typeof(TDelegate);
+			if (!type.IsSubclassOf(typeof(Delegate)))
 			{
 				throw CommonExceptions.MustBeDelegate("TDelegate", typeof(TDelegate));
 			}
-			Type type = typeof(TDelegate);
-			Delegate dlg = CreateOpenDelegate(type, type.GetInvokeMethod(), method);
+			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
+			{
+				throw CommonExceptions.UnboundGenParam("method");
+			}
+			Delegate dlg = CreateOpenDelegate(type, method);
 			if (dlg == null)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -75,7 +78,8 @@ namespace Cyjb
 				throw CommonExceptions.ArgumentNull("method");
 			}
 			Contract.EndContractBlock();
-			if (!typeof(TDelegate).IsSubclassOf(typeof(Delegate)))
+			Type type = typeof(TDelegate);
+			if (!type.IsSubclassOf(typeof(Delegate)))
 			{
 				throw CommonExceptions.MustBeDelegate("TDelegate", typeof(TDelegate));
 			}
@@ -83,8 +87,7 @@ namespace Cyjb
 			{
 				throw CommonExceptions.UnboundGenParam("method");
 			}
-			Type type = typeof(TDelegate);
-			Delegate dlg = CreateOpenDelegate(type, type.GetInvokeMethod(), method);
+			Delegate dlg = CreateOpenDelegate(type, method);
 			if (dlg == null && throwOnBindFailure)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -123,7 +126,7 @@ namespace Cyjb
 			{
 				throw CommonExceptions.UnboundGenParam("method");
 			}
-			Delegate dlg = CreateOpenDelegate(type, type.GetInvokeMethod(), method);
+			Delegate dlg = CreateOpenDelegate(type, method);
 			if (dlg == null)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -165,7 +168,7 @@ namespace Cyjb
 			{
 				throw CommonExceptions.UnboundGenParam("method");
 			}
-			Delegate dlg = CreateOpenDelegate(type, type.GetInvokeMethod(), method);
+			Delegate dlg = CreateOpenDelegate(type, method);
 			if (dlg == null && throwOnBindFailure)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -178,58 +181,37 @@ namespace Cyjb
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。方法不能是包含泛型参数的非泛型定义。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
-		/// <param name="invoke">委托的 invoke 方法。</param>
 		/// <param name="method">要调用的方法。</param>
 		/// <returns><paramref name="type"/> 类型的委托，表示静态或实例方法的委托。</returns>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
-		private static Delegate CreateOpenDelegate(Type type, MethodInfo invoke, MethodBase method)
+		private static Delegate CreateOpenDelegate(Type type, MethodBase method)
 		{
-			Contract.Requires(type != null && invoke != null && method != null);
-			Type[] invokeParamTypes = invoke.GetParameterTypes();
-			Type[] types = invokeParamTypes;
-			MethodArgumentsOption options = MethodArgumentsOption.OptionalParamBinding | MethodArgumentsOption.Explicit;
+			Contract.Requires(type != null && method != null);
+			// 判断是否需要作为实例的形参。
 			int index = 0;
 			if (!method.IsStatic && !(method is ConstructorInfo))
 			{
-				options |= MethodArgumentsOption.ContainsInstance;
 				index++;
 			}
+			MethodInfo invoke = type.GetInvokeMethod();
+			Type[] paramTypes = invoke.GetParameterTypes();
+			Type[] types = paramTypes.Extend(method.GetParametersNoCopy().Length + index);
+			Type returnType = invoke.ReturnType;
 			// 提取方法参数信息。
-			int paramLen = method.GetParametersNoCopy().Length;
-			if (invokeParamTypes.Length < paramLen + index)
+			MethodArgumentsInfo argumentsInfo = GetArgumentsInfo(ref method, types, returnType);
+			if (argumentsInfo == null)
 			{
-				types = new Type[paramLen + index];
-				invokeParamTypes.CopyTo(types, 0);
-			}
-			MethodArgumentsInfo argumentsInfo;
-			if (method.IsGenericMethodDefinition)
-			{
-				// 对泛型方法定义进行类型推断。
-				argumentsInfo = method.GenericArgumentsInferences(invoke.ReturnType, types, options);
-				if (argumentsInfo == null)
-				{
-					return null;
-				}
-				method = ((MethodInfo)method).MakeGenericMethod(argumentsInfo.GenericArguments);
-			}
-			else
-			{
-				// 调用时保证 !method.ContainsGenericParameters。
-				argumentsInfo = MethodArgumentsInfo.GetInfo(method, types, options);
-				if (argumentsInfo == null)
-				{
-					return null;
-				}
+				return null;
 			}
 			// 构造动态委托。
-			DynamicMethod dlgMethod = new DynamicMethod("MethodDelegate", invoke.ReturnType, invokeParamTypes,
+			DynamicMethod dlgMethod = new DynamicMethod("MethodDelegate", returnType, paramTypes,
 				method.Module, true);
 			ILGenerator il = dlgMethod.GetILGenerator();
 			Contract.Assume(il != null);
 			// 实例方法的第一个参数用作传递实例对象。
 			if (argumentsInfo.InstanceType != null)
 			{
-				EmitLoadInstance(il, method, argumentsInfo.InstanceType);
+				EmitLoadInstance(il, method, argumentsInfo.InstanceType, true);
 			}
 			// 加载方法参数。
 			bool optimizeTailcall = EmitLoadParameters(il, method, argumentsInfo, index);
@@ -239,11 +221,39 @@ namespace Cyjb
 			{
 				optionalArgumentTypes = argumentsInfo.OptionalArgumentTypes.ToArray();
 			}
-			if (EmitInvokeMethod(il, method, optionalArgumentTypes, invoke.ReturnType, optimizeTailcall))
+			if (!EmitInvokeMethod(il, method, optionalArgumentTypes, returnType, optimizeTailcall))
 			{
-				return dlgMethod.CreateDelegate(type);
+				return null;
 			}
-			return null;
+			return dlgMethod.CreateDelegate(type);
+		}
+		/// <summary>
+		/// 获取指定方法的参数信息。
+		/// </summary>
+		/// <param name="method">要获取参数信息的方法。</param>
+		/// <param name="types">方法的实参类型列表。</param>
+		/// <param name="returnType">方法的返回值类型。</param>
+		/// <returns>方法的参数信息。</returns>
+		private static MethodArgumentsInfo GetArgumentsInfo(ref MethodBase method, Type[] types, Type returnType)
+		{
+			MethodArgumentsOption options = MethodArgumentsOption.OptionalAndExplicit;
+			if (!method.IsStatic && !(method is ConstructorInfo))
+			{
+				options |= MethodArgumentsOption.ContainsInstance;
+			}
+			if (method.IsGenericMethodDefinition)
+			{
+				// 对泛型方法定义进行类型推断。
+				MethodArgumentsInfo argumentsInfo = method.GenericArgumentsInferences(returnType, types, options);
+				if (argumentsInfo == null)
+				{
+					return null;
+				}
+				method = ((MethodInfo)method).MakeGenericMethod(argumentsInfo.GenericArguments);
+				return argumentsInfo;
+			}
+			// 调用时保证 !method.ContainsGenericParameters。
+			return MethodArgumentsInfo.GetInfo(method, types, options);
 		}
 		/// <summary>
 		/// 加载第一个参数作为实例，调用保证类型可以转换。
@@ -251,10 +261,14 @@ namespace Cyjb
 		/// <param name="il">IL 指令生成器。</param>
 		/// <param name="method">要调用的方法。</param>
 		/// <param name="instanceType">实例实参的类型。</param>
-		private static void EmitLoadInstance(ILGenerator il, MethodBase method, Type instanceType)
+		/// <param name="isCheckNull">是否检查实例是否为 <c>null</c>。</param>
+		private static void EmitLoadInstance(ILGenerator il, MethodBase method, Type instanceType, bool isCheckNull)
 		{
 			Contract.Requires(il != null && method != null && instanceType != null);
-			il.EmitCheckArgumentNull(0, "instance");
+			if (isCheckNull)
+			{
+				il.EmitCheckArgumentNull(0, "instance");
+			}
 			il.Emit(OpCodes.Ldarg_0);
 			Type declType = method.DeclaringType;
 			Contract.Assume(declType != null);
@@ -277,47 +291,15 @@ namespace Cyjb
 			int index)
 		{
 			Contract.Requires(il != null && method != null && argumentsInfo != null && index >= 0);
-			bool optimizeTailcall = true;
 			ParameterInfo[] parameters = method.GetParametersNoCopy();
 			IList<Type> args = argumentsInfo.FixedArguments;
 			int argCnt = args.Count;
+			bool optimizeTailcall = true;
 			for (int i = 0; i < argCnt; i++, index++)
 			{
-				Type type = args[i];
-				if (type == null)
+				if (!EmitLoadParameter(il, parameters[i], index, args[i]))
 				{
-					ParameterInfo param = parameters[i];
-					if (param.IsParamArray())
-					{
-						// params 参数。
-						il.EmitConstant(0);
-						il.Emit(OpCodes.Newarr, param.ParameterType.GetElementType());
-					}
-					else
-					{
-						// MethodArgumentsInfo 保证包含默认值。
-						il.EmitConstant(param.DefaultValue);
-					}
-				}
-				else
-				{
-					Type paramType = parameters[i].ParameterType;
-					if (paramType.IsByRef)
-					{
-						if (type.IsByRef)
-						{
-							il.EmitLoadArg(index);
-						}
-						else
-						{
-							il.EmitLoadArgAddress(index);
-							optimizeTailcall = false;
-						}
-					}
-					else
-					{
-						EmitLoadParameter(il, paramType, index, type);
-					}
+					optimizeTailcall = false;
 				}
 			}
 			if ((args = argumentsInfo.ParamArgumentTypes) != null)
@@ -356,21 +338,66 @@ namespace Cyjb
 		/// 加载方法参数。
 		/// </summary>
 		/// <param name="il">IL 指令生成器。</param>
-		/// <param name="paramType">方法形参的类型。</param>
+		/// <param name="parameter">方法形参信息。</param>
 		/// <param name="index">要加载的实参索引。</param>
 		/// <param name="argumentType">要加载的实参类型。</param>
-		private static void EmitLoadParameter(ILGenerator il, Type paramType, int index, Type argumentType)
+		/// <returns>能否对方法进行 tailcall 优化，如果可以则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
+		private static bool EmitLoadParameter(ILGenerator il, ParameterInfo parameter, int index, Type argumentType)
 		{
-			Contract.Requires(il != null && paramType != null && index >= 0 && argumentType != null);
-			if (argumentType.IsByRef)
+			Contract.Requires(il != null && parameter != null && index >= 0);
+			if (argumentType != null)
 			{
-				il.EmitLoadArg(index);
-				il.EmitLoadIndirect(argumentType.GetElementType());
+				return EmitLoadParameter(il, parameter.ParameterType, index, argumentType);
+			}
+			if (parameter.IsParamArray())
+			{
+				// params 参数。
+				il.EmitConstant(0);
+				il.Emit(OpCodes.Newarr, parameter.ParameterType.GetElementType());
 			}
 			else
 			{
-				il.EmitLoadArg(index, argumentType, paramType, true);
+				// MethodArgumentsInfo 保证包含默认值。
+				il.EmitConstant(parameter.DefaultValue);
 			}
+			return true;
+		}
+		/// <summary>
+		/// 加载方法参数。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="paramType">方法形参的类型。</param>
+		/// <param name="index">要加载的实参索引。</param>
+		/// <param name="argumentType">要加载的实参类型。</param>
+		/// <returns>能否对方法进行 tailcall 优化，如果可以则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
+		private static bool EmitLoadParameter(ILGenerator il, Type paramType, int index, Type argumentType)
+		{
+			Contract.Requires(il != null && paramType != null && index >= 0 && argumentType != null);
+			if (paramType.IsByRef)
+			{
+				if (argumentType.IsByRef)
+				{
+					il.EmitLoadArg(index);
+				}
+				else
+				{
+					il.EmitLoadArgAddress(index);
+					return false;
+				}
+			}
+			else
+			{
+				il.EmitLoadArg(index);
+				if (argumentType.IsByRef)
+				{
+					il.EmitLoadIndirect(argumentType.GetElementType());
+				}
+				else if (argumentType != TypeExt.ReferenceTypeMark && paramType != argumentType)
+				{
+					il.EmitConversion(argumentType, paramType, true);
+				}
+			}
+			return true;
 		}
 		/// <summary>
 		/// 写入调用方法的指令。
@@ -437,109 +464,162 @@ namespace Cyjb
 		#region 构造封闭方法委托
 
 		/// <summary>
-		/// 使用指定的第一个参数创建表示指定的静态或实例方法的指定类型的委托。 
+		/// 使用指定的第一个参数，创建用于表示指定静态或实例方法的指定类型的委托。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
-		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
-		/// <param name="method">描述委托要表示的静态或实例方法的 
-		/// <see cref="System.Reflection.MethodInfo"/>。</param>
-		/// <param name="firstArgument">委托要绑定到的对象，或为 <c>null</c>，
-		/// 后者表示将 <paramref name="method"/> 视为 <c>static</c>。</param>
+		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
+		/// <param name="firstArgument">如果是实例方法（非构造函数），则作为委托要绑定到的对象；
+		/// 否则将作为方法的第一个参数。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><typeparamref name="TDelegate"/> 不继承
-		/// <see cref="System.MulticastDelegate"/>。</exception>
-		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="method"/>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <typeparamref name="TDelegate"/>
-		/// 的 <c>Invoke</c> 方法。</exception>
-		/// <exception cref="System.MethodAccessException">调用方无权访问
-		/// <paramref name="method"/>。</exception>
-		public static TDelegate CreateDelegate<TDelegate>(this MethodInfo method, object firstArgument)
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentException">无法绑定 <paramref name="method"/>。</exception>
+		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
+		/// <seealso cref="Delegate.CreateDelegate(Type, object, MethodInfo)"/>
+		public static TDelegate CreateDelegate<TDelegate>(this MethodBase method, object firstArgument)
 			where TDelegate : class
 		{
-			return CreateDelegate(typeof(TDelegate), method, firstArgument, true) as TDelegate;
+			if (method == null)
+			{
+				throw CommonExceptions.ArgumentNull("method");
+			}
+			Contract.Ensures(Contract.Result<TDelegate>() != null);
+			Type type = typeof(TDelegate);
+			if (!type.IsSubclassOf(typeof(Delegate)))
+			{
+				throw CommonExceptions.MustBeDelegate("type", type);
+			}
+			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
+			{
+				throw CommonExceptions.UnboundGenParam("method");
+			}
+			Delegate dlg = CreateClosedDelegate(type, method, firstArgument);
+			if (dlg == null)
+			{
+				throw CommonExceptions.BindTargetMethod("method");
+			}
+			return dlg as TDelegate;
 		}
 		/// <summary>
-		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建表示指定的静态或实例方法的指定类型的委托。 
+		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示指定静态或实例方法的指定类型的委托。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
-		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
-		/// <param name="method">描述委托要表示的静态或实例方法的 
-		/// <param name="firstArgument">委托要绑定到的对象，或为 <c>null</c>，
-		/// 后者表示将 <paramref name="method"/> 视为 <c>static</c>。</param>
-		/// <see cref="System.Reflection.MethodInfo"/>。</param>
+		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
+		/// <param name="firstArgument">如果是实例方法（非构造函数），则作为委托要绑定到的对象；
+		/// 否则将作为方法的第一个参数。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="method"/> 
 		/// 时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><typeparamref name="TDelegate"/> 不继承
-		/// <see cref="System.MulticastDelegate"/>。</exception>
-		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="method"/>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentException">无法绑定 <paramref name="method"/>
 		/// 且 <paramref name="throwOnBindFailure"/> 为 <c>true</c>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <typeparamref name="TDelegate"/>
-		/// 的 <c>Invoke</c> 方法。</exception>
-		/// <exception cref="System.MethodAccessException">调用方无权访问
-		/// <paramref name="method"/>。</exception>
-		public static TDelegate CreateDelegate<TDelegate>(this MethodInfo method, object firstArgument,
+		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
+		/// <seealso cref="Delegate.CreateDelegate(Type, object, MethodInfo, bool)"/>
+		public static TDelegate CreateDelegate<TDelegate>(this MethodBase method, object firstArgument,
 			bool throwOnBindFailure)
 			where TDelegate : class
 		{
-			return CreateDelegate(typeof(TDelegate), method, firstArgument, throwOnBindFailure) as TDelegate;
+			if (method == null)
+			{
+				throw CommonExceptions.ArgumentNull("method");
+			}
+			Contract.EndContractBlock();
+			Type type = typeof(TDelegate);
+			if (!type.IsSubclassOf(typeof(Delegate)))
+			{
+				throw CommonExceptions.MustBeDelegate("type", type);
+			}
+			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
+			{
+				throw CommonExceptions.UnboundGenParam("method");
+			}
+			Delegate dlg = CreateClosedDelegate(type, method, firstArgument);
+			if (dlg == null && throwOnBindFailure)
+			{
+				throw CommonExceptions.BindTargetMethod("method");
+			}
+			return dlg as TDelegate;
 		}
 		/// <summary>
-		/// 使用指定的第一个参数创建表示指定的静态或实例方法的指定类型的委托。 
+		/// 使用指定的第一个参数，创建用于表示指定静态或实例方法的指定类型的委托。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
-		/// <param name="method">描述委托要表示的静态或实例方法的 
-		/// <see cref="System.Reflection.MethodInfo"/>。</param>
-		/// <param name="firstArgument">委托要绑定到的对象，或为 <c>null</c>，
-		/// 后者表示将 <paramref name="method"/> 视为 <c>static</c>。</param>
+		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
+		/// <param name="firstArgument">如果是实例方法（非构造函数），则作为委托要绑定到的对象；
+		/// 否则将作为方法的第一个参数。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承
-		/// <see cref="System.MulticastDelegate"/>。</exception>
-		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="method"/>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <paramref name="type"/>
-		/// 的 <c>Invoke</c> 方法。</exception>
-		/// <exception cref="System.MethodAccessException">调用方无权访问
-		/// <paramref name="method"/>。</exception>
-		public static Delegate CreateDelegate(Type type, MethodInfo method, object firstArgument)
+		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="type"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentException">无法绑定 <paramref name="method"/>。</exception>
+		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
+		/// <seealso cref="Delegate.CreateDelegate(Type, object, MethodInfo)"/>
+		public static Delegate CreateDelegate(Type type, MethodBase method, object firstArgument)
 		{
-			return CreateDelegate(type, method, firstArgument, true);
+			if (type == null)
+			{
+				throw CommonExceptions.ArgumentNull("type");
+			}
+			if (method == null)
+			{
+				throw CommonExceptions.ArgumentNull("method");
+			}
+			Contract.Ensures(Contract.Result<Delegate>() != null);
+			if (!type.IsSubclassOf(typeof(Delegate)))
+			{
+				throw CommonExceptions.MustBeDelegate("type", type);
+			}
+			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
+			{
+				throw CommonExceptions.UnboundGenParam("method");
+			}
+			Delegate dlg = CreateClosedDelegate(type, method, firstArgument);
+			if (dlg == null)
+			{
+				throw CommonExceptions.BindTargetMethod("method");
+			}
+			return dlg;
 		}
 		/// <summary>
-		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建表示指定的静态或实例方法的指定类型的委托。 
+		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示指定静态或实例方法的指定类型的委托。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
-		/// <param name="method">描述委托要表示的静态或实例方法的 
-		/// <see cref="System.Reflection.MethodInfo"/>。</param>
-		/// <param name="firstArgument">委托要绑定到的对象，或为 <c>null</c>，
-		/// 后者表示将 <paramref name="method"/> 视为 <c>static</c>。</param>
+		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
+		/// <param name="firstArgument">如果是实例方法（非构造函数），则作为委托要绑定到的对象；
+		/// 否则将作为方法的第一个参数。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="method"/> 
 		/// 时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承
-		/// <see cref="System.MulticastDelegate"/>。</exception>
-		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="method"/>
+		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="type"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentException">无法绑定 <paramref name="method"/>
 		/// 且 <paramref name="throwOnBindFailure"/> 为 <c>true</c>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <paramref name="type"/>
-		/// 的 <c>Invoke</c> 方法。</exception>
-		/// <exception cref="System.MethodAccessException">调用方无权访问
-		/// <paramref name="method"/>。</exception>
-		public static Delegate CreateDelegate(Type type, MethodInfo method, object firstArgument, bool throwOnBindFailure)
+		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
+		/// <seealso cref="Delegate.CreateDelegate(Type, object, MethodInfo, bool)"/>
+		public static Delegate CreateDelegate(Type type, MethodBase method, object firstArgument, bool throwOnBindFailure)
 		{
-			CommonExceptions.CheckArgumentNull(method, "method");
-			CommonExceptions.CheckDelegateType(type, "type");
-			MethodInfo invoke = type.GetMethod("Invoke");
-			ParameterInfo[] invokeParams = invoke.GetParameters();
-			ParameterInfo[] methodParams = method.GetParameters();
-			// 尝试创建带有第一个参数的方法委托。
-			Delegate dlg = CreateDelegateWithArgument(type, firstArgument, invoke, invokeParams, method, methodParams);
+			if (type == null)
+			{
+				throw CommonExceptions.ArgumentNull("type");
+			}
+			if (method == null)
+			{
+				throw CommonExceptions.ArgumentNull("method");
+			}
+			Contract.EndContractBlock();
+			if (!type.IsSubclassOf(typeof(Delegate)))
+			{
+				throw CommonExceptions.MustBeDelegate("type", type);
+			}
+			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
+			{
+				throw CommonExceptions.UnboundGenParam("method");
+			}
+			Delegate dlg = CreateClosedDelegate(type, method, firstArgument);
 			if (dlg == null && throwOnBindFailure)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -547,160 +627,227 @@ namespace Cyjb
 			return dlg;
 		}
 		/// <summary>
-		/// 创建指定的静态或实例方法的指定类型的带有第一个参数的方法委托。
-		/// 如果是实例方法，需要将实例对象作为委托的第一个参数。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
+		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示指定静态或实例方法的指定类型的方法委托。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。方法不能是包含泛型参数的非泛型定义。
 		/// </summary>
-		/// <param name="type">委托的类型。</param>
-		/// <param name="firstArgument">委托表示的方法的第一个参数。</param>
-		/// <param name="invoke">委托的方法信息。</param>
-		/// <param name="invokeParams">委托的参数列表。</param>
-		/// <param name="method">目标方法的信息。</param>
-		/// <param name="methodParams">目标方法的参数列表。</param>
-		/// <returns>指定类型的委托，表示静态方法或实例方法。</returns>
-		/// <exception cref="System.MethodAccessException">调用方无权访问
-		/// <paramref name="method"/>。</exception>
-		private static Delegate CreateDelegateWithArgument(Type type, object firstArgument,
-			MethodInfo invoke, ParameterInfo[] invokeParams,
-			MethodInfo method, ParameterInfo[] methodParams)
+		/// <param name="type">要创建的委托的类型。</param>
+		/// <param name="method">要调用的方法。</param>
+		/// <param name="firstArgument">委托要绑定到的对象，或为 <c>null</c>，后者表示将 
+		/// <paramref name="method"/> 视为 <c>static</c>。</param>
+		/// <returns><paramref name="type"/> 类型的委托，表示静态或实例方法的委托。</returns>
+		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
+		private static Delegate CreateClosedDelegate(Type type, MethodBase method, object firstArgument)
 		{
-			// 尝试创建开放的方法委托。
-			Delegate dlg = CreateOpenDelegate(type, invoke, method);
-			if (dlg != null)
+			Contract.Requires(type != null && method != null);
+			if (firstArgument == null)
 			{
-				return dlg;
+				// 开放方法。
+				Delegate dlg = CreateOpenDelegate(type, method);
+				if (dlg != null)
+				{
+					return dlg;
+				}
+				// 如果是值类型的实例方法，则报错，因为值类型不能为 null。
+				if (!method.IsStatic && !method.IsConstructor)
+				{
+					return null;
+				}
 			}
-			// 尝试创建封闭的方法委托。
-			if (firstArgument == null && !method.IsStatic && invokeParams.Length == methodParams.Length)
+			// 封闭方法。
+			MethodInfo invoke = type.GetInvokeMethod();
+			Type[] paramTypes = invoke.GetParameterTypes();
+			Type[] paramTypesWithFirstArg = paramTypes.Insert(0,
+				// 这里使用 firstArgument 的实际类型，因为需要做类型检查和泛型类型推断。
+				firstArgument == null ? TypeExt.ReferenceTypeMark : firstArgument.GetType());
+			// 判断是否需要作为实例的形参。
+			int index = 0;
+			if (!method.IsStatic && !(method is ConstructorInfo))
 			{
-				return CreateNullCloseInstanceDelegate(type, invoke, invokeParams, method, methodParams);
+				index++;
+			}
+			Type[] types = paramTypesWithFirstArg.Extend(method.GetParametersNoCopy().Length + index);
+			Type returnType = invoke.ReturnType;
+			MethodArgumentsInfo argumentsInfo = GetArgumentsInfo(ref method, types, returnType);
+			if (argumentsInfo == null)
+			{
+				return null;
+			}
+			bool needLoadFirstArg = false;
+			if (!ILExt.CanEmitConstant(firstArgument))
+			{
+				needLoadFirstArg = true;
+				// 修正额外参数的类型。
+				paramTypesWithFirstArg[0] = GetFirstArgParamType(method, firstArgument);
+				paramTypes = paramTypesWithFirstArg;
+			}
+			// 构造动态委托。
+			DynamicMethod dlgMethod = new DynamicMethod("MethodDelegate", returnType, paramTypes,
+				method.Module, true);
+			ILGenerator il = dlgMethod.GetILGenerator();
+			Contract.Assume(il != null);
+			bool optimizeTailcall;
+			if (needLoadFirstArg)
+			{
+				if (argumentsInfo.InstanceType != null)
+				{
+					EmitLoadInstance(il, method, argumentsInfo.InstanceType, true);
+				}
+				optimizeTailcall = EmitLoadParameters(il, method, argumentsInfo, index);
+			}
+			else if (argumentsInfo.InstanceType != null)
+			{
+				EmitLoadInstance(il, method, firstArgument);
+				optimizeTailcall = EmitLoadParameters(il, method, argumentsInfo, 0);
 			}
 			else
 			{
-				return CreateCloseDelegate(type, firstArgument, invoke, invokeParams, method, methodParams);
+				optimizeTailcall = EmitLoadParameters(il, method, argumentsInfo, firstArgument);
+			}
+			// 调用方法。
+			Type[] optionalArgumentTypes = null;
+			if (argumentsInfo.OptionalArgumentTypes != null)
+			{
+				optionalArgumentTypes = argumentsInfo.OptionalArgumentTypes.ToArray();
+			}
+			if (!EmitInvokeMethod(il, method, optionalArgumentTypes, returnType, optimizeTailcall))
+			{
+				return null;
+			}
+			return needLoadFirstArg ? dlgMethod.CreateDelegate(type, firstArgument) : dlgMethod.CreateDelegate(type);
+		}
+		/// <summary>
+		/// 获取 firstArgument 对应的形参类型。
+		/// </summary>
+		/// <param name="method">方法信息。</param>
+		/// <param name="firstArgument">第一个参数。</param>
+		/// <returns><paramref name="firstArgument"/> 对应的形参类型。</returns>
+		private static Type GetFirstArgParamType(MethodBase method, object firstArgument)
+		{
+			Contract.Requires(method != null);
+			if (firstArgument == null)
+			{
+				// 找到 firstArgument 对应的形参类型。
+				if (method.IsStatic || method is ConstructorInfo)
+				{
+					return method.GetParametersNoCopy()[0].ParameterType;
+				}
+				return method.DeclaringType;
+			}
+			Type argType = firstArgument.GetType();
+			// CreateDelegate 方法传入的 firstArgument 不能为值类型，除非形参类型是 object。
+			return argType.IsValueType ? typeof(object) : argType;
+		}
+		/// <summary>
+		/// 加载指定值作为实例，调用值可写入 IL 且保证类型可以转换。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="method">要调用的方法。</param>
+		/// <param name="value">作为实例加载的值。</param>
+		private static void EmitLoadInstance(ILGenerator il, MethodBase method, object value)
+		{
+			Contract.Requires(il != null && method != null);
+			Type declType = method.DeclaringType;
+			Contract.Assume(declType != null);
+			if (value == null)
+			{
+				il.EmitConstant(null, declType);
+				return;
+			}
+			// 提前完成类型转换。
+			value = Convert.ChangeType(value, declType);
+			il.EmitConstant(value);
+			if (declType.IsValueType)
+			{
+				// 值类型要转换为相应的指针。
+				il.EmitGetAddress(declType);
+			}
+			else
+			{
+				// 需要对值类型进行装箱。
+				il.Emit(OpCodes.Box, value.GetType());
 			}
 		}
 		/// <summary>
-		/// 创建指定的实例方法的通过空引用封闭的方法委托。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
+		/// 加载方法参数。
 		/// </summary>
-		/// <param name="type">委托的类型。</param>
-		/// <param name="invoke">委托的方法信息。</param>
-		/// <param name="invokeParams">委托的参数列表。</param>
-		/// <param name="method">目标方法的信息。</param>
-		/// <param name="methodParams">目标方法的参数列表。</param>
-		/// <returns>指定类型的委托，表示通过空引用封闭的实例方法。</returns>
-		/// <exception cref="System.MethodAccessException">调用方无权访问
-		/// <paramref name="method"/>。</exception>
-		private static Delegate CreateNullCloseInstanceDelegate(Type type,
-			MethodInfo invoke, ParameterInfo[] invokeParams,
-			MethodInfo method, ParameterInfo[] methodParams)
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="method">要加载参数的方法。</param>
+		/// <param name="argumentsInfo">方法实参信息。</param>
+		/// <param name="firstArgument">第一个参数的值。</param>
+		/// <returns>能否对方法进行 tailcall 优化，如果可以则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
+		private static bool EmitLoadParameters(ILGenerator il, MethodBase method, MethodArgumentsInfo argumentsInfo,
+			object firstArgument)
 		{
-			// 通过空引用封闭实例方法，类似于对空实例调用实例方法，无法自己产生代码，
-			if (method.IsGenericMethodDefinition)
+			Contract.Requires(il != null && method != null && argumentsInfo != null);
+			ParameterInfo[] parameters = method.GetParametersNoCopy();
+			IList<Type> args = argumentsInfo.FixedArguments;
+			int argCnt = args.Count, index = 0;
+			bool optimizeTailcall = true, firstArg = true;
+			if (argCnt > 0)
 			{
-				// 构造泛型方法的封闭方法，对于静态方法要在前面添加一个参数。
-				Type[] paramTypes = GetParameterTypes(invokeParams, 0, 0, 0);
-				method = method.MakeGenericMethodFromParamTypes(paramTypes, MethodArgumentsOption.None);
-				if (method == null) { return null; }
-				methodParams = method.GetParameters();
-			}
-			// 尝试直接使用 CreateDelegate 进行创建。
-			Delegate dlg = Delegate.CreateDelegate(type, null, method, false);
-			if (dlg == null)
-			{
-				// 尝试包装强制类型转换的代码。
-				// 生成与 method 完全匹配的委托类型。
-				Type[] methodTypes = GetParameterTypes(methodParams, 0, 0, 1);
-				methodTypes[methodParams.Length] = method.ReturnType;
-				Type delType = Expression.GetDelegateType(methodTypes);
-				dlg = Delegate.CreateDelegate(delType, null, method, false);
-				if (dlg != null)
+				firstArg = false;
+				Type paramType = parameters[0].ParameterType;
+				if (paramType.IsByRef)
 				{
-					// 将由 Delegate 创建的委托进行参数的强制类型转换。
-					ParameterExpression[] paramList = invokeParams.ToExpressions();
-					Expression[] paramExps = GetParameterExpressions(paramList, 0, methodParams, 0);
-					if (paramExps != null)
-					{
-						Expression delInvoke = Expression.Invoke(Expression.Constant(dlg), paramExps);
-						delInvoke = GetReturn(delInvoke, invoke.ReturnType);
-						if (delInvoke != null)
-						{
-							dlg = Expression.Lambda(type, delInvoke, paramList).Compile();
-						}
-					}
+					il.EmitConstant(Convert.ChangeType(firstArgument, paramType));
+					il.EmitGetAddress(paramType);
+					optimizeTailcall = false;
+				}
+				else
+				{
+					il.EmitConstant(Convert.ChangeType(firstArgument, paramType));
 				}
 			}
-			return dlg;
-		}
-		/// <summary>
-		/// 创建指定的静态或实例方法的指定类型的封闭方法委托。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
-		/// </summary>
-		/// <param name="type">委托的类型。</param>
-		/// <param name="firstArgument">委托表示的方法的第一个参数。</param>
-		/// <param name="invoke">委托的方法信息。</param>
-		/// <param name="invokeParams">委托的参数列表。</param>
-		/// <param name="method">目标方法的信息。</param>
-		/// <param name="methodParams">目标方法的参数列表。</param>
-		/// <returns>指定类型的委托，表示静态方法或实例方法。</returns>
-		/// <exception cref="System.MethodAccessException">调用方无权访问
-		/// <paramref name="method"/>。</exception>
-		private static Delegate CreateCloseDelegate(Type type, object firstArgument,
-			MethodInfo invoke, ParameterInfo[] invokeParams,
-			MethodInfo method, ParameterInfo[] methodParams)
-		{
-			// 要求参数数量匹配，其中静态方法的第一个参数被封闭。
-			int skipIdx = method.IsStatic ? 1 : 0;
-			if (invokeParams.Length == methodParams.Length - skipIdx)
+			for (int i = 1; i < argCnt; i++, index++)
 			{
-				if (method.IsGenericMethodDefinition)
+				if (!EmitLoadParameter(il, parameters[i], index, args[i]))
 				{
-					// 构造泛型方法的封闭方法，对于静态方法要在前面添加一个参数。
-					Type[] paramTypes = GetParameterTypes(invokeParams, 0, skipIdx, 0);
-					if (skipIdx == 1)
-					{
-						// 将第一个参数的类型填充到参数类型列表中。
-						paramTypes[0] = firstArgument == null ? typeof(object) : firstArgument.GetType();
-					}
-					method = method.MakeGenericMethodFromParamTypes(paramTypes, MethodArgumentsOption.None);
-					if (method == null) { return null; }
-					methodParams = method.GetParameters();
-				}
-				// 方法的参数列表。
-				ParameterExpression[] paramList = invokeParams.ToExpressions();
-				// 构造调用参数列表。
-				Expression[] paramExps = GetParameterExpressions(paramList, 0, methodParams, skipIdx);
-				if (paramExps != null)
-				{
-					Expression instance = null;
-					if (skipIdx == 1)
-					{
-						paramExps[0] = Expression.Constant(firstArgument).ConvertType(methodParams[0].ParameterType);
-						if (paramExps[0] == null)
-						{
-							// 不允许进行强制类型转换。
-							return null;
-						}
-					}
-					else
-					{
-						instance = Expression.Constant(firstArgument).ConvertType(method.DeclaringType);
-						if (instance == null)
-						{
-							// 不允许进行强制类型转换。
-							return null;
-						}
-					}
-					Expression methodCall = Expression.Call(instance, method, paramExps);
-					methodCall = GetReturn(methodCall, invoke.ReturnType);
-					if (methodCall != null)
-					{
-						return Expression.Lambda(type, methodCall, paramList).Compile();
-					}
+					optimizeTailcall = false;
 				}
 			}
-			return null;
+			if ((args = argumentsInfo.ParamArgumentTypes) != null)
+			{
+				// 加载 params 参数。
+				argCnt = args.Count;
+				Type elementType = argumentsInfo.ParamArrayType.GetElementType();
+				Contract.Assume(elementType != null);
+				il.EmitConstant(argCnt);
+				il.Emit(OpCodes.Newarr, elementType);
+				LocalBuilder local = il.GetLocal(argumentsInfo.ParamArrayType);
+				il.Emit(OpCodes.Stloc, local);
+				int i = 0;
+				if (firstArg)
+				{
+					i++;
+					il.EmitConstant(Convert.ChangeType(firstArgument, elementType));
+				}
+				for (; i < argCnt; i++, index++)
+				{
+					il.Emit(OpCodes.Ldloc, local);
+					il.EmitConstant(i);
+					EmitLoadParameter(il, elementType, index, args[i]);
+					il.EmitStoreElement(elementType);
+				}
+				il.Emit(OpCodes.Ldloc, local);
+				il.FreeLocal(local);
+				optimizeTailcall = false;
+			}
+			else if ((args = argumentsInfo.OptionalArgumentTypes) != null)
+			{
+				// 加载可变参数。
+				argCnt = args.Count;
+				int i = 0;
+				if (firstArg)
+				{
+					i++;
+					il.EmitConstant(firstArgument);
+				}
+				for (; i < argCnt; i++, index++)
+				{
+					EmitLoadParameter(il, args[i], index, args[i]);
+				}
+			}
+			return optimizeTailcall;
 		}
 
 		#endregion // 构造封闭方法委托

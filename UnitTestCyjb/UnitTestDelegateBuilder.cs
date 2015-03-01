@@ -243,6 +243,24 @@ namespace UnitTestCyjb
 			Assert.AreEqual("X", instance.Text);
 			Assert.AreEqual("InstanceMethodRef", value);
 			Assert.AreEqual(101, value2);
+
+			// ToString
+			Assert.AreEqual("10", typeof(object).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<object, string>>()(
+				10));
+			Assert.AreEqual("10", typeof(object).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<object, string>>()(
+				"10"));
+			Assert.AreEqual("10", typeof(string).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<string, string>>()(
+				"10"));
+			Assert.AreEqual("10", typeof(string).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<object, string>>()(
+				"10"));
+			Assert.AreEqual("10", typeof(int).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<int, string>>()(
+				10));
+			Assert.AreEqual("10", typeof(int).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<long, string>>()(
+				10));
+			Assert.AreEqual("10", typeof(int).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<short, string>>()(
+				10));
+			Assert.AreEqual("10", typeof(int).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<object, string>>()(
+				10));
 		}
 		/// <summary>
 		/// 测试构造开放构造函数委托。
@@ -273,156 +291,277 @@ namespace UnitTestCyjb
 
 		#endregion // 测试开放方法委托
 
+		#region 测试封闭方法委托
+
 		/// <summary>
-		/// 测试通过 MethodInfo 构造方法委托。
+		/// 测试构造封闭方法委托。
 		/// </summary>
 		[TestMethod]
-		public void TestMethodDelegateFromMethodInfo()
+		public void TestClosedMethodDelegate()
 		{
-			//Type type = typeof(TestClass);
-			//MethodInfo method0 = type.GetMethod("TestStaticMethod", Type.EmptyTypes);
-			//MethodInfo method = type.GetMethod("TestStaticMethod", new Type[] { typeof(string) });
-			//MethodInfo method2 = type.GetMethod("TestStaticMethod", new Type[] { typeof(string), typeof(int) });
-			//MethodInfo method3 = type.GetMethod("TestStaticMethodGeneric");
-			//MethodInfo method4 = type.GetMethod("TestStaticMethodRef");
-			//// 开放的静态方法。
-			//Assert.AreEqual("StaticMethod", method0.CreateDelegate<Func<string>>()());
-			//Assert.AreEqual("StaticMethod", method0.CreateDelegate<Func<object>>()());
-			//Assert.AreEqual(null, method0.CreateDelegate<Func<string, string>>(false));
-			//Assert.AreEqual(null, method0.CreateDelegate<Func<int>>(false));
-			//Assert.AreEqual("Test1_StaticMethod", method.CreateDelegate<Func<string, string>>()("Test1"));
-			//Assert.AreEqual("Test2_StaticMethod", method.CreateDelegate<Func<string, string>>(null)("Test2"));
-			//Assert.AreEqual("Test2_StaticMethod", method.CreateDelegate<Func<string, string>>("NoUse")("Test2"));
-			//Assert.AreEqual(null, method.CreateDelegate<Func<int, string>>(false));
-			//Assert.AreEqual(null, method.CreateDelegate<Func<string, int>>(false));
-			//Assert.AreEqual("Test3_StaticMethod", method.CreateDelegate<Func<object, string>>()("Test3"));
-			//Assert.AreEqual("Test4_StaticMethod", method.CreateDelegate<Func<object, object>>()("Test4"));
-			//Assert.AreEqual("Test5_10_StaticMethod", method2.CreateDelegate<Func<string, int, string>>()("Test5", 10));
-			//Assert.AreEqual("Test6_10_StaticMethod", method2.CreateDelegate<Func<string, short, string>>()("Test6", 10));
-			//Assert.AreEqual("Test7_10_StaticMethod", method2.CreateDelegate<Func<string, ulong, string>>()("Test7", 10UL));
-			//Assert.AreEqual("Test8_10_StaticMethod", method2.CreateDelegate<Func<object, ulong, string>>()("Test8", 10UL));
-			//Assert.AreEqual("Test9_10_StaticMethod", method2.CreateDelegate<Func<object, ulong, object>>()("Test9", 10UL));
-			//Assert.AreEqual(null, method2.CreateDelegate<Func<string, string, string>>(false));
-			//// 第一个参数封闭的静态方法。
-			//Assert.AreEqual("StaticMethod", method0.CreateDelegate<Func<string>>(null)());
-			//Assert.AreEqual("_StaticMethod", method.CreateDelegate<Func<string>>(null)());
-			//Assert.AreEqual("Test10_StaticMethod", method.CreateDelegate<Func<string>>("Test10")());
-			//Assert.AreEqual("Test11_StaticMethod", method.CreateDelegate<Func<object>>("Test11")());
-			//Assert.AreEqual(null, method.CreateDelegate<Func<int>>("Test11", false));
-			//// 开放的泛型静态方法。
-			//Assert.AreEqual("<System.String>Test13_StaticMethod", method3.CreateDelegate<Func<string, string>>()("Test13"));
-			//Assert.AreEqual("<System.Int32>14_StaticMethod", method3.CreateDelegate<Func<int, string>>()(14));
-			//Assert.AreEqual("<System.String>Test15_StaticMethod", method3.CreateDelegate<Func<string, string>>(null)("Test15"));
-			//Assert.AreEqual("<System.String>Test16_StaticMethod", method3.CreateDelegate<Func<string, string>>("NoUse")("Test16"));
-			//Assert.AreEqual(null, method3.CreateDelegate<Func<string, int>>(false));
-			//// 第一个参数封闭的泛型静态方法。
-			//Assert.AreEqual("<System.Object>_StaticMethod", method3.CreateDelegate<Func<string>>(null)());
-			//Assert.AreEqual("<System.String>Test17_StaticMethod", method3.CreateDelegate<Func<string>>("Test17")());
-			//Assert.AreEqual("<System.String>Test18_StaticMethod", method3.CreateDelegate<Func<object>>("Test18")());
-			//Assert.AreEqual("<System.Int32>19_StaticMethod", method3.CreateDelegate<Func<string>>(19)());
-			//Assert.AreEqual(null, method3.CreateDelegate<Func<int>>("Test11", false));
-			//// 特殊静态方法。
-			//Assert.AreEqual("A_B_StaticMethod", method4.CreateDelegate<Func<string, string, int, string>>()("A", "B", 0));
-			//Assert.AreEqual("A_B_StaticMethod", method4.CreateDelegate<Func<string, int, string>>("A")("B", 0));
-			//string value = "B";
-			//int value2;
-			//Assert.AreEqual("A_B_StaticMethod", method4.CreateDelegate<TestDelegate>()("A", ref value, out value2));
-			//Assert.AreEqual("StaticMethodRef", value);
-			//Assert.AreEqual(101, value2);
-			//// 实例方法。
-			//method0 = type.GetMethod("TestInstanceMethod", Type.EmptyTypes);
-			//method = type.GetMethod("TestInstanceMethod", new Type[] { typeof(string) });
-			//method2 = type.GetMethod("TestInstanceMethod", new Type[] { typeof(string), typeof(int) });
-			//method3 = type.GetMethod("TestInstanceMethod2");
-			//method4 = type.GetMethod("TestInstanceMethod3");
-			//TestClass tc = new TestClass();
-			//tc.Text = "TC";
-			//// 开放的实例方法。
-			//Assert.AreEqual("TC_InstanceMethod", method0.CreateDelegate<Func<TestClass, string>>()(tc));
-			//Assert.AreEqual("TC_InstanceMethod", method0.CreateDelegate<Func<TestClass, string>>(null)(tc));
-			//Assert.AreEqual("TC_InstanceMethod", method0.CreateDelegate<Func<TestClass, string>>("NoUse")(tc));
-			//Assert.AreEqual("TC_InstanceMethod", method0.CreateDelegate<Func<object, object>>()(tc));
-			//Assert.AreEqual(null, method0.CreateDelegate<Func<TestClass, string, string>>(false));
-			//Assert.AreEqual(null, method0.CreateDelegate<Func<TestClass, int>>(false));
-			//Assert.AreEqual("Test_Instance_InstanceMethod", method.CreateDelegate<Func<TestClass, string, string>>()(tc, "Test1"));
-			//Assert.AreEqual("Test_Instance_InstanceMethod", method.CreateDelegate<Func<TestClass, string, string>>(null)(tc, "Test2"));
-			//Assert.AreEqual("Test_Instance_InstanceMethod", method.CreateDelegate<Func<TestClass, string, string>>("NoUse")(tc, "Test2"));
-			//Assert.AreEqual(null, method.CreateDelegate<Func<TestClass, int, string>>(false));
-			//Assert.AreEqual(null, method.CreateDelegate<Func<TestClass, string, int>>(false));
-			//Assert.AreEqual("Test_Instance_InstanceMethod", method.CreateDelegate<Func<TestClass, object, string>>()(tc, "Test3"));
-			//Assert.AreEqual("Test_Instance_InstanceMethod", method.CreateDelegate<Func<TestClass, object, object>>()(tc, "Test4"));
-			//Assert.AreEqual("Test_Instance_InstanceMethod", method.CreateDelegate<Func<object, object, object>>()(tc, "Test4"));
-			//Assert.AreEqual("Test5_1_Instance_InstanceMethod",
-			//	method2.CreateDelegate<Func<TestClass, string, int, string>>()(tc, "Test5", 10));
-			//Assert.AreEqual("Test6_1_Instance_InstanceMethod",
-			//	method2.CreateDelegate<Func<TestClass, string, short, string>>()(tc, "Test6", 10));
-			//Assert.AreEqual("Test7_1_Instance_InstanceMethod",
-			//	method2.CreateDelegate<Func<TestClass, string, ulong, string>>()(tc, "Test7", 10UL));
-			//Assert.AreEqual("Test8_1_Instance_InstanceMethod",
-			//	method2.CreateDelegate<Func<TestClass, object, ulong, string>>()(tc, "Test8", 10UL));
-			//Assert.AreEqual("Test9_1_Instance_InstanceMethod",
-			//	method2.CreateDelegate<Func<TestClass, object, ulong, object>>()(tc, "Test9", 10UL));
-			//Assert.AreEqual(null, method2.CreateDelegate<Func<TestClass, string, string, string>>(false));
-			//// 第一个参数封闭的实例方法。
-			//Assert.AreEqual("TC_InstanceMethod", method0.CreateDelegate<Func<string>>(tc)());
-			//Assert.AreEqual("NullThis_InstanceMethod", method0.CreateDelegate<Func<string>>(null)());
-			//Assert.AreEqual("Test10_NullThis_InstanceMethod", method.CreateDelegate<Func<string, string>>(null)("Test10"));
-			//Assert.AreEqual("Test10_NullThis_InstanceMethod", method.CreateDelegate<Func<object, string>>(null)("Test10"));
-			//Assert.AreEqual("Test10_NullThis_InstanceMethod", method.CreateDelegate<Func<string, object>>(null)("Test10"));
-			//Assert.AreEqual("Test10_NullThis_InstanceMethod", method.CreateDelegate<Func<object, object>>(null)("Test10"));
-			//Assert.AreEqual(null, method.CreateDelegate<Func<int, object>>(null));
-			//Assert.AreEqual("Test1_Instance_InstanceMethod", method.CreateDelegate<Func<string, string>>(tc)("Test10"));
-			//Assert.AreEqual("Test1_Instance_InstanceMethod", method.CreateDelegate<Func<string, object>>(tc)("Test11"));
-			//Assert.AreEqual("Test1_Instance_InstanceMethod", method.CreateDelegate<Func<object, object>>(tc)("Test11"));
-			//Assert.AreEqual(null, method.CreateDelegate<Func<int>>(tc, false));
-			//// 开放的泛型实例方法。
-			//Assert.AreEqual("<System.String>Test1_Instance_InstanceMethod",
-			//	method3.CreateDelegate<Func<TestClass, string, string>>()(tc, "Test13"));
-			//Assert.AreEqual("<System.Int32>1_Instance_InstanceMethod",
-			//	method3.CreateDelegate<Func<TestClass, int, string>>()(tc, 14));
-			//Assert.AreEqual("<System.String>Test1_Instance_InstanceMethod",
-			//	method3.CreateDelegate<Func<TestClass, string, string>>(null)(tc, "Test15"));
-			//Assert.AreEqual("<System.String>Test1_Instance_InstanceMethod",
-			//	method3.CreateDelegate<Func<TestClass, string, string>>("NoUse")(tc, "Test16"));
-			//Assert.AreEqual("<System.Object>Test1_Instance_InstanceMethod",
-			//	method3.CreateDelegate<Func<object, object, string>>("NoUse")(tc, "Test16"));
-			//Assert.AreEqual(null, method3.CreateDelegate<Func<TestClass, string, int>>(false));
-			//// 第一个参数封闭的泛型实例方法。
-			//Assert.AreEqual("<System.String>Test17_NullThis_InstanceMethod",
-			//	method3.CreateDelegate<Func<string, string>>(null)("Test17"));
-			//Assert.AreEqual("<System.Object>Test17_NullThis_InstanceMethod",
-			//	method3.CreateDelegate<Func<object, string>>(null)("Test17"));
-			//Assert.AreEqual("<System.String>Test17_NullThis_InstanceMethod",
-			//	method3.CreateDelegate<Func<string, object>>(null)("Test17"));
-			//Assert.AreEqual("<System.Object>Test17_NullThis_InstanceMethod",
-			//	method3.CreateDelegate<Func<object, object>>(null)("Test17"));
-			//Assert.AreEqual("<System.Int32>17_NullThis_InstanceMethod",
-			//	method3.CreateDelegate<Func<int, object>>(null)(17));
-			//Assert.AreEqual(null, method3.CreateDelegate<Func<int, int>>(null));
-			//Assert.AreEqual("<System.String>Test1_Instance_InstanceMethod",
-			//	method3.CreateDelegate<Func<string, string>>(tc)("Test18"));
-			//Assert.AreEqual("<System.String>Test1_Instance_InstanceMethod",
-			//	method3.CreateDelegate<Func<string, object>>(tc)("Test19"));
-			//Assert.AreEqual("<System.Object>Test2_Instance_InstanceMethod",
-			//	method3.CreateDelegate<Func<object, object>>(tc)("Test20"));
-			//Assert.AreEqual("<System.Int32>2_Instance_InstanceMethod",
-			//	method3.CreateDelegate<Func<int, object>>(tc)(21));
-			//// 特殊实例方法。
-			//Assert.AreEqual("A_B_InstanceMethod",
-			//	method4.CreateDelegate<Func<TestClass, string, string, int, string>>()(tc, "A", "B", 0));
-			//Assert.AreEqual("B", tc.Text);
-			//tc.Text = "XXX";
-			//Assert.AreEqual("A_B_InstanceMethod", method4.CreateDelegate<Func<string, string, int, string>>(tc)("A", "B", 0));
-			//Assert.AreEqual("B", tc.Text);
-			//value = "B";
-			//value2 = 0;
-			//tc.Text = "XXX";
-			//Assert.AreEqual("A_B_InstanceMethod", method4.CreateDelegate<TestDelegate>(tc)("A", ref value, out value2));
-			//Assert.AreEqual("InstanceMethodRef", value);
-			//Assert.AreEqual("B", tc.Text);
-			//Assert.AreEqual(101, value2);
+			Type type = typeof(TestClass);
+
+			// 静态方法
+			// 无参数
+			MethodBase method = type.GetMethod("TestStaticMethod", Type.EmptyTypes);
+			Assert.AreEqual("StaticMethod", method.CreateDelegate<Func<string>>(null)());
+			Assert.AreEqual("StaticMethod", method.CreateDelegate<Func<object>>(null)());
+			Assert.AreEqual(null, method.CreateDelegate<Func<string, string>>(null, false));
+			Assert.AreEqual(null, method.CreateDelegate<Func<int>>(null, false));
+			// 字符串参数
+			MethodBase methodStr = type.GetMethod("TestStaticMethod", new[] { typeof(string) });
+			Assert.AreEqual("Test_StaticMethod", methodStr.CreateDelegate<Func<string, string>>(null)("Test"));
+			Assert.AreEqual("Test_StaticMethod", methodStr.CreateDelegate<Func<object, string>>(null)("Test"));
+			Assert.AreEqual("Test_StaticMethod", methodStr.CreateDelegate<Func<object, object>>(null)("Test"));
+			Assert.AreEqual("Test_StaticMethod", methodStr.CreateDelegate<Func<string>>("Test")());
+			Assert.AreEqual("Test_StaticMethod", methodStr.CreateDelegate<Func<object>>("Test")());
+			Assert.AreEqual("_StaticMethod", methodStr.CreateDelegate<Func<string>>(null)());
+			Assert.AreEqual("_StaticMethod", methodStr.CreateDelegate<Func<object>>(null)());
+			Assert.AreEqual(null, methodStr.CreateDelegate<Func<int, string>>(null, false));
+			Assert.AreEqual(null, methodStr.CreateDelegate<Func<string, int>>(null, false));
+			Assert.AreEqual(null, methodStr.CreateDelegate<Func<int>>(null, false));
+			// 整数参数
+			MethodBase methodInt = type.GetMethod("TestStaticMethod", new[] { typeof(int) });
+			Assert.AreEqual("10_StaticMethod", methodInt.CreateDelegate<Func<int, string>>(null)(10));
+			Assert.AreEqual("10_StaticMethod", methodInt.CreateDelegate<Func<string>>(10)());
+			Assert.AreEqual(null, methodInt.CreateDelegate<Func<string, string>>(null, false));
+			Assert.AreEqual("10_StaticMethod", methodInt.CreateDelegate<Func<long, string>>(null)(10));
+			Assert.AreEqual("10_StaticMethod", methodInt.CreateDelegate<Func<short, string>>(null)(10));
+			Assert.AreEqual("10_StaticMethod", methodInt.CreateDelegate<Func<object, string>>(null)(10));
+			Assert.AreEqual("10_StaticMethod", methodInt.CreateDelegate<Func<object, object>>(null)(10));
+			// 可选参数
+			MethodBase methodOptional = type.GetMethod("TestStaticMethodOptional");
+			Assert.AreEqual("Test_10_StaticMethod", methodOptional.CreateDelegate<Func<string, int, string>>(null)("Test", 10));
+			Assert.AreEqual("Test_0_StaticMethod", methodOptional.CreateDelegate<Func<string, string>>(null)("Test"));
+			Assert.AreEqual("defaultKey_0_StaticMethod", methodOptional.CreateDelegate<Func<string>>(null)());
+			Assert.AreEqual("Test_10_StaticMethod", methodOptional.CreateDelegate<Func<int, string>>("Test")(10));
+			Assert.AreEqual("Test_0_StaticMethod", methodOptional.CreateDelegate<Func<string>>("Test")());
+			// 可变参数
+			method = type.GetMethod("TestStaticMethodVarargs", Type.EmptyTypes);
+			Assert.AreEqual("StaticMethod", method.CreateDelegate<Func<string>>(null)());
+			Assert.AreEqual("Test_StaticMethod", method.CreateDelegate<Func<string, string>>(null)("Test"));
+			Assert.AreEqual("Test_Test2_StaticMethod", method.CreateDelegate<Func<string, string, string>>
+				(null)("Test", "Test2"));
+			methodStr = type.GetMethod("TestStaticMethodVarargs", new[] { typeof(string) });
+			Assert.AreEqual("Test_StaticMethod", methodStr.CreateDelegate<Func<string, string>>(null)("Test"));
+			Assert.AreEqual("Test2_Test_StaticMethod", methodStr.CreateDelegate<Func<string, string, string>>
+				(null)("Test", "Test2"));
+			Assert.AreEqual("Test2_Test3_Test_StaticMethod", methodStr.CreateDelegate<Func<string, string, string, string>>
+				(null)("Test", "Test2", "Test3"));
+			Assert.AreEqual("Test_StaticMethod", method.CreateDelegate<Func<string>>("Test")());
+			Assert.AreEqual("Test_Test2_StaticMethod", method.CreateDelegate<Func<string, string>>("Test")("Test2"));
+			Assert.AreEqual("Test_StaticMethod", methodStr.CreateDelegate<Func<string>>("Test")());
+			Assert.AreEqual("Test2_Test_StaticMethod", methodStr.CreateDelegate<Func<string, string>>("Test")("Test2"));
+			Assert.AreEqual("Test2_Test3_Test_StaticMethod", methodStr.CreateDelegate<Func<string, string, string>>("Test")
+				("Test2", "Test3"));
+			// 泛型方法
+			MethodBase methodGeneric = type.GetMethod("TestStaticMethodGeneric");
+			Assert.AreEqual("<System.String>Test_StaticMethod", methodGeneric.CreateDelegate<Func<string, string>>(null)("Test"));
+			Assert.AreEqual("<System.Int32>10_StaticMethod", methodGeneric.CreateDelegate<Func<int, string>>(null)(10));
+			Assert.AreEqual(null, methodGeneric.CreateDelegate<Func<string, int>>(null, false));
+			Assert.AreEqual("<System.String>Test_StaticMethod", methodGeneric.CreateDelegate<Func<string>>("Test")());
+			Assert.AreEqual("<System.Int32>10_StaticMethod", methodGeneric.CreateDelegate<Func<string>>(10)());
+			// 引用参数
+			MethodBase methodRef = type.GetMethod("TestStaticMethodRef");
+			Assert.AreEqual("A_B_StaticMethod", methodRef.CreateDelegate<Func<string, string, int, string>>(null)("A", "B", 0));
+			string value = "B";
+			int value2;
+			Assert.AreEqual("A_B_StaticMethod", methodRef.CreateDelegate<TestDelegate>(null)("A", ref value, out value2));
+			Assert.AreEqual("StaticMethodRef", value);
+			Assert.AreEqual(101, value2);
+			Assert.AreEqual("A_B_StaticMethod", methodRef.CreateDelegate<Func<string, int, string>>("A")("B", 0));
+			value = "B";
+			Assert.AreEqual("A_B_StaticMethod", methodRef.CreateDelegate<TestDelegateWithoutKey>("A")(ref value, out value2));
+			Assert.AreEqual("StaticMethodRef", value);
+			Assert.AreEqual(101, value2);
+
+			// 实例方法
+			TestClass instance = new TestClass { Text = "Instance" };
+			// 无参数
+			method = type.GetMethod("TestInstanceMethod", Type.EmptyTypes);
+			Assert.AreEqual("Instance_InstanceMethod", method.CreateDelegate<Func<TestClass, string>>(null)(instance));
+			Assert.AreEqual("Instance_InstanceMethod", method.CreateDelegate<Func<object, object>>(null)(instance));
+			Assert.AreEqual(null, method.CreateDelegate<Func<TestClass, string, string>>(null, false));
+			Assert.AreEqual(null, method.CreateDelegate<Func<TestClass, int>>(null, false));
+			Assert.AreEqual("Instance_InstanceMethod", method.CreateDelegate<Func<string>>(instance)());
+			// 字符串参数
+			methodStr = type.GetMethod("TestInstanceMethod", new[] { typeof(string) });
+			Assert.AreEqual("Test_Instance_InstanceMethod", methodStr.CreateDelegate<Func<TestClass, string, string>>(null)(
+				instance, "Test"));
+			Assert.AreEqual(null, methodStr.CreateDelegate<Func<TestClass, int, string>>(null, false));
+			Assert.AreEqual(null, methodStr.CreateDelegate<Func<TestClass, string, int>>(null, false));
+			Assert.AreEqual("Test_Instance_InstanceMethod", methodStr.CreateDelegate<Func<TestClass, object, string>>(null)(
+				instance, "Test"));
+			Assert.AreEqual("Test_Instance_InstanceMethod", methodStr.CreateDelegate<Func<TestClass, object, object>>(null)(
+				instance, "Test"));
+			Assert.AreEqual("Test_Instance_InstanceMethod", methodStr.CreateDelegate<Func<object, object, object>>(null)(
+				instance, "Test"));
+			Assert.AreEqual("Test_Instance_InstanceMethod", methodStr.CreateDelegate<Func<string, string>>(instance)(
+				"Test"));
+			Assert.AreEqual("Test_Instance_InstanceMethod", methodStr.CreateDelegate<Func<object, string>>(instance)(
+				"Test"));
+			Assert.AreEqual("Test_Instance_InstanceMethod", methodStr.CreateDelegate<Func<object, object>>(instance)(
+				"Test"));
+			// 整数参数
+			methodInt = type.GetMethod("TestInstanceMethod", new[] { typeof(int) });
+			Assert.AreEqual("10_Instance_InstanceMethod", methodInt.CreateDelegate<Func<TestClass, int, string>>(null)(
+				instance, 10));
+			Assert.AreEqual(null, methodInt.CreateDelegate<Func<TestClass, string, string>>(null, false));
+			Assert.AreEqual("10_Instance_InstanceMethod", methodInt.CreateDelegate<Func<TestClass, long, string>>(null)(
+				instance, 10));
+			Assert.AreEqual("10_Instance_InstanceMethod", methodInt.CreateDelegate<Func<TestClass, short, string>>(null)(
+				instance, 10));
+			Assert.AreEqual("10_Instance_InstanceMethod", methodInt.CreateDelegate<Func<TestClass, object, string>>(null)(
+				instance, 10));
+			Assert.AreEqual("10_Instance_InstanceMethod", methodInt.CreateDelegate<Func<TestClass, object, object>>(null)(
+				instance, 10));
+			Assert.AreEqual("10_Instance_InstanceMethod", methodInt.CreateDelegate<Func<int, string>>(instance)(10));
+			Assert.AreEqual(null, methodInt.CreateDelegate<Func<string, string>>(instance, false));
+			Assert.AreEqual("10_Instance_InstanceMethod", methodInt.CreateDelegate<Func<long, string>>(instance)(10));
+			Assert.AreEqual("10_Instance_InstanceMethod", methodInt.CreateDelegate<Func<short, string>>(instance)(10));
+			Assert.AreEqual("10_Instance_InstanceMethod", methodInt.CreateDelegate<Func<object, string>>(instance)(10));
+			Assert.AreEqual("10_Instance_InstanceMethod", methodInt.CreateDelegate<Func<object, object>>(instance)(10));
+			// 可选参数
+			methodOptional = type.GetMethod("TestInstanceMethodOptional");
+			Assert.AreEqual("Test_10_Instance_InstanceMethod",
+				methodOptional.CreateDelegate<Func<TestClass, string, int, string>>(null)(instance, "Test", 10));
+			Assert.AreEqual("Test_0_Instance_InstanceMethod",
+				methodOptional.CreateDelegate<Func<TestClass, string, string>>(null)(instance, "Test"));
+			Assert.AreEqual("defaultKey_0_Instance_InstanceMethod",
+				methodOptional.CreateDelegate<Func<TestClass, string>>(null)(instance));
+			Assert.AreEqual("Test_10_Instance_InstanceMethod",
+				methodOptional.CreateDelegate<Func<string, int, string>>(instance)("Test", 10));
+			Assert.AreEqual("Test_0_Instance_InstanceMethod",
+				methodOptional.CreateDelegate<Func<string, string>>(instance)("Test"));
+			Assert.AreEqual("defaultKey_0_Instance_InstanceMethod",
+				methodOptional.CreateDelegate<Func<string>>(instance)());
+			// 可变参数
+			method = type.GetMethod("TestInstanceMethodVarargs", Type.EmptyTypes);
+			Assert.AreEqual("Instance_InstanceMethod", method.CreateDelegate<Func<TestClass, string>>(null)(instance));
+			Assert.AreEqual("Test_Instance_InstanceMethod", method.CreateDelegate<Func<TestClass, string, string>>(null)(
+				instance, "Test"));
+			Assert.AreEqual("Test_Test2_Instance_InstanceMethod",
+				method.CreateDelegate<Func<TestClass, string, string, string>>(null)(instance, "Test", "Test2"));
+			methodStr = type.GetMethod("TestInstanceMethodVarargs", new[] { typeof(string) });
+			Assert.AreEqual("Test_Instance_InstanceMethod",
+				methodStr.CreateDelegate<Func<TestClass, string, string>>(null)(instance, "Test"));
+			Assert.AreEqual("Test2_Test_Instance_InstanceMethod",
+				methodStr.CreateDelegate<Func<TestClass, string, string, string>>(null)(instance, "Test", "Test2"));
+			Assert.AreEqual("Test2_Test3_Test_Instance_InstanceMethod",
+				methodStr.CreateDelegate<Func<TestClass, string, string, string, string>>(null)(
+				instance, "Test", "Test2", "Test3"));
+			Assert.AreEqual("Instance_InstanceMethod", method.CreateDelegate<Func<string>>(instance)());
+			Assert.AreEqual("Test_Instance_InstanceMethod", method.CreateDelegate<Func<string, string>>(instance)(
+				"Test"));
+			Assert.AreEqual("Test_Test2_Instance_InstanceMethod",
+				method.CreateDelegate<Func<string, string, string>>(instance)("Test", "Test2"));
+			methodStr = type.GetMethod("TestInstanceMethodVarargs", new[] { typeof(string) });
+			Assert.AreEqual("Test_Instance_InstanceMethod",
+				methodStr.CreateDelegate<Func<TestClass, string, string>>(null)(instance, "Test"));
+			Assert.AreEqual("Test2_Test_Instance_InstanceMethod",
+				methodStr.CreateDelegate<Func<TestClass, string, string, string>>(null)(instance, "Test", "Test2"));
+			Assert.AreEqual("Test2_Test3_Test_Instance_InstanceMethod",
+				methodStr.CreateDelegate<Func<TestClass, string, string, string, string>>(null)(
+				instance, "Test", "Test2", "Test3"));
+			Assert.AreEqual("Test_Instance_InstanceMethod", methodStr.CreateDelegate<Func<string, string>>(instance)(
+				"Test"));
+			Assert.AreEqual("Test2_Test_Instance_InstanceMethod",
+				methodStr.CreateDelegate<Func<string, string, string>>(instance)("Test", "Test2"));
+			Assert.AreEqual("Test2_Test3_Test_Instance_InstanceMethod",
+				methodStr.CreateDelegate<Func<string, string, string, string>>(instance)("Test", "Test2", "Test3"));
+			// 泛型方法
+			methodGeneric = type.GetMethod("TestInstanceMethodGeneric");
+			Assert.AreEqual("<System.String>Test_Instance_InstanceMethod",
+				methodGeneric.CreateDelegate<Func<TestClass, string, string>>(null)(instance, "Test"));
+			Assert.AreEqual("<System.Int32>10_Instance_InstanceMethod",
+				methodGeneric.CreateDelegate<Func<TestClass, int, string>>(null)(instance, 10));
+			Assert.AreEqual(null, methodGeneric.CreateDelegate<Func<TestClass, string, int>>(null, false));
+			Assert.AreEqual("<System.String>Test_Instance_InstanceMethod",
+				methodGeneric.CreateDelegate<Func<string, string>>(instance)("Test"));
+			Assert.AreEqual("<System.Int32>10_Instance_InstanceMethod",
+				methodGeneric.CreateDelegate<Func<int, string>>(instance)(10));
+			Assert.AreEqual(null, methodGeneric.CreateDelegate<Func<string, int>>(instance, false));
+			// 引用参数
+			methodRef = type.GetMethod("TestInstanceMethodRef");
+			Assert.AreEqual("A_B_InstanceMethod",
+				methodRef.CreateDelegate<Func<TestClass, string, string, int, string>>(null)(instance, "A", "B", 0));
+			Assert.AreEqual("B", instance.Text);
+			value = "X";
+			Assert.AreEqual("A_X_InstanceMethod", methodRef.CreateDelegate<TestInstanceDelegate>(null)(
+				instance, "A", ref value, out value2));
+			Assert.AreEqual("X", instance.Text);
+			Assert.AreEqual("InstanceMethodRef", value);
+			Assert.AreEqual(101, value2);
+			Assert.AreEqual("A_B_InstanceMethod",
+				methodRef.CreateDelegate<Func<string, string, int, string>>(instance)("A", "B", 0));
+			Assert.AreEqual("B", instance.Text);
+			value = "X";
+			Assert.AreEqual("A_X_InstanceMethod", methodRef.CreateDelegate<TestDelegate>(instance)(
+				"A", ref value, out value2));
+			Assert.AreEqual("X", instance.Text);
+			Assert.AreEqual("InstanceMethodRef", value);
+			Assert.AreEqual(101, value2);
+
+			// ToString
+			Assert.AreEqual("10", typeof(object).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<object, string>>(
+				null)(10));
+			Assert.AreEqual("10", typeof(object).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<object, string>>(
+				null)("10"));
+			Assert.AreEqual("10", typeof(string).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<string, string>>(
+				null)("10"));
+			Assert.AreEqual("10", typeof(string).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<object, string>>(
+				null)("10"));
+			Assert.AreEqual("10", typeof(int).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<int, string>>(
+				null)(10));
+			Assert.AreEqual("10", typeof(int).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<long, string>>(
+				null)(10));
+			Assert.AreEqual("10", typeof(int).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<short, string>>(
+				null)(10));
+			Assert.AreEqual("10", typeof(int).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<object, string>>(
+				null)(10));
+			Assert.AreEqual("10", typeof(object).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<string>>(10)());
+			Assert.AreEqual("10", typeof(object).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<string>>("10")());
+			Assert.AreEqual("UnitTestCyjb.UnitTestDelegateBuilder+TestStruct",
+				typeof(object).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<string>>(new TestStruct())());
+			Assert.AreEqual("10", typeof(string).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<string>>("10")());
+			Assert.AreEqual("10", typeof(int).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<string>>(10)());
+			Assert.AreEqual("10", typeof(int).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<string>>(10L)());
+			Assert.AreEqual("10", typeof(int).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<string>>((short)10)());
+			Assert.AreEqual("UnitTestCyjb.UnitTestDelegateBuilder+TestStruct",
+				typeof(TestStruct).GetMethod("ToString", Type.EmptyTypes).CreateDelegate<Func<string>>(new TestStruct())());
+		}
+		/// <summary>
+		/// 测试构造封闭构造函数委托。
+		/// </summary>
+		[TestMethod]
+		public void TestClosedConstructorDelegate()
+		{
+			Type type = typeof(TestClass);
+
+			// 无参数
+			MethodBase method = type.GetConstructor(Type.EmptyTypes);
+			Assert.AreEqual("NoParam", method.CreateDelegate<Func<TestClass>>(null)().Text);
+			Assert.AreEqual("NoParam", ((TestClass)method.CreateDelegate<Func<object>>(null)()).Text);
+			Assert.AreEqual(null, method.CreateDelegate<Func<string, object>>(null, false));
+			Assert.AreEqual(null, method.CreateDelegate<Func<int>>(null, false));
+			// 字符串参数
+			MethodBase methodStr = type.GetConstructor(new[] { typeof(string) });
+			Assert.AreEqual("Test", methodStr.CreateDelegate<Func<string, TestClass>>(null)("Test").Text);
+			Assert.AreEqual("Test", methodStr.CreateDelegate<Func<object, TestClass>>(null)("Test").Text);
+			Assert.AreEqual(null, methodStr.CreateDelegate<Func<string, string>>(null, false));
+			Assert.AreEqual("Test", methodStr.CreateDelegate<Func<TestClass>>("Test")().Text);
+			// 整数
+			MethodBase methodInt = type.GetConstructor(new[] { typeof(int) });
+			Assert.AreEqual("10", methodInt.CreateDelegate<Func<int, TestClass>>(null)(10).Text);
+			Assert.AreEqual("10", methodInt.CreateDelegate<Func<ulong, TestClass>>(null)(10UL).Text);
+			Assert.AreEqual("10", methodInt.CreateDelegate<Func<short, TestClass>>(null)(10).Text);
+			Assert.AreEqual(null, methodInt.CreateDelegate<Func<string, TestClass>>(null, false));
+			Assert.AreEqual("10", methodInt.CreateDelegate<Func<TestClass>>(10)().Text);
+			Assert.AreEqual("10", methodInt.CreateDelegate<Func<TestClass>>(10UL)().Text);
+			Assert.AreEqual("10", methodInt.CreateDelegate<Func<TestClass>>((short)10)().Text);
 		}
 
+		#endregion // 测试封闭方法委托
 
 		/// <summary>
 		/// 测试通过 PropertyInfo 构造方法委托。
@@ -656,8 +795,9 @@ namespace UnitTestCyjb
 		}
 
 		private delegate string TestDelegate(string key, ref string value, out int value2);
+		private delegate string TestDelegateWithoutKey(ref string value, out int value2);
 		private delegate string TestInstanceDelegate(TestClass instance, string key, ref string value, out int value2);
-		private class TestStruct { }
+		private struct TestStruct { }
 		private class TestClass
 		{
 

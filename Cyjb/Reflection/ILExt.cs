@@ -947,11 +947,9 @@ namespace Cyjb.Reflection
 				throw CommonExceptions.ArgumentNull("valueType");
 			}
 			Contract.EndContractBlock();
-			ILManager manager = il.GetManager();
-			LocalBuilder locFrom = manager.GetLocal(valueType);
+			LocalBuilder locFrom = il.DeclareLocal(valueType);
 			il.Emit(OpCodes.Stloc, locFrom);
 			il.Emit(OpCodes.Ldloca, locFrom);
-			manager.FreeLocal(locFrom);
 		}
 		/// <summary>
 		/// 使用指定类型的无参数构造函数创建实例。
