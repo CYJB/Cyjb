@@ -107,10 +107,7 @@ namespace Cyjb.Collections.ObjectModel
 		[Pure]
 		public virtual bool IsProperSubsetOf(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			return this.items.IsProperSubsetOf(other);
 		}
@@ -125,10 +122,7 @@ namespace Cyjb.Collections.ObjectModel
 		[Pure]
 		public virtual bool IsProperSupersetOf(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			return this.items.IsProperSubsetOf(other);
 		}
@@ -143,10 +137,7 @@ namespace Cyjb.Collections.ObjectModel
 		[Pure]
 		public virtual bool IsSubsetOf(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			return this.items.IsSubsetOf(other);
 		}
@@ -161,10 +152,7 @@ namespace Cyjb.Collections.ObjectModel
 		[Pure]
 		public virtual bool IsSupersetOf(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			return this.items.IsSupersetOf(other);
 		}
@@ -179,10 +167,7 @@ namespace Cyjb.Collections.ObjectModel
 		[Pure]
 		public virtual bool Overlaps(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			return this.items.Overlaps(other);
 		}
@@ -197,10 +182,7 @@ namespace Cyjb.Collections.ObjectModel
 		[Pure]
 		public virtual bool SetEquals(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			return this.items.SetEquals(other);
 		}
@@ -440,10 +422,7 @@ namespace Cyjb.Collections.ObjectModel
 			[Pure]
 			public override bool IsProperSubsetOf(IEnumerable<T> other)
 			{
-				if (other == null)
-				{
-					throw CommonExceptions.ArgumentNull("other");
-				}
+				CommonExceptions.CheckArgumentNull(other, "other");
 				Contract.EndContractBlock();
 				return other.Any();
 			}
@@ -458,10 +437,7 @@ namespace Cyjb.Collections.ObjectModel
 			[Pure]
 			public override bool IsProperSupersetOf(IEnumerable<T> other)
 			{
-				if (other == null)
-				{
-					throw CommonExceptions.ArgumentNull("other");
-				}
+				CommonExceptions.CheckArgumentNull(other, "other");
 				Contract.EndContractBlock();
 				return false;
 			}
@@ -476,10 +452,7 @@ namespace Cyjb.Collections.ObjectModel
 			[Pure]
 			public override bool IsSubsetOf(IEnumerable<T> other)
 			{
-				if (other == null)
-				{
-					throw CommonExceptions.ArgumentNull("other");
-				}
+				CommonExceptions.CheckArgumentNull(other, "other");
 				Contract.EndContractBlock();
 				return true;
 			}
@@ -494,10 +467,7 @@ namespace Cyjb.Collections.ObjectModel
 			[Pure]
 			public override bool IsSupersetOf(IEnumerable<T> other)
 			{
-				if (other == null)
-				{
-					throw CommonExceptions.ArgumentNull("other");
-				}
+				CommonExceptions.CheckArgumentNull(other, "other");
 				Contract.EndContractBlock();
 				return !other.Any();
 			}
@@ -512,10 +482,7 @@ namespace Cyjb.Collections.ObjectModel
 			[Pure]
 			public override bool Overlaps(IEnumerable<T> other)
 			{
-				if (other == null)
-				{
-					throw CommonExceptions.ArgumentNull("other");
-				}
+				CommonExceptions.CheckArgumentNull(other, "other");
 				Contract.EndContractBlock();
 				return false;
 			}
@@ -530,10 +497,7 @@ namespace Cyjb.Collections.ObjectModel
 			[Pure]
 			public override bool SetEquals(IEnumerable<T> other)
 			{
-				if (other == null)
-				{
-					throw CommonExceptions.ArgumentNull("other");
-				}
+				CommonExceptions.CheckArgumentNull(other, "other");
 				Contract.EndContractBlock();
 				return !other.Any();
 			}

@@ -53,10 +53,7 @@ namespace Cyjb
 		/// <exception cref="IndexOutOfRangeException"><paramref name="index"/> 大于等于字符串的长度或小于零。</exception>
 		public static bool IsHex(string str, int index)
 		{
-			if (str == null)
-			{
-				throw CommonExceptions.ArgumentNull("str");
-			}
+			CommonExceptions.CheckArgumentNull(str, "str");
 			if (index < 0 || index >= str.Length)
 			{
 				throw CommonExceptions.ArgumentOutOfRange("index", index);
@@ -182,10 +179,7 @@ namespace Cyjb
 		/// <seealso href="http://www.unicode.org/reports/tr11/">Unicode Standard Annex #11 EAST ASIAN WIDTH</seealso>。
 		public static int Width(string str, int index)
 		{
-			if (str == null)
-			{
-				throw CommonExceptions.ArgumentNull("str");
-			}
+			CommonExceptions.CheckArgumentNull(str, "str");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);

@@ -190,10 +190,7 @@ namespace Cyjb.IO
 		/// <exception cref="ArgumentNullException"><paramref name="chars"/> 为 <c>null</c>。</exception>
 		public void Forward(char[] chars)
 		{
-			if (chars == null)
-			{
-				throw CommonExceptions.ArgumentNull("chars");
-			}
+			CommonExceptions.CheckArgumentNull(chars, "chars");
 			Contract.EndContractBlock();
 			if (chars.Length == 1)
 			{
@@ -217,10 +214,7 @@ namespace Cyjb.IO
 		/// 不表示 <paramref name="chars"/> 中的有效范围。</exception>
 		public void Forward(char[] chars, int index, int count)
 		{
-			if (chars == null)
-			{
-				throw CommonExceptions.ArgumentNull("chars");
-			}
+			CommonExceptions.CheckArgumentNull(chars, "chars");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);
@@ -250,10 +244,7 @@ namespace Cyjb.IO
 		/// <exception cref="ArgumentNullException"><paramref name="str"/> 为 <c>null</c>。</exception>
 		public void Forward(string str)
 		{
-			if (str == null)
-			{
-				throw CommonExceptions.ArgumentNull("str");
-			}
+			CommonExceptions.CheckArgumentNull(str, "str");
 			Contract.EndContractBlock();
 			if (str.Length == 1)
 			{
@@ -277,10 +268,7 @@ namespace Cyjb.IO
 		/// 不表示 <paramref name="str"/> 中的有效范围。</exception>
 		public void Forward(string str, int index, int count)
 		{
-			if (str == null)
-			{
-				throw CommonExceptions.ArgumentNull("str");
-			}
+			CommonExceptions.CheckArgumentNull(str, "str");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);

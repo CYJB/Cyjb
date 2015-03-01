@@ -34,16 +34,10 @@ namespace Cyjb
 		public static TDelegate CreateDelegate<TDelegate>(this MethodBase method)
 			where TDelegate : class
 		{
-			if (method == null)
-			{
-				throw CommonExceptions.ArgumentNull("method");
-			}
+			CommonExceptions.CheckArgumentNull(method, "method");
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
 			Type type = typeof(TDelegate);
-			if (!type.IsSubclassOf(typeof(Delegate)))
-			{
-				throw CommonExceptions.MustBeDelegate("TDelegate", typeof(TDelegate));
-			}
+			CommonExceptions.CheckDelegateType(type);
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
@@ -73,16 +67,10 @@ namespace Cyjb
 		public static TDelegate CreateDelegate<TDelegate>(this MethodBase method, bool throwOnBindFailure)
 			where TDelegate : class
 		{
-			if (method == null)
-			{
-				throw CommonExceptions.ArgumentNull("method");
-			}
+			CommonExceptions.CheckArgumentNull(method, "method");
 			Contract.EndContractBlock();
 			Type type = typeof(TDelegate);
-			if (!type.IsSubclassOf(typeof(Delegate)))
-			{
-				throw CommonExceptions.MustBeDelegate("TDelegate", typeof(TDelegate));
-			}
+			CommonExceptions.CheckDelegateType(type);
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
@@ -109,19 +97,10 @@ namespace Cyjb
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
 		public static Delegate CreateDelegate(Type type, MethodBase method)
 		{
-			if (type == null)
-			{
-				throw CommonExceptions.ArgumentNull("type");
-			}
-			if (method == null)
-			{
-				throw CommonExceptions.ArgumentNull("method");
-			}
+			CommonExceptions.CheckArgumentNull(type, "type");
+			CommonExceptions.CheckArgumentNull(method, "method");
 			Contract.Ensures(Contract.Result<Delegate>() != null);
-			if (!type.IsSubclassOf(typeof(Delegate)))
-			{
-				throw CommonExceptions.MustBeDelegate("type", type);
-			}
+			CommonExceptions.CheckDelegateType(type, "type");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
@@ -151,19 +130,10 @@ namespace Cyjb
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
 		public static Delegate CreateDelegate(Type type, MethodBase method, bool throwOnBindFailure)
 		{
-			if (type == null)
-			{
-				throw CommonExceptions.ArgumentNull("type");
-			}
-			if (method == null)
-			{
-				throw CommonExceptions.ArgumentNull("method");
-			}
+			CommonExceptions.CheckArgumentNull(type, "type");
+			CommonExceptions.CheckArgumentNull(method, "method");
 			Contract.EndContractBlock();
-			if (!type.IsSubclassOf(typeof(Delegate)))
-			{
-				throw CommonExceptions.MustBeDelegate("type", type);
-			}
+			CommonExceptions.CheckDelegateType(type, "type");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
@@ -479,16 +449,10 @@ namespace Cyjb
 		public static TDelegate CreateDelegate<TDelegate>(this MethodBase method, object firstArgument)
 			where TDelegate : class
 		{
-			if (method == null)
-			{
-				throw CommonExceptions.ArgumentNull("method");
-			}
+			CommonExceptions.CheckArgumentNull(method, "method");
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
 			Type type = typeof(TDelegate);
-			if (!type.IsSubclassOf(typeof(Delegate)))
-			{
-				throw CommonExceptions.MustBeDelegate("type", type);
-			}
+			CommonExceptions.CheckDelegateType(type);
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
@@ -520,16 +484,10 @@ namespace Cyjb
 			bool throwOnBindFailure)
 			where TDelegate : class
 		{
-			if (method == null)
-			{
-				throw CommonExceptions.ArgumentNull("method");
-			}
+			CommonExceptions.CheckArgumentNull(method, "method");
 			Contract.EndContractBlock();
 			Type type = typeof(TDelegate);
-			if (!type.IsSubclassOf(typeof(Delegate)))
-			{
-				throw CommonExceptions.MustBeDelegate("type", type);
-			}
+			CommonExceptions.CheckDelegateType(type);
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
@@ -558,19 +516,10 @@ namespace Cyjb
 		/// <seealso cref="Delegate.CreateDelegate(Type, object, MethodInfo)"/>
 		public static Delegate CreateDelegate(Type type, MethodBase method, object firstArgument)
 		{
-			if (type == null)
-			{
-				throw CommonExceptions.ArgumentNull("type");
-			}
-			if (method == null)
-			{
-				throw CommonExceptions.ArgumentNull("method");
-			}
+			CommonExceptions.CheckArgumentNull(type, "type");
+			CommonExceptions.CheckArgumentNull(method, "method");
 			Contract.Ensures(Contract.Result<Delegate>() != null);
-			if (!type.IsSubclassOf(typeof(Delegate)))
-			{
-				throw CommonExceptions.MustBeDelegate("type", type);
-			}
+			CommonExceptions.CheckDelegateType(type, "type");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
@@ -602,19 +551,10 @@ namespace Cyjb
 		/// <seealso cref="Delegate.CreateDelegate(Type, object, MethodInfo, bool)"/>
 		public static Delegate CreateDelegate(Type type, MethodBase method, object firstArgument, bool throwOnBindFailure)
 		{
-			if (type == null)
-			{
-				throw CommonExceptions.ArgumentNull("type");
-			}
-			if (method == null)
-			{
-				throw CommonExceptions.ArgumentNull("method");
-			}
+			CommonExceptions.CheckArgumentNull(type, "type");
+			CommonExceptions.CheckArgumentNull(method, "method");
 			Contract.EndContractBlock();
-			if (!type.IsSubclassOf(typeof(Delegate)))
-			{
-				throw CommonExceptions.MustBeDelegate("type", type);
-			}
+			CommonExceptions.CheckDelegateType(type, "type");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
@@ -627,13 +567,13 @@ namespace Cyjb
 			return dlg;
 		}
 		/// <summary>
-		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示指定静态或实例方法的指定类型的方法委托。
+		/// 创建指定的静态或实例方法的指定类型的封闭方法委托。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。方法不能是包含泛型参数的非泛型定义。
 		/// </summary>
 		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="method">要调用的方法。</param>
-		/// <param name="firstArgument">委托要绑定到的对象，或为 <c>null</c>，后者表示将 
-		/// <paramref name="method"/> 视为 <c>static</c>。</param>
+		/// <param name="firstArgument">如果是实例方法（非构造函数），则作为委托要绑定到的对象；
+		/// 否则将作为方法的第一个参数。</param>
 		/// <returns><paramref name="type"/> 类型的委托，表示静态或实例方法的委托。</returns>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
 		private static Delegate CreateClosedDelegate(Type type, MethodBase method, object firstArgument)

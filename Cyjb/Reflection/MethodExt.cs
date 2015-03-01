@@ -151,7 +151,7 @@ namespace Cyjb.Reflection
 		/// <returns>一个 <see cref="MethodInfo"/> 对象，表示通过将当前泛型方法定义的类型参数替换为根据 
 		/// <paramref name="types"/> 推断得到的元素生成的封闭构造方法。</returns>
 		/// <exception cref="InvalidOperationException">当前 <see cref="MethodInfo"/> 不表示泛型方法定义。
-		/// 也就是说，<see cref="MethodInfo.IsGenericMethodDefinition "/> 返回 <c>false</c>。</exception>
+		/// 也就是说，<see cref="MethodBase.IsGenericMethodDefinition "/> 返回 <c>false</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="types"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException">不能从 <paramref name="types"/> 推断得到类型参数。</exception>
@@ -159,14 +159,8 @@ namespace Cyjb.Reflection
 		/// 推断出来的类型参数中的某个元素不满足为当前泛型方法定义的相应类型参数指定的约束。</exception>
 		public static MethodInfo MakeGenericMethodFromParamTypes(this MethodInfo method, params Type[] types)
 		{
-			if (method == null)
-			{
-				throw CommonExceptions.ArgumentNull("method");
-			}
-			if (types == null)
-			{
-				throw CommonExceptions.ArgumentNull("types");
-			}
+			CommonExceptions.CheckArgumentNull(method, "method");
+			CommonExceptions.CheckArgumentNull(types, "types");
 			Contract.EndContractBlock();
 			if (!method.IsGenericMethodDefinition)
 			{
@@ -189,7 +183,7 @@ namespace Cyjb.Reflection
 		/// <returns>一个 <see cref="MethodInfo"/> 对象，表示通过将当前泛型方法定义的类型参数替换为根据 
 		/// <paramref name="types"/> 推断得到的元素生成的封闭构造方法。</returns>
 		/// <exception cref="InvalidOperationException">当前 <see cref="MethodInfo"/> 不表示泛型方法定义。
-		/// 也就是说，<see cref="MethodInfo.IsGenericMethodDefinition "/> 返回 <c>false</c>。</exception>
+		/// 也就是说，<see cref="MethodBase.IsGenericMethodDefinition "/> 返回 <c>false</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="types"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException">不能从 <paramref name="types"/> 推断得到类型参数。</exception>
@@ -198,14 +192,8 @@ namespace Cyjb.Reflection
 		public static MethodInfo MakeGenericMethodFromParamTypes(this MethodInfo method, Type[] types,
 			MethodArgumentsOption options)
 		{
-			if (method == null)
-			{
-				throw CommonExceptions.ArgumentNull("method");
-			}
-			if (types == null)
-			{
-				throw CommonExceptions.ArgumentNull("types");
-			}
+			CommonExceptions.CheckArgumentNull(method, "method");
+			CommonExceptions.CheckArgumentNull(types, "types");
 			Contract.EndContractBlock();
 			if (!method.IsGenericMethodDefinition)
 			{
@@ -227,17 +215,11 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="types"/> 为 <c>null</c>。</exception>
 		/// <exception cref="InvalidOperationException">当前 <see cref="MethodInfo"/> 不表示泛型方法定义。
-		/// 也就是说，<see cref="MethodInfo.IsGenericMethodDefinition "/> 返回 <c>false</c>。</exception>
+		/// 也就是说，<see cref="MethodBase.IsGenericMethodDefinition "/> 返回 <c>false</c>。</exception>
 		public static Type[] GenericArgumentsInferences(this MethodBase method, params Type[] types)
 		{
-			if (method == null)
-			{
-				throw CommonExceptions.ArgumentNull("method");
-			}
-			if (types == null)
-			{
-				throw CommonExceptions.ArgumentNull("types");
-			}
+			CommonExceptions.CheckArgumentNull(method, "method");
+			CommonExceptions.CheckArgumentNull(types, "types");
 			Contract.EndContractBlock();
 			if (!method.IsGenericMethodDefinition)
 			{
@@ -256,18 +238,12 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="types"/> 为 <c>null</c>。</exception>
 		/// <exception cref="InvalidOperationException">当前 <see cref="MethodInfo"/> 不表示泛型方法定义。
-		/// 也就是说，<see cref="MethodInfo.IsGenericMethodDefinition "/> 返回 <c>false</c>。</exception>
+		/// 也就是说，<see cref="MethodBase.IsGenericMethodDefinition "/> 返回 <c>false</c>。</exception>
 		public static Type[] GenericArgumentsInferences(this MethodBase method, Type[] types,
 			MethodArgumentsOption options)
 		{
-			if (method == null)
-			{
-				throw CommonExceptions.ArgumentNull("method");
-			}
-			if (types == null)
-			{
-				throw CommonExceptions.ArgumentNull("types");
-			}
+			CommonExceptions.CheckArgumentNull(method, "method");
+			CommonExceptions.CheckArgumentNull(types, "types");
 			Contract.EndContractBlock();
 			if (!method.IsGenericMethodDefinition)
 			{

@@ -9,6 +9,7 @@ using System.Security;
 using System.Security.Permissions;
 using System.Text;
 using Cyjb.Collections.ObjectModel;
+using JetBrains.Annotations;
 
 namespace Cyjb.IO
 {
@@ -123,10 +124,7 @@ namespace Cyjb.IO
 		private AggregateSourceException(string message, IList<SourceException> innerExceptions)
 			: base(message, innerExceptions != null && innerExceptions.Count > 0 ? innerExceptions[0] : null)
 		{
-			if (innerExceptions == null)
-			{
-				throw CommonExceptions.ArgumentNull("innerExceptions");
-			}
+			CommonExceptions.CheckArgumentNull(innerExceptions, "innerExceptions");
 			if (innerExceptions.Any(ex => ex == null))
 			{
 				throw CommonExceptions.CollectionItemNull("innerExceptions");
@@ -150,10 +148,7 @@ namespace Cyjb.IO
 		protected AggregateSourceException(SerializationInfo info, StreamingContext context)
 			: base(info, context)
 		{
-			if (info == null)
-			{
-				throw CommonExceptions.ArgumentNull("info");
-			}
+			CommonExceptions.CheckArgumentNull(info, "info");
 			Contract.EndContractBlock();
 			this.innerExps = (SourceException[])info.GetValue("InnerExceptions", typeof(SourceException[]));
 			innerExpsCollection = new ReadOnlyCollection<SourceException>(innerExps);
@@ -175,6 +170,7 @@ namespace Cyjb.IO
 		/// <value>内部异常的数量。</value>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		[UsedImplicitly]
 		private int InnerExceptionCount
 		{
 			get { return this.innerExps.Length; }
@@ -266,10 +262,7 @@ namespace Cyjb.IO
 		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			if (info == null)
-			{
-				throw CommonExceptions.ArgumentNull("info");
-			}
+			CommonExceptions.CheckArgumentNull(info, "info");
 			Contract.EndContractBlock();
 			base.GetObjectData(info, context);
 			info.AddValue("InnerExceptions", innerExps.Clone());

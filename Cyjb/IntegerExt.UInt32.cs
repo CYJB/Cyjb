@@ -31,10 +31,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static void Times(this uint source, Action action)
 		{
-			if (action == null)
-			{
-				throw CommonExceptions.ArgumentNull("action");
-			}
+			CommonExceptions.CheckArgumentNull(action, "action");
 			Contract.EndContractBlock();
 			for (uint i = 0; i < source; i++)
 			{
@@ -50,10 +47,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static void Times(this uint source, Action<uint> action)
 		{
-			if (action == null)
-			{
-				throw CommonExceptions.ArgumentNull("action");
-			}
+			CommonExceptions.CheckArgumentNull(action, "action");
 			Contract.EndContractBlock();
 			for (uint i = 0; i < source; i++)
 			{
@@ -87,10 +81,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static IEnumerable<T> Times<T>(this uint source, Func<T> value)
 		{
-			if (value == null)
-			{
-				throw CommonExceptions.ArgumentNull("value");
-			}
+			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 			for (uint i = 0; i < source; i++)
 			{
@@ -108,10 +99,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static IEnumerable<T> Times<T>(this uint source, Func<uint, T> value)
 		{
-			if (value == null)
-			{
-				throw CommonExceptions.ArgumentNull("value");
-			}
+			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 			for (uint i = 0; i < source; i++)
 			{
@@ -162,10 +150,7 @@ namespace Cyjb
 		[CLSCompliant(false)]
 		public static void To(this uint source, uint destination, Action<uint> action)
 		{
-			if (action == null)
-			{
-				throw CommonExceptions.ArgumentNull("action");
-			}
+			CommonExceptions.CheckArgumentNull(action, "action");
 			Contract.EndContractBlock();
 			if (source < destination)
 			{

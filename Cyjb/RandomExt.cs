@@ -295,10 +295,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="buffer"/> 为 <c>null</c>。</exception>
 		public static void NextBytes(byte[] buffer)
 		{
-			if (buffer == null)
-			{
-				throw CommonExceptions.ArgumentNull("buffer");
-			}
+			CommonExceptions.CheckArgumentNull(buffer, "buffer");
 			Contract.EndContractBlock();
 			Random.NextBytes(buffer);
 		}
@@ -370,10 +367,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentException"><paramref name="items"/> 为空数组。</exception>
 		public static T Choose<T>(params T[] items)
 		{
-			if (items == null)
-			{
-				throw CommonExceptions.ArgumentNull("items");
-			}
+			CommonExceptions.CheckArgumentNull(items, "items");
 			if (items.Length == 0)
 			{
 				throw CommonExceptions.CollectionEmpty("items");

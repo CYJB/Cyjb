@@ -41,19 +41,10 @@ namespace Cyjb
 		/// 因此，如果多个枚举成员具有相同的值，应用程序代码决不应依赖于返回特定成员名称的方法。</remarks>
 		public static string GetName<TValue>(Type enumType, TValue value)
 		{
-			if (enumType == null)
-			{
-				throw CommonExceptions.ArgumentNull("type");
-			}
-			if (!enumType.IsValueType)
-			{
-				throw CommonExceptions.MustBeEnum("type", enumType);
-			}
-			if (value == null)
-			{
-				throw CommonExceptions.ArgumentNull("value");
-			}
+			CommonExceptions.CheckArgumentNull(enumType, "enumType");
+			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.EndContractBlock();
+			CommonExceptions.CheckEnumType(enumType, "enumType");
 			ulong ulValue = ToUInt64(value);
 			EnumCache cache = GetEnumCache(enumType);
 			int idx = Array.BinarySearch(cache.Values, ulValue);
@@ -78,19 +69,10 @@ namespace Cyjb
 		/// 因此，如果多个枚举成员具有相同的值，应用程序代码决不应依赖于返回特定成员描述的方法。</remarks>
 		public static string GetDescription(Type enumType, object value)
 		{
-			if (enumType == null)
-			{
-				throw CommonExceptions.ArgumentNull("type");
-			}
-			if (!enumType.IsValueType)
-			{
-				throw CommonExceptions.MustBeEnum("type", enumType);
-			}
-			if (value == null)
-			{
-				throw CommonExceptions.ArgumentNull("value");
-			}
+			CommonExceptions.CheckArgumentNull(enumType, "enumType");
+			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.EndContractBlock();
+			CommonExceptions.CheckEnumType(enumType, "enumType");
 			ulong ulValue = ToUInt64(value);
 			EnumCache cache = GetEnumCache(enumType);
 			int idx = Array.BinarySearch(cache.Values, ulValue);
@@ -113,19 +95,10 @@ namespace Cyjb
 		/// 因此，如果多个枚举成员具有相同的值，应用程序代码决不应依赖于返回特定成员描述的方法。</remarks>
 		public static string GetDescription<TValue>(Type enumType, TValue value)
 		{
-			if (enumType == null)
-			{
-				throw CommonExceptions.ArgumentNull("type");
-			}
-			if (!enumType.IsValueType)
-			{
-				throw CommonExceptions.MustBeEnum("type", enumType);
-			}
-			if (value == null)
-			{
-				throw CommonExceptions.ArgumentNull("value");
-			}
+			CommonExceptions.CheckArgumentNull(enumType, "enumType");
+			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.EndContractBlock();
+			CommonExceptions.CheckEnumType(enumType, "enumType");
 			ulong ulValue = ToUInt64(value);
 			EnumCache cache = GetEnumCache(enumType);
 			int idx = Array.BinarySearch(cache.Values, ulValue);
@@ -140,10 +113,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="value"/> 为 <c>null</c>。</exception>
 		public static string ToDescription(this Enum value)
 		{
-			if (value == null)
-			{
-				throw CommonExceptions.ArgumentNull("value");
-			}
+			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.Ensures(Contract.Result<string>() != null);
 			Type enumType = value.GetType();
 			ulong ulongValue = ToUInt64((object)value);
@@ -233,15 +203,9 @@ namespace Cyjb
 		/// </overloads>
 		public static TextValuePairCollection GetNameValues(Type enumType)
 		{
-			if (enumType == null)
-			{
-				throw CommonExceptions.ArgumentNull("type");
-			}
-			if (!enumType.IsEnum)
-			{
-				throw CommonExceptions.MustBeEnum("type", enumType);
-			}
+			CommonExceptions.CheckArgumentNull(enumType, "enumType");
 			Contract.Ensures(Contract.Result<TextValuePairCollection>() != null);
+			CommonExceptions.CheckEnumType(enumType, "enumType");
 			return GetTextValues(enumType, false);
 		}
 		/// <summary>
@@ -253,11 +217,8 @@ namespace Cyjb
 		/// <exception cref="ArgumentException"><typeparamref name="TEnum"/> 不是 <see cref="Enum"/>。</exception>
 		public static TextValuePairCollection<TEnum> GetNameValues<TEnum>()
 		{
-			if (!typeof(TEnum).IsEnum)
-			{
-				throw CommonExceptions.MustBeEnum("TEnum", typeof(TEnum));
-			}
 			Contract.Ensures(Contract.Result<TextValuePairCollection<TEnum>>() != null);
+			CommonExceptions.CheckEnumType(typeof (TEnum));
 			return GetTextValues<TEnum>(false);
 		}
 		/// <summary>
@@ -275,15 +236,9 @@ namespace Cyjb
 		/// </overloads>
 		public static TextValuePairCollection GetDescValues(Type enumType)
 		{
-			if (enumType == null)
-			{
-				throw CommonExceptions.ArgumentNull("type");
-			}
-			if (!enumType.IsEnum)
-			{
-				throw CommonExceptions.MustBeEnum("type", enumType);
-			}
+			CommonExceptions.CheckArgumentNull(enumType, "enumType");
 			Contract.Ensures(Contract.Result<TextValuePairCollection>() != null);
+			CommonExceptions.CheckEnumType(enumType, "enumType");
 			return GetTextValues(enumType, true);
 		}
 		/// <summary>
@@ -295,11 +250,8 @@ namespace Cyjb
 		/// <exception cref="ArgumentException"><typeparamref name="TEnum"/> 不是 <see cref="Enum"/>。</exception>
 		public static TextValuePairCollection<TEnum> GetDescValues<TEnum>()
 		{
-			if (!typeof(TEnum).IsEnum)
-			{
-				throw CommonExceptions.MustBeEnum("TEnum", typeof(TEnum));
-			}
 			Contract.Ensures(Contract.Result<TextValuePairCollection<TEnum>>() != null);
+			CommonExceptions.CheckEnumType(typeof (TEnum));
 			return GetTextValues<TEnum>(true);
 		}
 		/// <summary>
@@ -375,10 +327,7 @@ namespace Cyjb
 		/// </overloads>
 		public static TEnum Parse<TEnum>(string value)
 		{
-			if (value == null)
-			{
-				throw CommonExceptions.ArgumentNull("value");
-			}
+			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.EndContractBlock();
 			return (TEnum)Enum.Parse(typeof(TEnum), value);
 		}
@@ -399,10 +348,7 @@ namespace Cyjb
 		/// 基础类型的范围。</exception>
 		public static TEnum Parse<TEnum>(string value, bool ignoreCase)
 		{
-			if (value == null)
-			{
-				throw CommonExceptions.ArgumentNull("value");
-			}
+			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.EndContractBlock();
 			return (TEnum)Enum.Parse(typeof(TEnum), value, ignoreCase);
 		}
@@ -427,19 +373,10 @@ namespace Cyjb
 		/// </overloads>
 		public static object ParseEx(Type enumType, string value)
 		{
-			if (enumType == null)
-			{
-				throw CommonExceptions.ArgumentNull("enumType");
-			}
-			if (!enumType.IsEnum)
-			{
-				throw CommonExceptions.MustBeEnum("enumType", enumType);
-			}
-			if (value == null)
-			{
-				throw CommonExceptions.ArgumentNull("value");
-			}
+			CommonExceptions.CheckArgumentNull(enumType, "enumType");
+			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.EndContractBlock();
+			CommonExceptions.CheckEnumType(enumType, "enumType");
 			ulong ulValue = ParseToULong(enumType, value, false);
 			if (enumType.IsUnsigned())
 			{
@@ -465,19 +402,10 @@ namespace Cyjb
 		/// 基础类型的范围。</exception>
 		public static object ParseEx(Type enumType, string value, bool ignoreCase)
 		{
-			if (enumType == null)
-			{
-				throw CommonExceptions.ArgumentNull("enumType");
-			}
-			if (!enumType.IsEnum)
-			{
-				throw CommonExceptions.MustBeEnum("enumType", enumType);
-			}
-			if (value == null)
-			{
-				throw CommonExceptions.ArgumentNull("value");
-			}
+			CommonExceptions.CheckArgumentNull(enumType, "enumType");
+			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.EndContractBlock();
+			CommonExceptions.CheckEnumType(enumType, "enumType");
 			ulong ulValue = ParseToULong(enumType, value, ignoreCase);
 			if (enumType.IsUnsigned())
 			{
@@ -500,15 +428,9 @@ namespace Cyjb
 		/// 基础类型的范围。</exception>
 		public static TEnum ParseEx<TEnum>(string value)
 		{
-			if (value == null)
-			{
-				throw CommonExceptions.ArgumentNull("value");
-			}
-			if (!typeof(TEnum).IsEnum)
-			{
-				throw CommonExceptions.MustBeEnum("TEnum", typeof(TEnum));
-			}
+			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.EndContractBlock();
+			CommonExceptions.CheckEnumType(typeof (TEnum));
 			ulong ulValue = ParseToULong(typeof(TEnum), value, false);
 			if (typeof(TEnum).IsUnsigned())
 			{
@@ -533,15 +455,9 @@ namespace Cyjb
 		/// 基础类型的范围。</exception>
 		public static TEnum ParseEx<TEnum>(string value, bool ignoreCase)
 		{
-			if (value == null)
-			{
-				throw CommonExceptions.ArgumentNull("value");
-			}
-			if (!typeof(TEnum).IsEnum)
-			{
-				throw CommonExceptions.MustBeEnum("TEnum", typeof(TEnum));
-			}
+			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.EndContractBlock();
+			CommonExceptions.CheckEnumType(typeof (TEnum));
 			ulong ulValue = ParseToULong(typeof(TEnum), value, ignoreCase);
 			if (typeof(TEnum).IsUnsigned())
 			{
@@ -685,14 +601,8 @@ namespace Cyjb
 		[SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Flag")]
 		public static bool AnyFlag(this Enum baseEnum, Enum value)
 		{
-			if (baseEnum == null)
-			{
-				throw CommonExceptions.ArgumentNull("baseEnum");
-			}
-			if (value == null)
-			{
-				throw CommonExceptions.ArgumentNull("value");
-			}
+			CommonExceptions.CheckArgumentNull(baseEnum, "baseEnum");
+			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.EndContractBlock();
 			if (baseEnum.GetType() != value.GetType())
 			{

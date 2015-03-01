@@ -137,10 +137,7 @@ namespace Cyjb.Collections
 		public CharSet(IEnumerable<char> collection)
 			: this(false, null)
 		{
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("colletion");
-			}
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			Contract.EndContractBlock();
 			this.UnionWith(collection);
 		}
@@ -154,10 +151,7 @@ namespace Cyjb.Collections
 		public CharSet(IEnumerable<char> collection, bool ignoreCase)
 			: this(ignoreCase, null)
 		{
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("colletion");
-			}
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			Contract.EndContractBlock();
 			this.UnionWith(collection);
 		}
@@ -173,10 +167,7 @@ namespace Cyjb.Collections
 		public CharSet(IEnumerable<char> collection, bool ignoreCase, CultureInfo culture)
 			: this(ignoreCase, culture)
 		{
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("colletion");
-			}
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			Contract.EndContractBlock();
 			this.UnionWith(collection);
 		}
@@ -191,10 +182,7 @@ namespace Cyjb.Collections
 		private CharSet(SerializationInfo info, StreamingContext context)
 			: base(null)
 		{
-			if (info == null)
-			{
-				throw CommonExceptions.ArgumentNull("info");
-			}
+			CommonExceptions.CheckArgumentNull(info, "info");
 			Contract.EndContractBlock();
 			this.data = (uint[][])info.GetValue("Data", typeof(uint[][]));
 			this.count = info.GetInt32("Count");
@@ -491,10 +479,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void ExceptWith(IEnumerable<char> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			if (this.count <= 0)
 			{
@@ -564,10 +549,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void IntersectWith(IEnumerable<char> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			if (this.count <= 0 || ReferenceEquals(this, other))
 			{
@@ -636,10 +618,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsProperSubsetOf(IEnumerable<char> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			ICollection<char> col = other as ICollection<char>;
 			if (this.count == 0)
@@ -670,10 +649,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsProperSupersetOf(IEnumerable<char> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			if (this.count == 0)
 			{
@@ -704,10 +680,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsSubsetOf(IEnumerable<char> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			if (this.count == 0)
 			{
@@ -733,10 +706,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsSupersetOf(IEnumerable<char> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			ICollection<char> col = other as ICollection<char>;
 			if (col != null)
@@ -768,10 +738,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool Overlaps(IEnumerable<char> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			if (this.count <= 0)
 			{
@@ -827,10 +794,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool SetEquals(IEnumerable<char> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			CharSet otherSet = other as CharSet;
 			if (otherSet != null &&
@@ -862,10 +826,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void SymmetricExceptWith(IEnumerable<char> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			if (this.count == 0)
 			{
@@ -940,10 +901,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void UnionWith(IEnumerable<char> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			if (ReferenceEquals(this, other))
 			{
@@ -1131,10 +1089,7 @@ namespace Cyjb.Collections
 		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
 		void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			if (info == null)
-			{
-				throw CommonExceptions.ArgumentNull("info");
-			}
+			CommonExceptions.CheckArgumentNull(info, "info");
 			Contract.EndContractBlock();
 			info.AddValue("Data", this.data);
 			info.AddValue("Count", this.count);

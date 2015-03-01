@@ -35,10 +35,7 @@ namespace Cyjb
 		/// </overloads>
 		public static void Times(this int source, Action action)
 		{
-			if (action == null)
-			{
-				throw CommonExceptions.ArgumentNull("action");
-			}
+			CommonExceptions.CheckArgumentNull(action, "action");
 			Contract.EndContractBlock();
 			for (int i = 0; i < source; i++)
 			{
@@ -53,10 +50,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="action"/> 为 <c>null</c>。</exception>
 		public static void Times(this int source, Action<int> action)
 		{
-			if (action == null)
-			{
-				throw CommonExceptions.ArgumentNull("action");
-			}
+			CommonExceptions.CheckArgumentNull(action, "action");
 			Contract.EndContractBlock();
 			for (int i = 0; i < source; i++)
 			{
@@ -88,10 +82,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="value"/> 为 <c>null</c>。</exception>
 		public static IEnumerable<T> Times<T>(this int source, Func<T> value)
 		{
-			if (value == null)
-			{
-				throw CommonExceptions.ArgumentNull("value");
-			}
+			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 			for (int i = 0; i < source; i++)
 			{
@@ -108,10 +99,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="value"/> 为 <c>null</c>。</exception>
 		public static IEnumerable<T> Times<T>(this int source, Func<int, T> value)
 		{
-			if (value == null)
-			{
-				throw CommonExceptions.ArgumentNull("value");
-			}
+			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 			for (int i = 0; i < source; i++)
 			{
@@ -163,10 +151,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="action"/> 为 <c>null</c>。</exception>
 		public static void To(this int source, int destination, Action<int> action)
 		{
-			if (action == null)
-			{
-				throw CommonExceptions.ArgumentNull("action");
-			}
+			CommonExceptions.CheckArgumentNull(action, "action");
 			Contract.EndContractBlock();
 			if (source < destination)
 			{

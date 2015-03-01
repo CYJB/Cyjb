@@ -361,10 +361,7 @@ namespace Cyjb
 		/// <seealso cref="String.Substring(int)"/>
 		public static string SubstringEx(this string str, int startIndex)
 		{
-			if (str == null)
-			{
-				throw CommonExceptions.ArgumentNull("str");
-			}
+			CommonExceptions.CheckArgumentNull(str, "str");
 			if (startIndex < -str.Length)
 			{
 				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
@@ -399,10 +396,7 @@ namespace Cyjb
 		/// </overloads>
 		public static string SubstringEx(this string str, int startIndex, int length)
 		{
-			if (str == null)
-			{
-				throw CommonExceptions.ArgumentNull("str");
-			}
+			CommonExceptions.CheckArgumentNull(str, "str");
 			if (length < 0)
 			{
 				throw CommonExceptions.ArgumentOutOfRange("length", length);
@@ -430,10 +424,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> 指示的位置不在此实例中。</exception>
 		public static string Slice(this string str, int startIndex)
 		{
-			if (str == null)
-			{
-				throw CommonExceptions.ArgumentNull("str");
-			}
+			CommonExceptions.CheckArgumentNull(str, "str");
 			if (startIndex < -str.Length)
 			{
 				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
@@ -470,10 +461,7 @@ namespace Cyjb
 		/// </overloads>
 		public static string Slice(this string str, int startIndex, int endIndex)
 		{
-			if (str == null)
-			{
-				throw CommonExceptions.ArgumentNull("str");
-			}
+			CommonExceptions.CheckArgumentNull(str, "str");
 			if (startIndex < -str.Length)
 			{
 				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);

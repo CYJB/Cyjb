@@ -80,10 +80,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			get
 			{
-				if (key == null)
-				{
-					throw CommonExceptions.ArgumentNull("key");
-				}
+				CommonExceptions.CheckArgumentNull(key, "key");
 				Contract.Ensures(Contract.Result<TItem>() != null);
 				TItem item = this.dict[key];
 				Contract.Assume(item != null);
@@ -111,10 +108,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		public virtual bool Remove(TKey key)
 		{
-			if (key == null)
-			{
-				throw CommonExceptions.ArgumentNull("key");
-			}
+			CommonExceptions.CheckArgumentNull(key, "key");
 			Contract.EndContractBlock();
 			return this.dict.Remove(key);
 		}
@@ -129,10 +123,7 @@ namespace Cyjb.Collections.ObjectModel
 		[Pure]
 		public bool TryGetValue(TKey key, out TItem item)
 		{
-			if (key == null)
-			{
-				throw CommonExceptions.ArgumentNull("key");
-			}
+			CommonExceptions.CheckArgumentNull(key, "key");
 			Contract.EndContractBlock();
 			return this.dict.TryGetValue(key, out item);
 		}
@@ -173,10 +164,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentException">集合中已存在具有相同键的元素。</exception>
 		public override void Add(TItem item)
 		{
-			if (item == null)
-			{
-				throw CommonExceptions.ArgumentNull("item");
-			}
+			CommonExceptions.CheckArgumentNull(item, "item");
 			Contract.EndContractBlock();
 			TKey key = this.GetKeyForItem(item);
 			this.dict.Add(key, item);
@@ -215,10 +203,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="item"/> 为 <c>null</c>。</exception>
 		public override bool Remove(TItem item)
 		{
-			if (item == null)
-			{
-				throw CommonExceptions.ArgumentNull("item");
-			}
+			CommonExceptions.CheckArgumentNull(item, "item");
 			Contract.EndContractBlock();
 			TKey key = this.GetKeyForItem(item);
 			TItem oldItem;

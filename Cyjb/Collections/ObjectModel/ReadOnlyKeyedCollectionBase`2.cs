@@ -79,10 +79,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			get
 			{
-				if (key == null)
-				{
-					throw CommonExceptions.ArgumentNull("key");
-				}
+				CommonExceptions.CheckArgumentNull(key, "key");
 				Contract.Ensures(Contract.Result<TItem>() != null);
 				return this.dict[key];
 			}
@@ -110,10 +107,7 @@ namespace Cyjb.Collections.ObjectModel
 		[Pure]
 		public bool TryGetValue(TKey key, out TItem item)
 		{
-			if (key == null)
-			{
-				throw CommonExceptions.ArgumentNull("key");
-			}
+			CommonExceptions.CheckArgumentNull(key, "key");
 			Contract.EndContractBlock();
 			return this.dict.TryGetValue(key, out item);
 		}

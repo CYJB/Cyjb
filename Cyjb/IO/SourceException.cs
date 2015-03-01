@@ -215,10 +215,7 @@ namespace Cyjb.IO
 		protected SourceException(SerializationInfo info, StreamingContext context)
 			: base(info, context)
 		{
-			if (info == null)
-			{
-				throw CommonExceptions.ArgumentNull("info");
-			}
+			CommonExceptions.CheckArgumentNull(info, "info");
 			Contract.EndContractBlock();
 			this.start = (SourcePosition)info.GetValue("Start", typeof(SourcePosition));
 			this.end = (SourcePosition)info.GetValue("End", typeof(SourcePosition));
@@ -297,10 +294,7 @@ namespace Cyjb.IO
 		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			if (info == null)
-			{
-				throw CommonExceptions.ArgumentNull("info");
-			}
+			CommonExceptions.CheckArgumentNull(info, "info");
 			Contract.EndContractBlock();
 			base.GetObjectData(info, context);
 			info.AddValue("Start", this.start);

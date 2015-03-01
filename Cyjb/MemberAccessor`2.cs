@@ -47,10 +47,7 @@ namespace Cyjb
 		/// </overloads>
 		public MemberAccessor(string name, Func<TTarget, TValue> getDelegate, Action<TTarget, TValue> setDelegate)
 		{
-			if (string.IsNullOrEmpty(name))
-			{
-				throw CommonExceptions.StringEmpty("name");
-			}
+			CommonExceptions.CheckStringEmpty(name, "name");
 			if (getDelegate == null && setDelegate == null)
 			{
 				throw CommonExceptions.ArgumentNull("getDelegate");
@@ -73,10 +70,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentException"><paramref name="name"/> 为 <c>null</c> 或空字符串。</exception>
 		public MemberAccessor(string name)
 		{
-			if (string.IsNullOrEmpty(name))
-			{
-				throw CommonExceptions.StringEmpty("name");
-			}
+			CommonExceptions.CheckStringEmpty(name, "name");
 			Contract.EndContractBlock();
 			this.name = name;
 			this.Init(typeof(TTarget), false);
@@ -91,10 +85,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentException"><paramref name="name"/> 为 <c>null</c> 或空字符串。</exception>
 		public MemberAccessor(string name, bool nonPublic)
 		{
-			if (string.IsNullOrEmpty(name))
-			{
-				throw CommonExceptions.StringEmpty("name");
-			}
+			CommonExceptions.CheckStringEmpty(name, "name");
 			Contract.EndContractBlock();
 			this.name = name;
 			this.Init(typeof(TTarget), nonPublic);
@@ -109,14 +100,8 @@ namespace Cyjb
 		/// <exception cref="ArgumentException"><paramref name="name"/> 为 <c>null</c> 或空字符串。</exception>
 		public MemberAccessor(Type targetType, string name)
 		{
-			if (targetType == null)
-			{
-				throw CommonExceptions.ArgumentNull("targetType");
-			}
-			if (string.IsNullOrEmpty(name))
-			{
-				throw CommonExceptions.StringEmpty("name");
-			}
+			CommonExceptions.CheckArgumentNull(targetType, "targetType");
+			CommonExceptions.CheckStringEmpty(name, "name");
 			Contract.EndContractBlock();
 			this.name = name;
 			this.Init(targetType, false);
@@ -133,14 +118,8 @@ namespace Cyjb
 		/// <exception cref="ArgumentException"><paramref name="name"/> 为 <c>null</c> 或空字符串。</exception>
 		public MemberAccessor(Type targetType, string name, bool nonPublic)
 		{
-			if (targetType == null)
-			{
-				throw CommonExceptions.ArgumentNull("targetType");
-			}
-			if (string.IsNullOrEmpty(name))
-			{
-				throw CommonExceptions.StringEmpty("name");
-			}
+			CommonExceptions.CheckArgumentNull(targetType, "targetType");
+			CommonExceptions.CheckStringEmpty(name, "name");
 			Contract.EndContractBlock();
 			this.name = name;
 			this.Init(targetType, nonPublic);
@@ -153,10 +132,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
 		public MemberAccessor(PropertyInfo property)
 		{
-			if (property == null)
-			{
-				throw CommonExceptions.ArgumentNull("property");
-			}
+			CommonExceptions.CheckArgumentNull(property, "property");
 			Contract.EndContractBlock();
 			this.name = property.Name;
 			Init(property, false);
@@ -171,10 +147,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
 		public MemberAccessor(PropertyInfo property, bool nonPublic)
 		{
-			if (property == null)
-			{
-				throw CommonExceptions.ArgumentNull("property");
-			}
+			CommonExceptions.CheckArgumentNull(property, "property");
 			Contract.EndContractBlock();
 			this.name = property.Name;
 			Init(property, nonPublic);
@@ -187,10 +160,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="field"/> 为 <c>null</c>。</exception>
 		public MemberAccessor(FieldInfo field)
 		{
-			if (field == null)
-			{
-				throw CommonExceptions.ArgumentNull("field");
-			}
+			CommonExceptions.CheckArgumentNull(field, "field");
 			Contract.EndContractBlock();
 			this.name = field.Name;
 			Init(field);

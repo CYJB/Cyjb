@@ -90,6 +90,9 @@
     <AssemblyOriginatorKeyFile>CYJB_Code_Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JetBrains.Annotations">
+      <HintPath>..\packages\JetBrains.Annotations.8.0.5.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
@@ -140,6 +143,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DelegateBuilder.cs" />
+    <Compile Include="DelegateBuilder.Field.cs">
+      <DependentUpon>DelegateBuilder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DelegateBuilder.Property.cs">
+      <DependentUpon>DelegateBuilder.cs</DependentUpon>
+    </Compile>
     <Compile Include="ExceptionResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -251,9 +260,9 @@
     <Compile Include="DelegateBuilder.Method.cs">
       <DependentUpon>DelegateBuilder.cs</DependentUpon>
     </Compile>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Collections\ComponentModel\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

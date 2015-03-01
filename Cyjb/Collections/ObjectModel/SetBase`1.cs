@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.Threading;
 
 namespace Cyjb.Collections.ObjectModel
 {
@@ -94,10 +93,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual void ExceptWith(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			this.items.ExceptWith(other);
 		}
@@ -109,10 +105,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual void IntersectWith(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			this.items.IntersectWith(other);
 		}
@@ -127,10 +120,7 @@ namespace Cyjb.Collections.ObjectModel
 		[Pure]
 		public virtual bool IsProperSubsetOf(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			return this.items.IsProperSubsetOf(other);
 		}
@@ -145,10 +135,7 @@ namespace Cyjb.Collections.ObjectModel
 		[Pure]
 		public virtual bool IsProperSupersetOf(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			return this.items.IsProperSubsetOf(other);
 		}
@@ -163,10 +150,7 @@ namespace Cyjb.Collections.ObjectModel
 		[Pure]
 		public virtual bool IsSubsetOf(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			return this.items.IsSubsetOf(other);
 		}
@@ -181,10 +165,7 @@ namespace Cyjb.Collections.ObjectModel
 		[Pure]
 		public virtual bool IsSupersetOf(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			return this.items.IsSupersetOf(other);
 		}
@@ -199,10 +180,7 @@ namespace Cyjb.Collections.ObjectModel
 		[Pure]
 		public virtual bool Overlaps(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			return this.items.Overlaps(other);
 		}
@@ -217,10 +195,7 @@ namespace Cyjb.Collections.ObjectModel
 		[Pure]
 		public virtual bool SetEquals(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			return this.items.SetEquals(other);
 		}
@@ -232,10 +207,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual void SymmetricExceptWith(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			this.items.SymmetricExceptWith(other);
 		}
@@ -247,10 +219,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual void UnionWith(IEnumerable<T> other)
 		{
-			if (other == null)
-			{
-				throw CommonExceptions.ArgumentNull("other");
-			}
+			CommonExceptions.CheckArgumentNull(other, "other");
 			Contract.EndContractBlock();
 			this.items.UnionWith(other);
 		}

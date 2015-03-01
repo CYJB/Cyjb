@@ -80,10 +80,7 @@ namespace Cyjb.IO
 		/// <exception cref="ArgumentException"><paramref name="range"/> 表的不是有效的范围。</exception>
 		public SourceFileRange(string fileName, ISourceLocatable range)
 		{
-			if (range == null)
-			{
-				throw CommonExceptions.ArgumentNull("range");
-			}
+			CommonExceptions.CheckArgumentNull(range, "range");
 			if (range.Start.IsUnknown != range.End.IsUnknown)
 			{
 				throw CommonExceptions.InvalidSourceRange(range.Start, range.End);
@@ -145,10 +142,7 @@ namespace Cyjb.IO
 		/// </override>
 		public bool Contains(ISourceLocatable locatable)
 		{
-			if (locatable == null)
-			{
-				throw CommonExceptions.ArgumentNull("locatable");
-			}
+			CommonExceptions.CheckArgumentNull(locatable, "locatable");
 			Contract.EndContractBlock();
 			return (!this.IsUnknown) && this.start <= locatable.Start && this.end >= locatable.End;
 		}
@@ -218,10 +212,7 @@ namespace Cyjb.IO
 		/// <exception cref="ArgumentNullException"><paramref name="locatable"/> 为 <c>null</c>。</exception>
 		public bool OverlapsWith(ISourceLocatable locatable)
 		{
-			if (locatable == null)
-			{
-				throw CommonExceptions.ArgumentNull("locatable");
-			}
+			CommonExceptions.CheckArgumentNull(locatable, "locatable");
 			Contract.EndContractBlock();
 			return (!this.IsUnknown) && this.start <= locatable.End && this.end >= locatable.Start;
 		}
@@ -233,10 +224,7 @@ namespace Cyjb.IO
 		/// <exception cref="ArgumentNullException"><paramref name="locatable"/> 为 <c>null</c>。</exception>
 		public SourceFileRange Overlap(ISourceLocatable locatable)
 		{
-			if (locatable == null)
-			{
-				throw CommonExceptions.ArgumentNull("locatable");
-			}
+			CommonExceptions.CheckArgumentNull(locatable, "locatable");
 			Contract.EndContractBlock();
 			SourcePosition maxStart = this.start > locatable.Start ? this.start : locatable.Start;
 			SourcePosition minEnd = this.end < locatable.End ? this.end : locatable.End;
@@ -264,10 +252,7 @@ namespace Cyjb.IO
 		/// </override>
 		public static SourceFileRange Merge(string fileName, params ISourceLocatable[] ranges)
 		{
-			if (fileName == null)
-			{
-				throw CommonExceptions.ArgumentNull("fileName");
-			}
+			CommonExceptions.CheckArgumentNull(fileName, "fileName");
 			Contract.EndContractBlock();
 			return Merge(fileName, ranges as IEnumerable<ISourceLocatable>);
 		}

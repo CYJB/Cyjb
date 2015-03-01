@@ -34,14 +34,8 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="outputType"/> 为 <c>null</c>。</exception>
 		public static Type GetConverterType(Type inputType, Type outputType)
 		{
-			if (inputType == null)
-			{
-				throw CommonExceptions.ArgumentNull("inputType");
-			}
-			if (outputType == null)
-			{
-				throw CommonExceptions.ArgumentNull("outputType");
-			}
+			CommonExceptions.CheckArgumentNull(inputType, "inputType");
+			CommonExceptions.CheckArgumentNull(outputType, "outputType");
 			Contract.EndContractBlock();
 			return typeof(Converter<,>).MakeGenericType(inputType, outputType);
 		}
@@ -226,14 +220,8 @@ namespace Cyjb
 		/// <exception cref="ArgumentException"><paramref name="outputType"/> 包含泛型参数。</exception>
 		public static Converter<object, object> GetConverter(Type inputType, Type outputType)
 		{
-			if (inputType == null)
-			{
-				throw CommonExceptions.ArgumentNull("inputType");
-			}
-			if (outputType == null)
-			{
-				throw CommonExceptions.ArgumentNull("outputType");
-			}
+			CommonExceptions.CheckArgumentNull(inputType, "inputType");
+			CommonExceptions.CheckArgumentNull(outputType, "outputType");
 			Contract.EndContractBlock();
 			if (inputType.ContainsGenericParameters)
 			{
@@ -269,14 +257,8 @@ namespace Cyjb
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
 		public static bool CanChangeType(Type inputType, Type outputType)
 		{
-			if (inputType == null)
-			{
-				throw CommonExceptions.ArgumentNull("inputType");
-			}
-			if (outputType == null)
-			{
-				throw CommonExceptions.ArgumentNull("outputType");
-			}
+			CommonExceptions.CheckArgumentNull(inputType, "inputType");
+			CommonExceptions.CheckArgumentNull(outputType, "outputType");
 			Contract.EndContractBlock();
 			if (inputType.ContainsGenericParameters)
 			{
@@ -306,10 +288,7 @@ namespace Cyjb
 		/// <see cref="IConverterProvider"/> 提供的类型转换方法。</remarks>
 		public static void AddConverter<TInput, TOutput>(Converter<TInput, TOutput> converter)
 		{
-			if (converter == null)
-			{
-				throw CommonExceptions.ArgumentNull("converter");
-			}
+			CommonExceptions.CheckArgumentNull(converter, "converter");
 			Contract.EndContractBlock();
 			ConversionFactory.AddConverterProvider(new ConverterProvider(converter, typeof(TInput), typeof(TOutput)));
 		}
@@ -325,13 +304,10 @@ namespace Cyjb
 		/// 方法提供的类型转换方法优先级更高，且后设置的优先级更高。</remarks>
 		public static void AddConverterProvider(IConverterProvider provider)
 		{
-			if (provider == null)
-			{
-				throw CommonExceptions.ArgumentNull("provider");
-			}
+			CommonExceptions.CheckArgumentNull(provider, "provider");
 			if (provider.OriginType == null)
 			{
-				throw CommonExceptions.ArgumentNull("provider.OriginType");
+				throw CommonExceptions.ArgumentNull("provider");
 			}
 			Contract.EndContractBlock();
 			ConversionFactory.AddConverterProvider(provider);
@@ -401,10 +377,7 @@ namespace Cyjb
 		/// <exception cref="InvalidCastException">不支持此转换。</exception>
 		public static object ChangeType(object value, Type outputType)
 		{
-			if (outputType == null)
-			{
-				throw CommonExceptions.ArgumentNull("outputType");
-			}
+			CommonExceptions.CheckArgumentNull(outputType, "outputType");
 			Contract.EndContractBlock();
 			if (value == null)
 			{

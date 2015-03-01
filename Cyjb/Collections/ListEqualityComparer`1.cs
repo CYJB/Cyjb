@@ -114,10 +114,7 @@ namespace Cyjb.Collections
 		/// </overloads>
 		public override int GetHashCode(IList<T> obj)
 		{
-			if (obj == null)
-			{
-				throw CommonExceptions.ArgumentNull("obj");
-			}
+			CommonExceptions.CheckArgumentNull(obj, "obj");
 			Contract.EndContractBlock();
 			return Hash.Combine(obj.Count, obj);
 		}

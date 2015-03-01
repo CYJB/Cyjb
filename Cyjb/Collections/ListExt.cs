@@ -36,10 +36,7 @@ namespace Cyjb.Collections
 		/// </overloads>
 		public static int BinarySearch<T>(this IList<T> list, T value)
 		{
-			if (list == null)
-			{
-				throw CommonExceptions.ArgumentNull("list");
-			}
+			CommonExceptions.CheckArgumentNull(list, "list");
 			Contract.Ensures((Contract.Result<int>() >= 0 && Contract.Result<int>() <= list.Count) ||
 							 (Contract.Result<int>() < 0 && ~Contract.Result<int>() <= list.Count + 1));
 			return BinarySearchInternal(list, 0, list.Count, value, null);
@@ -62,10 +59,7 @@ namespace Cyjb.Collections
 		/// 且 <typeparamref name="T"/> 类型没有实现 <see cref="IComparable{T}"/> 泛型接口。</exception>
 		public static int BinarySearch<T>(this IList<T> list, T value, IComparer<T> comparer)
 		{
-			if (list == null)
-			{
-				throw CommonExceptions.ArgumentNull("list");
-			}
+			CommonExceptions.CheckArgumentNull(list, "list");
 			Contract.Ensures((Contract.Result<int>() >= 0 && Contract.Result<int>() <= list.Count) ||
 							 (Contract.Result<int>() < 0 && ~Contract.Result<int>() <= list.Count + 1));
 			return BinarySearchInternal(list, 0, list.Count, value, comparer);
@@ -93,10 +87,7 @@ namespace Cyjb.Collections
 		/// 类型没有实现 <see cref="IComparable{T}"/> 泛型接口。</exception>>
 		public static int BinarySearch<T>(this IList<T> list, int index, int length, T value)
 		{
-			if (list == null)
-			{
-				throw CommonExceptions.ArgumentNull("list");
-			}
+			CommonExceptions.CheckArgumentNull(list, "list");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);
@@ -137,10 +128,7 @@ namespace Cyjb.Collections
 		/// 且 <typeparamref name="T"/> 类型没有实现 <see cref="IComparable{T}"/> 泛型接口。</exception>
 		public static int BinarySearch<T>(this IList<T> list, int index, int length, T value, IComparer<T> comparer)
 		{
-			if (list == null)
-			{
-				throw CommonExceptions.ArgumentNull("list");
-			}
+			CommonExceptions.CheckArgumentNull(list, "list");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);
@@ -240,14 +228,8 @@ namespace Cyjb.Collections
 		public static int BinarySearch<TElement, TKey>(this IList<TElement> list, TKey value,
 			Func<TElement, TKey> keySelector)
 		{
-			if (list == null)
-			{
-				throw CommonExceptions.ArgumentNull("list");
-			}
-			if (keySelector == null)
-			{
-				throw CommonExceptions.ArgumentNull("keySelector");
-			}
+			CommonExceptions.CheckArgumentNull(list, "list");
+			CommonExceptions.CheckArgumentNull(keySelector, "keySelector");
 			Contract.Ensures((Contract.Result<int>() >= 0 && Contract.Result<int>() <= list.Count) ||
 							 (Contract.Result<int>() < 0 && ~Contract.Result<int>() <= list.Count + 1));
 			return BinarySearchInternal(list, 0, list.Count, value, keySelector, null);
@@ -274,14 +256,8 @@ namespace Cyjb.Collections
 		public static int BinarySearch<TElement, TKey>(this IList<TElement> list, TKey value,
 			Func<TElement, TKey> keySelector, IComparer<TKey> comparer)
 		{
-			if (list == null)
-			{
-				throw CommonExceptions.ArgumentNull("list");
-			}
-			if (keySelector == null)
-			{
-				throw CommonExceptions.ArgumentNull("keySelector");
-			}
+			CommonExceptions.CheckArgumentNull(list, "list");
+			CommonExceptions.CheckArgumentNull(keySelector, "keySelector");
 			Contract.Ensures((Contract.Result<int>() >= 0 && Contract.Result<int>() <= list.Count) ||
 							 (Contract.Result<int>() < 0 && ~Contract.Result<int>() <= list.Count + 1));
 			return BinarySearchInternal(list, 0, list.Count, value, keySelector, comparer);
@@ -313,14 +289,8 @@ namespace Cyjb.Collections
 		public static int BinarySearch<TElement, TKey>(this IList<TElement> list, int index, int length,
 			TKey value, Func<TElement, TKey> keySelector)
 		{
-			if (list == null)
-			{
-				throw CommonExceptions.ArgumentNull("list");
-			}
-			if (keySelector == null)
-			{
-				throw CommonExceptions.ArgumentNull("keySelector");
-			}
+			CommonExceptions.CheckArgumentNull(list, "list");
+			CommonExceptions.CheckArgumentNull(keySelector, "keySelector");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);
@@ -365,14 +335,8 @@ namespace Cyjb.Collections
 		public static int BinarySearch<TElement, TKey>(this IList<TElement> list, int index, int length,
 			TKey value, Func<TElement, TKey> keySelector, IComparer<TKey> comparer)
 		{
-			if (list == null)
-			{
-				throw CommonExceptions.ArgumentNull("list");
-			}
-			if (keySelector == null)
-			{
-				throw CommonExceptions.ArgumentNull("keySelector");
-			}
+			CommonExceptions.CheckArgumentNull(list, "list");
+			CommonExceptions.CheckArgumentNull(keySelector, "keySelector");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);
@@ -466,14 +430,8 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public static void AddRange<T>(this IList<T> list, IEnumerable<T> collection)
 		{
-			if (list == null)
-			{
-				throw CommonExceptions.ArgumentNull("list");
-			}
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("collection");
-			}
+			CommonExceptions.CheckArgumentNull(list, "list");
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			Contract.EndContractBlock();
 			foreach (T item in collection)
 			{
@@ -493,14 +451,8 @@ namespace Cyjb.Collections
 		/// <paramref name="list"/> 中的有效索引。</exception>
 		public static void InsertRange<T>(this IList<T> list, int index, IEnumerable<T> collection)
 		{
-			if (list == null)
-			{
-				throw CommonExceptions.ArgumentNull("list");
-			}
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("collection");
-			}
+			CommonExceptions.CheckArgumentNull(list, "list");
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);

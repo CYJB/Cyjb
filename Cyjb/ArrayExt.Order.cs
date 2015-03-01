@@ -38,10 +38,7 @@ namespace Cyjb
 		/// </overloads>
 		public static T[] Random<T>(this T[] array)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			for (int i = array.Length - 1; i > 0; i--)
 			{
@@ -83,10 +80,7 @@ namespace Cyjb
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "0#")]
 		public static T[,] Random<T>(this T[,] array)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			Contract.Ensures(Contract.Result<T[,]>() != null);
 			int w = array.GetLength(1);
 			int idx = array.Length;
@@ -94,6 +88,7 @@ namespace Cyjb
 			{
 				for (int j = w - 1; j >= 0; j--)
 				{
+					Contract.Assume(idx >= 0);
 					int r = RandomExt.Next(idx--);
 					int y = r / w;
 					int x = r - y * w; // r % w
@@ -137,10 +132,7 @@ namespace Cyjb
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Return")]
 		public static T[, ,] Random<T>(this T[, ,] array)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			Contract.Ensures(Contract.Result<T[, ,]>() != null);
 			int h = array.GetLength(1);
 			int w = array.GetLength(2);
@@ -151,6 +143,7 @@ namespace Cyjb
 				{
 					for (int k = w - 1; k >= 0; k--)
 					{
+						Contract.Assume(idx >= 0);
 						int r = RandomExt.Next(idx--);
 						int t = r / w;
 						int x = r - t * w; // r % w

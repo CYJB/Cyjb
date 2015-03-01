@@ -6,6 +6,7 @@ using System.Reflection;
 using Cyjb.IO;
 using Cyjb.Reflection;
 using Cyjb.Utility;
+using JetBrains.Annotations;
 
 namespace Cyjb
 {
@@ -22,9 +23,44 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">为 <c>null</c> 的参数名。</param>
 		/// <returns><see cref="ArgumentNullException"/> 对象。</returns>
-		public static ArgumentNullException ArgumentNull(string paramName)
+		public static ArgumentNullException ArgumentNull([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentNullException>() != null);
 			return new ArgumentNullException(paramName);
+		}
+		/// <summary>
+		/// 检查指定参数的值，如果为 <c>null</c> 则抛出相应异常。
+		/// </summary>
+		/// <param name="value">要检查是否为 <c>null</c> 的参数值。</param>
+		/// <overloads>
+		/// <summary>
+		/// 检查指定参数的值，如果为 <c>null</c> 则抛出相应异常。
+		/// </summary>
+		/// </overloads>
+		[ContractArgumentValidator]
+		[ContractAnnotation("value:null=>halt")]
+		public static void CheckArgumentNull<T>([NoEnumeration]T value)
+		{
+			if (value == null)
+			{
+				throw new ArgumentNullException();
+			}
+			Contract.EndContractBlock();
+		}
+		/// <summary>
+		/// 检查指定参数的值，如果为 <c>null</c> 则抛出相应异常。
+		/// </summary>
+		/// <param name="value">要检查是否为 <c>null</c> 的参数值。</param>
+		/// <param name="paramName">被检查的参数名。</param>
+		[ContractArgumentValidator]
+		[ContractAnnotation("value:null=>halt")]
+		public static void CheckArgumentNull<T>([NoEnumeration]T value, [InvokerParameterName]string paramName)
+		{
+			if (value == null)
+			{
+				throw new ArgumentNullException(paramName);
+			}
+			Contract.EndContractBlock();
 		}
 		/// <summary>
 		/// 返回参数顺序颠倒的异常。
@@ -34,16 +70,11 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="firstParam"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="secondParam"/> 为 <c>null</c>。</exception>
-		public static ArgumentException ReversedArgument(string firstParam, string secondParam)
+		public static ArgumentException ReversedArgument([InvokerParameterName]string firstParam,
+			[InvokerParameterName]string secondParam)
 		{
-			if (firstParam == null)
-			{
-				throw ArgumentNull("firstParam");
-			}
-			if (secondParam == null)
-			{
-				throw ArgumentNull("secondParam");
-			}
+			CheckArgumentNull(firstParam, "firstParam");
+			CheckArgumentNull(secondParam, "secondParam");
 			Contract.EndContractBlock();
 			return new ArgumentException(Format(Resources.ReversedArgument, firstParam, secondParam));
 		}
@@ -57,7 +88,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		public static ArgumentException ArrayNonZeroLowerBound(string paramName)
+		public static ArgumentException ArrayNonZeroLowerBound([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.ArrayNonZeroLowerBound, paramName);
 		}
@@ -66,7 +97,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		public static ArgumentException ArrayTooSmall(string paramName)
+		public static ArgumentException ArrayTooSmall([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.ArrayTooSmall, paramName);
 		}
@@ -84,7 +115,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		public static ArgumentException CollectionCountDiffer(string paramName)
+		public static ArgumentException CollectionCountDiffer([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.CollectionCountDiffer, paramName);
 		}
@@ -93,7 +124,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		public static ArgumentException CollectionEmpty(string paramName)
+		public static ArgumentException CollectionEmpty([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.CollectionEmpty, paramName);
 		}
@@ -110,7 +141,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		public static ArgumentException CollectionItemNotExist(string paramName)
+		public static ArgumentException CollectionItemNotExist([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.CollectionItemNotExist, paramName);
 		}
@@ -119,7 +150,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		public static ArgumentException CollectionItemNull(string paramName)
+		public static ArgumentException CollectionItemNull([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.CollectionItemNull, paramName);
 		}
@@ -152,7 +183,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		public static ArgumentException KeyDuplicate(string paramName)
+		public static ArgumentException KeyDuplicate([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.KeyDuplicate, paramName);
 		}
@@ -177,10 +208,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c> 或空字符串。</exception>
 		public static KeyNotFoundException KeyNotFound(string key)
 		{
-			if (string.IsNullOrEmpty(key))
-			{
-				throw StringEmpty("key");
-			}
+			CheckStringEmpty(key, "key");
 			Contract.EndContractBlock();
 			return new KeyNotFoundException(Format(Resources.KeyNotFound_Key, key));
 		}
@@ -203,12 +231,9 @@ namespace Cyjb
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="RankException"/> 对象。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="paramName"/> 为 <c>null</c> 或空字符串。</exception>
-		public static RankException MultidimensionalArrayNotSupported(string paramName)
+		public static RankException MultidimensionalArrayNotSupported([InvokerParameterName]string paramName)
 		{
-			if (string.IsNullOrEmpty(paramName))
-			{
-				throw StringEmpty("paramName");
-			}
+			CheckStringEmpty(paramName, "paramName");
 			Contract.EndContractBlock();
 			return new RankException(Format(Resources.MultidimensionalArrayNotSupported_Param, paramName));
 		}
@@ -222,18 +247,48 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		public static ArgumentException StringEmpty(string paramName)
+		public static ArgumentException StringEmpty([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.StringEmpty, paramName);
+		}
+		/// <summary>
+		/// 检查指定的字符串，如果为 <c>null</c> 或空字符串（<c>""</c>）则抛出相应异常。
+		/// </summary>
+		/// <param name="text">要检查是否为 <c>null</c> 或空字符串的字符串。</param>
+		/// <param name="paramName">被检查的参数名。</param>
+		[ContractArgumentValidator]
+		[ContractAnnotation("text:null=>halt")]
+		public static void CheckStringEmpty(string text, [InvokerParameterName]string paramName)
+		{
+			if (string.IsNullOrEmpty(text))
+			{
+				throw new ArgumentException(Resources.StringEmpty, paramName);
+			}
+			Contract.EndContractBlock();
 		}
 		/// <summary>
 		/// 返回字符串只包含空白的异常。
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		public static ArgumentException StringWhiteSpace(string paramName)
+		public static ArgumentException StringWhiteSpace([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.StringWhiteSpace, paramName);
+		}
+		/// <summary>
+		/// 检查指定的字符串，如果为 <c>null</c> 或只包含空白则抛出相应异常。
+		/// </summary>
+		/// <param name="text">要检查是否为 <c>null</c> 或只包含空白的字符串。</param>
+		/// <param name="paramName">被检查的参数名。</param>
+		[ContractArgumentValidator]
+		[ContractAnnotation("text:null=>halt")]
+		public static void CheckStringWhiteSpace(string text, [InvokerParameterName]string paramName)
+		{
+			if (string.IsNullOrWhiteSpace(text))
+			{
+				throw new ArgumentException(Resources.StringWhiteSpace, paramName);
+			}
+			Contract.EndContractBlock();
 		}
 
 		#endregion // 字符串异常
@@ -261,7 +316,7 @@ namespace Cyjb
 		/// 返回参数类型错误的异常。
 		/// </summary>
 		/// </overloads>
-		public static ArgumentException ArgumentWrongType(string paramName)
+		public static ArgumentException ArgumentWrongType([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.ArgumentWrongType, paramName);
 		}
@@ -273,12 +328,10 @@ namespace Cyjb
 		/// <param name="targetType">目标类型的值。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="targetType"/> 为 <c>null</c>。</exception>
-		public static ArgumentException ArgumentWrongType(string paramName, object actualValue, Type targetType)
+		public static ArgumentException ArgumentWrongType([InvokerParameterName]string paramName,
+			object actualValue, Type targetType)
 		{
-			if (targetType == null)
-			{
-				throw ArgumentNull("targetType");
-			}
+			CheckArgumentNull(targetType, "targetType");
 			Contract.EndContractBlock();
 			string message = Format(Resources.ArgumentWrongType_Specific, actualValue, targetType);
 			return new ArgumentException(message, paramName);
@@ -300,16 +353,11 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="paramName"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="baseType"/> 为 <c>null</c>。</exception>
-		internal static ArgumentException EnumTypeDoesNotMatch(string paramName, Type paramType, Type baseType)
+		internal static ArgumentException EnumTypeDoesNotMatch([InvokerParameterName]string paramName,
+			Type paramType, Type baseType)
 		{
-			if (paramType == null)
-			{
-				throw ArgumentNull("paramType");
-			}
-			if (baseType == null)
-			{
-				throw ArgumentNull("baseType");
-			}
+			CheckArgumentNull(paramType, "paramType");
+			CheckArgumentNull(baseType, "baseType");
 			Contract.EndContractBlock();
 			return new ArgumentException(Format(Resources.EnumTypeDoesNotMatch, paramType, baseType), paramName);
 		}
@@ -336,14 +384,8 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="toType"/> 为 <c>null</c>。</exception>
 		public static InvalidCastException InvalidCast(Type fromType, Type toType)
 		{
-			if (fromType == null)
-			{
-				throw ArgumentNull("fromType");
-			}
-			if (toType == null)
-			{
-				throw ArgumentNull("toType");
-			}
+			CheckArgumentNull(fromType, "fromType");
+			CheckArgumentNull(toType, "toType");
 			Contract.EndContractBlock();
 			return new InvalidCastException(Format(Resources.InvalidCast_FromTo, fromType, toType));
 		}
@@ -379,7 +421,7 @@ namespace Cyjb
 		/// 返回类型必须从委托派生的异常。
 		/// </summary>
 		/// </overloads>
-		public static ArgumentException MustBeDelegate(string paramName)
+		public static ArgumentException MustBeDelegate([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.MustBeDelegate, paramName);
 		}
@@ -390,14 +432,43 @@ namespace Cyjb
 		/// <param name="type">异常的类型。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
-		public static ArgumentException MustBeDelegate(string paramName, Type type)
+		public static ArgumentException MustBeDelegate([InvokerParameterName]string paramName, Type type)
 		{
-			if (type == null)
-			{
-				throw ArgumentNull("type");
-			}
+			CheckArgumentNull(type, "type");
 			Contract.EndContractBlock();
 			return new ArgumentException(Format(Resources.MustBeDelegate_Type, type), paramName);
+		}
+		/// <summary>
+		/// 检查指定类型是否是委托类型，如果不是则抛出相应异常。
+		/// </summary>
+		/// <param name="type">要检查是否是委托类型的类型。</param>
+		/// <overloads>
+		/// <summary>
+		/// 检查指定类型是否是委托类型，如果不是则抛出相应异常。
+		/// </summary>
+		/// </overloads>
+		[ContractAnnotation("type:null=>halt")]
+		public static void CheckDelegateType(Type type)
+		{
+			CheckArgumentNull(type);
+			if (!type.IsSubclassOf(typeof(Delegate)))
+			{
+				throw new ArgumentException(Format(Resources.MustBeDelegate_Type, type));
+			}
+		}
+		/// <summary>
+		/// 检查指定类型是否是委托类型，如果不是则抛出相应异常。
+		/// </summary>
+		/// <param name="type">要检查是否是委托类型的类型。</param>
+		/// <param name="paramName">被检查的参数名。</param>
+		[ContractAnnotation("type:null=>halt")]
+		public static void CheckDelegateType(Type type, [InvokerParameterName]string paramName)
+		{
+			CheckArgumentNull(type, paramName);
+			if (!type.IsSubclassOf(typeof(Delegate)))
+			{
+				throw new ArgumentException(Format(Resources.MustBeDelegate_Type, type), paramName);
+			}
 		}
 		/// <summary>
 		/// 返回必须是枚举类型的异常。
@@ -409,7 +480,7 @@ namespace Cyjb
 		/// 返回必须是枚举类型的异常。
 		/// </summary>
 		/// </overloads>
-		public static ArgumentException MustBeEnum(string paramName)
+		public static ArgumentException MustBeEnum([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.MustBeEnum, paramName);
 		}
@@ -420,14 +491,43 @@ namespace Cyjb
 		/// <param name="type">异常的类型。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
-		public static ArgumentException MustBeEnum(string paramName, Type type)
+		public static ArgumentException MustBeEnum([InvokerParameterName]string paramName, Type type)
 		{
-			if (type == null)
-			{
-				throw ArgumentNull("type");
-			}
+			CheckArgumentNull(type, "type");
 			Contract.EndContractBlock();
 			return new ArgumentException(Format(Resources.MustBeEnum_Type, type), paramName);
+		}
+		/// <summary>
+		/// 检查指定类型是否是枚举类型，如果不是则抛出相应异常。
+		/// </summary>
+		/// <param name="type">要检查是否是枚举类型的类型。</param>
+		/// <overloads>
+		/// <summary>
+		/// 检查指定类型是否是枚举类型，如果不是则抛出相应异常。
+		/// </summary>
+		/// </overloads>
+		[ContractAnnotation("type:null=>halt")]
+		public static void CheckEnumType(Type type)
+		{
+			CheckArgumentNull(type);
+			if (!type.IsEnum)
+			{
+				throw new ArgumentException(Resources.MustBeEnum);
+			}
+		}
+		/// <summary>
+		/// 检查指定类型是否是枚举类型，如果不是则抛出相应异常。
+		/// </summary>
+		/// <param name="type">要检查是否是枚举类型的类型。</param>
+		/// <param name="paramName">被检查的参数名。</param>
+		[ContractAnnotation("type:null=>halt")]
+		public static void CheckEnumType(Type type, [InvokerParameterName]string paramName)
+		{
+			CheckArgumentNull(type, paramName);
+			if (!type.IsEnum)
+			{
+				throw new ArgumentException(Format(Resources.MustBeEnum_Type, type), paramName);
+			}
 		}
 
 		#endregion // 类型异常
@@ -440,7 +540,8 @@ namespace Cyjb
 		/// <param name="paramName">异常参数的名称。</param>
 		/// <param name="actualValue">导致此异常的参数值。</param>
 		/// <returns><see cref="ArgumentOutOfRangeException"/> 对象。</returns>
-		public static ArgumentOutOfRangeException ArgumentMustBePositive(string paramName, object actualValue)
+		public static ArgumentOutOfRangeException ArgumentMustBePositive([InvokerParameterName]string paramName,
+			object actualValue)
 		{
 			return new ArgumentOutOfRangeException(paramName, actualValue, Resources.ArgumentMustBePositive);
 		}
@@ -450,7 +551,8 @@ namespace Cyjb
 		/// <param name="paramName">异常参数的名称。</param>
 		/// <param name="actualValue">导致此异常的参数值。</param>
 		/// <returns><see cref="ArgumentOutOfRangeException"/> 对象。</returns>
-		public static ArgumentOutOfRangeException ArgumentNegative(string paramName, object actualValue)
+		public static ArgumentOutOfRangeException ArgumentNegative([InvokerParameterName]string paramName,
+			object actualValue)
 		{
 			return new ArgumentOutOfRangeException(paramName, actualValue, Resources.ArgumentNegative);
 		}
@@ -465,7 +567,8 @@ namespace Cyjb
 		/// 返回参数超出范围的异常。
 		/// </summary>
 		/// </overloads>
-		public static ArgumentOutOfRangeException ArgumentOutOfRange(string paramName, object actualValue)
+		public static ArgumentOutOfRangeException ArgumentOutOfRange([InvokerParameterName]string paramName,
+			object actualValue)
 		{
 			return new ArgumentOutOfRangeException(paramName, actualValue, Resources.ArgumentOutOfRange);
 		}
@@ -479,17 +582,11 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentOutOfRangeException"/> 对象。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="begin"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="end"/> 为 <c>null</c>。</exception>
-		public static ArgumentOutOfRangeException ArgumentOutOfRange(string paramName, object actualValue,
-			object begin, object end)
+		public static ArgumentOutOfRangeException ArgumentOutOfRange([InvokerParameterName]string paramName,
+			object actualValue, object begin, object end)
 		{
-			if (begin == null)
-			{
-				throw ArgumentNull("begin");
-			}
-			if (end == null)
-			{
-				throw ArgumentNull("end");
-			}
+			CheckArgumentNull(begin, "begin");
+			CheckArgumentNull(end, "end");
 			Contract.EndContractBlock();
 			return new ArgumentOutOfRangeException(paramName, actualValue,
 				Format(Resources.ArgumentOutOfRangeBetween, begin, end));
@@ -500,7 +597,7 @@ namespace Cyjb
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <param name="actualBase">导致此异常的基。</param>
 		/// <returns><see cref="ArgumentOutOfRangeException"/> 对象。</returns>
-		internal static ArgumentOutOfRangeException InvalidBase(string paramName, int actualBase)
+		internal static ArgumentOutOfRangeException InvalidBase([InvokerParameterName]string paramName, int actualBase)
 		{
 			return new ArgumentOutOfRangeException(paramName, actualBase, Resources.InvalidBase);
 		}
@@ -510,7 +607,8 @@ namespace Cyjb
 		/// <param name="paramName">超出范围的参数名称</param>
 		/// <param name="actualThreshold">导致此异常的阈值。</param>
 		/// <returns><see cref="ArgumentOutOfRangeException"/> 对象。</returns>
-		public static ArgumentOutOfRangeException InvalidThreshold(string paramName, object actualThreshold)
+		public static ArgumentOutOfRangeException InvalidThreshold([InvokerParameterName]string paramName,
+			object actualThreshold)
 		{
 			return new ArgumentOutOfRangeException(paramName, actualThreshold, Resources.InvalidThreshold);
 		}
@@ -599,10 +697,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="streamType"/> 为 <c>null</c>。</exception>
 		public static ObjectDisposedException StreamClosed(Type streamType)
 		{
-			if (streamType == null)
-			{
-				throw ArgumentNull("streamType");
-			}
+			CheckArgumentNull(streamType, "streamType");
 			Contract.EndContractBlock();
 			return new ObjectDisposedException(Format(Resources.StreamClosed, streamType));
 		}
@@ -657,7 +752,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		public static ArgumentException MustContainValidInfo(string paramName)
+		public static ArgumentException MustContainValidInfo([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.MustContainValidInfo, paramName);
 		}
@@ -687,7 +782,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException BindOpenConstructedMethod(string paramName)
+		internal static ArgumentException BindOpenConstructedMethod([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.BindOpenConstructedMethod, paramName);
 		}
@@ -696,7 +791,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException BindTargetField(string paramName)
+		internal static ArgumentException BindTargetField([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.BindTargetField, paramName);
 		}
@@ -705,7 +800,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException BindTargetMethod(string paramName)
+		internal static ArgumentException BindTargetMethod([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.BindTargetMethod, paramName);
 		}
@@ -714,7 +809,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException BindTargetProperty(string paramName)
+		internal static ArgumentException BindTargetProperty([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.BindTargetProperty, paramName);
 		}
@@ -723,7 +818,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException BindTargetPropertyNoGet(string paramName)
+		internal static ArgumentException BindTargetPropertyNoGet([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.BindTargetPropertyNoGet, paramName);
 		}
@@ -732,7 +827,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException BindTargetPropertyNoSet(string paramName)
+		internal static ArgumentException BindTargetPropertyNoSet([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.BindTargetPropertyNoSet, paramName);
 		}
@@ -741,7 +836,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException CannotInferenceGenericArguments(string paramName)
+		internal static ArgumentException CannotInferenceGenericArguments([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(paramName, Resources.CannotInferenceGenericArguments);
 		}
@@ -761,7 +856,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
-		internal static InvalidOperationException NeedGenericMethodDefinition(string paramName)
+		internal static InvalidOperationException NeedGenericMethodDefinition([InvokerParameterName]string paramName)
 		{
 			Contract.Requires(paramName != null);
 			return new InvalidOperationException(Format(Resources.NeedGenericMethodDefinition, paramName));
@@ -769,22 +864,22 @@ namespace Cyjb
 		/// <summary>
 		/// 返回属性不存在 get 访问器的异常。
 		/// </summary>
-		/// <param name="propertyName">属性名称。</param>
+		/// <param name="paramName">参数的名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException PropertyNoGetter(string propertyName)
+		internal static ArgumentException PropertyNoGetter([InvokerParameterName]string paramName)
 		{
-			Contract.Requires(propertyName != null);
-			return new ArgumentException(Format(Resources.PropertyNoGetter, propertyName));
+			Contract.Requires(paramName != null);
+			return new ArgumentException(Format(Resources.PropertyNoGetter, paramName));
 		}
 		/// <summary>
 		/// 返回属性不存在 set 访问器的异常。
 		/// </summary>
-		/// <param name="propertyName">属性名称。</param>
+		/// <param name="paramName">参数的名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException PropertyNoSetter(string propertyName)
+		internal static ArgumentException PropertyNoSetter([InvokerParameterName]string paramName)
 		{
-			Contract.Requires(propertyName != null);
-			return new ArgumentException(Format(Resources.PropertyNoSetter, propertyName));
+			Contract.Requires(paramName != null);
+			return new ArgumentException(Format(Resources.PropertyNoSetter, paramName));
 		}
 		/// <summary>
 		/// 返回找不到属性或字段的异常。
@@ -833,7 +928,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException UnboundGenParam(string paramName)
+		internal static ArgumentException UnboundGenParam([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(Resources.UnboundGenParam, paramName);
 		}
@@ -1009,7 +1104,7 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException SameParameterName(string paramName)
+		internal static ArgumentException SameParameterName([InvokerParameterName]string paramName)
 		{
 			return new ArgumentException(ExceptionResources.SameParameterName, paramName);
 		}
@@ -1050,7 +1145,7 @@ namespace Cyjb
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <param name="context">发生异常的上下文。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		public static ArgumentException InvalidLexerContext(string paramName, string context)
+		public static ArgumentException InvalidLexerContext([InvokerParameterName]string paramName, string context)
 		{
 			return null;
 			//return GetArgumentException(paramName, ExceptionResources.InvalidLexerContext, context);
@@ -1098,23 +1193,6 @@ namespace Cyjb
 
 		#endregion // 辅助方法
 
-
-		internal static void CheckArgumentNull<T>(T v, string s)
-		{
-			if (v == null)
-			{
-				throw ArgumentNull(s);
-			}
-		}
-		internal static void CheckDelegateType(Type type, string paramName)
-		{
-			CheckArgumentNull(type, paramName);
-			Type baseType = type.BaseType;
-			if (baseType != typeof(MulticastDelegate))
-			{
-				throw MustBeDelegate(paramName);
-			}
-		}
 
 		/// <summary>
 		/// 格式化指定的异常信息。

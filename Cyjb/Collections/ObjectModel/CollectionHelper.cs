@@ -30,10 +30,7 @@ namespace Cyjb.Collections.ObjectModel
 		public static void CopyTo<T>(ICollection<T> source, Array array, int index)
 		{
 			Contract.Requires(source != null);
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			if (array.Rank != 1)
 			{
 				throw CommonExceptions.MultidimensionalArrayNotSupported("array");
@@ -92,10 +89,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <returns>指定字典的值集合。</returns>
 		public static IEnumerable<TItem> GetDictValues<TKey, TItem>(IDictionary<TKey, TItem> dict)
 		{
-			if (dict == null)
-			{
-				throw CommonExceptions.ArgumentNull("dict");
-			}
+			CommonExceptions.CheckArgumentNull(dict, "dict");
 			Contract.Ensures(Contract.Result<IEnumerable<TItem>>() != null);
 			return dict.Values;
 		}

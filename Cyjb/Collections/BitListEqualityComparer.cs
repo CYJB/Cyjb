@@ -24,6 +24,7 @@ namespace Cyjb.Collections
 		{
 			get
 			{
+				Contract.Ensures(Contract.Result<BitListEqualityComparer>() != null);
 				if (defaultValue == null)
 				{
 					Interlocked.CompareExchange(ref defaultValue, new BitListEqualityComparer(), null);
@@ -74,10 +75,7 @@ namespace Cyjb.Collections
 		/// </overloads>
 		public override int GetHashCode(BitList obj)
 		{
-			if (obj == null)
-			{
-				throw CommonExceptions.ArgumentNull("obj");
-			}
+			CommonExceptions.CheckArgumentNull(obj, "obj");
 			Contract.EndContractBlock();
 			return obj.GetContentHashCode();
 		}

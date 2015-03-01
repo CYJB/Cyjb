@@ -52,10 +52,7 @@ namespace Cyjb.IO
 		/// <exception cref="ArgumentNullException"><paramref name="path"/> 为 <c>null</c>。</exception>
 		public static bool IsValidPath(string path)
 		{
-			if (path == null)
-			{
-				throw CommonExceptions.ArgumentNull("fileName");
-			}
+			CommonExceptions.CheckArgumentNull(path, "path");
 			Contract.EndContractBlock();
 			return path.All(t => !invalidPathChars.Contains(t));
 		}
@@ -83,10 +80,7 @@ namespace Cyjb.IO
 		/// <exception cref="ArgumentNullException"><paramref name="path"/> 为 <c>null</c>。</exception>
 		public static string GetValidPath(string path, string replaceStr)
 		{
-			if (path == null)
-			{
-				throw CommonExceptions.ArgumentNull("fileName");
-			}
+			CommonExceptions.CheckArgumentNull(path, "path");
 			Contract.EndContractBlock();
 			StringBuilder builder = new StringBuilder(path.Length);
 			for (int i = 0; i < path.Length; i++)
@@ -111,10 +105,7 @@ namespace Cyjb.IO
 		/// <exception cref="ArgumentNullException"><paramref name="fileName"/> 为 <c>null</c>。</exception>
 		public static bool IsValidFileName(string fileName)
 		{
-			if (fileName == null)
-			{
-				throw CommonExceptions.ArgumentNull("fileName");
-			}
+			CommonExceptions.CheckArgumentNull(fileName, "fileName");
 			Contract.EndContractBlock();
 			return fileName.All(t => !invalidFileNameChars.Contains(t));
 		}
@@ -142,10 +133,7 @@ namespace Cyjb.IO
 		/// <exception cref="ArgumentNullException"><paramref name="fileName"/> 为 <c>null</c>。</exception>
 		public static string GetValidFileName(string fileName, string replaceStr)
 		{
-			if (fileName == null)
-			{
-				throw CommonExceptions.ArgumentNull("fileName");
-			}
+			CommonExceptions.CheckArgumentNull(fileName, "fileName");
 			StringBuilder builder = new StringBuilder(fileName.Length);
 			int len = fileName.Length;
 			for (int i = 0; i < len; i++)

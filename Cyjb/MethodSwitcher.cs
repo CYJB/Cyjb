@@ -108,19 +108,13 @@ namespace Cyjb
 		public static TDelegate Create<TDelegate>(params Delegate[] delegates)
 			where TDelegate : class
 		{
-			if (delegates == null)
-			{
-				throw CommonExceptions.ArgumentNull("delegates");
-			}
+			CommonExceptions.CheckArgumentNull(delegates, "delegates");
 			if (delegates.Any(d => d == null))
 			{
 				throw CommonExceptions.CollectionItemNull("delegates");
 			}
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
-			if (!typeof(TDelegate).IsSubclassOf(typeof(Delegate)))
-			{
-				throw CommonExceptions.MustBeDelegate("TDelegate", typeof(TDelegate));
-			}
+			CommonExceptions.CheckDelegateType(typeof(TDelegate));
 			ProcessorData data = new ProcessorData(delegates);
 			CheckDelegateType<TDelegate>(data);
 			return CreateSwitcher<TDelegate>(data, null, null);
@@ -139,15 +133,9 @@ namespace Cyjb
 		public static TDelegate Create<TDelegate>(Type type)
 			where TDelegate : class
 		{
-			if (type == null)
-			{
-				throw CommonExceptions.ArgumentNull("type");
-			}
+			CommonExceptions.CheckArgumentNull(type, "type");
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
-			if (!typeof(TDelegate).IsSubclassOf(typeof(Delegate)))
-			{
-				throw CommonExceptions.MustBeDelegate("TDelegate", typeof(TDelegate));
-			}
+			CommonExceptions.CheckDelegateType(typeof(TDelegate));
 			ProcessorData data = GetMethods<TDelegate>(type, ProcessorAttribute.DefaultId, true);
 			return CreateSwitcher<TDelegate>(data, ProcessorAttribute.DefaultId, null);
 		}
@@ -168,19 +156,10 @@ namespace Cyjb
 		public static TDelegate Create<TDelegate>(Type type, string id)
 			where TDelegate : class
 		{
-			if (type == null)
-			{
-				throw CommonExceptions.ArgumentNull("type");
-			}
-			if (string.IsNullOrEmpty(id))
-			{
-				throw CommonExceptions.StringEmpty("id");
-			}
+			CommonExceptions.CheckArgumentNull(type, "type");
+			CommonExceptions.CheckStringEmpty(id, "id");
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
-			if (!typeof(TDelegate).IsSubclassOf(typeof(Delegate)))
-			{
-				throw CommonExceptions.MustBeDelegate("TDelegate", typeof(TDelegate));
-			}
+			CommonExceptions.CheckDelegateType(typeof(TDelegate));
 			ProcessorData data = GetMethods<TDelegate>(type, id, true);
 			return CreateSwitcher<TDelegate>(data, id, null);
 		}
@@ -198,15 +177,9 @@ namespace Cyjb
 		public static TDelegate Create<TDelegate>(object target)
 			where TDelegate : class
 		{
-			if (target == null)
-			{
-				throw CommonExceptions.ArgumentNull("target");
-			}
+			CommonExceptions.CheckArgumentNull(target, "target");
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
-			if (!typeof(TDelegate).IsSubclassOf(typeof(Delegate)))
-			{
-				throw CommonExceptions.MustBeDelegate("TDelegate", typeof(TDelegate));
-			}
+			CommonExceptions.CheckDelegateType(typeof(TDelegate));
 			ProcessorData data = GetMethods<TDelegate>(target.GetType(), ProcessorAttribute.DefaultId, false);
 			return CreateSwitcher<TDelegate>(data, ProcessorAttribute.DefaultId, target);
 		}
@@ -227,19 +200,10 @@ namespace Cyjb
 		public static TDelegate Create<TDelegate>(object target, string id)
 			where TDelegate : class
 		{
-			if (target == null)
-			{
-				throw CommonExceptions.ArgumentNull("target");
-			}
-			if (string.IsNullOrEmpty(id))
-			{
-				throw CommonExceptions.StringEmpty("id");
-			}
+			CommonExceptions.CheckArgumentNull(target, "target");
+			CommonExceptions.CheckStringEmpty(id, "id");
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
-			if (!typeof(TDelegate).IsSubclassOf(typeof(Delegate)))
-			{
-				throw CommonExceptions.MustBeDelegate("TDelegate", typeof(TDelegate));
-			}
+			CommonExceptions.CheckDelegateType(typeof(TDelegate));
 			ProcessorData data = GetMethods<TDelegate>(target.GetType(), id, false);
 			return CreateSwitcher<TDelegate>(data, id, target);
 		}

@@ -135,10 +135,7 @@ namespace Cyjb.IO
 		public SourceReader(TextReader reader, SourcePosition initPosition, int tabSize)
 			: this(initPosition, tabSize)
 		{
-			if (reader == null)
-			{
-				throw CommonExceptions.ArgumentNull("reader");
-			}
+			CommonExceptions.CheckArgumentNull(reader, "reader");
 			if (tabSize <= 0)
 			{
 				throw CommonExceptions.ArgumentMustBePositive("tabSize", tabSize);

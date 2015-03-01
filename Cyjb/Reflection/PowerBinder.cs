@@ -191,10 +191,7 @@ namespace Cyjb.Reflection
 		public override MethodBase BindToMethod(BindingFlags bindingAttr, MethodBase[] match, ref object[] args,
 			ParameterModifier[] modifiers, CultureInfo culture, string[] names, out object state)
 		{
-			if (match == null)
-			{
-				throw CommonExceptions.ArgumentNull("match");
-			}
+			CommonExceptions.CheckArgumentNull(match, "match");
 			if (match.Length == 0)
 			{
 				throw CommonExceptions.CollectionEmpty("match");
@@ -293,10 +290,7 @@ namespace Cyjb.Reflection
 		public override MethodBase SelectMethod(BindingFlags bindingAttr, MethodBase[] match, Type[] types,
 			ParameterModifier[] modifiers)
 		{
-			if (match == null)
-			{
-				throw CommonExceptions.ArgumentNull("match");
-			}
+			CommonExceptions.CheckArgumentNull(match, "match");
 			if (match.Length == 0)
 			{
 				throw CommonExceptions.CollectionEmpty("match");

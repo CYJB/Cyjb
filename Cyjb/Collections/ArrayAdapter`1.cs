@@ -43,10 +43,7 @@ namespace Cyjb.Collections
 		public ArrayAdapter(params T[] array)
 			: base(array)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			Contract.EndContractBlock();
 			this.array = array;
 			this.count = array.Length;
@@ -63,10 +60,7 @@ namespace Cyjb.Collections
 		public ArrayAdapter(T[] array, int offset)
 			: base(array)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			if (offset < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("offset", offset);
@@ -95,10 +89,7 @@ namespace Cyjb.Collections
 		public ArrayAdapter(T[] array, int offset, int count)
 			: base(array)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			if (offset < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("offset", offset);

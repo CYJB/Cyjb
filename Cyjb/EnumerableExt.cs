@@ -20,10 +20,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> 为 <c>null</c>。</exception>
 		public static IEnumerable<TSource> RandomOrder<TSource>(this IEnumerable<TSource> source)
 		{
-			if (source == null)
-			{
-				throw CommonExceptions.ArgumentNull("source");
-			}
+			CommonExceptions.CheckArgumentNull(source, "source");
 			Contract.EndContractBlock();
 			return source.ToArray().Random();
 		}
@@ -55,10 +52,7 @@ namespace Cyjb
 		public static IEnumerable<TSource> Iterative<TSource>(this IEnumerable<TSource> source,
 			IEqualityComparer<TSource> comparer)
 		{
-			if (source == null)
-			{
-				throw CommonExceptions.ArgumentNull("source");
-			}
+			CommonExceptions.CheckArgumentNull(source, "source");
 			Contract.EndContractBlock();
 			Dictionary<TSource, bool> dict = new Dictionary<TSource, bool>(comparer);
 			foreach (TSource item in source)
@@ -89,14 +83,8 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="predicate"/> 为 <c>null</c>。</exception>
 		public static int FirstIndex<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate)
 		{
-			if (source == null)
-			{
-				throw CommonExceptions.ArgumentNull("source");
-			}
-			if (predicate == null)
-			{
-				throw CommonExceptions.ArgumentNull("predicate");
-			}
+			CommonExceptions.CheckArgumentNull(source, "source");
+			CommonExceptions.CheckArgumentNull(predicate, "predicate");
 			Contract.EndContractBlock();
 			int idx = 0;
 			foreach (TSource item in source)
@@ -121,14 +109,8 @@ namespace Cyjb
 		public static int LastIndex<TSource>(this IEnumerable<TSource> source,
 			Func<TSource, bool> predicate)
 		{
-			if (source == null)
-			{
-				throw CommonExceptions.ArgumentNull("source");
-			}
-			if (predicate == null)
-			{
-				throw CommonExceptions.ArgumentNull("predicate");
-			}
+			CommonExceptions.CheckArgumentNull(source, "source");
+			CommonExceptions.CheckArgumentNull(predicate, "predicate");
 			Contract.EndContractBlock();
 			int lastIdx = -1;
 			int idx = 0;

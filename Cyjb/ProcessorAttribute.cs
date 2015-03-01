@@ -38,10 +38,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentException"><paramref name="id"/> 为 <c>null</c> 或空字符串。</exception>
 		public ProcessorAttribute(string id)
 		{
-			if (string.IsNullOrEmpty(id))
-			{
-				throw CommonExceptions.StringEmpty(id);
-			}
+			CommonExceptions.CheckStringEmpty(id, "id");
 			Contract.EndContractBlock();
 			this.id = id;
 		}

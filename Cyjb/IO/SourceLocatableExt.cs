@@ -14,10 +14,7 @@ namespace Cyjb.IO
 		/// <value>指定对象在源文件中的字符长度。</value>
 		public static int Length(this ISourceLocatable locatable)
 		{
-			if (locatable == null)
-			{
-				throw CommonExceptions.ArgumentNull("locatable");
-			}
+			CommonExceptions.CheckArgumentNull(locatable, "locatable");
 			Contract.EndContractBlock();
 			return locatable.IsUnknown() ? 0 : locatable.End.Index - locatable.Start.Index + 1;
 		}
@@ -27,10 +24,7 @@ namespace Cyjb.IO
 		/// <value>如果指定对象表示未知范围，则为 <c>true</c>；否则为 <c>false</c>。</value>
 		public static bool IsUnknown(this ISourceLocatable locatable)
 		{
-			if (locatable == null)
-			{
-				throw CommonExceptions.ArgumentNull("locatable");
-			}
+			CommonExceptions.CheckArgumentNull(locatable, "locatable");
 			Contract.EndContractBlock();
 			return locatable.Start == SourcePosition.Unknown || locatable.End == SourcePosition.Unknown;
 		}
@@ -53,14 +47,8 @@ namespace Cyjb.IO
 		/// </override>
 		public static bool Contains(this ISourceLocatable thisObj, ISourceLocatable locatable)
 		{
-			if (thisObj == null)
-			{
-				throw CommonExceptions.ArgumentNull("thisObj");
-			}
-			if (locatable == null)
-			{
-				throw CommonExceptions.ArgumentNull("locatable");
-			}
+			CommonExceptions.CheckArgumentNull(thisObj, "thisObj");
+			CommonExceptions.CheckArgumentNull(locatable, "locatable");
 			Contract.EndContractBlock();
 			return (!thisObj.IsUnknown()) && thisObj.Start <= locatable.Start && thisObj.End >= locatable.End;
 		}
@@ -74,10 +62,7 @@ namespace Cyjb.IO
 		/// <exception cref="ArgumentNullException"><paramref name="thisObj"/> 为 <c>null</c>。</exception>
 		public static bool Contains(this ISourceLocatable thisObj, SourcePosition location)
 		{
-			if (thisObj == null)
-			{
-				throw CommonExceptions.ArgumentNull("thisObj");
-			}
+			CommonExceptions.CheckArgumentNull(thisObj, "thisObj");
 			Contract.EndContractBlock();
 			if (location.IsUnknown || thisObj.IsUnknown())
 			{
@@ -95,10 +80,7 @@ namespace Cyjb.IO
 		/// <exception cref="ArgumentNullException"><paramref name="thisObj"/> 为 <c>null</c>。</exception>
 		public static bool Contains(this ISourceLocatable thisObj, int index)
 		{
-			if (thisObj == null)
-			{
-				throw CommonExceptions.ArgumentNull("thisObj");
-			}
+			CommonExceptions.CheckArgumentNull(thisObj, "thisObj");
 			Contract.EndContractBlock();
 			if (index < 0 || thisObj.IsUnknown())
 			{
@@ -119,10 +101,7 @@ namespace Cyjb.IO
 		/// 小于 <c>0</c>。</exception>
 		public static bool Contains(this ISourceLocatable thisObj, int line, int col)
 		{
-			if (thisObj == null)
-			{
-				throw CommonExceptions.ArgumentNull("thisObj");
-			}
+			CommonExceptions.CheckArgumentNull(thisObj, "thisObj");
 			Contract.EndContractBlock();
 			if (line < 1 || col < 1 || thisObj.IsUnknown())
 			{
@@ -153,14 +132,8 @@ namespace Cyjb.IO
 		/// <paramref name="locatable"/> 为 <c>null</c>。</exception>
 		public static bool OverlapsWith(this ISourceLocatable thisObj, ISourceLocatable locatable)
 		{
-			if (thisObj == null)
-			{
-				throw CommonExceptions.ArgumentNull("thisObj");
-			}
-			if (locatable == null)
-			{
-				throw CommonExceptions.ArgumentNull("locatable");
-			}
+			CommonExceptions.CheckArgumentNull(thisObj, "thisObj");
+			CommonExceptions.CheckArgumentNull(locatable, "locatable");
 			Contract.EndContractBlock();
 			return (!thisObj.IsUnknown()) && thisObj.Start <= locatable.End && thisObj.End >= locatable.Start;
 		}
@@ -176,14 +149,8 @@ namespace Cyjb.IO
 		/// <paramref name="locatable"/> 为 <c>null</c>。</exception>>
 		public static SourceRange Overlap(this ISourceLocatable thisObj, ISourceLocatable locatable)
 		{
-			if (thisObj == null)
-			{
-				throw CommonExceptions.ArgumentNull("thisObj");
-			}
-			if (locatable == null)
-			{
-				throw CommonExceptions.ArgumentNull("locatable");
-			}
+			CommonExceptions.CheckArgumentNull(thisObj, "thisObj");
+			CommonExceptions.CheckArgumentNull(locatable, "locatable");
 			Contract.EndContractBlock();
 			SourcePosition maxStart = thisObj.Start > locatable.Start ? thisObj.Start : locatable.Start;
 			SourcePosition minEnd = thisObj.End < locatable.End ? thisObj.End : locatable.End;

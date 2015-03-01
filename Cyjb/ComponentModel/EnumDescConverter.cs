@@ -58,10 +58,7 @@ namespace Cyjb.ComponentModel
 		public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture,
 			object value, Type destinationType)
 		{
-			if (destinationType == null)
-			{
-				throw CommonExceptions.ArgumentNull("destinationType");
-			}
+			CommonExceptions.CheckArgumentNull(destinationType, "destinationType");
 			Contract.EndContractBlock();
 			if (value != null && destinationType == typeof(string))
 			{

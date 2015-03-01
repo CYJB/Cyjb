@@ -25,10 +25,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> 小于 <c>0</c>。</exception>
 		public static T[] Left<T>(this T[] array, int length)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			if (length < 0)
 			{
 				throw CommonExceptions.ArgumentOutOfRange("length", length);
@@ -59,10 +56,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> 小于 <c>0</c>。</exception>
 		public static T[] Right<T>(this T[] array, int length)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			if (length < 0)
 			{
 				throw CommonExceptions.ArgumentOutOfRange("length", length);
@@ -99,10 +93,7 @@ namespace Cyjb
 		/// </overloads>
 		public static T[] Subarray<T>(this T[] array, int startIndex)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			if (startIndex < -array.Length || startIndex > array.Length)
 			{
 				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
@@ -133,10 +124,7 @@ namespace Cyjb
 		/// 之和指示的位置不在此数组中。</exception>
 		public static T[] Subarray<T>(this T[] array, int startIndex, int length)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			if (startIndex < -array.Length)
 			{
 				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
@@ -176,10 +164,7 @@ namespace Cyjb
 		/// </overloads>
 		public static T[] Slice<T>(this T[] array, int startIndex)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			if (startIndex < -array.Length || startIndex > array.Length)
 			{
 				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
@@ -213,10 +198,7 @@ namespace Cyjb
 		/// 指示的位置不在此数组中。</exception>
 		public static T[] Slice<T>(this T[] array, int startIndex, int endIndex)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			if (startIndex < -array.Length || startIndex > array.Length)
 			{
 				throw CommonExceptions.ArgumentOutOfRange("startIndex", startIndex);
@@ -287,10 +269,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
 		public static T[] Add<T>(this T[] array, params T[] items)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			if (items == null || items.Length == 0)
 			{
@@ -314,10 +293,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c> 或大于数组的长度。</exception>
 		public static T[] Insert<T>(this T[] array, int index, params T[] items)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);
@@ -350,10 +326,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="arrays"/> 为 <c>null</c>。</exception>
 		public static T[] Combine<T>(params T[][] arrays)
 		{
-			if (arrays == null)
-			{
-				throw CommonExceptions.ArgumentNull("arrays");
-			}
+			CommonExceptions.CheckArgumentNull(arrays, "arrays");
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			int len = arrays.Sum(arr => arr == null ? 0 : arr.Length);
 			if (len == 0)
@@ -382,10 +355,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
 		public static T[] Extend<T>(this T[] array, int length)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			if (length <= array.Length)
 			{
@@ -406,10 +376,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
 		public static T[] Extend<T>(this T[] array, int length, T value)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			Contract.Ensures(Contract.Result<T[]>() != null);
 			if (length <= array.Length)
 			{
@@ -435,10 +402,7 @@ namespace Cyjb
 		/// <typeparamref name="TOutput"/> 类型。</exception>
 		public static TOutput[] ConvertAll<TInput, TOutput>(this TInput[] array)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("array");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			Contract.EndContractBlock();
 			Converter<TInput, TOutput> converter = Convert.GetConverter<TInput, TOutput>();
 			if (converter == null)

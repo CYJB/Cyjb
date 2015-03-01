@@ -78,10 +78,7 @@ namespace Cyjb.Collections
 		/// </overloads>
 		public override int GetHashCode(ISet<T> obj)
 		{
-			if (obj == null)
-			{
-				throw CommonExceptions.ArgumentNull("obj");
-			}
+			CommonExceptions.CheckArgumentNull(obj, "obj");
 			Contract.EndContractBlock();
 			// 使用与位置无关的弱哈希。
 			return obj.Count ^ obj.Select(o => o.GetHashCode()).Aggregate((x, y) => x ^ y);

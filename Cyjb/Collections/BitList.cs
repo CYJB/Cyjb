@@ -92,10 +92,7 @@ namespace Cyjb.Collections
 		public BitList(IEnumerable<uint> collection)
 			: this(0)
 		{
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("collection");
-			}
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			Contract.EndContractBlock();
 			this.AddRange(collection);
 		}
@@ -109,10 +106,7 @@ namespace Cyjb.Collections
 		public BitList(IEnumerable<int> collection)
 			: this(0)
 		{
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("collection");
-			}
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			Contract.EndContractBlock();
 			this.AddRange(collection);
 		}
@@ -126,10 +120,7 @@ namespace Cyjb.Collections
 		public BitList(IEnumerable<byte> collection)
 			: this(0)
 		{
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("collection");
-			}
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			Contract.EndContractBlock();
 			this.AddRange(collection);
 		}
@@ -142,10 +133,7 @@ namespace Cyjb.Collections
 		public BitList(IEnumerable<bool> collection)
 			: this(0)
 		{
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("collection");
-			}
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			Contract.EndContractBlock();
 			this.AddRange(collection);
 		}
@@ -215,10 +203,7 @@ namespace Cyjb.Collections
 		/// </overloads>
 		public void AddRange(IEnumerable<uint> collection)
 		{
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("collection");
-			}
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			Contract.EndContractBlock();
 			this.InsertRange(this.count, collection);
 		}
@@ -230,10 +215,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public void AddRange(IEnumerable<int> collection)
 		{
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("collection");
-			}
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			Contract.EndContractBlock();
 			this.InsertRange(this.count, collection);
 		}
@@ -245,10 +227,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public void AddRange(IEnumerable<byte> collection)
 		{
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("collection");
-			}
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			Contract.EndContractBlock();
 			this.InsertRange(this.count, collection);
 		}
@@ -260,10 +239,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public void AddRange(IEnumerable<bool> collection)
 		{
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("collection");
-			}
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			Contract.EndContractBlock();
 			this.InsertRange(this.count, collection);
 		}
@@ -306,10 +282,7 @@ namespace Cyjb.Collections
 		/// </overloads>
 		public void InsertRange(int index, IEnumerable<int> collection)
 		{
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("collection");
-			}
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);
@@ -333,10 +306,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 大于 <see cref="Count"/>。</exception>
 		public void InsertRange(int index, IEnumerable<uint> collection)
 		{
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("collection");
-			}
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);
@@ -360,10 +330,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 大于 <see cref="Count"/>。</exception>
 		public void InsertRange(int index, IEnumerable<byte> collection)
 		{
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("collection");
-			}
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);
@@ -406,10 +373,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 大于 <see cref="Count"/>。</exception>
 		public void InsertRange(int index, IEnumerable<bool> collection)
 		{
-			if (collection == null)
-			{
-				throw CommonExceptions.ArgumentNull("collection");
-			}
+			CommonExceptions.CheckArgumentNull(collection, "collection");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);
@@ -802,10 +766,7 @@ namespace Cyjb.Collections
 		/// 和当前 <see cref="BitList"/> 的元素数不同。</exception>
 		public BitList And(BitList list)
 		{
-			if (list == null)
-			{
-				throw CommonExceptions.ArgumentNull("list");
-			}
+			CommonExceptions.CheckArgumentNull(list, "list");
 			if (list.count != this.count)
 			{
 				throw CommonExceptions.CollectionCountDiffer("list");
@@ -833,10 +794,7 @@ namespace Cyjb.Collections
 		/// 和当前 <see cref="BitList"/> 的元素数不同。</exception>
 		public BitList Or(BitList list)
 		{
-			if (list == null)
-			{
-				throw CommonExceptions.ArgumentNull("list");
-			}
+			CommonExceptions.CheckArgumentNull(list, "list");
 			if (list.count != this.count)
 			{
 				throw CommonExceptions.CollectionCountDiffer("list");
@@ -864,10 +822,7 @@ namespace Cyjb.Collections
 		/// 和当前 <see cref="BitList"/> 的元素数不同。</exception>
 		public BitList Xor(BitList list)
 		{
-			if (list == null)
-			{
-				throw CommonExceptions.ArgumentNull("list");
-			}
+			CommonExceptions.CheckArgumentNull(list, "list");
 			if (list.count != this.count)
 			{
 				throw CommonExceptions.CollectionCountDiffer("list");
@@ -954,7 +909,7 @@ namespace Cyjb.Collections
 		/// <param name="item">要插入的对象。</param>
 		protected override void InsertItem(int index, bool item)
 		{
-			if(this.count + 1 > this.capacity)
+			if (this.count + 1 > this.capacity)
 			{
 				EnsureCapacity(this.count + 1);
 			}
@@ -1116,10 +1071,7 @@ namespace Cyjb.Collections
 		/// 的类型无法自动转换为目标 <paramref name="array"/> 的类型。</exception>
 		void ICollection.CopyTo(Array array, int index)
 		{
-			if (array == null)
-			{
-				throw CommonExceptions.ArgumentNull("source");
-			}
+			CommonExceptions.CheckArgumentNull(array, "array");
 			if (array.Rank != 1)
 			{
 				throw CommonExceptions.MultidimensionalArrayNotSupported("array");

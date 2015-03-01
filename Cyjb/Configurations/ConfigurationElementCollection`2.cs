@@ -44,10 +44,7 @@ namespace Cyjb.Configurations
 			get { return BaseGet(key) as TElement; }
 			set
 			{
-				if (value == null)
-				{
-					throw CommonExceptions.ArgumentNull("value");
-				}
+				CommonExceptions.CheckArgumentNull(value, "value");
 				Contract.EndContractBlock();
 				ConfigurationElement item = BaseGet(key);
 				if (item != null)

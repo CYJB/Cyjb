@@ -21,10 +21,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="dict"/> 为 <c>null</c>。</exception>
 		public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
 		{
-			if (dict == null)
-			{
-				throw CommonExceptions.ArgumentNull("dict");
-			}
+			CommonExceptions.CheckArgumentNull(dict, "dict");
 			Contract.EndContractBlock();
 			TValue value;
 			return dict.TryGetValue(key, out value) ? value : default(TValue);

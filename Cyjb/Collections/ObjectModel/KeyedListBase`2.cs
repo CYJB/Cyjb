@@ -161,10 +161,7 @@ namespace Cyjb.Collections.ObjectModel
 		{
 			get
 			{
-				if (key == null)
-				{
-					throw CommonExceptions.ArgumentNull("key");
-				}
+				CommonExceptions.CheckArgumentNull(key, "key");
 				Contract.Ensures(Contract.Result<TItem>() != null);
 				TItem item;
 				if (this.TryGetValue(key, out item))
@@ -246,10 +243,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// </overloads>
 		public bool Remove(TKey key)
 		{
-			if (key == null)
-			{
-				throw CommonExceptions.ArgumentNull("key");
-			}
+			CommonExceptions.CheckArgumentNull(key, "key");
 			Contract.EndContractBlock();
 			int index = this.IndexOf(key);
 			if (index < 0)
@@ -270,10 +264,7 @@ namespace Cyjb.Collections.ObjectModel
 		[Pure]
 		public bool TryGetValue(TKey key, out TItem item)
 		{
-			if (key == null)
-			{
-				throw CommonExceptions.ArgumentNull("key");
-			}
+			CommonExceptions.CheckArgumentNull(key, "key");
 			Contract.EndContractBlock();
 			if (this.dict != null)
 			{
@@ -334,10 +325,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="item"/> 为 <c>null</c>。</exception>
 		protected override void InsertItem(int index, TItem item)
 		{
-			if (item == null)
-			{
-				throw CommonExceptions.ArgumentNull("item");
-			}
+			CommonExceptions.CheckArgumentNull(item, "item");
 			Contract.EndContractBlock();
 			TKey key = this.GetKeyForItem(item);
 			this.AddKey(key, item);
@@ -363,10 +351,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="item"/> 为 <c>null</c>。</exception>
 		protected override void SetItemAt(int index, TItem item)
 		{
-			if (item == null)
-			{
-				throw CommonExceptions.ArgumentNull("item");
-			}
+			CommonExceptions.CheckArgumentNull(item, "item");
 			Contract.EndContractBlock();
 			TItem oldItem = this.GetItemAt(index);
 			Contract.Assume(oldItem != null);

@@ -29,10 +29,7 @@ namespace Cyjb.Text
 		/// <exception cref="ArgumentNullException"><paramref name="chars"/> 为 <c>null</c>。</exception>
 		public CharsReader(IEnumerable<char> chars)
 		{
-			if (chars == null)
-			{
-				throw CommonExceptions.ArgumentNull("chars");
-			}
+			CommonExceptions.CheckArgumentNull(chars, "chars");
 			Contract.EndContractBlock();
 			this.chars = chars.GetEnumerator();
 			this.nextChar = this.NextChar();
@@ -95,10 +92,7 @@ namespace Cyjb.Text
 		/// 不指定 <paramref name="buffer"/> 中的有效范围。</exception>
 		public override int Read(char[] buffer, int index, int count)
 		{
-			if (buffer == null)
-			{
-				throw CommonExceptions.ArgumentNull("buffer");
-			}
+			CommonExceptions.CheckArgumentNull(buffer, "buffer");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);
