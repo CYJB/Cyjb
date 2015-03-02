@@ -118,6 +118,17 @@ namespace Cyjb
 		private static Delegate CreateOpenDelegate(Type type, PropertyInfo property, bool throwOnBindFailure)
 		{
 			Contract.Requires(type != null && property != null);
+			// 检查属性是否包含泛型参数。
+			Type declaringType = property.DeclaringType;
+			Contract.Assume(declaringType != null);
+			if (declaringType.ContainsGenericParameters)
+			{
+				if (throwOnBindFailure)
+				{
+					throw CommonExceptions.UnboundGenParam("property");
+				}
+				return null;
+			}
 			MethodInfo invoke = type.GetInvokeMethod();
 			// 判断是获取属性还是设置属性。
 			MethodInfo method;
@@ -144,15 +155,6 @@ namespace Cyjb
 					}
 					return null;
 				}
-			}
-			// 检查方法是否包含泛型参数。
-			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
-			{
-				if (throwOnBindFailure)
-				{
-					throw CommonExceptions.UnboundGenParam("property");
-				}
-				return null;
 			}
 			// 创建委托。
 			Delegate dlg = CreateOpenDelegate(type, method);
@@ -276,6 +278,17 @@ namespace Cyjb
 			bool throwOnBindFailure)
 		{
 			Contract.Requires(type != null && property != null);
+			// 检查属性是否包含泛型参数。
+			Type declaringType = property.DeclaringType;
+			Contract.Assume(declaringType != null);
+			if (declaringType.ContainsGenericParameters)
+			{
+				if (throwOnBindFailure)
+				{
+					throw CommonExceptions.UnboundGenParam("property");
+				}
+				return null;
+			}
 			MethodInfo invoke = type.GetInvokeMethod();
 			// 判断是获取属性还是设置属性。
 			MethodInfo method;
@@ -302,15 +315,6 @@ namespace Cyjb
 					}
 					return null;
 				}
-			}
-			// 检查方法是否包含泛型参数。
-			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
-			{
-				if (throwOnBindFailure)
-				{
-					throw CommonExceptions.UnboundGenParam("property");
-				}
-				return null;
 			}
 			// 创建委托。
 			Delegate dlg = CreateClosedDelegate(type, method, firstArgument);
