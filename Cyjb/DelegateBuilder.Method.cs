@@ -364,7 +364,7 @@ namespace Cyjb
 				}
 				else if (argumentType != TypeExt.ReferenceTypeMark && paramType != argumentType)
 				{
-					il.EmitConversion(argumentType, paramType, true);
+					il.EmitConversion(argumentType, paramType, true, ConversionType.Explicit);
 				}
 			}
 			return true;
