@@ -30,7 +30,7 @@ namespace Cyjb
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
-			return CreateOpenDelegate(type, property, true) as TDelegate;
+			return CreateOpenDelegate(property, type, true) as TDelegate;
 		}
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示获取或设置指定静态或实例属性的指定类型的委托。
@@ -55,7 +55,7 @@ namespace Cyjb
 			Contract.EndContractBlock();
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
-			return CreateOpenDelegate(type, property, throwOnBindFailure) as TDelegate;
+			return CreateOpenDelegate(property, type, throwOnBindFailure) as TDelegate;
 		}
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示获取或设置指定静态或实例属性的指定类型的委托。
@@ -63,21 +63,21 @@ namespace Cyjb
 		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="property">描述委托要表示的静态或实例属性的 <see cref="PropertyInfo"/>。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例属性。</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentException"><paramref name="type"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="property"/>。</exception>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="property"/>。</exception>
-		public static Delegate CreateDelegate(Type type, PropertyInfo property)
+		public static Delegate CreateDelegate(this PropertyInfo property, Type delegateType)
 		{
-			CommonExceptions.CheckArgumentNull(type, "type");
 			CommonExceptions.CheckArgumentNull(property, "property");
+			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.Ensures(Contract.Result<Delegate>() != null);
-			CommonExceptions.CheckDelegateType(type, "type");
-			return CreateOpenDelegate(type, property, true);
+			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
+			return CreateOpenDelegate(property, delegateType, true);
 		}
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示获取或设置指定静态或实例属性的指定类型的委托。
@@ -85,24 +85,24 @@ namespace Cyjb
 		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="property">描述委托要表示的静态或实例属性的 <see cref="PropertyInfo"/>。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="property"/> 
-		/// 时引发异常；否则为 <c>false</c>。</param>
+		///     时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例属性。</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentException"><paramref name="type"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="property"/> 
 		/// 且 <paramref name="throwOnBindFailure"/> 为 <c>true</c>。</exception>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="property"/>。</exception>
-		public static Delegate CreateDelegate(Type type, PropertyInfo property, bool throwOnBindFailure)
+		public static Delegate CreateDelegate(this PropertyInfo property, Type delegateType, bool throwOnBindFailure)
 		{
-			CommonExceptions.CheckArgumentNull(type, "type");
 			CommonExceptions.CheckArgumentNull(property, "property");
+			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.EndContractBlock();
-			CommonExceptions.CheckDelegateType(type, "type");
-			return CreateOpenDelegate(type, property, throwOnBindFailure);
+			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
+			return CreateOpenDelegate(property, delegateType, throwOnBindFailure);
 		}
 		/// <summary>
 		/// 创建指定的静态或实例属性的指定类型的开放属性委托。
@@ -110,14 +110,14 @@ namespace Cyjb
 		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="property">要获取或设置的属性。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="property"/> 
-		/// 时引发异常；否则为 <c>false</c>。</param>
-		/// <returns><paramref name="type"/> 类型的委托，表示静态或实例属性的委托。</returns>
-		private static Delegate CreateOpenDelegate(Type type, PropertyInfo property, bool throwOnBindFailure)
+		///     时引发异常；否则为 <c>false</c>。</param>
+		/// <returns><paramref name="delegateType"/> 类型的委托，表示静态或实例属性的委托。</returns>
+		private static Delegate CreateOpenDelegate(PropertyInfo property, Type delegateType, bool throwOnBindFailure)
 		{
-			Contract.Requires(type != null && property != null);
+			Contract.Requires(property != null && delegateType != null);
 			// 检查属性是否包含泛型参数。
 			Type declaringType = property.DeclaringType;
 			Contract.Assume(declaringType != null);
@@ -129,7 +129,7 @@ namespace Cyjb
 				}
 				return null;
 			}
-			MethodInfo invoke = type.GetInvokeMethod();
+			MethodInfo invoke = delegateType.GetInvokeMethod();
 			// 判断是获取属性还是设置属性。
 			MethodInfo method;
 			if (invoke.ReturnType == typeof(void))
@@ -157,7 +157,7 @@ namespace Cyjb
 				}
 			}
 			// 创建委托。
-			Delegate dlg = CreateOpenDelegate(type, method);
+			Delegate dlg = CreateOpenDelegate(method, delegateType);
 			if (dlg == null && throwOnBindFailure)
 			{
 				throw CommonExceptions.BindTargetProperty("property");
@@ -189,7 +189,7 @@ namespace Cyjb
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
-			return CreateClosedDelegate(type, property, firstArgument, true) as TDelegate;
+			return CreateClosedDelegate(property, type, firstArgument, true) as TDelegate;
 		}
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示获取或设置指定的静态或实例属性的指定类型的委托。 
@@ -215,69 +215,71 @@ namespace Cyjb
 			Contract.EndContractBlock();
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
-			return CreateClosedDelegate(type, property, firstArgument, throwOnBindFailure) as TDelegate;
+			return CreateClosedDelegate(property, type, firstArgument, throwOnBindFailure) as TDelegate;
 		}
 		/// <summary>
 		/// 使用指定的第一个参数，创建用于表示获取或设置指定的静态或实例属性的指定类型的委托。 
 		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="property">描述委托要表示的静态或实例属性的 <see cref="PropertyInfo"/>。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="firstArgument">如果是实例属性，则作为委托要绑定到的对象；否则将作为属性的第一个参数。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例属性。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentException"><paramref name="type"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="property"/>。</exception>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="property"/>。</exception>
-		public static Delegate CreateDelegate(Type type, PropertyInfo property, object firstArgument)
+		public static Delegate CreateDelegate(this PropertyInfo property, Type delegateType, object firstArgument)
 		{
-			CommonExceptions.CheckArgumentNull(type, "type");
 			CommonExceptions.CheckArgumentNull(property, "property");
+			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.Ensures(Contract.Result<Delegate>() != null);
-			CommonExceptions.CheckDelegateType(type, "type");
-			return CreateClosedDelegate(type, property, firstArgument, true);
+			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
+			return CreateClosedDelegate(property, delegateType, firstArgument, true);
 		}
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示获取或设置指定的静态或实例属性的指定类型的委托。 
 		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="property">描述委托要表示的静态或实例属性的 <see cref="PropertyInfo"/>。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="firstArgument">如果是实例属性，则作为委托要绑定到的对象；否则将作为属性的第一个参数。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="property"/> 
-		/// 时引发异常；否则为 <c>false</c>。</param>
+		///     时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例属性。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentException"><paramref name="type"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="property"/> 
 		/// 且 <paramref name="throwOnBindFailure"/> 为 <c>true</c>。</exception>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="property"/>。</exception>
-		public static Delegate CreateDelegate(Type type, PropertyInfo property, object firstArgument,
+		public static Delegate CreateDelegate(this PropertyInfo property, Type delegateType, object firstArgument,
 			bool throwOnBindFailure)
 		{
-			CommonExceptions.CheckArgumentNull(type, "type");
 			CommonExceptions.CheckArgumentNull(property, "property");
+			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.EndContractBlock();
-			CommonExceptions.CheckDelegateType(type, "type");
-			return CreateClosedDelegate(type, property, firstArgument, throwOnBindFailure);
+			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
+			return CreateClosedDelegate(property, delegateType, firstArgument, throwOnBindFailure);
 		}
 		/// <summary>
 		/// 创建指定的静态或实例属性的指定类型的封闭属性委托。
 		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="property">要获取或设置的属性。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="firstArgument">如果是实例属性，则作为委托要绑定到的对象；否则将作为属性的第一个参数。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="property"/> 
-		/// 时引发异常；否则为 <c>false</c>。</param>
-		/// <returns><paramref name="type"/> 类型的委托，表示静态或实例属性的委托。</returns>
-		private static Delegate CreateClosedDelegate(Type type, PropertyInfo property, object firstArgument,
+		///     时引发异常；否则为 <c>false</c>。</param>
+		/// <returns><paramref name="delegateType"/> 类型的委托，表示静态或实例属性的委托。</returns>
+		private static Delegate CreateClosedDelegate(PropertyInfo property, Type delegateType, object firstArgument,
 			bool throwOnBindFailure)
 		{
-			Contract.Requires(type != null && property != null);
+			Contract.Requires(property != null && delegateType != null);
 			// 检查属性是否包含泛型参数。
 			Type declaringType = property.DeclaringType;
 			Contract.Assume(declaringType != null);
@@ -289,7 +291,7 @@ namespace Cyjb
 				}
 				return null;
 			}
-			MethodInfo invoke = type.GetInvokeMethod();
+			MethodInfo invoke = delegateType.GetInvokeMethod();
 			// 判断是获取属性还是设置属性。
 			MethodInfo method;
 			if (invoke.ReturnType == typeof(void))
@@ -317,7 +319,7 @@ namespace Cyjb
 				}
 			}
 			// 创建委托。
-			Delegate dlg = CreateClosedDelegate(type, method, firstArgument);
+			Delegate dlg = CreateClosedDelegate(method, delegateType, firstArgument);
 			if (dlg == null && throwOnBindFailure)
 			{
 				throw CommonExceptions.BindTargetProperty("property");

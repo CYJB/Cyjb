@@ -517,7 +517,7 @@ namespace Cyjb
 				{
 					Type keyType = list[i].GetParameters()[this.KeyIndex].ParameterType;
 					// 经过前面的类型检查，创建委托时应当总是会成功。
-					this.Processors.Add(keyType, DelegateBuilder.CreateDelegate(this.DelegateType, list[i]));
+					this.Processors.Add(keyType, DelegateBuilder.CreateDelegate(list[i], this.DelegateType));
 				}
 			}
 			/// <summary>

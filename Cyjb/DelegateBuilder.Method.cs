@@ -42,7 +42,7 @@ namespace Cyjb
 			{
 				throw CommonExceptions.UnboundGenParam("method");
 			}
-			Delegate dlg = CreateOpenDelegate(type, method);
+			Delegate dlg = CreateOpenDelegate(method, type);
 			if (dlg == null)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -75,7 +75,7 @@ namespace Cyjb
 			{
 				throw CommonExceptions.UnboundGenParam("method");
 			}
-			Delegate dlg = CreateOpenDelegate(type, method);
+			Delegate dlg = CreateOpenDelegate(method, type);
 			if (dlg == null && throwOnBindFailure)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -87,25 +87,25 @@ namespace Cyjb
 		/// 如果是实例方法（非构造函数），需要将实例对象作为委托的第一个参数。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentException"><paramref name="type"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="method"/>。</exception>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
-		public static Delegate CreateDelegate(Type type, MethodBase method)
+		public static Delegate CreateDelegate(this MethodBase method, Type delegateType)
 		{
-			CommonExceptions.CheckArgumentNull(type, "type");
 			CommonExceptions.CheckArgumentNull(method, "method");
+			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.Ensures(Contract.Result<Delegate>() != null);
-			CommonExceptions.CheckDelegateType(type, "type");
+			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
 			}
-			Delegate dlg = CreateOpenDelegate(type, method);
+			Delegate dlg = CreateOpenDelegate(method, delegateType);
 			if (dlg == null)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -117,28 +117,28 @@ namespace Cyjb
 		/// 如果是实例方法（非构造函数），需要将实例对象作为委托的第一个参数。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="method"/> 
 		/// 时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentException"><paramref name="type"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="method"/>
 		/// 且 <paramref name="throwOnBindFailure"/> 为 <c>true</c>。</exception>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
-		public static Delegate CreateDelegate(Type type, MethodBase method, bool throwOnBindFailure)
+		public static Delegate CreateDelegate(this MethodBase method, Type delegateType, bool throwOnBindFailure)
 		{
-			CommonExceptions.CheckArgumentNull(type, "type");
 			CommonExceptions.CheckArgumentNull(method, "method");
+			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.EndContractBlock();
-			CommonExceptions.CheckDelegateType(type, "type");
+			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
 			}
-			Delegate dlg = CreateOpenDelegate(type, method);
+			Delegate dlg = CreateOpenDelegate(method, delegateType);
 			if (dlg == null && throwOnBindFailure)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -150,20 +150,20 @@ namespace Cyjb
 		/// 如果是实例方法（非构造函数），需要将实例对象作为委托的第一个参数。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。方法不能是包含泛型参数的非泛型定义。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="method">要调用的方法。</param>
-		/// <returns><paramref name="type"/> 类型的委托，表示静态或实例方法的委托。</returns>
+		/// <param name="delegateType">要创建的委托的类型。</param>
+		/// <returns><paramref name="delegateType"/> 类型的委托，表示静态或实例方法的委托。</returns>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
-		private static Delegate CreateOpenDelegate(Type type, MethodBase method)
+		private static Delegate CreateOpenDelegate(MethodBase method, Type delegateType)
 		{
-			Contract.Requires(type != null && method != null);
+			Contract.Requires(method != null && delegateType != null);
 			// 判断是否需要作为实例的形参。
 			int index = 0;
 			if (!method.IsStatic && !(method is ConstructorInfo))
 			{
 				index++;
 			}
-			MethodInfo invoke = type.GetInvokeMethod();
+			MethodInfo invoke = delegateType.GetInvokeMethod();
 			Type[] paramTypes = invoke.GetParameterTypes();
 			Type[] types = paramTypes.Extend(method.GetParametersNoCopy().Length + index);
 			Type returnType = invoke.ReturnType;
@@ -195,7 +195,7 @@ namespace Cyjb
 			{
 				return null;
 			}
-			return dlgMethod.CreateDelegate(type);
+			return dlgMethod.CreateDelegate(delegateType);
 		}
 		/// <summary>
 		/// 获取指定方法的参数信息。
@@ -457,7 +457,7 @@ namespace Cyjb
 			{
 				throw CommonExceptions.UnboundGenParam("method");
 			}
-			Delegate dlg = CreateClosedDelegate(type, method, firstArgument);
+			Delegate dlg = CreateClosedDelegate(method, type, firstArgument);
 			if (dlg == null)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -492,7 +492,7 @@ namespace Cyjb
 			{
 				throw CommonExceptions.UnboundGenParam("method");
 			}
-			Delegate dlg = CreateClosedDelegate(type, method, firstArgument);
+			Delegate dlg = CreateClosedDelegate(method, type, firstArgument);
 			if (dlg == null && throwOnBindFailure)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -503,28 +503,28 @@ namespace Cyjb
 		/// 使用指定的第一个参数，创建用于表示指定静态或实例方法的指定类型的委托。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="firstArgument">如果是实例方法（非构造函数），则作为委托要绑定到的对象；
 		/// 否则将作为方法的第一个参数。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentException"><paramref name="type"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="method"/>。</exception>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
 		/// <seealso cref="Delegate.CreateDelegate(Type, object, MethodInfo)"/>
-		public static Delegate CreateDelegate(Type type, MethodBase method, object firstArgument)
+		public static Delegate CreateDelegate(this MethodBase method, Type delegateType, object firstArgument)
 		{
-			CommonExceptions.CheckArgumentNull(type, "type");
 			CommonExceptions.CheckArgumentNull(method, "method");
+			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.Ensures(Contract.Result<Delegate>() != null);
-			CommonExceptions.CheckDelegateType(type, "type");
+			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
 			}
-			Delegate dlg = CreateClosedDelegate(type, method, firstArgument);
+			Delegate dlg = CreateClosedDelegate(method, delegateType, firstArgument);
 			if (dlg == null)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -535,31 +535,32 @@ namespace Cyjb
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示指定静态或实例方法的指定类型的委托。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="firstArgument">如果是实例方法（非构造函数），则作为委托要绑定到的对象；
-		/// 否则将作为方法的第一个参数。</param>
+		///     否则将作为方法的第一个参数。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="method"/> 
-		/// 时引发异常；否则为 <c>false</c>。</param>
+		///     时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentException"><paramref name="type"/> 不是委托类型。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="method"/>
 		/// 且 <paramref name="throwOnBindFailure"/> 为 <c>true</c>。</exception>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
 		/// <seealso cref="Delegate.CreateDelegate(Type, object, MethodInfo, bool)"/>
-		public static Delegate CreateDelegate(Type type, MethodBase method, object firstArgument, bool throwOnBindFailure)
+		public static Delegate CreateDelegate(this MethodBase method, Type delegateType, object firstArgument, 
+			bool throwOnBindFailure)
 		{
-			CommonExceptions.CheckArgumentNull(type, "type");
 			CommonExceptions.CheckArgumentNull(method, "method");
+			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.EndContractBlock();
-			CommonExceptions.CheckDelegateType(type, "type");
+			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
 			}
-			Delegate dlg = CreateClosedDelegate(type, method, firstArgument);
+			Delegate dlg = CreateClosedDelegate(method, delegateType, firstArgument);
 			if (dlg == null && throwOnBindFailure)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -570,26 +571,26 @@ namespace Cyjb
 		/// 创建指定的静态或实例方法的指定类型的封闭方法委托。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。方法不能是包含泛型参数的非泛型定义。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
 		/// <param name="method">要调用的方法。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="firstArgument">如果是实例方法（非构造函数），则作为委托要绑定到的对象；
-		/// 否则将作为方法的第一个参数。</param>
-		/// <returns><paramref name="type"/> 类型的委托，表示静态或实例方法的委托。</returns>
+		///     否则将作为方法的第一个参数。</param>
+		/// <returns><paramref name="delegateType"/> 类型的委托，表示静态或实例方法的委托。</returns>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
-		private static Delegate CreateClosedDelegate(Type type, MethodBase method, object firstArgument)
+		private static Delegate CreateClosedDelegate(MethodBase method, Type delegateType, object firstArgument)
 		{
-			Contract.Requires(type != null && method != null);
+			Contract.Requires(method != null && delegateType != null);
 			if (firstArgument == null)
 			{
 				// 开放方法。
-				Delegate dlg = CreateOpenDelegate(type, method);
+				Delegate dlg = CreateOpenDelegate(method, delegateType);
 				if (dlg != null)
 				{
 					return dlg;
 				}
 			}
 			// 封闭方法。
-			MethodInfo invoke = type.GetInvokeMethod();
+			MethodInfo invoke = delegateType.GetInvokeMethod();
 			Type[] paramTypes = invoke.GetParameterTypes();
 			Type[] paramTypesWithFirstArg = paramTypes.Insert(0,
 				// 这里使用 firstArgument 的实际类型，因为需要做类型检查和泛型类型推断。
@@ -654,7 +655,7 @@ namespace Cyjb
 			{
 				return null;
 			}
-			return needLoadFirstArg ? dlgMethod.CreateDelegate(type, firstArgument) : dlgMethod.CreateDelegate(type);
+			return needLoadFirstArg ? dlgMethod.CreateDelegate(delegateType, firstArgument) : dlgMethod.CreateDelegate(delegateType);
 		}
 		/// <summary>
 		/// 获取 firstArgument 对应的形参类型。

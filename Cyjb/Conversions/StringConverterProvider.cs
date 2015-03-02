@@ -52,7 +52,7 @@ namespace Cyjb.Conversions
 		{
 			if (outputType.IsEnum)
 			{
-				return DelegateBuilder.CreateDelegate(Convert.GetConverterType(typeof(string), outputType), convertToEnumMethod);
+				return DelegateBuilder.CreateDelegate(convertToEnumMethod, Convert.GetConverterType(typeof(string), outputType));
 			}
 			switch (Type.GetTypeCode(outputType))
 			{
@@ -99,7 +99,7 @@ namespace Cyjb.Conversions
 		/// 其输入类型是 <paramref name="inputType"/>，输出类型是 <see cref="OriginType"/>。</remarks>
 		public Delegate GetConverterFrom(Type inputType)
 		{
-			return DelegateBuilder.CreateDelegate(Convert.GetConverterType(inputType, typeof(string)), convertToStringMethod);
+			return DelegateBuilder.CreateDelegate(convertToStringMethod, Convert.GetConverterType(inputType, typeof(string)));
 		}
 		/// <summary>
 		/// 将指定类型转换为字符串。
