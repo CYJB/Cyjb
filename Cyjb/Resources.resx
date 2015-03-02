@@ -481,4 +481,8 @@
     <value>Late bound operations cannot be performed on types or methods for which ContainsGenericParameters is true.</value>
     <comment>不能对包含未赋值的泛型类型参数的类型和方法进行后期绑定。</comment>
   </data>
+  <data name="ArgumentBothNull" xml:space="preserve">
+    <value>Value of parameter '{0}' and '{1}' can not botn be null.</value>
+    <comment>参数全部为 null。</comment>
+  </data>
 </root>

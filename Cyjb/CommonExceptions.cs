@@ -19,6 +19,22 @@ namespace Cyjb
 		#region 参数异常
 
 		/// <summary>
+		/// 返回参数全部为 <c>null</c> 的异常。
+		/// </summary>
+		/// <param name="firstParamName">为 <c>null</c> 的第一个参数名。</param>
+		/// <param name="secondParamName">为 <c>null</c> 的第二个参数名。</param>
+		/// <returns><see cref="ArgumentNullException"/> 对象。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="firstParamName"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="secondParamName"/> 为 <c>null</c>。</exception>
+		public static ArgumentNullException ArgumentBothNull([InvokerParameterName]string firstParamName,
+			[InvokerParameterName]string secondParamName)
+		{
+			CheckArgumentNull(firstParamName, "firstParamName");
+			CheckArgumentNull(secondParamName, "secondParamName");
+			Contract.Ensures(Contract.Result<ArgumentNullException>() != null);
+			return new ArgumentNullException(Format(Resources.ArgumentBothNull, firstParamName, secondParamName));
+		}
+		/// <summary>
 		/// 返回参数为 <c>null</c> 的异常。
 		/// </summary>
 		/// <param name="paramName">为 <c>null</c> 的参数名。</param>
@@ -75,7 +91,7 @@ namespace Cyjb
 		{
 			CheckArgumentNull(firstParam, "firstParam");
 			CheckArgumentNull(secondParam, "secondParam");
-			Contract.EndContractBlock();
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Format(Resources.ReversedArgument, firstParam, secondParam));
 		}
 
@@ -90,7 +106,27 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		public static ArgumentException ArrayNonZeroLowerBound([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.ArrayNonZeroLowerBound, paramName);
+		}
+		/// <summary>
+		/// 检查指定的数组，如果数组为 <c>null</c>，或者不是下限为零的一维数组则抛出相应异常。
+		/// </summary>
+		/// <param name="array">要检查的数组。</param>
+		/// <param name="paramName">数组参数的名称。</param>
+		[ContractArgumentValidator]
+		public static void CheckSimplyArray(Array array, [InvokerParameterName]string paramName)
+		{
+			CheckArgumentNull(array, paramName);
+			if (array.Rank != 1)
+			{
+				throw MultidimensionalArrayNotSupported(paramName);
+			}
+			if (array.GetLowerBound(0) != 0)
+			{
+				throw new ArgumentException(Resources.ArrayNonZeroLowerBound, paramName);
+			}
+			Contract.EndContractBlock();
 		}
 		/// <summary>
 		/// 返回目标数组太小而不能复制集合的异常。
@@ -99,6 +135,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		public static ArgumentException ArrayTooSmall([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.ArrayTooSmall, paramName);
 		}
 		/// <summary>
@@ -108,6 +145,7 @@ namespace Cyjb
 		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
 		public static InvalidOperationException CollectionItemCompareFailed(Exception innerException)
 		{
+			Contract.Ensures(Contract.Result<InvalidOperationException>() != null);
 			return new InvalidOperationException(Resources.CollectionItemCompareFailed, innerException);
 		}
 		/// <summary>
@@ -117,6 +155,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		public static ArgumentException CollectionCountDiffer([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.CollectionCountDiffer, paramName);
 		}
 		/// <summary>
@@ -126,6 +165,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		public static ArgumentException CollectionEmpty([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.CollectionEmpty, paramName);
 		}
 		/// <summary>
@@ -134,6 +174,7 @@ namespace Cyjb
 		/// <returns><see cref="NotSupportedException"/> 对象。</returns>
 		public static NotSupportedException CollectionFixedSize()
 		{
+			Contract.Ensures(Contract.Result<NotSupportedException>() != null);
 			return new NotSupportedException(Resources.CollectionFixedSize);
 		}
 		/// <summary>
@@ -143,6 +184,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		public static ArgumentException CollectionItemNotExist([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.CollectionItemNotExist, paramName);
 		}
 		/// <summary>
@@ -152,6 +194,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		public static ArgumentException CollectionItemNull([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.CollectionItemNull, paramName);
 		}
 		/// <summary>
@@ -160,6 +203,7 @@ namespace Cyjb
 		/// <returns><see cref="NotSupportedException"/> 对象。</returns>
 		public static NotSupportedException CollectionReadOnly()
 		{
+			Contract.Ensures(Contract.Result<NotSupportedException>() != null);
 			return new NotSupportedException(Resources.CollectionReadOnly);
 		}
 		/// <summary>
@@ -168,6 +212,7 @@ namespace Cyjb
 		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
 		public static InvalidOperationException EnumerationFailed()
 		{
+			Contract.Ensures(Contract.Result<InvalidOperationException>() != null);
 			return new InvalidOperationException(Resources.EnumerationFailed);
 		}
 		/// <summary>
@@ -176,6 +221,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		public static ArgumentException InvalidOffsetLength()
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.InvalidOffsetLength);
 		}
 		/// <summary>
@@ -185,6 +231,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		public static ArgumentException KeyDuplicate([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.KeyDuplicate, paramName);
 		}
 		/// <summary>
@@ -198,6 +245,7 @@ namespace Cyjb
 		/// </overloads>
 		public static KeyNotFoundException KeyNotFound()
 		{
+			Contract.Ensures(Contract.Result<KeyNotFoundException>() != null);
 			return new KeyNotFoundException(Resources.KeyNotFound);
 		}
 		/// <summary>
@@ -205,12 +253,19 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="key">不存在的键。</param>
 		/// <returns><see cref="KeyNotFoundException"/> 对象。</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c> 或空字符串。</exception>
 		public static KeyNotFoundException KeyNotFound(string key)
 		{
-			CheckStringEmpty(key, "key");
-			Contract.EndContractBlock();
-			return new KeyNotFoundException(Format(Resources.KeyNotFound_Key, key));
+			Contract.Ensures(Contract.Result<KeyNotFoundException>() != null);
+			string message;
+			if (string.IsNullOrEmpty(key))
+			{
+				message = Resources.KeyNotFound;
+			}
+			else
+			{
+				message = Format(Resources.KeyNotFound_Key, key);
+			}
+			return new KeyNotFoundException(message);
 		}
 		/// <summary>
 		/// 返回多维数组不被支持的异常。
@@ -223,6 +278,7 @@ namespace Cyjb
 		/// </overloads>
 		public static RankException MultidimensionalArrayNotSupported()
 		{
+			Contract.Ensures(Contract.Result<RankException>() != null);
 			return new RankException(Resources.MultidimensionalArrayNotSupported);
 		}
 		/// <summary>
@@ -230,12 +286,19 @@ namespace Cyjb
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <returns><see cref="RankException"/> 对象。</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="paramName"/> 为 <c>null</c> 或空字符串。</exception>
 		public static RankException MultidimensionalArrayNotSupported([InvokerParameterName]string paramName)
 		{
-			CheckStringEmpty(paramName, "paramName");
-			Contract.EndContractBlock();
-			return new RankException(Format(Resources.MultidimensionalArrayNotSupported_Param, paramName));
+			Contract.Ensures(Contract.Result<RankException>() != null);
+			string message;
+			if (paramName == null)
+			{
+				message = Resources.MultidimensionalArrayNotSupported;
+			}
+			else
+			{
+				message = Format(Resources.MultidimensionalArrayNotSupported_Param, paramName);
+			}
+			return new RankException(message);
 		}
 
 		#endregion // 数组、集合异常
@@ -249,6 +312,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		public static ArgumentException StringEmpty([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.StringEmpty, paramName);
 		}
 		/// <summary>
@@ -273,6 +337,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		public static ArgumentException StringWhiteSpace([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.StringWhiteSpace, paramName);
 		}
 		/// <summary>
@@ -304,6 +369,7 @@ namespace Cyjb
 		internal static InvalidOperationException AmbiguousUserDefinedConverter(Type inputType, Type outputType)
 		{
 			Contract.Requires(inputType != null && outputType != null);
+			Contract.Ensures(Contract.Result<InvalidOperationException>() != null);
 			return new InvalidOperationException(Format(Resources.AmbiguousUserDefinedConverter, inputType, outputType));
 		}
 		/// <summary>
@@ -318,6 +384,7 @@ namespace Cyjb
 		/// </overloads>
 		public static ArgumentException ArgumentWrongType([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.ArgumentWrongType, paramName);
 		}
 		/// <summary>
@@ -332,7 +399,7 @@ namespace Cyjb
 			object actualValue, Type targetType)
 		{
 			CheckArgumentNull(targetType, "targetType");
-			Contract.EndContractBlock();
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			string message = Format(Resources.ArgumentWrongType_Specific, actualValue, targetType);
 			return new ArgumentException(message, paramName);
 		}
@@ -342,6 +409,7 @@ namespace Cyjb
 		/// <returns><see cref="InvalidCastException"/> 对象。</returns>
 		public static InvalidCastException CannotCastNullToValueType()
 		{
+			Contract.Ensures(Contract.Result<InvalidCastException>() != null);
 			return new InvalidCastException(Resources.CannotCastNullToValueType);
 		}
 		/// <summary>
@@ -358,7 +426,7 @@ namespace Cyjb
 		{
 			CheckArgumentNull(paramType, "paramType");
 			CheckArgumentNull(baseType, "baseType");
-			Contract.EndContractBlock();
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Format(Resources.EnumTypeDoesNotMatch, paramType, baseType), paramName);
 		}
 		/// <summary>
@@ -372,6 +440,7 @@ namespace Cyjb
 		/// </overloads>
 		public static InvalidCastException InvalidCast()
 		{
+			Contract.Ensures(Contract.Result<InvalidCastException>() != null);
 			return new InvalidCastException(Resources.InvalidCast);
 		}
 		/// <summary>
@@ -386,7 +455,7 @@ namespace Cyjb
 		{
 			CheckArgumentNull(fromType, "fromType");
 			CheckArgumentNull(toType, "toType");
-			Contract.EndContractBlock();
+			Contract.Ensures(Contract.Result<InvalidCastException>() != null);
 			return new InvalidCastException(Format(Resources.InvalidCast_FromTo, fromType, toType));
 		}
 		/// <summary>
@@ -400,6 +469,7 @@ namespace Cyjb
 		/// </overloads>
 		public static ArrayTypeMismatchException InvalidElementType()
 		{
+			Contract.Ensures(Contract.Result<ArrayTypeMismatchException>() != null);
 			return new ArrayTypeMismatchException(Resources.InvalidElementType);
 		}
 		/// <summary>
@@ -409,6 +479,7 @@ namespace Cyjb
 		/// <returns><see cref="ArrayTypeMismatchException"/> 对象。</returns>
 		public static ArrayTypeMismatchException InvalidElementType(Exception innerException)
 		{
+			Contract.Ensures(Contract.Result<ArrayTypeMismatchException>() != null);
 			return new ArrayTypeMismatchException(Resources.InvalidElementType, innerException);
 		}
 		/// <summary>
@@ -423,6 +494,7 @@ namespace Cyjb
 		/// </overloads>
 		public static ArgumentException MustBeDelegate([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.MustBeDelegate, paramName);
 		}
 		/// <summary>
@@ -435,7 +507,7 @@ namespace Cyjb
 		public static ArgumentException MustBeDelegate([InvokerParameterName]string paramName, Type type)
 		{
 			CheckArgumentNull(type, "type");
-			Contract.EndContractBlock();
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Format(Resources.MustBeDelegate_Type, type), paramName);
 		}
 		/// <summary>
@@ -482,6 +554,7 @@ namespace Cyjb
 		/// </overloads>
 		public static ArgumentException MustBeEnum([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.MustBeEnum, paramName);
 		}
 		/// <summary>
@@ -494,7 +567,7 @@ namespace Cyjb
 		public static ArgumentException MustBeEnum([InvokerParameterName]string paramName, Type type)
 		{
 			CheckArgumentNull(type, "type");
-			Contract.EndContractBlock();
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Format(Resources.MustBeEnum_Type, type), paramName);
 		}
 		/// <summary>
@@ -543,6 +616,7 @@ namespace Cyjb
 		public static ArgumentOutOfRangeException ArgumentMustBePositive([InvokerParameterName]string paramName,
 			object actualValue)
 		{
+			Contract.Ensures(Contract.Result<ArgumentOutOfRangeException>() != null);
 			return new ArgumentOutOfRangeException(paramName, actualValue, Resources.ArgumentMustBePositive);
 		}
 		/// <summary>
@@ -554,6 +628,7 @@ namespace Cyjb
 		public static ArgumentOutOfRangeException ArgumentNegative([InvokerParameterName]string paramName,
 			object actualValue)
 		{
+			Contract.Ensures(Contract.Result<ArgumentOutOfRangeException>() != null);
 			return new ArgumentOutOfRangeException(paramName, actualValue, Resources.ArgumentNegative);
 		}
 		/// <summary>
@@ -570,6 +645,7 @@ namespace Cyjb
 		public static ArgumentOutOfRangeException ArgumentOutOfRange([InvokerParameterName]string paramName,
 			object actualValue)
 		{
+			Contract.Ensures(Contract.Result<ArgumentOutOfRangeException>() != null);
 			return new ArgumentOutOfRangeException(paramName, actualValue, Resources.ArgumentOutOfRange);
 		}
 		/// <summary>
@@ -587,7 +663,7 @@ namespace Cyjb
 		{
 			CheckArgumentNull(begin, "begin");
 			CheckArgumentNull(end, "end");
-			Contract.EndContractBlock();
+			Contract.Ensures(Contract.Result<ArgumentOutOfRangeException>() != null);
 			return new ArgumentOutOfRangeException(paramName, actualValue,
 				Format(Resources.ArgumentOutOfRangeBetween, begin, end));
 		}
@@ -599,6 +675,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentOutOfRangeException"/> 对象。</returns>
 		internal static ArgumentOutOfRangeException InvalidBase([InvokerParameterName]string paramName, int actualBase)
 		{
+			Contract.Ensures(Contract.Result<ArgumentOutOfRangeException>() != null);
 			return new ArgumentOutOfRangeException(paramName, actualBase, Resources.InvalidBase);
 		}
 		/// <summary>
@@ -610,6 +687,7 @@ namespace Cyjb
 		public static ArgumentOutOfRangeException InvalidThreshold([InvokerParameterName]string paramName,
 			object actualThreshold)
 		{
+			Contract.Ensures(Contract.Result<ArgumentOutOfRangeException>() != null);
 			return new ArgumentOutOfRangeException(paramName, actualThreshold, Resources.InvalidThreshold);
 		}
 		/// <summary>
@@ -618,6 +696,7 @@ namespace Cyjb
 		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowByte()
 		{
+			Contract.Ensures(Contract.Result<OverflowException>() != null);
 			return new OverflowException(Resources.OverflowByte);
 		}
 		/// <summary>
@@ -626,6 +705,7 @@ namespace Cyjb
 		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowSByte()
 		{
+			Contract.Ensures(Contract.Result<OverflowException>() != null);
 			return new OverflowException(Resources.OverflowSByte);
 		}
 		/// <summary>
@@ -634,6 +714,7 @@ namespace Cyjb
 		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowInt16()
 		{
+			Contract.Ensures(Contract.Result<OverflowException>() != null);
 			return new OverflowException(Resources.OverflowInt16);
 		}
 		/// <summary>
@@ -642,6 +723,7 @@ namespace Cyjb
 		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowInt32()
 		{
+			Contract.Ensures(Contract.Result<OverflowException>() != null);
 			return new OverflowException(Resources.OverflowInt32);
 		}
 		/// <summary>
@@ -650,6 +732,7 @@ namespace Cyjb
 		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowInt64()
 		{
+			Contract.Ensures(Contract.Result<OverflowException>() != null);
 			return new OverflowException(Resources.OverflowInt64);
 		}
 		/// <summary>
@@ -658,6 +741,7 @@ namespace Cyjb
 		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowUInt16()
 		{
+			Contract.Ensures(Contract.Result<OverflowException>() != null);
 			return new OverflowException(Resources.OverflowUInt16);
 		}
 		/// <summary>
@@ -666,6 +750,7 @@ namespace Cyjb
 		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowUInt32()
 		{
+			Contract.Ensures(Contract.Result<OverflowException>() != null);
 			return new OverflowException(Resources.OverflowUInt32);
 		}
 		/// <summary>
@@ -674,6 +759,7 @@ namespace Cyjb
 		/// <returns><see cref="OverflowException"/> 对象。</returns>
 		public static OverflowException OverflowUInt64()
 		{
+			Contract.Ensures(Contract.Result<OverflowException>() != null);
 			return new OverflowException(Resources.OverflowUInt64);
 		}
 
@@ -687,6 +773,7 @@ namespace Cyjb
 		/// <returns><see cref="ObjectDisposedException"/> 对象。</returns>
 		public static ObjectDisposedException ObjectDisposed()
 		{
+			Contract.Ensures(Contract.Result<ObjectDisposedException>() != null);
 			return new ObjectDisposedException(Resources.ObjectDisposed);
 		}
 		/// <summary>
@@ -698,7 +785,7 @@ namespace Cyjb
 		public static ObjectDisposedException StreamClosed(Type streamType)
 		{
 			CheckArgumentNull(streamType, "streamType");
-			Contract.EndContractBlock();
+			Contract.Ensures(Contract.Result<ObjectDisposedException>() != null);
 			return new ObjectDisposedException(Format(Resources.StreamClosed, streamType));
 		}
 
@@ -712,6 +799,7 @@ namespace Cyjb
 		/// <returns><see cref="NotSupportedException"/> 对象。</returns>
 		public static NotSupportedException MethodNotSupported()
 		{
+			Contract.Ensures(Contract.Result<NotSupportedException>() != null);
 			return new NotSupportedException(Resources.MethodNotSupported);
 		}
 		/// <summary>
@@ -720,7 +808,7 @@ namespace Cyjb
 		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
 		internal static InvalidOperationException Unreachable()
 		{
-			Contract.Assert(false);
+			Contract.Requires(false);
 			return new InvalidOperationException("Code supposed to be unreachable.");
 		}
 
@@ -737,6 +825,7 @@ namespace Cyjb
 		internal static FormatException EnumValueNotFound(Type enumType, string str)
 		{
 			Contract.Requires(enumType != null && str != null);
+			Contract.Ensures(Contract.Result<FormatException>() != null);
 			return new FormatException(Format(Resources.EnumValueNotFound, enumType, str));
 		}
 		/// <summary>
@@ -745,6 +834,7 @@ namespace Cyjb
 		/// <returns><see cref="FormatException"/> 对象。</returns>
 		public static FormatException ExtraJunkAtEnd()
 		{
+			Contract.Ensures(Contract.Result<FormatException>() != null);
 			return new FormatException(Resources.ExtraJunkAtEnd);
 		}
 		/// <summary>
@@ -754,6 +844,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		public static ArgumentException MustContainValidInfo([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.MustContainValidInfo, paramName);
 		}
 		/// <summary>
@@ -762,6 +853,7 @@ namespace Cyjb
 		/// <returns><see cref="FormatException"/> 对象。</returns>
 		public static FormatException NegativeUnsigned()
 		{
+			Contract.Ensures(Contract.Result<FormatException>() != null);
 			return new FormatException(Resources.NegativeUnsigned);
 		}
 		/// <summary>
@@ -770,6 +862,7 @@ namespace Cyjb
 		/// <returns><see cref="FormatException"/> 对象。</returns>
 		public static FormatException NoParsibleDigits()
 		{
+			Contract.Ensures(Contract.Result<FormatException>() != null);
 			return new FormatException(Resources.NoParsibleDigits);
 		}
 
@@ -784,6 +877,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException BindOpenConstructedMethod([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.BindOpenConstructedMethod, paramName);
 		}
 		/// <summary>
@@ -793,6 +887,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException BindTargetField([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.BindTargetField, paramName);
 		}
 		/// <summary>
@@ -802,6 +897,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException BindTargetMethod([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.BindTargetMethod, paramName);
 		}
 		/// <summary>
@@ -811,6 +907,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException BindTargetProperty([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.BindTargetProperty, paramName);
 		}
 		/// <summary>
@@ -820,6 +917,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException BindTargetPropertyNoGet([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.BindTargetPropertyNoGet, paramName);
 		}
 		/// <summary>
@@ -829,6 +927,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException BindTargetPropertyNoSet([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.BindTargetPropertyNoSet, paramName);
 		}
 		/// <summary>
@@ -838,6 +937,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException CannotInferenceGenericArguments([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(paramName, Resources.CannotInferenceGenericArguments);
 		}
 		/// <summary>
@@ -849,6 +949,7 @@ namespace Cyjb
 		internal static ArgumentException DelegateCompatible(Type sourceDlg, Type targetDlg)
 		{
 			Contract.Requires(sourceDlg != null && targetDlg != null);
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Format(Resources.DelegateIncompatible, sourceDlg, targetDlg));
 		}
 		/// <summary>
@@ -859,6 +960,7 @@ namespace Cyjb
 		internal static InvalidOperationException NeedGenericMethodDefinition([InvokerParameterName]string paramName)
 		{
 			Contract.Requires(paramName != null);
+			Contract.Ensures(Contract.Result<InvalidOperationException>() != null);
 			return new InvalidOperationException(Format(Resources.NeedGenericMethodDefinition, paramName));
 		}
 		/// <summary>
@@ -869,6 +971,7 @@ namespace Cyjb
 		internal static ArgumentException PropertyNoGetter([InvokerParameterName]string paramName)
 		{
 			Contract.Requires(paramName != null);
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Format(Resources.PropertyNoGetter, paramName));
 		}
 		/// <summary>
@@ -879,6 +982,7 @@ namespace Cyjb
 		internal static ArgumentException PropertyNoSetter([InvokerParameterName]string paramName)
 		{
 			Contract.Requires(paramName != null);
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Format(Resources.PropertyNoSetter, paramName));
 		}
 		/// <summary>
@@ -890,6 +994,7 @@ namespace Cyjb
 		internal static ArgumentException PropertyOrFieldNotFound(string memberName, bool nonPublic)
 		{
 			Contract.Requires(memberName != null);
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			string message = nonPublic ? Resources.PropertyOrFieldNotFound_NonPublic : Resources.PropertyOrFieldNotFound;
 			return new ArgumentException(Format(message, memberName));
 		}
@@ -901,6 +1006,7 @@ namespace Cyjb
 		internal static ArgumentException TypeContainsGenericParameters(Type type)
 		{
 			Contract.Requires(type != null);
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Format(Resources.TypeContainsGenericParameters, type));
 		}
 		/// <summary>
@@ -911,6 +1017,7 @@ namespace Cyjb
 		internal static ArgumentException TypeMemberNotFound(string memberName)
 		{
 			Contract.Requires(memberName != null);
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Format(Resources.TypeMemberNotFound, memberName));
 		}
 		/// <summary>
@@ -930,6 +1037,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException UnboundGenParam([InvokerParameterName]string paramName)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.UnboundGenParam, paramName);
 		}
 
@@ -945,6 +1053,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException ProcessorKeyAmbigus(Type type, string id)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Format(Resources.ProcessorKeyAmbigus_TypeId, type, id));
 		}
 		/// <summary>
@@ -955,6 +1064,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException ProcessorKeyNotFound(Type type, string id)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Format(Resources.ProcessorKeyNotFound_TypeId, type, id));
 		}
 		/// <summary>
@@ -966,6 +1076,7 @@ namespace Cyjb
 		internal static ArgumentException ProcessorMixed(Type type, string id)
 		{
 			Contract.Requires(type != null && id != null);
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Format(Resources.ProcessorMixed, type, id));
 		}
 		/// <summary>
@@ -977,6 +1088,7 @@ namespace Cyjb
 		internal static ArgumentException ProcessorNotFound(Type type, string id)
 		{
 			Contract.Requires(type != null);
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			string message;
 			if (string.IsNullOrEmpty(id))
 			{
@@ -997,6 +1109,7 @@ namespace Cyjb
 		internal static ArgumentException ProcessorMismatch(Type type, string id)
 		{
 			Contract.Requires(type != null && id != null);
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Format(Resources.ProcessorMismatch, type, id));
 		}
 		/// <summary>
@@ -1007,6 +1120,7 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		internal static ArgumentException ProcessorParameterMismatch(Type type, string id)
 		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			if (type == null || id == null)
 			{
 				return new ArgumentException(Resources.ProcessorParameterMismatch);
@@ -1148,7 +1262,7 @@ namespace Cyjb
 		public static ArgumentException InvalidLexerContext([InvokerParameterName]string paramName, string context)
 		{
 			return null;
-			//return GetArgumentException(paramName, ExceptionResources.InvalidLexerContext, context);
+			//return GetArgumentException(firstParamName, ExceptionResources.InvalidLexerContext, context);
 		}
 		/// <summary>
 		/// 返回未识别的词法单元的异常。
@@ -1203,6 +1317,7 @@ namespace Cyjb
 		private static string Format(string message, params object[] args)
 		{
 			Contract.Requires(message != null && args != null);
+			Contract.Ensures(Contract.Result<string>() != null);
 			return string.Format(Resources.Culture, message, Format(args));
 		}
 		/// <summary>
@@ -1212,6 +1327,7 @@ namespace Cyjb
 		private static object[] Format(object[] args)
 		{
 			Contract.Requires(args != null);
+			Contract.Ensures(Contract.Result<object[]>() != null);
 			for (int i = 0; i < args.Length; i++)
 			{
 				object value = args[i];

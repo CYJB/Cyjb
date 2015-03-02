@@ -49,7 +49,7 @@ namespace Cyjb
 			CommonExceptions.CheckStringEmpty(name, "name");
 			if (getDelegate == null && setDelegate == null)
 			{
-				throw CommonExceptions.ArgumentNull("getDelegate");
+				throw CommonExceptions.ArgumentBothNull("getDelegate", "setDelegate");
 			}
 			Contract.EndContractBlock();
 			this.name = name;

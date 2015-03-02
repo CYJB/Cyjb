@@ -174,7 +174,7 @@ namespace Cyjb.Collections
 			{
 				if (value < this.count)
 				{
-					throw CommonExceptions.ArgumentOutOfRange("Capacity", value);
+					throw CommonExceptions.ArgumentOutOfRange("value", value);
 				}
 				Contract.EndContractBlock();
 				int newLength = (value >> IndexShift) + 1;
@@ -1071,15 +1071,7 @@ namespace Cyjb.Collections
 		/// 的类型无法自动转换为目标 <paramref name="array"/> 的类型。</exception>
 		void ICollection.CopyTo(Array array, int index)
 		{
-			CommonExceptions.CheckArgumentNull(array, "array");
-			if (array.Rank != 1)
-			{
-				throw CommonExceptions.MultidimensionalArrayNotSupported("array");
-			}
-			if (array.GetLowerBound(0) != 0)
-			{
-				throw CommonExceptions.ArrayNonZeroLowerBound("array");
-			}
+			CommonExceptions.CheckSimplyArray(array, "array");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);

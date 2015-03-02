@@ -481,4 +481,8 @@
     <value>不能对 ContainsGenericParameters 为 true 的类型或方法执行后期绑定操作。</value>
     <comment>不能对包含未赋值的泛型类型参数的类型和方法进行后期绑定。</comment>
   </data>
+  <data name="ArgumentBothNull" xml:space="preserve">
+    <value>参数 '{0}' 和 '{1}' 的值不能全部为 null。</value>
+    <comment>参数全部为 null。</comment>
+  </data>
 </root>

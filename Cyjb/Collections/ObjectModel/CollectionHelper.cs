@@ -30,15 +30,7 @@ namespace Cyjb.Collections.ObjectModel
 		public static void CopyTo<T>(ICollection<T> source, Array array, int index)
 		{
 			Contract.Requires(source != null);
-			CommonExceptions.CheckArgumentNull(array, "array");
-			if (array.Rank != 1)
-			{
-				throw CommonExceptions.MultidimensionalArrayNotSupported("array");
-			}
-			if (array.GetLowerBound(0) != 0)
-			{
-				throw CommonExceptions.ArrayNonZeroLowerBound("array");
-			}
+			CommonExceptions.CheckSimplyArray(array, "array");
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative("index", index);

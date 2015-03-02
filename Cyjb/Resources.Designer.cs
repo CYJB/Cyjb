@@ -79,6 +79,15 @@ namespace Cyjb {
         }
         
         /// <summary>
+        ///   查找类似 Value of parameter &apos;{0}&apos; and &apos;{1}&apos; can not botn be null. 的本地化字符串。
+        /// </summary>
+        internal static string ArgumentBothNull {
+            get {
+                return ResourceManager.GetString("ArgumentBothNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Parameter values must be greater than zero. 的本地化字符串。
         /// </summary>
         internal static string ArgumentMustBePositive {
