@@ -563,73 +563,98 @@ namespace UnitTestCyjb
 
 		#endregion // 测试封闭方法委托
 
+		#region 测试属性委托
+
 		/// <summary>
-		/// 测试通过 PropertyInfo 构造方法委托。
+		/// 测试构造开放属性委托。
 		/// </summary>
 		[TestMethod]
-		public void TestPropertyDelegateFromPropertyInfo()
+		public void TestOpenPropertyDelegate()
 		{
 			Type type = typeof(TestClass);
+
+			// 静态属性
 			PropertyInfo property = type.GetProperty("TestStaticProperty");
-			// 开放的静态属性。
 			property.CreateDelegate<Action<string>>()("Test1");
-			Assert.AreEqual("Test1", TestClass.TestStaticProperty);
 			Assert.AreEqual("Test1", property.CreateDelegate<Func<string>>()());
-			Assert.AreEqual("Test1", property.CreateDelegate<Func<object>>()());
+			property.CreateDelegate<Action<object>>()("Test2");
+			Assert.AreEqual("Test2", property.CreateDelegate<Func<object>>()());
 			Assert.AreEqual(null, property.CreateDelegate<Func<string, string>>(false));
 			Assert.AreEqual(null, property.CreateDelegate<Func<int>>(false));
-			property.CreateDelegate<Action<object>>()("Test2");
-			Assert.AreEqual("Test2", TestClass.TestStaticProperty);
-			// 第一个参数封闭的静态属性。
-			property.CreateDelegate<Action>("Test3")();
-			Assert.AreEqual("Test3", TestClass.TestStaticProperty);
-			// 实例属性。
+
+			// 实例属性
 			property = type.GetProperty("TestInstanceProperty");
-			PropertyInfo property2 = type.GetProperty("Item", new Type[] { typeof(int) });
-			PropertyInfo property3 = type.GetProperty("Item", new Type[] { typeof(int), typeof(int) });
-			TestClass tc = new TestClass();
-			// 开放的实例属性。
-			property.CreateDelegate<Action<TestClass, string>>()(tc, "Test1");
-			Assert.AreEqual("Test1", tc.TestInstanceProperty);
-			Assert.AreEqual("Test1", property.CreateDelegate<Func<TestClass, string>>()(tc));
-			Assert.AreEqual("Test1", property.CreateDelegate<Func<object, object>>()(tc));
+			TestClass instance = new TestClass();
+			property.CreateDelegate<Action<TestClass, string>>()(instance, "Test1");
+			Assert.AreEqual("Test1", property.CreateDelegate<Func<TestClass, string>>()(instance));
+			property.CreateDelegate<Action<TestClass, object>>()(instance, "Test2");
+			Assert.AreEqual("Test2", property.CreateDelegate<Func<object, object>>()(instance));
 			Assert.AreEqual(null, property.CreateDelegate<Func<string, string>>(false));
 			Assert.AreEqual(null, property.CreateDelegate<Func<TestClass, int>>(false));
-			property.CreateDelegate<Action<object, object>>("NoUse")(tc, "Test2");
-			Assert.AreEqual("Test2", tc.TestInstanceProperty);
-			property2.CreateDelegate<Action<TestClass, int, string>>()(tc, 0, "Test3");
-			property2.CreateDelegate<Action<object, object, object>>(null)(tc, 1, "Test4");
-			property3.CreateDelegate<Action<TestClass, short, ulong, string>>("NoUse")(tc, 0, 2, "Test5");
-			property3.CreateDelegate<Action<object, object, short, object>>()(tc, 1, 2, "Test6");
-			Assert.AreEqual("Test3", tc[0]);
-			Assert.AreEqual("Test4", tc[1]);
-			Assert.AreEqual("Test5", tc[2]);
-			Assert.AreEqual("Test6", tc[3]);
-			Assert.AreEqual("Test3", property3.CreateDelegate<Func<TestClass, int, short, string>>()(tc, 0, 0));
-			Assert.AreEqual("Test4", property3.CreateDelegate<Func<object, object, short, object>>()(tc, 2, -1));
-			Assert.AreEqual("Test5", property2.CreateDelegate<Func<TestClass, int, string>>()(tc, 2));
-			Assert.AreEqual("Test6", property2.CreateDelegate<Func<object, object, object>>()(tc, 3));
-			// 第一个参数封闭的实例属性。
-			property.CreateDelegate<Action<string>>(tc)("Test7");
-			Assert.AreEqual("Test7", tc.TestInstanceProperty);
-			Assert.AreEqual("Test7", property.CreateDelegate<Func<string>>(tc)());
-			Assert.AreEqual("Test7", property.CreateDelegate<Func<object>>(tc)());
-			Assert.AreEqual(null, property.CreateDelegate<Func<int>>(tc, false));
-			property.CreateDelegate<Action<object>>(tc)("Test8");
-			Assert.AreEqual("Test8", tc.TestInstanceProperty);
-			property2.CreateDelegate<Action<int, string>>(tc)(4, "Test9");
-			property2.CreateDelegate<Action<object, object>>(tc)(5, "Test10");
-			property3.CreateDelegate<Action<short, ulong, string>>(tc)(3, 3, "Test11");
-			property3.CreateDelegate<Action<object, short, object>>(tc)(10, -3, "Test12");
-			Assert.AreEqual("Test9", tc[4]);
-			Assert.AreEqual("Test10", tc[5]);
-			Assert.AreEqual("Test11", tc[6]);
-			Assert.AreEqual("Test12", tc[7]);
-			Assert.AreEqual("Test9", property3.CreateDelegate<Func<TestClass, int, short, string>>()(tc, 4, 0));
-			Assert.AreEqual("Test10", property3.CreateDelegate<Func<object, object, short, object>>()(tc, -1, 6));
-			Assert.AreEqual("Test11", property2.CreateDelegate<Func<TestClass, int, string>>()(tc, 6));
-			Assert.AreEqual("Test12", property2.CreateDelegate<Func<object, object, object>>()(tc, 7));
+			// 索引属性
+			property = type.GetProperty("Item", new[] { typeof(int) });
+			property.CreateDelegate<Action<TestClass, int, string>>()(instance, 0, "Test1");
+			property.CreateDelegate<Action<object, object, object>>(null)(instance, 1, "Test2");
+			property.CreateDelegate<Action<object, long, object>>(null)(instance, 2, "Test3");
+			property.CreateDelegate<Action<object, short, object>>(null)(instance, 3, "Test4");
+			Assert.AreEqual("Test1", property.CreateDelegate<Func<TestClass, int, string>>()(instance, 0));
+			Assert.AreEqual("Test2", property.CreateDelegate<Func<object, object, object>>()(instance, 1));
+			Assert.AreEqual("Test3", property.CreateDelegate<Func<object, long, object>>()(instance, 2));
+			Assert.AreEqual("Test4", property.CreateDelegate<Func<object, short, object>>()(instance, 3));
+
+			property = type.GetProperty("Item", new[] { typeof(int), typeof(int) });
+			property.CreateDelegate<Action<TestClass, short, ulong, string>>()(instance, 2, 2, "Test5");
+			property.CreateDelegate<Action<object, object, short, object>>()(instance, 1, 5, "Test6");
+			Assert.AreEqual("Test5", property.CreateDelegate<Func<TestClass, short, ulong, string>>()(instance, -1, 5));
+			Assert.AreEqual("Test6", property.CreateDelegate<Func<object, object, short, object>>()(instance, 3, 3));
 		}
+		/// <summary>
+		/// 测试构造封闭属性委托。
+		/// </summary>
+		[TestMethod]
+		public void TestClosedPropertyDelegate()
+		{
+			Type type = typeof(TestClass);
+
+			// 静态属性
+			PropertyInfo property = type.GetProperty("TestStaticProperty");
+			property.CreateDelegate<Action<string>>(null)("Test1");
+			Assert.AreEqual("Test1", property.CreateDelegate<Func<string>>(null)());
+			property.CreateDelegate<Action<object>>(null)("Test2");
+			Assert.AreEqual("Test2", property.CreateDelegate<Func<object>>(null)());
+			property.CreateDelegate<Action>("Test3")();
+			Assert.AreEqual("Test3", property.CreateDelegate<Func<string>>(null)());
+			Assert.AreEqual(null, property.CreateDelegate<Func<string, string>>(null, false));
+			Assert.AreEqual(null, property.CreateDelegate<Func<int>>(null, false));
+
+			// 实例属性
+			property = type.GetProperty("TestInstanceProperty");
+			TestClass instance = new TestClass();
+			property.CreateDelegate<Action<string>>(instance)("Test1");
+			Assert.AreEqual("Test1", property.CreateDelegate<Func<string>>(instance)());
+			property.CreateDelegate<Action<object>>(instance)("Test2");
+			Assert.AreEqual("Test2", property.CreateDelegate<Func<object>>(instance)());
+			Assert.AreEqual(null, property.CreateDelegate<Func<string, string>>(null, false));
+			Assert.AreEqual(null, property.CreateDelegate<Func<TestClass, int>>(null, false));
+			// 索引属性
+			property = type.GetProperty("Item", new[] { typeof(int) });
+			property.CreateDelegate<Action<int, string>>(instance)(0, "Test1");
+			property.CreateDelegate<Action<object, object>>(instance)(1, "Test2");
+			property.CreateDelegate<Action<long, object>>(instance)(2, "Test3");
+			property.CreateDelegate<Action<short, object>>(instance)(3, "Test4");
+			Assert.AreEqual("Test1", property.CreateDelegate<Func<int, string>>(instance)(0));
+			Assert.AreEqual("Test2", property.CreateDelegate<Func<object, object>>(instance)(1));
+			Assert.AreEqual("Test3", property.CreateDelegate<Func<long, object>>(instance)(2));
+			Assert.AreEqual("Test4", property.CreateDelegate<Func<short, object>>(instance)(3));
+
+			property = type.GetProperty("Item", new[] { typeof(int), typeof(int) });
+			property.CreateDelegate<Action<short, ulong, string>>(instance)(2, 2, "Test5");
+			property.CreateDelegate<Action<object, short, object>>(instance)(1, 5, "Test6");
+			Assert.AreEqual("Test5", property.CreateDelegate<Func<short, ulong, string>>(instance)(-1, 5));
+			Assert.AreEqual("Test6", property.CreateDelegate<Func<object, short, object>>(instance)(3, 3));
+		}
+
+		#endregion // 测试属性委托
 
 		/// <summary>
 		/// 测试通过 FieldInfo 构造方法委托。
@@ -936,9 +961,14 @@ namespace UnitTestCyjb
 
 			#endregion // 构造函数
 
-			#region 静态和实例属性
+			#region 静态属性
 
 			public static string TestStaticProperty { get; set; }
+
+			#endregion // 静态属性
+
+			#region 静态和实例属性
+
 			public string TestInstanceProperty { get; set; }
 			private string[] items = new string[10];
 			public string this[int index]
