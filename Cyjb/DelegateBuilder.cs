@@ -97,7 +97,7 @@ namespace Cyjb
 			// 加载实例对象。
 			if (!method.IsStatic)
 			{
-				EmitLoadInstance(il, method, typeof(object), true);
+				il.EmitLoadInstance(method, typeof(object), true);
 			}
 			bool optimizeTailcall = true;
 			// 加载方法参数。
@@ -132,7 +132,7 @@ namespace Cyjb
 				}
 			}
 			// 调用函数。
-			EmitInvokeMethod(il, method, null, typeof(object), optimizeTailcall);
+			il.EmitInvokeMethod(method, null, typeof(object), optimizeTailcall);
 			return (MethodInvoker)dlgMethod.CreateDelegate(typeof(MethodInvoker));
 		}
 		/// <summary>
@@ -205,125 +205,6 @@ namespace Cyjb
 
 
 
-		#region 从 FieldInfo 构造带有第一个参数的字段委托
-
-		/// <summary>
-		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建表示获取或设置指定的静态或实例字段的指定类型的委托。 
-		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
-		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
-		/// <param name="field">描述委托要表示的静态或实例字段的 
-		/// <see cref="System.Reflection.PropertyInfo"/>。</param>
-		/// <param name="firstArgument">委托要绑定到的对象，或为 <c>null</c>，
-		/// 后者表示将 <paramref name="field"/> 视为 <c>static</c>。</param>
-		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="field"/> 
-		/// 时引发异常；否则为 <c>false</c>。</param>
-		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例字段。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentNullException"><paramref name="field"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承
-		/// <see cref="System.MulticastDelegate"/>。</exception>
-		/// <exception cref="System.ArgumentException">不能绑定 <paramref name="field"/> 
-		/// 且 <paramref name="throwOnBindFailure"/> 为 <c>true</c>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <paramref name="type"/>
-		/// 的 <c>Invoke</c> 方法。</exception>
-		/// <exception cref="System.MethodAccessException">调用方无权访问
-		/// <paramref name="field"/>。</exception>
-		public static Delegate CreateDelegateXSFSF(Type type, FieldInfo field, object firstArgument, bool throwOnBindFailure)
-		{
-			CommonExceptions.CheckArgumentNull(field, "field");
-			CommonExceptions.CheckDelegateType(type, "type");
-			MethodInfo invoke = type.GetMethod("Invoke");
-			ParameterInfo[] invokeParams = invoke.GetParameters();
-			// 尝试创建开放的字段委托。
-			Delegate dlg = null;//CreateOpenDelegate(type, field, invoke, invokeParams);
-			if (dlg != null)
-			{
-				return dlg;
-			}
-			// 尝试创建封闭的字段委托。
-			bool setField = invoke.ReturnType == typeof(void);
-			// 检查参数数量。
-			if (invokeParams.Length == ((field.IsStatic || !setField) ? 0 : 1))
-			{
-				if (firstArgument == null && !field.IsStatic)
-				{
-					// 通过空引用封闭的实例字段委托。
-					// 委托的参数列表。
-					ParameterExpression[] paramList = invokeParams.ToExpressions();
-					Expression throwExp = Expression.Throw(Expression.New(typeof(NullReferenceException)));
-					Expression fieldExp = Expression.Block(throwExp, Expression.Default(field.FieldType));
-					dlg = Expression.Lambda(type, fieldExp, paramList).Compile();
-				}
-				else
-				{
-					// 通过第一个参数封闭的字段委托。
-					dlg = CreateCloseDelegate(type, field, firstArgument, invoke, invokeParams);
-				}
-			}
-			if (dlg == null && throwOnBindFailure)
-			{
-				throw CommonExceptions.BindTargetField("field");
-			}
-			return dlg;
-		}
-		/// <summary>
-		/// 创建指定的静态或实例字段的指定类型的封闭字段委托。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
-		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
-		/// <param name="field">目标字段的信息。</param>
-		/// <param name="firstArgument">委托表示的字段的第一个参数。</param>
-		/// <param name="invoke">委托的方法信息。</param>
-		/// <param name="invokeParams">委托的方法参数列表。</param>
-		/// <returns>指定类型的委托，表示静态方法或实例字段。</returns>
-		/// <exception cref="System.MethodAccessException">调用方无权访问
-		/// <paramref name="field"/>。</exception>
-		private static Delegate CreateCloseDelegate(Type type, FieldInfo field, object firstArgument,
-			MethodInfo invoke, ParameterInfo[] invokeParams)
-		{
-			// 委托的参数列表。
-			ParameterExpression[] paramList = invokeParams.ToExpressions();
-			// 访问字段的实例对象。
-			Expression instance = null;
-			if (!field.IsStatic)
-			{
-				instance = Expression.Constant(firstArgument).ConvertType(field.DeclaringType);
-				if (instance == null)
-				{
-					return null;
-				}
-			}
-			Expression fieldExp = Expression.Field(instance, field);
-			if (invoke.ReturnType == typeof(void))
-			{
-				// 字段的设置值。
-				Expression value = null;
-				if (field.IsStatic)
-				{
-					value = Expression.Constant(firstArgument).ConvertType(field.FieldType);
-				}
-				else
-				{
-					value = paramList[0].ConvertType(field.FieldType);
-				}
-				if (value == null)
-				{
-					return null;
-				}
-				fieldExp = Expression.Assign(fieldExp, value);
-			}
-			fieldExp = GetReturn(fieldExp, invoke.ReturnType);
-			if (fieldExp != null)
-			{
-				// 创建委托。
-				return Expression.Lambda(type, fieldExp, paramList).Compile();
-			}
-			return null;
-		}
-
-		#endregion // 从 FieldInfo 构造带有第一个参数的字段委托
 
 		#region 从 Type 构造成员委托
 
@@ -1487,22 +1368,6 @@ namespace Cyjb
 
 		#region Expression 辅助方法
 
-		/// <summary>
-		/// 返回检查参数数组长度的表达式。认为 count 大于 0。
-		/// </summary>
-		/// <param name="paramExp">要检查长度的参数数组的表达式。</param>
-		/// <param name="count">预期的参数数目。</param>
-		/// <returns>检查参数数组长度的表达式。</returns>
-		private static Expression GetCheckParameterExp(Expression paramExp, int count)
-		{
-			return Expression.IfThen(
-				Expression.OrElse(
-				// paramExp == null
-					Expression.Equal(paramExp, Expression.Constant(null)),
-				// paramExp.Length != count
-					Expression.NotEqual(Expression.PropertyOrField(paramExp, "Length"), Expression.Constant(count))),
-				Expression.Throw(Expression.New(typeof(TargetParameterCountException))));
-		}
 		/// <summary>
 		/// 返回给定的参数信息的参数类型列表。
 		/// </summary>

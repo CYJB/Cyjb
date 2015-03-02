@@ -656,47 +656,66 @@ namespace UnitTestCyjb
 
 		#endregion // 测试属性委托
 
+		#region 测试字段委托
+
 		/// <summary>
-		/// 测试通过 FieldInfo 构造方法委托。
+		/// 测试构造开放字段委托。
 		/// </summary>
 		[TestMethod]
-		public void TestFieldDelegateFromFieldInfo()
+		public void TestOpenFieldDelegate()
 		{
 			Type type = typeof(TestClass);
+
+			// 静态字段
 			FieldInfo field = type.GetField("TestStaticField");
-			// 开放的静态字段。
 			field.CreateDelegate<Action<string>>()("Test1");
-			Assert.AreEqual("Test1", TestClass.TestStaticField);
 			Assert.AreEqual("Test1", field.CreateDelegate<Func<string>>()());
-			Assert.AreEqual("Test1", field.CreateDelegate<Func<object>>()());
+			field.CreateDelegate<Action<object>>()("Test2");
+			Assert.AreEqual("Test2", field.CreateDelegate<Func<object>>()());
 			Assert.AreEqual(null, field.CreateDelegate<Func<string, string>>(false));
 			Assert.AreEqual(null, field.CreateDelegate<Func<int>>(false));
-			field.CreateDelegate<Action<object>>()("Test2");
-			Assert.AreEqual("Test2", TestClass.TestStaticField);
-			// 第一个参数封闭的静态字段。
-			field.CreateDelegate<Action>("Test3")();
-			Assert.AreEqual("Test3", TestClass.TestStaticField);
-			// 实例字段。
+
+			// 实例字段
 			field = type.GetField("TestInstanceField");
-			TestClass tc = new TestClass();
-			// 开放的实例字段。
-			field.CreateDelegate<Action<TestClass, string>>()(tc, "Test1");
-			Assert.AreEqual("Test1", tc.TestInstanceField);
-			Assert.AreEqual("Test1", field.CreateDelegate<Func<TestClass, string>>()(tc));
-			Assert.AreEqual("Test1", field.CreateDelegate<Func<object, object>>()(tc));
+			TestClass instance = new TestClass();
+			field.CreateDelegate<Action<TestClass, string>>()(instance, "Test1");
+			Assert.AreEqual("Test1", field.CreateDelegate<Func<TestClass, string>>()(instance));
+			field.CreateDelegate<Action<TestClass, object>>()(instance, "Test2");
+			Assert.AreEqual("Test2", field.CreateDelegate<Func<object, object>>()(instance));
 			Assert.AreEqual(null, field.CreateDelegate<Func<string, string>>(false));
 			Assert.AreEqual(null, field.CreateDelegate<Func<TestClass, int>>(false));
-			field.CreateDelegate<Action<object, object>>("NoUse")(tc, "Test2");
-			Assert.AreEqual("Test2", tc.TestInstanceField);
-			// 第一个参数封闭的实例字段。
-			field.CreateDelegate<Action<string>>(tc)("Test7");
-			Assert.AreEqual("Test7", tc.TestInstanceField);
-			Assert.AreEqual("Test7", field.CreateDelegate<Func<string>>(tc)());
-			Assert.AreEqual("Test7", field.CreateDelegate<Func<object>>(tc)());
-			Assert.AreEqual(null, field.CreateDelegate<Func<int>>(tc, false));
-			field.CreateDelegate<Action<object>>(tc)("Test8");
-			Assert.AreEqual("Test8", tc.TestInstanceField);
 		}
+		/// <summary>
+		/// 测试构造封闭字段委托。
+		/// </summary>
+		[TestMethod]
+		public void TestClosedFieldDelegate()
+		{
+			Type type = typeof(TestClass);
+
+			// 静态字段
+			FieldInfo field = type.GetField("TestStaticField");
+			field.CreateDelegate<Action<string>>(null)("Test1");
+			Assert.AreEqual("Test1", field.CreateDelegate<Func<string>>(null)());
+			field.CreateDelegate<Action<object>>(null)("Test2");
+			Assert.AreEqual("Test2", field.CreateDelegate<Func<object>>(null)());
+			field.CreateDelegate<Action>("Test3")();
+			Assert.AreEqual("Test3", field.CreateDelegate<Func<string>>(null)());
+			Assert.AreEqual(null, field.CreateDelegate<Func<string, string>>(null, false));
+			Assert.AreEqual(null, field.CreateDelegate<Func<int>>(null, false));
+
+			// 实例字段
+			field = type.GetField("TestInstanceField");
+			TestClass instance = new TestClass();
+			field.CreateDelegate<Action<string>>(instance)("Test1");
+			Assert.AreEqual("Test1", field.CreateDelegate<Func<string>>(instance)());
+			field.CreateDelegate<Action<object>>(instance)("Test2");
+			Assert.AreEqual("Test2", field.CreateDelegate<Func<object>>(instance)());
+			Assert.AreEqual(null, field.CreateDelegate<Func<string, string>>(null, false));
+			Assert.AreEqual(null, field.CreateDelegate<Func<TestClass, int>>(null, false));
+		}
+
+		#endregion // 测试字段委托
 
 		/// <summary>
 		/// 测试通过 Type 构造方法委托。
@@ -967,7 +986,7 @@ namespace UnitTestCyjb
 
 			#endregion // 静态属性
 
-			#region 静态和实例属性
+			#region 实例属性
 
 			public string TestInstanceProperty { get; set; }
 			private string[] items = new string[10];
@@ -982,7 +1001,7 @@ namespace UnitTestCyjb
 				set { items[index + index2] = value; }
 			}
 
-			#endregion // 静态和实例属性
+			#endregion // 实例属性
 
 			#region 静态和实例字段
 

@@ -181,17 +181,17 @@ namespace Cyjb
 			// 实例方法的第一个参数用作传递实例对象。
 			if (argumentsInfo.InstanceType != null)
 			{
-				EmitLoadInstance(il, method, argumentsInfo.InstanceType, true);
+				il.EmitLoadInstance(method, argumentsInfo.InstanceType, true);
 			}
 			// 加载方法参数。
-			bool optimizeTailcall = EmitLoadParameters(il, method, argumentsInfo, index);
+			bool optimizeTailcall = il.EmitLoadParameters(method, argumentsInfo, index);
 			// 调用方法。
 			Type[] optionalArgumentTypes = null;
 			if (argumentsInfo.OptionalArgumentTypes != null)
 			{
 				optionalArgumentTypes = argumentsInfo.OptionalArgumentTypes.ToArray();
 			}
-			if (!EmitInvokeMethod(il, method, optionalArgumentTypes, returnType, optimizeTailcall))
+			if (!il.EmitInvokeMethod(method, optionalArgumentTypes, returnType, optimizeTailcall))
 			{
 				return null;
 			}
@@ -222,30 +222,30 @@ namespace Cyjb
 				method = ((MethodInfo)method).MakeGenericMethod(argumentsInfo.GenericArguments);
 				return argumentsInfo;
 			}
-			// 调用时保证 !method.ContainsGenericParameters。
+			// 调用时保证 !member.ContainsGenericParameters。
 			return MethodArgumentsInfo.GetInfo(method, types, options);
 		}
 		/// <summary>
 		/// 加载第一个参数作为实例，调用保证类型可以转换。
 		/// </summary>
 		/// <param name="il">IL 指令生成器。</param>
-		/// <param name="method">要调用的方法。</param>
+		/// <param name="member">要为实例调用的成员。</param>
 		/// <param name="instanceType">实例实参的类型。</param>
 		/// <param name="isCheckNull">是否检查实例是否为 <c>null</c>。</param>
-		private static void EmitLoadInstance(ILGenerator il, MethodBase method, Type instanceType, bool isCheckNull)
+		private static void EmitLoadInstance(this ILGenerator il, MemberInfo member, Type instanceType, bool isCheckNull)
 		{
-			Contract.Requires(il != null && method != null && instanceType != null);
+			Contract.Requires(il != null && member != null && instanceType != null);
 			if (isCheckNull)
 			{
 				il.EmitCheckArgumentNull(0, "instance");
 			}
 			il.Emit(OpCodes.Ldarg_0);
-			Type declType = method.DeclaringType;
+			Type declType = member.DeclaringType;
 			Contract.Assume(declType != null);
 			il.EmitConversion(instanceType, declType, true, ConversionType.Explicit);
 			if (declType.IsValueType)
 			{
-				// 值类型要转换为相应的指针。
+				// 值类型要转换为相应的地址。
 				il.EmitGetAddress(declType);
 			}
 		}
@@ -257,7 +257,7 @@ namespace Cyjb
 		/// <param name="argumentsInfo">方法实参信息。</param>
 		/// <param name="index">实参的起始索引。</param>
 		/// <returns>能否对方法进行 tailcall 优化，如果可以则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
-		private static bool EmitLoadParameters(ILGenerator il, MethodBase method, MethodArgumentsInfo argumentsInfo,
+		private static bool EmitLoadParameters(this ILGenerator il, MethodBase method, MethodArgumentsInfo argumentsInfo,
 			int index)
 		{
 			Contract.Requires(il != null && method != null && argumentsInfo != null && index >= 0);
@@ -267,7 +267,7 @@ namespace Cyjb
 			bool optimizeTailcall = true;
 			for (int i = 0; i < argCnt; i++, index++)
 			{
-				if (!EmitLoadParameter(il, parameters[i], index, args[i]))
+				if (!il.EmitLoadParameter(parameters[i], index, args[i]))
 				{
 					optimizeTailcall = false;
 				}
@@ -286,7 +286,7 @@ namespace Cyjb
 				{
 					il.Emit(OpCodes.Ldloc, local);
 					il.EmitConstant(i);
-					EmitLoadParameter(il, elementType, index, args[i]);
+					il.EmitLoadParameter(elementType, index, args[i]);
 					il.EmitStoreElement(elementType);
 				}
 				il.Emit(OpCodes.Ldloc, local);
@@ -299,7 +299,7 @@ namespace Cyjb
 				argCnt = args.Count;
 				for (int i = 0; i < argCnt; i++, index++)
 				{
-					EmitLoadParameter(il, args[i], index, args[i]);
+					il.EmitLoadParameter(args[i], index, args[i]);
 				}
 			}
 			return optimizeTailcall;
@@ -312,12 +312,12 @@ namespace Cyjb
 		/// <param name="index">要加载的实参索引。</param>
 		/// <param name="argumentType">要加载的实参类型。</param>
 		/// <returns>能否对方法进行 tailcall 优化，如果可以则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
-		private static bool EmitLoadParameter(ILGenerator il, ParameterInfo parameter, int index, Type argumentType)
+		private static bool EmitLoadParameter(this ILGenerator il, ParameterInfo parameter, int index, Type argumentType)
 		{
 			Contract.Requires(il != null && parameter != null && index >= 0);
 			if (argumentType != null)
 			{
-				return EmitLoadParameter(il, parameter.ParameterType, index, argumentType);
+				return il.EmitLoadParameter(parameter.ParameterType, index, argumentType);
 			}
 			if (parameter.IsParamArray())
 			{
@@ -340,7 +340,7 @@ namespace Cyjb
 		/// <param name="index">要加载的实参索引。</param>
 		/// <param name="argumentType">要加载的实参类型。</param>
 		/// <returns>能否对方法进行 tailcall 优化，如果可以则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
-		private static bool EmitLoadParameter(ILGenerator il, Type paramType, int index, Type argumentType)
+		private static bool EmitLoadParameter(this ILGenerator il, Type paramType, int index, Type argumentType)
 		{
 			Contract.Requires(il != null && paramType != null && index >= 0 && argumentType != null);
 			if (paramType.IsByRef)
@@ -378,7 +378,7 @@ namespace Cyjb
 		/// <param name="returnType">方法调用的返回值类型。</param>
 		/// <param name="optimizeTailcall">是否对方法调用进行 tailcall 优化。</param>
 		/// <returns>如果成功写入调用方法的指令，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private static bool EmitInvokeMethod(ILGenerator il, MethodBase method, Type[] optionalArgumentTypes,
+		private static bool EmitInvokeMethod(this ILGenerator il, MethodBase method, Type[] optionalArgumentTypes,
 			Type returnType, bool optimizeTailcall)
 		{
 			Contract.Requires(il != null && method != null && returnType != null);
@@ -587,11 +587,6 @@ namespace Cyjb
 				{
 					return dlg;
 				}
-				// 如果是值类型的实例方法，则报错，因为值类型不能为 null。
-				if (!method.IsStatic && !method.IsConstructor)
-				{
-					return null;
-				}
 			}
 			// 封闭方法。
 			MethodInfo invoke = type.GetInvokeMethod();
@@ -617,7 +612,13 @@ namespace Cyjb
 			{
 				needLoadFirstArg = true;
 				// 修正额外参数的类型。
-				paramTypesWithFirstArg[0] = GetFirstArgParamType(method, firstArgument);
+				Type argType = GetFirstArgParamType(method);
+				// 提前进行类型转换。
+				if (firstArgument != null && firstArgument.GetType() != argType)
+				{
+					firstArgument = Convert.ChangeType(firstArgument, argType);
+				}
+				paramTypesWithFirstArg[0] = argType;
 				paramTypes = paramTypesWithFirstArg;
 			}
 			// 构造动态委托。
@@ -630,18 +631,18 @@ namespace Cyjb
 			{
 				if (argumentsInfo.InstanceType != null)
 				{
-					EmitLoadInstance(il, method, argumentsInfo.InstanceType, true);
+					il.EmitLoadInstance(method, argumentsInfo.InstanceType, true);
 				}
-				optimizeTailcall = EmitLoadParameters(il, method, argumentsInfo, index);
+				optimizeTailcall = il.EmitLoadParameters(method, argumentsInfo, index);
 			}
 			else if (argumentsInfo.InstanceType != null)
 			{
-				EmitLoadInstance(il, method, firstArgument);
-				optimizeTailcall = EmitLoadParameters(il, method, argumentsInfo, 0);
+				il.EmitLoadInstance(method, firstArgument);
+				optimizeTailcall = il.EmitLoadParameters(method, argumentsInfo, 0);
 			}
 			else
 			{
-				optimizeTailcall = EmitLoadParameters(il, method, argumentsInfo, firstArgument);
+				optimizeTailcall = il.EmitLoadParameters(method, argumentsInfo, firstArgument);
 			}
 			// 调用方法。
 			Type[] optionalArgumentTypes = null;
@@ -649,7 +650,7 @@ namespace Cyjb
 			{
 				optionalArgumentTypes = argumentsInfo.OptionalArgumentTypes.ToArray();
 			}
-			if (!EmitInvokeMethod(il, method, optionalArgumentTypes, returnType, optimizeTailcall))
+			if (!il.EmitInvokeMethod(method, optionalArgumentTypes, returnType, optimizeTailcall))
 			{
 				return null;
 			}
@@ -659,34 +660,37 @@ namespace Cyjb
 		/// 获取 firstArgument 对应的形参类型。
 		/// </summary>
 		/// <param name="method">方法信息。</param>
-		/// <param name="firstArgument">第一个参数。</param>
-		/// <returns><paramref name="firstArgument"/> 对应的形参类型。</returns>
-		private static Type GetFirstArgParamType(MethodBase method, object firstArgument)
+		/// <returns>firstArgument 对应的形参类型。</returns>
+		private static Type GetFirstArgParamType(MethodBase method)
 		{
 			Contract.Requires(method != null);
-			if (firstArgument == null)
+			Type type;
+			if (method.IsStatic || method is ConstructorInfo)
 			{
-				// 找到 firstArgument 对应的形参类型。
-				if (method.IsStatic || method is ConstructorInfo)
-				{
-					return method.GetParametersNoCopy()[0].ParameterType;
-				}
-				return method.DeclaringType;
+				type = method.GetParametersNoCopy()[0].ParameterType;
 			}
-			Type argType = firstArgument.GetType();
-			// CreateDelegate 方法传入的 firstArgument 不能为值类型，除非形参类型是 object。
-			return argType.IsValueType ? typeof(object) : argType;
+			else
+			{
+				type = method.DeclaringType;
+			}
+			Contract.Assume(type != null);
+			if (type.IsValueType)
+			{
+				// CreateDelegate 方法传入的 firstArgument 不能为值类型，除非形参类型是 object。
+				type = typeof(object);
+			}
+			return type;
 		}
 		/// <summary>
 		/// 加载指定值作为实例，调用值可写入 IL 且保证类型可以转换。
 		/// </summary>
 		/// <param name="il">IL 指令生成器。</param>
-		/// <param name="method">要调用的方法。</param>
+		/// <param name="member">要调用的成员。</param>
 		/// <param name="value">作为实例加载的值。</param>
-		private static void EmitLoadInstance(ILGenerator il, MethodBase method, object value)
+		private static void EmitLoadInstance(this ILGenerator il, MemberInfo member, object value)
 		{
-			Contract.Requires(il != null && method != null);
-			Type declType = method.DeclaringType;
+			Contract.Requires(il != null && member != null);
+			Type declType = member.DeclaringType;
 			Contract.Assume(declType != null);
 			if (value == null)
 			{
@@ -715,7 +719,7 @@ namespace Cyjb
 		/// <param name="argumentsInfo">方法实参信息。</param>
 		/// <param name="firstArgument">第一个参数的值。</param>
 		/// <returns>能否对方法进行 tailcall 优化，如果可以则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
-		private static bool EmitLoadParameters(ILGenerator il, MethodBase method, MethodArgumentsInfo argumentsInfo,
+		private static bool EmitLoadParameters(this ILGenerator il, MethodBase method, MethodArgumentsInfo argumentsInfo,
 			object firstArgument)
 		{
 			Contract.Requires(il != null && method != null && argumentsInfo != null);
@@ -740,7 +744,7 @@ namespace Cyjb
 			}
 			for (int i = 1; i < argCnt; i++, index++)
 			{
-				if (!EmitLoadParameter(il, parameters[i], index, args[i]))
+				if (!il.EmitLoadParameter(parameters[i], index, args[i]))
 				{
 					optimizeTailcall = false;
 				}
@@ -765,7 +769,7 @@ namespace Cyjb
 				{
 					il.Emit(OpCodes.Ldloc, local);
 					il.EmitConstant(i);
-					EmitLoadParameter(il, elementType, index, args[i]);
+					il.EmitLoadParameter(elementType, index, args[i]);
 					il.EmitStoreElement(elementType);
 				}
 				il.Emit(OpCodes.Ldloc, local);
@@ -784,7 +788,7 @@ namespace Cyjb
 				}
 				for (; i < argCnt; i++, index++)
 				{
-					EmitLoadParameter(il, args[i], index, args[i]);
+					il.EmitLoadParameter(args[i], index, args[i]);
 				}
 			}
 			return optimizeTailcall;
