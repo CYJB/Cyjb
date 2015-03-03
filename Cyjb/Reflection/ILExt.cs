@@ -20,6 +20,17 @@ namespace Cyjb.Reflection
 		/// 表示 <see cref="Closure.Constants"/> 字段。
 		/// </summary>
 		private static readonly FieldInfo closureConstants = typeof(Closure).GetField("Constants");
+		/// <summary>
+		/// 表示 <c>System.Reflection.Emit.DynamicMethod+RTDynamicMethod</c> 类。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private static readonly Type rtDynamicMethodType = Type.GetType("System.Reflection.Emit.DynamicMethod+RTDynamicMethod");
+		/// <summary>
+		/// 获取 <c>System.Reflection.Emit.DynamicMethod+RTDynamicMethod</c> 类对应的 <see cref="DynamicMethod"/> 的方法。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private static readonly Func<object, DynamicMethod> getDynamicMethod = rtDynamicMethodType
+			.CreateDelegate<Func<object, DynamicMethod>>("m_owner");
 
 		#endregion // 成员反射信息常量
 
@@ -630,14 +641,7 @@ namespace Cyjb.Reflection
 			CommonExceptions.CheckArgumentNull(il, "il");
 			CommonExceptions.CheckArgumentNull(method, "method");
 			Contract.EndContractBlock();
-			if (method.CallingConvention == CallingConventions.VarArgs)
-			{
-				il.EmitCall(OpCodes.Call, method, Type.EmptyTypes);
-			}
-			else
-			{
-				il.Emit(OpCodes.Call, method);
-			}
+			il.EmitCallInternal(method, false, Type.EmptyTypes);
 		}
 		/// <summary>
 		/// 调用指定的方法（call）。
@@ -652,18 +656,7 @@ namespace Cyjb.Reflection
 			CommonExceptions.CheckArgumentNull(il, "il");
 			CommonExceptions.CheckArgumentNull(method, "method");
 			Contract.EndContractBlock();
-			if (tailCall)
-			{
-				il.Emit(OpCodes.Tailcall);
-			}
-			if (method.CallingConvention == CallingConventions.VarArgs)
-			{
-				il.EmitCall(OpCodes.Call, method, Type.EmptyTypes);
-			}
-			else
-			{
-				il.Emit(OpCodes.Call, method);
-			}
+			il.EmitCallInternal(method, tailCall, Type.EmptyTypes);
 		}
 		/// <summary>
 		/// 调用指定的方法（call）。
@@ -679,14 +672,7 @@ namespace Cyjb.Reflection
 			CommonExceptions.CheckArgumentNull(il, "il");
 			CommonExceptions.CheckArgumentNull(method, "method");
 			Contract.EndContractBlock();
-			if (method.CallingConvention == CallingConventions.VarArgs)
-			{
-				il.EmitCall(OpCodes.Call, method, parameterTypes);
-			}
-			else
-			{
-				il.Emit(OpCodes.Call, method);
-			}
+			il.EmitCallInternal(method, false, parameterTypes);
 		}
 		/// <summary>
 		/// 调用指定的方法（call）。
@@ -704,6 +690,25 @@ namespace Cyjb.Reflection
 			CommonExceptions.CheckArgumentNull(il, "il");
 			CommonExceptions.CheckArgumentNull(method, "method");
 			Contract.EndContractBlock();
+			il.EmitCallInternal(method, tailCall, parameterTypes);
+		}
+		/// <summary>
+		/// 调用指定的方法（call）。
+		/// </summary>
+		/// <param name="il">IL 指令生成器。</param>
+		/// <param name="method">要调用的方法。</param>
+		/// <param name="tailCall">是否执行后缀的方法调用。</param>
+		/// <param name="parameterTypes">参数的类型；如果 <paramref name="method"/> 不是可变参数方法，
+		/// 则忽略该参数。</param>
+		private static void EmitCallInternal(this ILGenerator il, MethodInfo method, bool tailCall,
+			params Type[] parameterTypes)
+		{
+			Contract.Requires(il != null && method != null);
+			if (rtDynamicMethodType.IsInstanceOfType(method))
+			{
+				// RTDynamicMethod 不能直接调用，需要取得相应的 DynamicMethod 才可以。
+				method = getDynamicMethod(method);
+			}
 			if (tailCall)
 			{
 				il.Emit(OpCodes.Tailcall);
@@ -803,6 +808,11 @@ namespace Cyjb.Reflection
 			params Type[] parameterTypes)
 		{
 			Contract.Requires(il != null && method != null);
+			if (rtDynamicMethodType.IsInstanceOfType(method))
+			{
+				// RTDynamicMethod 不能直接调用，需要取得相应的 DynamicMethod 才可以。
+				method = getDynamicMethod(method);
+			}
 			OpCode callOp;
 			if (UseVirtual(method))
 			{
