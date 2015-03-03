@@ -203,6 +203,62 @@ namespace Cyjb
 
 		#endregion // 通用委托
 
+		#region 委托类型包装
+
+		/// <summary>
+		/// 将指定的委托用指定类型的委托包装，支持对参数进行强制类型转换。
+		/// </summary>
+		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
+		/// <param name="dlg">要被包装的委托。</param>
+		/// <returns>指定类型的委托，其包装了 <paramref name="dlg"/>。
+		/// 如果参数个数不同，或者参数间不能执行强制类型转换，则为 <c>null</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="dlg"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
+		/// <exception cref="MethodAccessException">调用方无权访问成员。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 将指定的委托用指定类型的委托包装，支持对参数进行强制类型转换。
+		/// </summary>
+		/// </overloads>
+		public static TDelegate Wrap<TDelegate>(this Delegate dlg)
+			where TDelegate : class
+		{
+			CommonExceptions.CheckArgumentNull(dlg, "dlg");
+			Contract.EndContractBlock();
+			TDelegate typedDlg = dlg as TDelegate;
+			if (typedDlg != null)
+			{
+				return typedDlg;
+			}
+			Type type = typeof(TDelegate);
+			CommonExceptions.CheckDelegateType(type);
+			return CreateClosedDelegate(dlg.Method, type, dlg.Target) as TDelegate;
+		}
+		/// <summary>
+		/// 将指定的委托用指定类型的委托包装，支持对参数进行强制类型转换。
+		/// </summary>
+		/// <param name="dlg">要被包装的委托。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
+		/// <returns>指定类型的委托，其包装了 <paramref name="dlg"/>。
+		/// 如果参数个数不同，或者参数间不能执行强制类型转换，则为 <c>null</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="dlg"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
+		/// <exception cref="MethodAccessException">调用方无权访问成员。</exception>
+		public static Delegate Wrap(this Delegate dlg, Type delegateType)
+		{
+			CommonExceptions.CheckArgumentNull(dlg, "dlg");
+			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
+			Contract.EndContractBlock();
+			if (delegateType.IsInstanceOfType(dlg))
+			{
+				return dlg;
+			}
+			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
+			return CreateClosedDelegate(dlg.Method, delegateType, dlg.Target);
+		}
+
+		#endregion // 委托类型包装
 
 
 
@@ -211,7 +267,7 @@ namespace Cyjb
 		/// <summary>
 		/// 构造函数的名称。
 		/// </summary>
-		private const string ConstructorName = ".type";
+		private const string ConstructorName = ".delegateType";
 		/// <summary>
 		/// 默认的绑定设置值。
 		/// </summary>
@@ -435,23 +491,23 @@ namespace Cyjb
 		/// 按照方法、属性、字段的顺序查找匹配的成员。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
 		/// <param name="memberName">委托要表示的成员的名称。</param> 
 		/// <returns>指定类型的委托，表示指定的静态或实例成员。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="memberName"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承
+		/// <exception cref="System.ArgumentException"><paramref name="delegateType"/> 不继承
 		/// <see cref="System.MulticastDelegate"/>。</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="target"/> 是一个开放式泛型类型。</exception>
 		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="memberName"/>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <paramref name="type"/>
+		/// <exception cref="System.MissingMethodException">未找到 <paramref name="delegateType"/>
 		/// 的 <c>Invoke</c> 方法。</exception>
 		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
-		public static Delegate CreateDelegate(Type type, Type target, string memberName)
+		public static Delegate CreateDelegate(Type delegateType, Type target, string memberName)
 		{
-			return CreateDelegate(type, target, memberName, BinderDefault, true);
+			return CreateDelegate(delegateType, target, memberName, BinderDefault, true);
 		}
 		/// <summary>
 		/// 使用指定的名称和搜索方式，创建用于表示静态或实例成员的指定类型的委托。
@@ -463,25 +519,25 @@ namespace Cyjb
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
 		/// <param name="memberName">委托要表示的成员的名称。</param> 
 		/// <param name="bindingAttr">一个位屏蔽，由一个或多个指定搜索执行方式的 
 		/// <see cref="System.Reflection.BindingFlags"/> 组成。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例成员。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="memberName"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承
+		/// <exception cref="System.ArgumentException"><paramref name="delegateType"/> 不继承
 		/// <see cref="System.MulticastDelegate"/>。</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="target"/> 是一个开放式泛型类型。</exception>
 		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="memberName"/>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <paramref name="type"/>
+		/// <exception cref="System.MissingMethodException">未找到 <paramref name="delegateType"/>
 		/// 的 <c>Invoke</c> 方法。</exception>
 		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
-		public static Delegate CreateDelegate(Type type, Type target, string memberName, BindingFlags bindingAttr)
+		public static Delegate CreateDelegate(Type delegateType, Type target, string memberName, BindingFlags bindingAttr)
 		{
-			return CreateDelegate(type, target, memberName, bindingAttr, true);
+			return CreateDelegate(delegateType, target, memberName, bindingAttr, true);
 		}
 		/// <summary>
 		/// 使用指定的名称、搜索方式和针对绑定失败的指定行为，创建用于表示静态或实例成员的指定类型的委托。
@@ -493,7 +549,7 @@ namespace Cyjb
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
 		/// <param name="memberName">委托要表示的成员的名称。</param> 
 		/// <param name="bindingAttr">一个位屏蔽，由一个或多个指定搜索执行方式的 
@@ -501,24 +557,24 @@ namespace Cyjb
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="memberName"/> 
 		/// 时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例成员。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="memberName"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承
+		/// <exception cref="System.ArgumentException"><paramref name="delegateType"/> 不继承
 		/// <see cref="System.MulticastDelegate"/>。</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="target"/> 是一个开放式泛型类型。</exception>
 		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="memberName"/>
 		/// 且 <paramref name="throwOnBindFailure"/> 为 <c>true</c>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <paramref name="type"/>
+		/// <exception cref="System.MissingMethodException">未找到 <paramref name="delegateType"/>
 		/// 的 <c>Invoke</c> 方法。</exception>
 		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
-		public static Delegate CreateDelegate(Type type, Type target, string memberName, BindingFlags bindingAttr,
+		public static Delegate CreateDelegate(Type delegateType, Type target, string memberName, BindingFlags bindingAttr,
 			bool throwOnBindFailure)
 		{
 			CommonExceptions.CheckArgumentNull(memberName, "memberName");
-			CommonExceptions.CheckDelegateType(type, "type");
+			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
 			CheckTargetType(target, "target");
-			MethodInfo invoke = type.GetMethod("Invoke");
+			MethodInfo invoke = delegateType.GetMethod("Invoke");
 			ParameterInfo[] paramInfos = invoke.GetParameters();
 			Type[] types = GetParameterTypes(paramInfos, 0, 0, 0);
 			BindingFlags memberFlags = bindingAttr & BinderMemberMask;
@@ -541,7 +597,7 @@ namespace Cyjb
 					PowerBinder.CastBinder, types, null);
 				if (ctor != null)
 				{
-					dlg = CreateDelegate(type, ctor, false);
+					dlg = CreateDelegate(ctor, delegateType, (object)false);
 				}
 			}
 			else
@@ -575,12 +631,12 @@ namespace Cyjb
 					// 查找静态方法成员。
 					if (containsStaticMember)
 					{
-						dlg = CreateMethodDelegate(type, target, memberName, null, staticBindingAttr, types);
+						dlg = CreateMethodDelegate(delegateType, target, memberName, null, staticBindingAttr, types);
 					}
 					// 查找实例方法成员。
 					if (dlg == null && containsInstnceMember)
 					{
-						dlg = CreateMethodDelegate(type, target, memberName, null, instancecBindingAttr, instanceTypes);
+						dlg = CreateMethodDelegate(delegateType, target, memberName, null, instancecBindingAttr, instanceTypes);
 					}
 				}
 				if (dlg == null && (memberFlags & BinderGetSetProperty) != BindingFlags.Default)
@@ -588,13 +644,13 @@ namespace Cyjb
 					// 查找静态属性成员。
 					if (containsStaticMember)
 					{
-						dlg = CreatePropertyDelegate(type, target, memberName, null, staticBindingAttr,
+						dlg = CreatePropertyDelegate(delegateType, target, memberName, null, staticBindingAttr,
 							invoke.ReturnType, types);
 					}
 					// 查找实例属性成员。
 					if (dlg == null && containsInstnceMember)
 					{
-						dlg = CreatePropertyDelegate(type, target, memberName, null, instancecBindingAttr,
+						dlg = CreatePropertyDelegate(delegateType, target, memberName, null, instancecBindingAttr,
 							invoke.ReturnType, instanceTypes);
 					}
 				}
@@ -604,7 +660,7 @@ namespace Cyjb
 					FieldInfo field = target.GetField(memberName, bindingAttr);
 					if (field != null)
 					{
-						dlg = CreateDelegate(type, field, false);
+						dlg = CreateDelegate(field, delegateType, false);
 					}
 				}
 			}
@@ -637,11 +693,11 @@ namespace Cyjb
 			{
 				if (firstArgument == null)
 				{
-					return CreateDelegate(type, (MethodBase)method, false);
+					return CreateDelegate((MethodBase)method, type, (object)false);
 				}
 				else
 				{
-					return CreateDelegate(type, method, firstArgument, false);
+					return CreateDelegate(method, type, firstArgument, false);
 				}
 			}
 			return null;
@@ -692,11 +748,11 @@ namespace Cyjb
 			{
 				if (firstArgument == null)
 				{
-					return CreateDelegate(type, property, false);
+					return CreateDelegate(property, type, false);
 				}
 				else
 				{
-					return CreateDelegate(type, property, firstArgument, false);
+					return CreateDelegate(property, type, firstArgument, false);
 				}
 			}
 			return null;
@@ -927,25 +983,25 @@ namespace Cyjb
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
 		/// <param name="memberName">委托要表示的成员的名称。</param> 
 		/// <param name="firstArgument">委托要绑定到的对象，或为 <c>null</c>，
 		/// 后者表示将 <paramref name="memberName"/> 视为 <c>static</c>。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例成员。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="memberName"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承
+		/// <exception cref="System.ArgumentException"><paramref name="delegateType"/> 不继承
 		/// <see cref="System.MulticastDelegate"/>。</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="target"/> 是一个开放式泛型类型。</exception>
 		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="memberName"/>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <paramref name="type"/>
+		/// <exception cref="System.MissingMethodException">未找到 <paramref name="delegateType"/>
 		/// 的 <c>Invoke</c> 方法。</exception>
 		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
-		public static Delegate CreateDelegate(Type type, Type target, string memberName, object firstArgument)
+		public static Delegate CreateDelegate(Type delegateType, Type target, string memberName, object firstArgument)
 		{
-			return CreateDelegate(type, target, memberName, firstArgument, BinderDefault, true);
+			return CreateDelegate(delegateType, target, memberName, firstArgument, BinderDefault, true);
 		}
 		/// <summary>
 		/// 使用指定的名称、第一个参数和搜索方式，创建用于表示静态或实例成员的指定类型的委托。
@@ -958,7 +1014,7 @@ namespace Cyjb
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
 		/// <param name="memberName">委托要表示的成员的名称。</param> 
 		/// <param name="firstArgument">委托要绑定到的对象，或为 <c>null</c>，
@@ -966,20 +1022,20 @@ namespace Cyjb
 		/// <param name="bindingAttr">一个位屏蔽，由一个或多个指定搜索执行方式的 
 		/// <see cref="System.Reflection.BindingFlags"/> 组成。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例成员。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="memberName"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承
+		/// <exception cref="System.ArgumentException"><paramref name="delegateType"/> 不继承
 		/// <see cref="System.MulticastDelegate"/>。</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="target"/> 是一个开放式泛型类型。</exception>
 		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="memberName"/>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <paramref name="type"/>
+		/// <exception cref="System.MissingMethodException">未找到 <paramref name="delegateType"/>
 		/// 的 <c>Invoke</c> 方法。</exception>
 		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
-		public static Delegate CreateDelegate(Type type, Type target, string memberName, object firstArgument,
+		public static Delegate CreateDelegate(Type delegateType, Type target, string memberName, object firstArgument,
 			BindingFlags bindingAttr)
 		{
-			return CreateDelegate(type, target, memberName, firstArgument, bindingAttr, true);
+			return CreateDelegate(delegateType, target, memberName, firstArgument, bindingAttr, true);
 		}
 		/// <summary>
 		/// 使用指定的名称、第一个参数、搜索方式和针对绑定失败的指定行为，创建用于表示静态或实例成员的指定类型的委托。
@@ -992,7 +1048,7 @@ namespace Cyjb
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="target">表示实现成员的类的 <see cref="System.Type"/>。</param>
 		/// <param name="memberName">委托要表示的成员的名称。</param> 
 		/// <param name="firstArgument">委托要绑定到的对象，或为 <c>null</c>，
@@ -1002,24 +1058,24 @@ namespace Cyjb
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="memberName"/> 
 		/// 时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例成员。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="memberName"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承
+		/// <exception cref="System.ArgumentException"><paramref name="delegateType"/> 不继承
 		/// <see cref="System.MulticastDelegate"/>。</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="target"/> 是一个开放式泛型类型。</exception>
 		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="memberName"/>
 		/// 且 <paramref name="throwOnBindFailure"/> 为 <c>true</c>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <paramref name="type"/>
+		/// <exception cref="System.MissingMethodException">未找到 <paramref name="delegateType"/>
 		/// 的 <c>Invoke</c> 方法。</exception>
 		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
-		public static Delegate CreateDelegate(Type type, Type target, string memberName, object firstArgument,
+		public static Delegate CreateDelegate(Type delegateType, Type target, string memberName, object firstArgument,
 			BindingFlags bindingAttr, bool throwOnBindFailure)
 		{
 			CommonExceptions.CheckArgumentNull(memberName, "memberName");
-			CommonExceptions.CheckDelegateType(type, "type");
+			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
 			CheckTargetType(target, "target");
-			MethodInfo invoke = type.GetMethod("Invoke");
+			MethodInfo invoke = delegateType.GetMethod("Invoke");
 			ParameterInfo[] paramInfos = invoke.GetParameters();
 			Type[] types = GetParameterTypes(paramInfos, 0, 0, 0);
 			BindingFlags memberFlags = bindingAttr & BinderMemberMask;
@@ -1041,7 +1097,7 @@ namespace Cyjb
 				ConstructorInfo ctor = target.GetConstructor(instancecBindingAttr, PowerBinder.CastBinder, types, null);
 				if (ctor != null)
 				{
-					dlg = CreateDelegate(type, ctor, false);
+					dlg = CreateDelegate(ctor, delegateType, (object)false);
 				}
 			}
 			else
@@ -1058,12 +1114,12 @@ namespace Cyjb
 				// 查找方法成员。
 				if ((memberFlags & BindingFlags.InvokeMethod) == BindingFlags.InvokeMethod)
 				{
-					dlg = CreateMethodDelegate(type, target, memberName, firstArgument, bindingAttr, types);
+					dlg = CreateMethodDelegate(delegateType, target, memberName, firstArgument, bindingAttr, types);
 				}
 				// 查找属性成员。
 				if (dlg == null && (memberFlags & BinderGetSetProperty) != BindingFlags.Default)
 				{
-					dlg = CreatePropertyDelegate(type, target, memberName, firstArgument, bindingAttr, invoke.ReturnType, types);
+					dlg = CreatePropertyDelegate(delegateType, target, memberName, firstArgument, bindingAttr, invoke.ReturnType, types);
 				}
 				// 查找字段成员。
 				if (dlg == null && (memberFlags & BinderGetSetField) != BindingFlags.Default)
@@ -1073,11 +1129,11 @@ namespace Cyjb
 					{
 						if (firstArgument == null)
 						{
-							dlg = CreateDelegate(type, field, throwOnBindFailure);
+							dlg = CreateDelegate(field, delegateType, throwOnBindFailure);
 						}
 						else
 						{
-							dlg = CreateDelegate(type, field, firstArgument, throwOnBindFailure);
+							dlg = CreateDelegate(field, delegateType, firstArgument, throwOnBindFailure);
 						}
 					}
 				}
@@ -1198,23 +1254,23 @@ namespace Cyjb
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="target">表示实现成员的类的实例。</param>
 		/// <param name="memberName">委托要表示的成员的名称。</param> 
 		/// <returns>指定类型的委托，表示指定的实例成员。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="memberName"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承
+		/// <exception cref="System.ArgumentException"><paramref name="delegateType"/> 不继承
 		/// <see cref="System.MulticastDelegate"/>。</exception>
 		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="memberName"/>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <paramref name="type"/>
+		/// <exception cref="System.MissingMethodException">未找到 <paramref name="delegateType"/>
 		/// 的 <c>Invoke</c> 方法。</exception>
 		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
-		public static Delegate CreateDelegate(Type type, object target, string memberName)
+		public static Delegate CreateDelegate(Type delegateType, object target, string memberName)
 		{
 			CommonExceptions.CheckArgumentNull(target, "target");
-			return CreateDelegate(type, target.GetType(), memberName, target, BinderDefault, true);
+			return CreateDelegate(delegateType, target.GetType(), memberName, target, BinderDefault, true);
 		}
 		/// <summary>
 		/// 使用指定的实例、名称和搜索方式，创建用于表示实例成员的指定类型的委托。
@@ -1225,25 +1281,25 @@ namespace Cyjb
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="target">表示实现成员的类的实例。</param>
 		/// <param name="memberName">委托要表示的成员的名称。</param> 
 		/// <param name="bindingAttr">一个位屏蔽，由一个或多个指定搜索执行方式的 
 		/// <see cref="System.Reflection.BindingFlags"/> 组成。</param>
 		/// <returns>指定类型的委托，表示指定的实例成员。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="memberName"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承
+		/// <exception cref="System.ArgumentException"><paramref name="delegateType"/> 不继承
 		/// <see cref="System.MulticastDelegate"/>。</exception>
 		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="memberName"/>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <paramref name="type"/>
+		/// <exception cref="System.MissingMethodException">未找到 <paramref name="delegateType"/>
 		/// 的 <c>Invoke</c> 方法。</exception>
 		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
-		public static Delegate CreateDelegate(Type type, object target, string memberName, BindingFlags bindingAttr)
+		public static Delegate CreateDelegate(Type delegateType, object target, string memberName, BindingFlags bindingAttr)
 		{
 			CommonExceptions.CheckArgumentNull(target, "target");
-			return CreateDelegate(type, target.GetType(), memberName, target, bindingAttr, true);
+			return CreateDelegate(delegateType, target.GetType(), memberName, target, bindingAttr, true);
 		}
 		/// <summary>
 		/// 使用指定的实例、名称、搜索方式和针对绑定失败的指定行为，创建用于表示实例成员的指定类型的委托。
@@ -1254,7 +1310,7 @@ namespace Cyjb
 		/// <see cref="BindingFlags.GetField"/>，<see cref="BindingFlags.SetField"/>，
 		/// <see cref="BindingFlags.GetProperty"/>，<see cref="BindingFlags.SetProperty"/> 来选择要绑定到的成员类型。
 		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
+		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="target">表示实现成员的类的实例。</param>
 		/// <param name="memberName">委托要表示的成员的名称。</param> 
 		/// <param name="bindingAttr">一个位屏蔽，由一个或多个指定搜索执行方式的 
@@ -1262,91 +1318,25 @@ namespace Cyjb
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="memberName"/> 
 		/// 时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示指定的实例成员。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="target"/> 为 <c>null</c>。</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="memberName"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承
+		/// <exception cref="System.ArgumentException"><paramref name="delegateType"/> 不继承
 		/// <see cref="System.MulticastDelegate"/>。</exception>
 		/// <exception cref="System.ArgumentException">无法绑定 <paramref name="memberName"/>
 		/// 且 <paramref name="throwOnBindFailure"/> 为 <c>true</c>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <paramref name="type"/>
+		/// <exception cref="System.MissingMethodException">未找到 <paramref name="delegateType"/>
 		/// 的 <c>Invoke</c> 方法。</exception>
 		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
-		public static Delegate CreateDelegate(Type type, object target, string memberName,
+		public static Delegate CreateDelegate(Type delegateType, object target, string memberName,
 			BindingFlags bindingAttr, bool throwOnBindFailure)
 		{
 			CommonExceptions.CheckArgumentNull(target, "target");
-			return CreateDelegate(type, target.GetType(), memberName, target, bindingAttr, throwOnBindFailure);
+			return CreateDelegate(delegateType, target.GetType(), memberName, target, bindingAttr, throwOnBindFailure);
 		}
 
 		#endregion // 从 Object 构造成员委托
 
-		#region 委托类型包装
-
-		/// <summary>
-		/// 将指定的委托用指定类型的委托包装，支持对参数进行强制类型转换。
-		/// </summary>
-		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
-		/// <param name="dlg">要被包装的委托。</param>
-		/// <returns>指定类型的委托，其包装了 <paramref name="dlg"/>。
-		/// 如果参数个数不同，或者参数间不能执行强制类型转换，则为 <c>null</c>。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="dlg"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><typeparamref name="TDelegate"/> 不继承
-		/// <see cref="System.MulticastDelegate"/>。</exception>
-		/// <exception cref="System.MissingMethodException">未找到 <typeparamref name="TDelegate"/>
-		/// 的 <c>Invoke</c> 方法。</exception>
-		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
-		/// <overloads>
-		/// <summary>
-		/// 将指定的委托用指定类型的委托包装，支持对参数进行强制类型转换。
-		/// </summary>
-		/// </overloads>
-		public static TDelegate Wrap<TDelegate>(this Delegate dlg)
-			where TDelegate : class
-		{
-			// TODO : 完全兼容的话不要创建新：的
-			return Wrap(typeof(TDelegate), dlg) as TDelegate;
-		}
-		/// <summary>
-		/// 将指定的委托用指定类型的委托包装，支持对参数进行强制类型转换。
-		/// </summary>
-		/// <param name="type">要创建的委托的类型。</param>
-		/// <param name="dlg">要被包装的委托。</param>
-		/// <returns>指定类型的委托，其包装了 <paramref name="dlg"/>。
-		/// 如果参数个数不同，或者参数间不能执行强制类型转换，则为 <c>null</c>。</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentNullException"><paramref name="dlg"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentException"><paramref name="type"/> 不继承
-		/// <see cref="System.MulticastDelegate"/>。</exception>
-		/// <exception cref="System.MethodAccessException">调用方无权访问成员。</exception>
-		public static Delegate Wrap(Type type, Delegate dlg)
-		{
-			CommonExceptions.CheckArgumentNull(dlg, "dlg");
-			CommonExceptions.CheckDelegateType(type, "type");
-			ParameterInfo[] paramInfos = dlg.GetType().GetMethod("Invoke").GetParameters();
-			MethodInfo targetInvoke = type.GetMethod("Invoke");
-			ParameterInfo[] targetParamInfos = targetInvoke.GetParameters();
-			if (paramInfos.Length != targetParamInfos.Length)
-			{
-				return null;
-			}
-			ParameterExpression[] paramList = targetParamInfos.ToExpressions();
-			// 构造调用参数列表。
-			Expression[] paramExps = GetParameterExpressions(paramList, 0, paramInfos, 0);
-			if (paramExps == null)
-			{
-				return null;
-			}
-			Expression dlgInvoke = GetReturn(Expression.Invoke(Expression.Constant(dlg), paramExps),
-				targetInvoke.ReturnType);
-			if (dlgInvoke == null)
-			{
-				return null;
-			}
-			return Expression.Lambda(type, dlgInvoke, paramList).Compile();
-		}
-
-		#endregion // 委托类型包装
 
 		#region 参数检查
 
@@ -1386,61 +1376,6 @@ namespace Cyjb
 				types[i - dif] = paramInfos[i].ParameterType;
 			}
 			return types;
-		}
-		/// <summary>
-		/// 根据给定的参数信息创建引用参数表达式列表。如果不能进行强制类型转换，则为 <c>null</c>。
-		/// </summary>
-		/// <param name="parameters">参数表达式列表。</param>
-		/// <param name="invokeIndex">参数表达式列表的起始索引。</param>
-		/// <param name="paramInfos">目标参数信息。</param>
-		/// <param name="methodIndex">目标参数信息的起始索引。</param>
-		/// <returns>得到的引用参数表达式列表。</returns>
-		private static Expression[] GetParameterExpressions(ParameterExpression[] parameters,
-			int invokeIndex, ParameterInfo[] paramInfos, int methodIndex)
-		{
-			Expression[] paramExps = new Expression[paramInfos.Length];
-			for (int i = invokeIndex, j = methodIndex; j < paramExps.Length; i++, j++)
-			{
-				Expression exp = parameters[i].ConvertType(paramInfos[j].ParameterType);
-				if (exp == null)
-				{
-					// 不能进行强制类型转换。
-					return null;
-				}
-				paramExps[j] = exp;
-			}
-			return paramExps;
-		}
-		/// <summary>
-		/// 返回对指定返回值到目标类型的强制类型转换的表达式。
-		/// </summary>
-		/// <param name="returnExp">返回值定义表达式。</param>
-		/// <param name="returnType">要强制类型转换到的目标类型。</param>
-		/// <returns>指定返回值到目标类型的强制类型转换的表达式。</returns>
-		private static Expression GetReturn(Expression returnExp, Type returnType)
-		{
-			if (returnType == typeof(void) || returnExp.Type == returnType ||
-				// Expression 不能处理值类型的类型转换。
-				(!returnType.IsValueType && !returnExp.Type.IsValueType &&
-				returnType.IsAssignableFrom(returnExp.Type)))
-			{
-				return returnExp;
-			}
-			if (returnExp.Type == typeof(void))
-			{
-				// 添加默认返回值。
-				return Expression.Block(returnExp, Expression.Default(returnType));
-			}
-			try
-			{
-				// 需要强制转换。
-				return Expression.Convert(returnExp, returnType);
-			}
-			catch (InvalidOperationException)
-			{
-				// 不允许进行强制类型转换。
-				return null;
-			}
 		}
 
 		#endregion // Expression 辅助方法

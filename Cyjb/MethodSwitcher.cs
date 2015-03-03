@@ -471,7 +471,7 @@ namespace Cyjb
 				{
 					Type keyType = list[i].GetParameters()[this.KeyIndex].ParameterType;
 					// 经过前面的类型检查，包装委托时应当总是会成功。
-					this.Processors.Add(keyType, DelegateBuilder.Wrap(this.DelegateType, delegates[i]));
+					this.Processors.Add(keyType, DelegateBuilder.Wrap(delegates[i], this.DelegateType));
 				}
 			}
 			/// <summary>

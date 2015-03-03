@@ -717,6 +717,45 @@ namespace UnitTestCyjb
 
 		#endregion // 测试字段委托
 
+		#region 测试委托包装
+
+		/// <summary>
+		/// 测试构造委托包装。
+		/// </summary>
+		[TestMethod]
+		public void TestWrapDelegate()
+		{
+			Action action = () => { };
+			Assert.AreEqual(action, action.Wrap<Action>());
+			Func<string> func = () => "Test";
+			Assert.AreEqual("Test", func.Wrap<TestFunc>()());
+			Func<string, int, string> func2 = (k, v) => k + "_" + v + "_Func";
+			Assert.AreEqual("Test_0_Func", func2.Wrap<TestFunc2>()("Test", 0));
+			string value = "Test";
+			int value2;
+			Assert.AreEqual("Test_0_Func", func2.Wrap<TestFunc3>()(ref value, out value2));
+			Assert.AreEqual("Test", value);
+			Assert.AreEqual(0, value2);
+			TestFunc3 func4 = (ref string k, out int v) =>
+			{
+				string oldK = k;
+				k = "TestNewValue";
+				v = 101;
+				return oldK + "_Func";
+			};
+			value = "Test";
+			Assert.AreEqual("Test_Func", func4.Wrap<TestFunc4>()(ref value, out value2));
+			Assert.AreEqual("TestNewValue", value);
+			Assert.AreEqual(101, value2);
+			Assert.AreEqual("Test_Func", func4.Wrap<Func<string, int, string>>()("Test", 0));
+		}
+		private delegate string TestFunc();
+		private delegate string TestFunc2(string k, int v);
+		private delegate string TestFunc3(ref string k, out int v);
+		private delegate string TestFunc4(ref string k, out int v);
+
+		#endregion // 测试委托包装
+
 		/// <summary>
 		/// 测试通过 Type 构造方法委托。
 		/// </summary>
