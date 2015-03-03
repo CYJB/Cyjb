@@ -367,11 +367,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentException"><paramref name="items"/> 为空数组。</exception>
 		public static T Choose<T>(params T[] items)
 		{
-			CommonExceptions.CheckArgumentNull(items, "items");
-			if (items.Length == 0)
-			{
-				throw CommonExceptions.CollectionEmpty("items");
-			}
+			CommonExceptions.CheckCollectionEmpty(items, "items");
 			Contract.EndContractBlock();
 			if (items.Length == 1)
 			{

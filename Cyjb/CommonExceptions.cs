@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics.Contracts;
@@ -110,7 +111,7 @@ namespace Cyjb
 			return new ArgumentException(Resources.ArrayNonZeroLowerBound, paramName);
 		}
 		/// <summary>
-		/// 检查指定的数组，如果数组为 <c>null</c>，或者不是下限为零的一维数组则抛出相应异常。
+		/// 检查指定的数组，如果为 <c>null</c>，或者不是下限为零的一维数组则抛出相应异常。
 		/// </summary>
 		/// <param name="array">要检查的数组。</param>
 		/// <param name="paramName">数组参数的名称。</param>
@@ -169,6 +170,21 @@ namespace Cyjb
 			return new ArgumentException(Resources.CollectionEmpty, paramName);
 		}
 		/// <summary>
+		/// 检查指定的集合，如果为 <c>null</c> 或者长度为零则抛出相应异常。
+		/// </summary>
+		/// <param name="collection">要检查的集合。</param>
+		/// <param name="paramName">集合参数的名称。</param>
+		[ContractArgumentValidator]
+		public static void CheckCollectionEmpty(ICollection collection, [InvokerParameterName]string paramName)
+		{
+			CheckArgumentNull(collection, paramName);
+			if (collection.Count == 0)
+			{
+				throw new ArgumentException(Resources.CollectionEmpty, paramName);
+			}
+			Contract.EndContractBlock();
+		}
+		/// <summary>
 		/// 返回集合是固定大小的异常。
 		/// </summary>
 		/// <returns><see cref="NotSupportedException"/> 对象。</returns>
@@ -196,6 +212,25 @@ namespace Cyjb
 		{
 			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.CollectionItemNull, paramName);
+		}
+		/// <summary>
+		/// 检查指定的数组，如果为 <c>null</c>、长度为零或包含为 <c>null</c> 的元素则抛出相应异常。
+		/// </summary>
+		/// <param name="array">要检查的数组。</param>
+		/// <param name="paramName">数组参数的名称。</param>
+		[ContractArgumentValidator]
+		public static void CheckCollectionItemNull<T>(T[] array, [InvokerParameterName]string paramName)
+		{
+			CheckArgumentNull(array, paramName);
+			if (array.Length == 0)
+			{
+				throw new ArgumentException(Resources.CollectionEmpty, paramName);
+			}
+			if (Array.IndexOf(array, null) >= 0)
+			{
+				throw new ArgumentException(Resources.CollectionItemNull, paramName);
+			}
+			Contract.EndContractBlock();
 		}
 		/// <summary>
 		/// 返回集合是只读的异常。

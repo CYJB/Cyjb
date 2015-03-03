@@ -108,11 +108,7 @@ namespace Cyjb
 		public static TDelegate Create<TDelegate>(params Delegate[] delegates)
 			where TDelegate : class
 		{
-			CommonExceptions.CheckArgumentNull(delegates, "delegates");
-			if (delegates.Any(d => d == null))
-			{
-				throw CommonExceptions.CollectionItemNull("delegates");
-			}
+			CommonExceptions.CheckCollectionItemNull(delegates, "delegates");
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
 			CommonExceptions.CheckDelegateType(typeof(TDelegate));
 			ProcessorData data = new ProcessorData(delegates);
