@@ -29,8 +29,23 @@ namespace Cyjb.Reflection
 		/// 获取 <c>System.Reflection.Emit.DynamicMethod+RTDynamicMethod</c> 类对应的 <see cref="DynamicMethod"/> 的方法。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static readonly Func<object, DynamicMethod> getDynamicMethod = rtDynamicMethodType
-			.CreateDelegate<Func<object, DynamicMethod>>("m_owner");
+		private static Func<object, DynamicMethod> getDynamicMethod;
+		/// <summary>
+		/// 获取 <c>System.Reflection.Emit.DynamicMethod+RTDynamicMethod</c> 类对应的 <see cref="DynamicMethod"/> 的方法。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private static Func<object, DynamicMethod> GetDynamicMethod
+		{
+			get
+			{
+				if (getDynamicMethod == null)
+				{
+					getDynamicMethod = rtDynamicMethodType.GetField("m_owner", TypeExt.InstanceFlag)
+						.CreateDelegate<Func<object, DynamicMethod>>();
+				}
+				return getDynamicMethod;
+			}
+		}
 
 		#endregion // 成员反射信息常量
 
@@ -707,7 +722,7 @@ namespace Cyjb.Reflection
 			if (rtDynamicMethodType.IsInstanceOfType(method))
 			{
 				// RTDynamicMethod 不能直接调用，需要取得相应的 DynamicMethod 才可以。
-				method = getDynamicMethod(method);
+				method = GetDynamicMethod(method);
 			}
 			if (tailCall)
 			{
@@ -811,7 +826,7 @@ namespace Cyjb.Reflection
 			if (rtDynamicMethodType.IsInstanceOfType(method))
 			{
 				// RTDynamicMethod 不能直接调用，需要取得相应的 DynamicMethod 才可以。
-				method = getDynamicMethod(method);
+				method = GetDynamicMethod(method);
 			}
 			OpCode callOp;
 			if (UseVirtual(method))
