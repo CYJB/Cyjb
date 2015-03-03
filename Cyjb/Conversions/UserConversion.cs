@@ -35,11 +35,11 @@ namespace Cyjb.Conversions
 		public override void Emit(ILGenerator generator, Type inputType, Type outputType, bool isChecked)
 		{
 			Type methodType = method.GetParametersNoCopy()[0].ParameterType;
-			Conversion conv = ConversionFactory.GetPreDefinedConversion(inputType, methodType);
+			Conversion conv = ConversionFactory.GetPreDefinedConversionNotVoid(inputType, methodType);
 			conv.Emit(generator, inputType, methodType, isChecked);
 			generator.EmitCall(method);
 			methodType = method.ReturnType;
-			conv = ConversionFactory.GetPreDefinedConversion(methodType, outputType);
+			conv = ConversionFactory.GetPreDefinedConversionNotVoid(methodType, outputType);
 			if (conv is FromNullableConversion)
 			{
 				generator.EmitGetAddress(methodType);

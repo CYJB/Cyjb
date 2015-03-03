@@ -171,7 +171,7 @@ namespace Cyjb
 				return method.CreateDelegate(typeof(Converter<,>).MakeGenericType(inputType, outputType));
 			}
 			// 从 object 拆箱得到值类型。
-			ConversionFactory.GetPreDefinedConversion(typeof(object), inputType).Emit(il, typeof(object), inputType, isChecked);
+			ConversionFactory.GetPreDefinedConversionNotVoid(typeof(object), inputType).Emit(il, typeof(object), inputType, isChecked);
 			if (passByAddress)
 			{
 				il.EmitGetAddress(inputType);

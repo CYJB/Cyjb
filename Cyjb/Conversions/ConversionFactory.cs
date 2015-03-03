@@ -52,7 +52,7 @@ namespace Cyjb.Conversions
 				return conversion;
 			}
 			// 判断预定义类型转换。
-			conversion = GetPreDefinedConversion(inputType, outputType);
+			conversion = GetPreDefinedConversionNotVoid(inputType, outputType);
 			if (conversion != null)
 			{
 				return conversion;
@@ -106,6 +106,22 @@ namespace Cyjb.Conversions
 		/// <returns>将对象从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 
 		/// 类型的预定义类型转换，如果不存在则为 <c>null</c>。</returns>
 		public static Conversion GetPreDefinedConversion(Type inputType, Type outputType)
+		{
+			if (inputType == typeof(void) || outputType == typeof(void))
+			{
+				return null;
+			}
+			return GetPreDefinedConversionNotVoid(inputType, outputType);
+		}
+		/// <summary>
+		/// 返回的将对象从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 
+		/// 类型的预定义类型转换。
+		/// </summary>
+		/// <param name="inputType">要转换的对象的类型，不能是 <see cref="Void"/>。</param>
+		/// <param name="outputType">要将输入对象转换到的类型，不能是 <see cref="Void"/>。</param>
+		/// <returns>将对象从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 
+		/// 类型的预定义类型转换，如果不存在则为 <c>null</c>。</returns>
+		public static Conversion GetPreDefinedConversionNotVoid(Type inputType, Type outputType)
 		{
 			Contract.Requires(inputType != null && outputType != null &&
 				inputType != typeof(void) && outputType != typeof(void));
@@ -240,7 +256,7 @@ namespace Cyjb.Conversions
 		/// <param name="outputTypeCode">要将输入对象转换到的类型。</param>
 		/// <returns>将对象从 <paramref name="inputType"/> 类型转换为 <paramref name="outputType"/> 
 		/// 类型的类型转换，如果不存在则为 <c>null</c>。</returns>
-		public static Conversion GetNumericOrEnumConversion(Type inputType, TypeCode inputTypeCode,
+		private static Conversion GetNumericOrEnumConversion(Type inputType, TypeCode inputTypeCode,
 			Type outputType, TypeCode outputTypeCode)
 		{
 			Contract.Requires(inputType != null && outputType != null);
@@ -460,7 +476,7 @@ namespace Cyjb.Conversions
 			{
 				return false;
 			}
-			Conversion conversion = GetPreDefinedConversion(inputType, outputType);
+			Conversion conversion = GetPreDefinedConversionNotVoid(inputType, outputType);
 			return conversion != null && conversion.ConversionType.IsReference();
 		}
 		/// <summary>
@@ -583,7 +599,7 @@ namespace Cyjb.Conversions
 		{
 			Contract.Requires(inputType != null && outputType != null &&
 				inputType != typeof(void) && outputType != typeof(void));
-			Conversion conversion = GetPreDefinedConversion(inputType, outputType);
+			Conversion conversion = GetPreDefinedConversionNotVoid(inputType, outputType);
 			// 不存在预定义类型转换。
 			if (conversion == null)
 			{

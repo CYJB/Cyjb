@@ -521,7 +521,12 @@ namespace Cyjb.Reflection
 			ConversionType conversionType)
 		{
 			Contract.Requires(il != null && inputType != null && outputType != null);
-			Conversion conversion = ConversionFactory.GetConversion(inputType, outputType);
+			Contract.Requires(conversionType == ConversionType.Implicit ||
+				conversionType == ConversionType.Explicit ||
+				conversionType == ConversionType.UserDefined);
+			Conversion conversion = conversionType == ConversionType.UserDefined ?
+				ConversionFactory.GetConversion(inputType, outputType) :
+				ConversionFactory.GetPreDefinedConversion(inputType, outputType);
 			if (conversion == null || conversion.ConversionType > conversionType)
 			{
 				throw CommonExceptions.InvalidCast(inputType, outputType);
@@ -574,7 +579,12 @@ namespace Cyjb.Reflection
 			ConversionType conversionType)
 		{
 			Contract.Requires(il != null && inputType != null && outputType != null);
-			Conversion conversion = ConversionFactory.GetConversion(inputType, outputType);
+			Contract.Requires(conversionType == ConversionType.Implicit ||
+				conversionType == ConversionType.Explicit ||
+				conversionType == ConversionType.UserDefined);
+			Conversion conversion = conversionType == ConversionType.UserDefined ?
+				ConversionFactory.GetConversion(inputType, outputType) :
+				ConversionFactory.GetPreDefinedConversion(inputType, outputType);
 			if (conversion == null || conversion.ConversionType > conversionType)
 			{
 				return null;
