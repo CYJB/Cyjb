@@ -69,7 +69,7 @@
     <Compile Include="Reflection\UnitTestMethodExt.cs" />
     <Compile Include="UnitTestTextValuePair`1.cs" />
     <Compile Include="UnitTestEnumExt.cs" />
-    <Compile Include="UnitTestPowerBinder.cs" />
+    <Compile Include="Reflection\UnitTestPowerBinder.cs" />
     <Compile Include="Reflection\UnitTestTypeExt.cs" />
     <Compile Include="UnitTestCharExt.cs" />
     <Compile Include="UnitTestStringExt.cs" />

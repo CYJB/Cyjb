@@ -48,12 +48,6 @@ namespace Cyjb.Reflection
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		internal static readonly bool IsMonoRuntime = Type.GetType("Mono.Runtime") != null;
-		/// <summary>
-		/// 引用类型的标志。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		internal static readonly Type ReferenceTypeMark = typeof(ReferenceTypeMarkClass);
-		private class ReferenceTypeMarkClass { }
 
 		#region 类型判断
 

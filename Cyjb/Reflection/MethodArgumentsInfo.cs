@@ -123,8 +123,8 @@ namespace Cyjb.Reflection
 		/// </summary>
 		/// <value>方法的固定实参列表。如果 <see cref="ParamArrayType"/> 不为 <c>null</c>，
 		/// 则不包含最后的 params 参数。</value>
-		/// <remarks>列表元素为 <c>null</c> 表示使用参数默认值或空数组（对于 params 参数）；
-		/// 为 <see cref="TypeExt.ReferenceTypeMark"/> 表示实参值是 <c>null</c>，仅具有引用类型的约束。</remarks>
+		/// <remarks>列表元素为 <see cref="Missing"/> 表示使用参数默认值或空数组（对于 params 参数）；
+		/// 为 <c>null</c> 表示实参值是 <c>null</c>，仅具有引用类型的约束。</remarks>
 		public IList<Type> FixedArguments
 		{
 			get { return this.fixedArguments; }
@@ -141,8 +141,7 @@ namespace Cyjb.Reflection
 		/// 获取 params 实参的类型列表。
 		/// </summary>
 		/// <value>params 实参的类型列表，如果为 <c>null</c> 表示无需特殊处理 params 参数。</value>
-		/// <remarks>列表元素为 <see cref="TypeExt.ReferenceTypeMark"/> 表示实参值是 <c>null</c>，
-		/// 仅具有引用类型的约束。</remarks>
+		/// <remarks>列表元素为 <c>null</c> 表示实参值是 <c>null</c>，仅具有引用类型的约束。</remarks>
 		public IList<Type> ParamArgumentTypes
 		{
 			get { return this.paramArgumentTypes; }
@@ -151,8 +150,7 @@ namespace Cyjb.Reflection
 		/// 获取可变参数的类型。
 		/// </summary>
 		/// <value>可变参数的类型，如果为 <c>null</c> 表示没有可变参数。</value>
-		/// <remarks>列表元素为 <see cref="TypeExt.ReferenceTypeMark"/> 表示实参值是 <c>null</c>，
-		/// 仅具有引用类型的约束。</remarks>
+		/// <remarks>列表元素为 <c>null</c> 表示实参值是 <c>null</c>，仅具有引用类型的约束。</remarks>
 		public IList<Type> OptionalArgumentTypes
 		{
 			get { return this.optionalArgumentTypes; }
@@ -191,15 +189,12 @@ namespace Cyjb.Reflection
 			this.instanceType = this.arguments[0];
 			if (this.instanceType == null)
 			{
-				return false;
-			}
-			if (this.instanceType == TypeExt.ReferenceTypeMark)
-			{
 				this.instanceType = this.method.DeclaringType;
 				Contract.Assume(this.instanceType != null);
 				return !this.instanceType.IsValueType;
 			}
-			return method.DeclaringType.IsConvertFrom(this.instanceType, isExplicit);
+			return this.instanceType != typeof(Missing) &&
+				method.DeclaringType.IsConvertFrom(this.instanceType, isExplicit);
 		}
 		/// <summary>
 		/// 填充 params 参数和可变参数。
@@ -249,8 +244,7 @@ namespace Cyjb.Reflection
 			{
 				// 只有一个实参，可能是数组或数组元素。
 				Type type = this.paramArgumentTypes[0];
-				if (type == null || type == TypeExt.ReferenceTypeMark ||
-					paramArrayType.IsConvertFrom(type, isExplicit))
+				if (type == null || type == typeof(Missing) || paramArrayType.IsConvertFrom(type, isExplicit))
 				{
 					// 实参是数组，无需进行特殊处理。
 					this.paramArrayType = null;
@@ -263,14 +257,14 @@ namespace Cyjb.Reflection
 			for (int i = 0; i < paramCnt; i++)
 			{
 				Type type = this.paramArgumentTypes[i];
-				if (type == TypeExt.ReferenceTypeMark)
+				if (type == null)
 				{
 					if (paramElementType.IsValueType)
 					{
 						return false;
 					}
 				}
-				else if (type == null || !paramElementType.IsConvertFrom(type, isExplicit))
+				else if (type == typeof(Missing) || !paramElementType.IsConvertFrom(type, isExplicit))
 				{
 					return false;
 				}
@@ -291,7 +285,7 @@ namespace Cyjb.Reflection
 			{
 				return true;
 			}
-			if (type == null)
+			if (type == typeof(Missing))
 			{
 				// 检查可选参数和 params 参数。
 				return parameter.IsParamArray() ||
@@ -303,7 +297,7 @@ namespace Cyjb.Reflection
 				paramType = paramType.GetElementType();
 				byRef = true;
 			}
-			if (type == TypeExt.ReferenceTypeMark)
+			if (type == null)
 			{
 				// 检查引用类型。
 				return !paramType.IsValueType;

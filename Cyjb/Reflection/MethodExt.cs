@@ -264,7 +264,9 @@ namespace Cyjb.Reflection
 			Type returnType, Type[] types, MethodArgumentsOption options)
 		{
 			Contract.Requires(method != null && types != null);
+			ParameterInfo[] parameters = method.GetParametersNoCopy();
 			// 提取方法参数信息。
+			types = types.Extend(parameters.Length, typeof (Missing));
 			MethodArgumentsInfo result = MethodArgumentsInfo.GetInfo(method, types, options);
 			if (result == null)
 			{
@@ -278,13 +280,12 @@ namespace Cyjb.Reflection
 				return null;
 			}
 			// 对方法固定参数进行推断。
-			ParameterInfo[] parameters = method.GetParametersNoCopy();
 			int paramLen = result.FixedArguments.Count;
 			for (int i = 0; i < paramLen; i++)
 			{
 				Type paramType = parameters[i].ParameterType;
 				Type argType = result.FixedArguments[i];
-				if (paramType.ContainsGenericParameters && argType != null &&
+				if (paramType.ContainsGenericParameters && argType != typeof(Missing) &&
 					!bounds.TypeInferences(paramType, argType))
 				{
 					return null;

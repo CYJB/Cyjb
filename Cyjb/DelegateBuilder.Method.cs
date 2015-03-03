@@ -165,7 +165,7 @@ namespace Cyjb
 			}
 			MethodInfo invoke = delegateType.GetInvokeMethod();
 			Type[] paramTypes = invoke.GetParameterTypes();
-			Type[] types = paramTypes.Extend(method.GetParametersNoCopy().Length + index);
+			Type[] types = paramTypes.Extend(method.GetParametersNoCopy().Length + index, typeof(Missing));
 			Type returnType = invoke.ReturnType;
 			// 提取方法参数信息。
 			MethodArgumentsInfo argumentsInfo = GetArgumentsInfo(ref method, types, returnType);
@@ -314,8 +314,8 @@ namespace Cyjb
 		/// <returns>能否对方法进行 tailcall 优化，如果可以则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
 		private static bool EmitLoadParameter(this ILGenerator il, ParameterInfo parameter, int index, Type argumentType)
 		{
-			Contract.Requires(il != null && parameter != null && index >= 0);
-			if (argumentType != null)
+			Contract.Requires(il != null && parameter != null && index >= 0 && argumentType != null);
+			if (argumentType != typeof(Missing))
 			{
 				return il.EmitLoadParameter(parameter.ParameterType, index, argumentType);
 			}
@@ -362,7 +362,7 @@ namespace Cyjb
 				{
 					il.EmitLoadIndirect(argumentType.GetElementType());
 				}
-				else if (argumentType != TypeExt.ReferenceTypeMark && paramType != argumentType)
+				else if (paramType != argumentType)
 				{
 					il.EmitConversion(argumentType, paramType, true, ConversionType.Explicit);
 				}
@@ -549,7 +549,7 @@ namespace Cyjb
 		/// 且 <paramref name="throwOnBindFailure"/> 为 <c>true</c>。</exception>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
 		/// <seealso cref="Delegate.CreateDelegate(Type, object, MethodInfo, bool)"/>
-		public static Delegate CreateDelegate(this MethodBase method, Type delegateType, object firstArgument, 
+		public static Delegate CreateDelegate(this MethodBase method, Type delegateType, object firstArgument,
 			bool throwOnBindFailure)
 		{
 			CommonExceptions.CheckArgumentNull(method, "method");
@@ -594,14 +594,14 @@ namespace Cyjb
 			Type[] paramTypes = invoke.GetParameterTypes();
 			Type[] paramTypesWithFirstArg = paramTypes.Insert(0,
 				// 这里使用 firstArgument 的实际类型，因为需要做类型检查和泛型类型推断。
-				firstArgument == null ? TypeExt.ReferenceTypeMark : firstArgument.GetType());
+				firstArgument == null ? null : firstArgument.GetType());
 			// 判断是否需要作为实例的形参。
 			int index = 0;
 			if (!method.IsStatic && !(method is ConstructorInfo))
 			{
 				index++;
 			}
-			Type[] types = paramTypesWithFirstArg.Extend(method.GetParametersNoCopy().Length + index);
+			Type[] types = paramTypesWithFirstArg.Extend(method.GetParametersNoCopy().Length + index, typeof(Missing));
 			Type returnType = invoke.ReturnType;
 			MethodArgumentsInfo argumentsInfo = GetArgumentsInfo(ref method, types, returnType);
 			if (argumentsInfo == null)
