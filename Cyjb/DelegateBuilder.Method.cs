@@ -38,6 +38,7 @@ namespace Cyjb
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
+			CommonExceptions.CheckUnboundGenParam(method, "method");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
@@ -71,6 +72,7 @@ namespace Cyjb
 			Contract.EndContractBlock();
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
+			CommonExceptions.CheckUnboundGenParam(method, "method");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
@@ -101,6 +103,7 @@ namespace Cyjb
 			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.Ensures(Contract.Result<Delegate>() != null);
 			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
+			CommonExceptions.CheckUnboundGenParam(method, "method");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
@@ -134,6 +137,7 @@ namespace Cyjb
 			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.EndContractBlock();
 			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
+			CommonExceptions.CheckUnboundGenParam(method, "method");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
@@ -453,6 +457,7 @@ namespace Cyjb
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
+			CommonExceptions.CheckUnboundGenParam(method, "method");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
@@ -488,6 +493,7 @@ namespace Cyjb
 			Contract.EndContractBlock();
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
+			CommonExceptions.CheckUnboundGenParam(method, "method");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
@@ -520,6 +526,7 @@ namespace Cyjb
 			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.Ensures(Contract.Result<Delegate>() != null);
 			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
+			CommonExceptions.CheckUnboundGenParam(method, "method");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");
@@ -556,6 +563,7 @@ namespace Cyjb
 			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.EndContractBlock();
 			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
+			CommonExceptions.CheckUnboundGenParam(method, "method");
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.UnboundGenParam("method");

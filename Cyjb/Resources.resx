@@ -485,4 +485,16 @@
     <value>Value of parameter '{0}' and '{1}' can not botn be null.</value>
     <comment>参数全部为 null。</comment>
   </data>
+  <data name="AmbiguousMatchField" xml:space="preserve">
+    <value>More than one field is found with the specified name and matching the specified binding constraints.</value>
+    <comment>找到多个有指定名称且与指定绑定约束匹配的字段。</comment>
+  </data>
+  <data name="AmbiguousMatchMethod" xml:space="preserve">
+    <value>More than one method is found with the specified name and matching the specified binding constraints.</value>
+    <comment>找到多个有指定名称且与指定绑定约束匹配的方法。</comment>
+  </data>
+  <data name="AmbiguousMatchProperty" xml:space="preserve">
+    <value>More than one property is found with the specified name and matching the specified binding constraints.</value>
+    <comment>找到多个有指定名称且与指定绑定约束匹配的属性。</comment>
+  </data>
 </root>

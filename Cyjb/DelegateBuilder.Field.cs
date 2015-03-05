@@ -31,12 +31,7 @@ namespace Cyjb
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
-			Type declaringType = field.DeclaringType;
-			Contract.Assume(declaringType != null);
-			if (declaringType.ContainsGenericParameters)
-			{
-				throw CommonExceptions.UnboundGenParam("field");
-			}
+			CommonExceptions.CheckUnboundGenParam(field, "field");
 			Delegate dlg = CreateOpenDelegate(field, type);
 			if (dlg == null)
 			{
@@ -67,12 +62,7 @@ namespace Cyjb
 			Contract.EndContractBlock();
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
-			Type declaringType = field.DeclaringType;
-			Contract.Assume(declaringType != null);
-			if (declaringType.ContainsGenericParameters)
-			{
-				throw CommonExceptions.UnboundGenParam("field");
-			}
+			CommonExceptions.CheckUnboundGenParam(field, "field");
 			Delegate dlg = CreateOpenDelegate(field, type);
 			if (dlg == null && throwOnBindFailure)
 			{
@@ -100,12 +90,7 @@ namespace Cyjb
 			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.Ensures(Contract.Result<Delegate>() != null);
 			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
-			Type declaringType = field.DeclaringType;
-			Contract.Assume(declaringType != null);
-			if (declaringType.ContainsGenericParameters)
-			{
-				throw CommonExceptions.UnboundGenParam("field");
-			}
+			CommonExceptions.CheckUnboundGenParam(field, "field");
 			Delegate dlg = CreateOpenDelegate(field, delegateType);
 			if (dlg == null)
 			{
@@ -136,12 +121,7 @@ namespace Cyjb
 			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.EndContractBlock();
 			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
-			Type declaringType = field.DeclaringType;
-			Contract.Assume(declaringType != null);
-			if (declaringType.ContainsGenericParameters)
-			{
-				throw CommonExceptions.UnboundGenParam("field");
-			}
+			CommonExceptions.CheckUnboundGenParam(field, "field");
 			Delegate dlg = CreateOpenDelegate(field, delegateType);
 			if (dlg == null && throwOnBindFailure)
 			{
@@ -269,12 +249,7 @@ namespace Cyjb
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
-			Type declaringType = field.DeclaringType;
-			Contract.Assume(declaringType != null);
-			if (declaringType.ContainsGenericParameters)
-			{
-				throw CommonExceptions.UnboundGenParam("field");
-			}
+			CommonExceptions.CheckUnboundGenParam(field, "field");
 			Delegate dlg = CreateClosedDelegate(field, type, firstArgument);
 			if (dlg == null)
 			{
@@ -306,12 +281,7 @@ namespace Cyjb
 			Contract.EndContractBlock();
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
-			Type declaringType = field.DeclaringType;
-			Contract.Assume(declaringType != null);
-			if (declaringType.ContainsGenericParameters)
-			{
-				throw CommonExceptions.UnboundGenParam("field");
-			}
+			CommonExceptions.CheckUnboundGenParam(field, "field");
 			Delegate dlg = CreateClosedDelegate(field, type, firstArgument);
 			if (dlg == null && throwOnBindFailure)
 			{
@@ -339,12 +309,7 @@ namespace Cyjb
 			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.Ensures(Contract.Result<Delegate>() != null);
 			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
-			Type declaringType = field.DeclaringType;
-			Contract.Assume(declaringType != null);
-			if (declaringType.ContainsGenericParameters)
-			{
-				throw CommonExceptions.UnboundGenParam("field");
-			}
+			CommonExceptions.CheckUnboundGenParam(field, "field");
 			Delegate dlg = CreateClosedDelegate(field, delegateType, firstArgument);
 			if (dlg == null)
 			{
@@ -376,12 +341,7 @@ namespace Cyjb
 			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.EndContractBlock();
 			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
-			Type declaringType = field.DeclaringType;
-			Contract.Assume(declaringType != null);
-			if (declaringType.ContainsGenericParameters)
-			{
-				throw CommonExceptions.UnboundGenParam("field");
-			}
+			CommonExceptions.CheckUnboundGenParam(field, "field");
 			Delegate dlg = CreateClosedDelegate(field, delegateType, firstArgument);
 			if (dlg == null && throwOnBindFailure)
 			{

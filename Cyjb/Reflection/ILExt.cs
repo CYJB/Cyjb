@@ -38,7 +38,7 @@ namespace Cyjb.Reflection
 		{
 			get
 			{
-				if (getDynamicMethod == null)
+				if (getDynamicMethod == null && rtDynamicMethodType != null)
 				{
 					getDynamicMethod = rtDynamicMethodType.GetField("m_owner", TypeExt.InstanceFlag)
 						.CreateDelegate<Func<object, DynamicMethod>>();
@@ -719,7 +719,7 @@ namespace Cyjb.Reflection
 			params Type[] parameterTypes)
 		{
 			Contract.Requires(il != null && method != null);
-			if (rtDynamicMethodType.IsInstanceOfType(method))
+			if (rtDynamicMethodType != null && rtDynamicMethodType.IsInstanceOfType(method))
 			{
 				// RTDynamicMethod 不能直接调用，需要取得相应的 DynamicMethod 才可以。
 				method = GetDynamicMethod(method);
@@ -823,7 +823,7 @@ namespace Cyjb.Reflection
 			params Type[] parameterTypes)
 		{
 			Contract.Requires(il != null && method != null);
-			if (rtDynamicMethodType.IsInstanceOfType(method))
+			if (rtDynamicMethodType != null && rtDynamicMethodType.IsInstanceOfType(method))
 			{
 				// RTDynamicMethod 不能直接调用，需要取得相应的 DynamicMethod 才可以。
 				method = GetDynamicMethod(method);

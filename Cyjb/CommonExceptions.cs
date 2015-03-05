@@ -906,6 +906,33 @@ namespace Cyjb
 		#region 动态绑定异常
 
 		/// <summary>
+		/// 返回找到多个与绑定约束匹配的字段的异常。
+		/// </summary>
+		/// <returns><see cref="AmbiguousMatchException"/> 对象。</returns>
+		internal static AmbiguousMatchException AmbiguousMatchField()
+		{
+			Contract.Ensures(Contract.Result<AmbiguousMatchException>() != null);
+			return new AmbiguousMatchException(Resources.AmbiguousMatchField);
+		}
+		/// <summary>
+		/// 返回找到多个与绑定约束匹配的方法的异常。
+		/// </summary>
+		/// <returns><see cref="AmbiguousMatchException"/> 对象。</returns>
+		internal static AmbiguousMatchException AmbiguousMatchMethod()
+		{
+			Contract.Ensures(Contract.Result<AmbiguousMatchException>() != null);
+			return new AmbiguousMatchException(Resources.AmbiguousMatchMethod);
+		}
+		/// <summary>
+		/// 返回找到多个与绑定约束匹配的属性的异常。
+		/// </summary>
+		/// <returns><see cref="AmbiguousMatchException"/> 对象。</returns>
+		internal static AmbiguousMatchException AmbiguousMatchProperty()
+		{
+			Contract.Ensures(Contract.Result<AmbiguousMatchException>() != null);
+			return new AmbiguousMatchException(Resources.AmbiguousMatchProperty);
+		}
+		/// <summary>
 		/// 返回不能绑定到开放构造方法的异常。
 		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
@@ -986,6 +1013,24 @@ namespace Cyjb
 			Contract.Requires(sourceDlg != null && targetDlg != null);
 			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Format(Resources.DelegateIncompatible, sourceDlg, targetDlg));
+		}
+		/// <summary>
+		/// 返回访问的字段不存在的异常。
+		/// </summary>
+		/// <returns><see cref="MissingFieldException"/> 对象。</returns>
+		internal static MissingFieldException MissingField()
+		{
+			Contract.Ensures(Contract.Result<MissingFieldException>() != null);
+			return new MissingFieldException();
+		}
+		/// <summary>
+		/// 返回访问的方法不存在的异常。
+		/// </summary>
+		/// <returns><see cref="MissingMethodException"/> 对象。</returns>
+		internal static MissingMethodException MissingMethod()
+		{
+			Contract.Ensures(Contract.Result<MissingMethodException>() != null);
+			return new MissingMethodException();
 		}
 		/// <summary>
 		/// 返回不表示泛型方法定义的异常。
@@ -1074,6 +1119,20 @@ namespace Cyjb
 		{
 			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Resources.UnboundGenParam, paramName);
+		}
+		/// <summary>
+		/// 检查指定的类型成员，如果所属类型包含未赋值的泛型类型参数则抛出相应异常。
+		/// </summary>
+		/// <param name="member">要检查所属类型的类型成员。</param>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		internal static void CheckUnboundGenParam(MemberInfo member, [InvokerParameterName]string paramName)
+		{
+			CheckArgumentNull(member, paramName);
+			Type declaringType = member.DeclaringType;
+			if (declaringType != null && declaringType.ContainsGenericParameters)
+			{
+				throw new ArgumentException(Resources.UnboundGenParam, paramName);
+			}
 		}
 
 		#endregion // 动态绑定异常
@@ -1165,6 +1224,19 @@ namespace Cyjb
 
 		#endregion // MethodSwitcher 异常
 
+		#region PowerBinder 异常
+
+		/// <summary>
+		/// 返回存在相同的参数名称的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		internal static ArgumentException SameParameterName([InvokerParameterName]string paramName)
+		{
+			return new ArgumentException(ExceptionResources.SameParameterName, paramName);
+		}
+
+		#endregion // PowerBinder 异常
 
 
 
@@ -1222,43 +1294,6 @@ namespace Cyjb
 
 		#endregion // 缓冲池工厂异常
 
-		#region PowerBinder 异常
-
-		/// <summary>
-		/// 返回找到多个与绑定约束匹配的字段的异常。
-		/// </summary>
-		/// <returns><see cref="AmbiguousMatchException"/> 对象。</returns>
-		internal static AmbiguousMatchException AmbiguousMatchField()
-		{
-			return new AmbiguousMatchException(ExceptionResources.AmbiguousMatchField);
-		}
-		/// <summary>
-		/// 返回找到多个与绑定约束匹配的方法的异常。
-		/// </summary>
-		/// <returns><see cref="AmbiguousMatchException"/> 对象。</returns>
-		internal static AmbiguousMatchException AmbiguousMatchMethod()
-		{
-			return new AmbiguousMatchException(ExceptionResources.AmbiguousMatchMethod);
-		}
-		/// <summary>
-		/// 返回找到多个与绑定约束匹配的属性的异常。
-		/// </summary>
-		/// <returns><see cref="AmbiguousMatchException"/> 对象。</returns>
-		internal static AmbiguousMatchException AmbiguousMatchProperty()
-		{
-			return new AmbiguousMatchException(ExceptionResources.AmbiguousMatchProperty);
-		}
-		/// <summary>
-		/// 返回存在相同的参数名称的异常。
-		/// </summary>
-		/// <param name="paramName">产生异常的参数名称。</param>
-		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException SameParameterName([InvokerParameterName]string paramName)
-		{
-			return new ArgumentException(ExceptionResources.SameParameterName, paramName);
-		}
-
-		#endregion // PowerBinder 异常
 
 		#region 词法分析异常
 

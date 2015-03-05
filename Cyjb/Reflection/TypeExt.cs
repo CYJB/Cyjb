@@ -261,6 +261,26 @@ namespace Cyjb.Reflection
 				(isExplicit || conversion.ConversionType.IsImplicit());
 		}
 		/// <summary>
+		/// 返回 <paramref name="inputType"/> 类型和 <paramref name="outputType"/> 类型之间的标准转换类型。
+		/// </summary>
+		/// <param name="inputType">要转换的对象的类型。</param>
+		/// <param name="outputType">要将输入对象转换到的类型。</param>
+		/// <returns><paramref name="inputType"/> 类型和 <paramref name="outputType"/> 类型之间的标准转换类型。</returns>
+		/// <remarks><para>这里标准转换指标准显式转换，包含了所有预定义隐式转换和预定义显式转换的子集，
+		/// 该子集是预定义隐式转换反向的转换。也就是说，如果存在从 A 类型到 B 类型的预定义隐式转换，
+		/// 那么 A 类型和 B 类型之间存在标准转换（A 到 B 或 B 到 A）。</para>
+		/// <para>如果不存在标准类型转换，则总是返回 <see cref="ConversionType.None"/>，即使存在其它的类型转换。</para>
+		/// </remarks>
+		internal static ConversionType GetStandardConversion(Type inputType, Type outputType)
+		{
+			Contract.Requires(inputType != null && outputType != null);
+			if (inputType == typeof(void) || outputType == typeof(void))
+			{
+				return ConversionType.None;
+			}
+			return ConversionFactory.GetStandardConversion(inputType, outputType);
+		}
+		/// <summary>
 		/// 返回 <paramref name="types"/> 中能够包含其它所有类型的类型（可以从其它所有类型隐式转换而来）。
 		/// </summary>
 		/// <param name="types">类型集合。</param>
@@ -575,7 +595,7 @@ namespace Cyjb.Reflection
 		public static string FullName(this Type type)
 		{
 			CommonExceptions.CheckArgumentNull(type, "type");
-			Contract.EndContractBlock();
+			Contract.Ensures(Contract.Result<string>() != null);
 			if (!type.IsGenericType || type.ContainsGenericParameters)
 			{
 				return type.FullName;

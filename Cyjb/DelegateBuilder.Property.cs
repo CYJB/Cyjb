@@ -30,6 +30,7 @@ namespace Cyjb
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
+			CommonExceptions.CheckUnboundGenParam(property, "property");
 			return CreateOpenDelegate(property, type, true) as TDelegate;
 		}
 		/// <summary>
@@ -55,6 +56,7 @@ namespace Cyjb
 			Contract.EndContractBlock();
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
+			CommonExceptions.CheckUnboundGenParam(property, "property");
 			return CreateOpenDelegate(property, type, throwOnBindFailure) as TDelegate;
 		}
 		/// <summary>
@@ -77,6 +79,7 @@ namespace Cyjb
 			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.Ensures(Contract.Result<Delegate>() != null);
 			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
+			CommonExceptions.CheckUnboundGenParam(property, "property");
 			return CreateOpenDelegate(property, delegateType, true);
 		}
 		/// <summary>
@@ -102,6 +105,7 @@ namespace Cyjb
 			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.EndContractBlock();
 			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
+			CommonExceptions.CheckUnboundGenParam(property, "property");
 			return CreateOpenDelegate(property, delegateType, throwOnBindFailure);
 		}
 		/// <summary>
@@ -118,17 +122,6 @@ namespace Cyjb
 		private static Delegate CreateOpenDelegate(PropertyInfo property, Type delegateType, bool throwOnBindFailure)
 		{
 			Contract.Requires(property != null && delegateType != null);
-			// 检查属性是否包含泛型参数。
-			Type declaringType = property.DeclaringType;
-			Contract.Assume(declaringType != null);
-			if (declaringType.ContainsGenericParameters)
-			{
-				if (throwOnBindFailure)
-				{
-					throw CommonExceptions.UnboundGenParam("property");
-				}
-				return null;
-			}
 			MethodInfo invoke = delegateType.GetInvokeMethod();
 			// 判断是获取属性还是设置属性。
 			MethodInfo method;
@@ -189,6 +182,7 @@ namespace Cyjb
 			Contract.Ensures(Contract.Result<TDelegate>() != null);
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
+			CommonExceptions.CheckUnboundGenParam(property, "property");
 			return CreateClosedDelegate(property, type, firstArgument, true) as TDelegate;
 		}
 		/// <summary>
@@ -215,6 +209,7 @@ namespace Cyjb
 			Contract.EndContractBlock();
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
+			CommonExceptions.CheckUnboundGenParam(property, "property");
 			return CreateClosedDelegate(property, type, firstArgument, throwOnBindFailure) as TDelegate;
 		}
 		/// <summary>
@@ -237,6 +232,7 @@ namespace Cyjb
 			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.Ensures(Contract.Result<Delegate>() != null);
 			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
+			CommonExceptions.CheckUnboundGenParam(property, "property");
 			return CreateClosedDelegate(property, delegateType, firstArgument, true);
 		}
 		/// <summary>
@@ -263,6 +259,7 @@ namespace Cyjb
 			CommonExceptions.CheckArgumentNull(delegateType, "delegateType");
 			Contract.EndContractBlock();
 			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
+			CommonExceptions.CheckUnboundGenParam(property, "property");
 			return CreateClosedDelegate(property, delegateType, firstArgument, throwOnBindFailure);
 		}
 		/// <summary>
@@ -280,17 +277,6 @@ namespace Cyjb
 			bool throwOnBindFailure)
 		{
 			Contract.Requires(property != null && delegateType != null);
-			// 检查属性是否包含泛型参数。
-			Type declaringType = property.DeclaringType;
-			Contract.Assume(declaringType != null);
-			if (declaringType.ContainsGenericParameters)
-			{
-				if (throwOnBindFailure)
-				{
-					throw CommonExceptions.UnboundGenParam("property");
-				}
-				return null;
-			}
 			MethodInfo invoke = delegateType.GetInvokeMethod();
 			// 判断是获取属性还是设置属性。
 			MethodInfo method;

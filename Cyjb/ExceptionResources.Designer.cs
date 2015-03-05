@@ -70,33 +70,6 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 More than one field is found with the specified name and matching the specified binding constraints. 的本地化字符串。
-        /// </summary>
-        internal static string AmbiguousMatchField {
-            get {
-                return ResourceManager.GetString("AmbiguousMatchField", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 More than one method is found with the specified name and matching the specified binding constraints. 的本地化字符串。
-        /// </summary>
-        internal static string AmbiguousMatchMethod {
-            get {
-                return ResourceManager.GetString("AmbiguousMatchMethod", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 More than one property is found with the specified name and matching the specified binding constraints. 的本地化字符串。
-        /// </summary>
-        internal static string AmbiguousMatchProperty {
-            get {
-                return ResourceManager.GetString("AmbiguousMatchProperty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 At least one object must implement IComparable. 的本地化字符串。
         /// </summary>
         internal static string ArgumentImplementIComparable {

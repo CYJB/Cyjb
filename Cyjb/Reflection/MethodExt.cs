@@ -393,6 +393,5 @@ namespace Cyjb.Reflection
 			return parameter != null && parameter.ParameterType.IsArray &&
 				parameter.IsDefined(typeof(ParamArrayAttribute), true);
 		}
-
 	}
 }

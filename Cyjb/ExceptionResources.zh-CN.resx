@@ -121,18 +121,6 @@
     <value>序列化流不包含内部异常。</value>
     <comment>异常集合反序列化异常。</comment>
   </data>
-  <data name="AmbiguousMatchField" xml:space="preserve">
-    <value>找到多个有指定名称且与指定绑定约束匹配的字段。</value>
-    <comment>找到多个有指定名称且与指定绑定约束匹配的字段。</comment>
-  </data>
-  <data name="AmbiguousMatchMethod" xml:space="preserve">
-    <value>找到多个有指定名称且与指定绑定约束匹配的方法。</value>
-    <comment>找到多个有指定名称且与指定绑定约束匹配的方法。</comment>
-  </data>
-  <data name="AmbiguousMatchProperty" xml:space="preserve">
-    <value>找到多个有指定名称且与指定绑定约束匹配的属性。</value>
-    <comment>找到多个有指定名称且与指定绑定约束匹配的属性。</comment>
-  </data>
   <data name="ArgumentImplementIComparable" xml:space="preserve">
     <value>必须至少有一个对象实现 IComparable。</value>
     <comment>必须至少有一个对象实现 IComparable。</comment>
