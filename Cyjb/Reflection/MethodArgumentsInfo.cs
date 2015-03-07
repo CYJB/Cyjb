@@ -18,27 +18,28 @@ namespace Cyjb.Reflection
 		/// </summary>
 		/// <param name="method">要获取参数信息的方法。</param>
 		/// <param name="types">方法实参类型数组，其长度必须大于等于方法的参数个数。
-		/// 使用 <c>null</c> 表示无需进行类型检查，
-		/// <see cref="TypeExt.ReferenceTypeMark"/> 表示引用类型标志。</param>
+		/// 使用 <see cref="Missing"/> 表示无需进行类型检查，<c>null</c> 表示引用类型标志。</param>
 		/// <param name="options">方法参数信息的选项。</param>
 		/// <returns>方法的参数信息。</returns>
 		public static MethodArgumentsInfo GetInfo(MethodBase method, Type[] types, MethodArgumentsOption options)
 		{
 			Contract.Requires(method != null && types != null);
 			MethodArgumentsInfo result = new MethodArgumentsInfo(method, types);
+			bool optionalParamBinding = options.HasFlag(MethodArgumentsOption.OptionalParamBinding);
 			bool isExplicit = options.HasFlag(MethodArgumentsOption.Explicit);
+			bool convertRefType = options.HasFlag(MethodArgumentsOption.ConvertRefType);
 			// 填充方法实例。
 			int offset = 0;
 			if (options.HasFlag(MethodArgumentsOption.ContainsInstance))
 			{
-				if (!result.MarkInstanceType(isExplicit))
+				if (!result.MarkInstanceType(isExplicit, convertRefType))
 				{
 					return null;
 				}
 				offset++;
 			}
 			// 填充 params 参数和可变参数。
-			if (!result.FillParamArray(isExplicit))
+			if (!result.FillParamArray(isExplicit, convertRefType))
 			{
 				return null;
 			}
@@ -52,7 +53,7 @@ namespace Cyjb.Reflection
 			}
 			for (int i = 0, j = offset; i < paramLen; i++, j++)
 			{
-				if (!result.CheckParameter(parameters[i], types[j], options))
+				if (!result.CheckParameter(parameters[i], types[j], optionalParamBinding, isExplicit, convertRefType))
 				{
 					return null;
 				}
@@ -168,6 +169,19 @@ namespace Cyjb.Reflection
 					this.fixedArguments.Count + 1);
 			}
 		}
+		/// <summary>
+		/// 更新 params 参数信息，因为该参数类型中可能包含泛型类型参数。
+		/// </summary>
+		/// <param name="newMethod">方法信息。</param>
+		public void UpdateParamArrayType(MethodBase newMethod)
+		{
+			Contract.Requires(newMethod != null);
+			if (this.paramArrayType != null)
+			{
+				ParameterInfo[] parameters = newMethod.GetParametersNoCopy();
+				this.paramArrayType = parameters[parameters.Length - 1].ParameterType;
+			}
+		}
 
 		#region 获取方法参数类型
 
@@ -175,8 +189,9 @@ namespace Cyjb.Reflection
 		/// 将实参中的第一个参数作为方法的实例。
 		/// </summary>
 		/// <param name="isExplicit">类型检查时，使用显式类型转换，而不是默认的隐式类型转换。</param>
+		/// <param name="convertRefType">是否允许对按引用传递的类型进行类型转换。</param>
 		/// <returns>如果第一个参数可以作为方法的实例，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private bool MarkInstanceType(bool isExplicit)
+		private bool MarkInstanceType(bool isExplicit, bool convertRefType)
 		{
 			if (method.IsStatic)
 			{
@@ -193,16 +208,28 @@ namespace Cyjb.Reflection
 				Contract.Assume(this.instanceType != null);
 				return !this.instanceType.IsValueType;
 			}
-			return this.instanceType != typeof(Missing) &&
-				method.DeclaringType.IsConvertFrom(this.instanceType, isExplicit);
+			if (this.instanceType == typeof(Missing))
+			{
+				return true;
+			}
+			if (this.instanceType.IsByRef)
+			{
+				this.instanceType = this.instanceType.GetElementType();
+				if (!convertRefType)
+				{
+					return method.DeclaringType == this.instanceType;
+				}
+			}
+			return method.DeclaringType.IsConvertFrom(this.instanceType, isExplicit);
 		}
 		/// <summary>
 		/// 填充 params 参数和可变参数。
 		/// </summary>
 		/// <param name="isExplicit">类型检查时，使用显式类型转换，而不是默认的隐式类型转换。</param>
+		/// <param name="convertRefType">是否允许对按引用传递的类型进行类型转换。</param>
 		/// <returns>如果第一个参数可以作为方法的实例，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		/// <returns>如果填充参数成功，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private bool FillParamArray(bool isExplicit)
+		private bool FillParamArray(bool isExplicit, bool convertRefType)
 		{
 			ParameterInfo[] parameters = method.GetParametersNoCopy();
 			int paramLen = parameters.Length;
@@ -220,7 +247,7 @@ namespace Cyjb.Reflection
 				{
 					this.paramArrayType = lastParam.ParameterType;
 					this.paramArgumentTypes = new ArrayAdapter<Type>(this.arguments, offset - 1);
-					return lastParam.ParameterType.ContainsGenericParameters || CheckParamArrayType(isExplicit);
+					return lastParam.ParameterType.ContainsGenericParameters || CheckParamArrayType(isExplicit, convertRefType);
 				}
 			}
 			// 检测方法实参数量。
@@ -231,8 +258,9 @@ namespace Cyjb.Reflection
 		/// </summary>
 		/// <param name="isExplicit">类型检查时，如果考虑显式类型转换，则为 <c>true</c>；
 		/// 否则只考虑隐式类型转换。</param>
+		/// <param name="convertRefType">是否允许对按引用传递的类型进行类型转换。</param>
 		/// <returns>如果 params 参数类型匹配，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private bool CheckParamArrayType(bool isExplicit)
+		private bool CheckParamArrayType(bool isExplicit, bool convertRefType)
 		{
 			int paramCnt = this.paramArgumentTypes.Count;
 			if (paramCnt == 0)
@@ -244,7 +272,24 @@ namespace Cyjb.Reflection
 			{
 				// 只有一个实参，可能是数组或数组元素。
 				Type type = this.paramArgumentTypes[0];
-				if (type == null || type == typeof(Missing) || paramArrayType.IsConvertFrom(type, isExplicit))
+				bool isTypeMatch;
+				if (type == null || type == typeof(Missing))
+				{
+					isTypeMatch = true;
+				}
+				else
+				{
+					if (type.IsByRef)
+					{
+						type = type.GetElementType();
+						if (!convertRefType)
+						{
+							return false;
+						}
+					}
+					isTypeMatch = paramArrayType.IsConvertFrom(type, isExplicit);
+				}
+				if (isTypeMatch)
 				{
 					// 实参是数组，无需进行特殊处理。
 					this.paramArrayType = null;
@@ -264,6 +309,20 @@ namespace Cyjb.Reflection
 						return false;
 					}
 				}
+				else if (type.IsByRef)
+				{
+					if (convertRefType)
+					{
+						if (!paramElementType.IsConvertFrom(type, isExplicit))
+						{
+							return false;
+						}
+					}
+					else if (paramElementType != type)
+					{
+						return false;
+					}
+				}
 				else if (type == typeof(Missing) || !paramElementType.IsConvertFrom(type, isExplicit))
 				{
 					return false;
@@ -276,9 +335,13 @@ namespace Cyjb.Reflection
 		/// </summary>
 		/// <param name="parameter">要检查的方法参数。</param>
 		/// <param name="type">方法实参类型。</param>
-		/// <param name="options">方法推断选项。</param>
+		/// <param name="optionalParamBinding">是否对可选参数进行绑定。</param>
+		/// <param name="isExplicit">类型检查时，如果考虑显式类型转换，则为 <c>true</c>；
+		/// 否则只考虑隐式类型转换。</param>
+		/// <param name="convertRefType">是否允许对按引用传递的类型进行类型转换。</param>
 		/// <returns>如果方法参数与实参兼容，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private bool CheckParameter(ParameterInfo parameter, Type type, MethodArgumentsOption options)
+		private bool CheckParameter(ParameterInfo parameter, Type type, bool optionalParamBinding,
+			bool isExplicit, bool convertRefType)
 		{
 			Type paramType = parameter.ParameterType;
 			if (paramType.ContainsGenericParameters)
@@ -288,29 +351,36 @@ namespace Cyjb.Reflection
 			if (type == typeof(Missing))
 			{
 				// 检查可选参数和 params 参数。
-				return parameter.IsParamArray() ||
-					(options.HasFlag(MethodArgumentsOption.OptionalParamBinding) && parameter.HasDefaultValue);
+				return parameter.IsParamArray() || (optionalParamBinding && parameter.HasDefaultValue);
 			}
-			bool byRef = false;
+			bool isByRef = false;
 			if (paramType.IsByRef)
 			{
 				paramType = paramType.GetElementType();
-				byRef = true;
+				isByRef = true;
 			}
 			if (type == null)
 			{
+				if (isByRef && !convertRefType)
+				{
+					return false;
+				}
 				// 检查引用类型。
 				return !paramType.IsValueType;
 			}
 			if (type.IsByRef)
 			{
-				if (byRef)
+				if (isByRef)
 				{
 					return type.GetElementType() == paramType;
 				}
+				if (!convertRefType)
+				{
+					return false;
+				}
 				type = type.GetElementType();
 			}
-			return paramType.IsConvertFrom(type, options.HasFlag(MethodArgumentsOption.Explicit));
+			return paramType.IsConvertFrom(type, isExplicit);
 		}
 
 		#endregion // 获取方法参数类型
@@ -338,6 +408,10 @@ namespace Cyjb.Reflection
 		/// 类型检查时，使用显式类型转换，而不是默认的隐式类型转换。
 		/// </summary>
 		Explicit = 4,
+		/// <summary>
+		/// 允许对按引用传递的类型进行类型转换。
+		/// </summary>
+		ConvertRefType = 8,
 		/// <summary>
 		/// 对可选参数进行绑定，且使用显式类型转换。
 		/// </summary>

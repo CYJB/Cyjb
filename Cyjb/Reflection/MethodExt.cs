@@ -260,13 +260,14 @@ namespace Cyjb.Reflection
 		/// <param name="types">方法实参类型数组。</param>
 		/// <param name="options">方法参数信息的选项。</param>
 		/// <returns>如果成功推断泛型方法的类型参数，则为推断结果；否则为 <c>null</c>。</returns>
+		/// <remarks>得到的结果中，<see cref="MethodArgumentsInfo.ParamArrayType"/> 可能包含泛型类型参数。</remarks>
 		internal static MethodArgumentsInfo GenericArgumentsInferences(this MethodBase method,
 			Type returnType, Type[] types, MethodArgumentsOption options)
 		{
 			Contract.Requires(method != null && types != null);
 			ParameterInfo[] parameters = method.GetParametersNoCopy();
 			// 提取方法参数信息。
-			types = types.Extend(parameters.Length, typeof (Missing));
+			types = types.Extend(parameters.Length, typeof(Missing));
 			MethodArgumentsInfo result = MethodArgumentsInfo.GetInfo(method, types, options);
 			if (result == null)
 			{
@@ -310,7 +311,7 @@ namespace Cyjb.Reflection
 				// 多个实参对应一个形参，做多次类型推断。
 				for (int i = 0; i < paramArgCnt; i++)
 				{
-					if (!bounds.TypeInferences(paramElementType, paramArgTypes[i]))
+					if (paramArgTypes[i] != typeof(Missing) && !bounds.TypeInferences(paramElementType, paramArgTypes[i]))
 					{
 						return null;
 					}
@@ -327,7 +328,7 @@ namespace Cyjb.Reflection
 			TypeBounds newBounds = new TypeBounds(bounds);
 			Type type = paramArgTypes[0];
 			// 首先尝试对 paramArrayType 进行推断。
-			if (bounds.TypeInferences(result.ParamArrayType, type))
+			if (type == typeof(Missing) || bounds.TypeInferences(result.ParamArrayType, type))
 			{
 				Type[] args = bounds.FixTypeArguments();
 				if (args != null)

@@ -210,7 +210,7 @@ namespace Cyjb
 		/// <returns>方法的参数信息。</returns>
 		private static MethodArgumentsInfo GetArgumentsInfo(ref MethodBase method, Type[] types, Type returnType)
 		{
-			MethodArgumentsOption options = MethodArgumentsOption.OptionalAndExplicit;
+			MethodArgumentsOption options = MethodArgumentsOption.OptionalAndExplicit | MethodArgumentsOption.ConvertRefType;
 			if (!method.IsStatic && !(method is ConstructorInfo))
 			{
 				options |= MethodArgumentsOption.ContainsInstance;
@@ -224,6 +224,7 @@ namespace Cyjb
 					return null;
 				}
 				method = ((MethodInfo)method).MakeGenericMethod(argumentsInfo.GenericArguments);
+				argumentsInfo.UpdateParamArrayType(method);
 				return argumentsInfo;
 			}
 			// 调用时保证 !member.ContainsGenericParameters。
