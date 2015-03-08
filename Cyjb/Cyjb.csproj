@@ -154,7 +154,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ExceptionResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ExpressionHelper.cs" />
     <Compile Include="DoubleComparer.cs" />
     <Compile Include="IntegerExt.cs" />
     <Compile Include="IntegerExt.Byte.cs">

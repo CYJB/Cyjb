@@ -497,4 +497,12 @@
     <value>找到多个有指定名称且与指定绑定约束匹配的属性。</value>
     <comment>找到多个有指定名称且与指定绑定约束匹配的属性。</comment>
   </data>
+  <data name="DuplicateName" xml:space="preserve">
+    <value>具有相同名称的参数已经存在。</value>
+    <comment>参数名相同。</comment>
+  </data>
+  <data name="NamedParamTooBig" xml:space="preserve">
+    <value>命名的参数数组不能大于变量数组。</value>
+    <comment>命名参数数组太长。</comment>
+  </data>
 </root>

@@ -161,10 +161,6 @@
     <value>From {0} to {1} is not a valid source range.</value>
     <comment>不是有效的源文件范围。</comment>
   </data>
-  <data name="SameParameterName" xml:space="preserve">
-    <value>Two parameters can not have same name.</value>
-    <comment>参数名相同。</comment>
-  </data>
   <data name="SourceReaderClosed" xml:space="preserve">
     <value>Cannot read from a closed SourceReader.</value>
     <comment>不能从关闭的 SourceReader 中读取。</comment>

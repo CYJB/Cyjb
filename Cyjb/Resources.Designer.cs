@@ -340,6 +340,15 @@ namespace Cyjb {
         }
         
         /// <summary>
+        ///   查找类似 A parameter with the same name has already existed. 的本地化字符串。
+        /// </summary>
+        internal static string DuplicateName {
+            get {
+                return ResourceManager.GetString("DuplicateName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Collection was modified, enumeration operation may not execute. 的本地化字符串。
         /// </summary>
         internal static string EnumerationFailed {
@@ -534,6 +543,15 @@ namespace Cyjb {
         internal static string MustContainValidInfo {
             get {
                 return ResourceManager.GetString("MustContainValidInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Named parameter array cannot be bigger than argument array. 的本地化字符串。
+        /// </summary>
+        internal static string NamedParamTooBig {
+            get {
+                return ResourceManager.GetString("NamedParamTooBig", resourceCulture);
             }
         }
         

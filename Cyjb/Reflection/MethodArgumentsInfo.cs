@@ -53,7 +53,7 @@ namespace Cyjb.Reflection
 			}
 			for (int i = 0, j = offset; i < paramLen; i++, j++)
 			{
-				if (!result.CheckParameter(parameters[i], types[j], optionalParamBinding, isExplicit, convertRefType))
+				if (!CheckParameter(parameters[i], types[j], optionalParamBinding, isExplicit, convertRefType))
 				{
 					return null;
 				}
@@ -220,7 +220,9 @@ namespace Cyjb.Reflection
 					return method.DeclaringType == this.instanceType;
 				}
 			}
-			return method.DeclaringType.IsConvertFrom(this.instanceType, isExplicit);
+			Type declaringType = method.DeclaringType;
+			Contract.Assume(declaringType != null);
+			return declaringType.IsConvertFrom(this.instanceType, isExplicit);
 		}
 		/// <summary>
 		/// 填充 params 参数和可变参数。
@@ -340,7 +342,7 @@ namespace Cyjb.Reflection
 		/// 否则只考虑隐式类型转换。</param>
 		/// <param name="convertRefType">是否允许对按引用传递的类型进行类型转换。</param>
 		/// <returns>如果方法参数与实参兼容，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private bool CheckParameter(ParameterInfo parameter, Type type, bool optionalParamBinding,
+		private static bool CheckParameter(ParameterInfo parameter, Type type, bool optionalParamBinding,
 			bool isExplicit, bool convertRefType)
 		{
 			Type paramType = parameter.ParameterType;

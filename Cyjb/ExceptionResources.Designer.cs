@@ -160,15 +160,6 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 Two parameters can not have same name. 的本地化字符串。
-        /// </summary>
-        internal static string SameParameterName {
-            get {
-                return ResourceManager.GetString("SameParameterName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Cannot read from a closed SourceReader. 的本地化字符串。
         /// </summary>
         internal static string SourceReaderClosed {

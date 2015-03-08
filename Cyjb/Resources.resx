@@ -497,4 +497,12 @@
     <value>More than one property is found with the specified name and matching the specified binding constraints.</value>
     <comment>找到多个有指定名称且与指定绑定约束匹配的属性。</comment>
   </data>
+  <data name="DuplicateName" xml:space="preserve">
+    <value>A parameter with the same name has already existed.</value>
+    <comment>参数名相同。</comment>
+  </data>
+  <data name="NamedParamTooBig" xml:space="preserve">
+    <value>Named parameter array cannot be bigger than argument array.</value>
+    <comment>命名参数数组太长。</comment>
+  </data>
 </root>

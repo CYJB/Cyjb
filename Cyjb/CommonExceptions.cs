@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Reflection;
 using Cyjb.IO;
@@ -54,8 +55,8 @@ namespace Cyjb
 		/// 检查指定参数的值，如果为 <c>null</c> 则抛出相应异常。
 		/// </summary>
 		/// </overloads>
-		[ContractArgumentValidator]
-		[ContractAnnotation("value:null=>halt")]
+		[SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly")]
+		[ContractArgumentValidator, ContractAnnotation("value:null=>halt")]
 		public static void CheckArgumentNull<T>([NoEnumeration]T value)
 		{
 			if (value == null)
@@ -1015,6 +1016,15 @@ namespace Cyjb
 			return new ArgumentException(Format(Resources.DelegateIncompatible, sourceDlg, targetDlg));
 		}
 		/// <summary>
+		/// 返回存在相同的参数名称的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		internal static ArgumentException DuplicateName([InvokerParameterName]string paramName)
+		{
+			return new ArgumentException(Resources.DuplicateName, paramName);
+		}
+		/// <summary>
 		/// 返回访问的字段不存在的异常。
 		/// </summary>
 		/// <returns><see cref="MissingFieldException"/> 对象。</returns>
@@ -1031,6 +1041,16 @@ namespace Cyjb
 		{
 			Contract.Ensures(Contract.Result<MissingMethodException>() != null);
 			return new MissingMethodException();
+		}
+		/// <summary>
+		/// 返回命名参数数组太长的异常。
+		/// </summary>
+		/// <param name="paramName">产生异常的参数名称。</param>
+		/// <returns><see cref="MissingMethodException"/> 对象。</returns>
+		internal static ArgumentException NamedParamTooBig([InvokerParameterName]string paramName)
+		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
+			return new ArgumentException(Resources.NamedParamTooBig, paramName);
 		}
 		/// <summary>
 		/// 返回不表示泛型方法定义的异常。
@@ -1224,19 +1244,6 @@ namespace Cyjb
 
 		#endregion // MethodSwitcher 异常
 
-		#region PowerBinder 异常
-
-		/// <summary>
-		/// 返回存在相同的参数名称的异常。
-		/// </summary>
-		/// <param name="paramName">产生异常的参数名称。</param>
-		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException SameParameterName([InvokerParameterName]string paramName)
-		{
-			return new ArgumentException(ExceptionResources.SameParameterName, paramName);
-		}
-
-		#endregion // PowerBinder 异常
 
 
 

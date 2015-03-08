@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Threading;
 
 namespace Cyjb.Reflection
 {
@@ -64,9 +63,12 @@ namespace Cyjb.Reflection
 		/// </summary>
 		/// <param name="method">要获取参数列表的方法。</param>
 		/// <returns>方法的参数列表。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		[Pure]
 		public static ParameterInfo[] GetParametersNoCopy(this MethodBase method)
 		{
+			CommonExceptions.CheckArgumentNull(method, "method");
+			Contract.EndContractBlock();
 			return getParametersNoCopy(method);
 		}
 		/// <summary>
@@ -74,8 +76,11 @@ namespace Cyjb.Reflection
 		/// </summary>
 		/// <param name="method">要获取参数类型列表的方法。</param>
 		/// <returns>方法的参数类型列表。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		public static Type[] GetParameterTypes(this MethodBase method)
 		{
+			CommonExceptions.CheckArgumentNull(method, "method");
+			Contract.EndContractBlock();
 			ParameterInfo[] parameters = method.GetParametersNoCopy();
 			if (parameters.Length == 0)
 			{
@@ -93,8 +98,11 @@ namespace Cyjb.Reflection
 		/// </summary>
 		/// <param name="method">要获取参数类型列表的方法。</param>
 		/// <returns>方法的参数类型列表。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		public static Type[] GetParameterTypesWithReturn(this MethodInfo method)
 		{
+			CommonExceptions.CheckArgumentNull(method, "method");
+			Contract.EndContractBlock();
 			ParameterInfo[] parameters = method.GetParametersNoCopy();
 			if (parameters.Length == 0)
 			{
@@ -111,34 +119,6 @@ namespace Cyjb.Reflection
 		}
 
 		#endregion // 方法参数
-
-		#region 参数顺序
-
-		/// <summary>
-		/// 默认的参数顺序数组。
-		/// </summary>
-		private static int[] defaultParamOrders = { 0 };
-		/// <summary>
-		/// 返回指定长度的参数顺序数组，其中的参数是按顺序排列的。
-		/// </summary>
-		/// <param name="len">要获取的参数顺序数组的长度。</param>
-		/// <returns>获取的参数顺序数组。</returns>
-		internal static int[] GetParamOrder(int len)
-		{
-			if (defaultParamOrders.Length < len)
-			{
-				int[] newOrder = new int[len];
-				for (int i = 0; i < len; i++) { newOrder[i] = i; }
-				int[] oldOrder = defaultParamOrders;
-				while (oldOrder.Length < len)
-				{
-					oldOrder = Interlocked.CompareExchange(ref defaultParamOrders, newOrder, oldOrder);
-				}
-			}
-			return defaultParamOrders;
-		}
-
-		#endregion // 参数顺序
 
 		#region 泛型参数推断
 
@@ -161,7 +141,7 @@ namespace Cyjb.Reflection
 		{
 			CommonExceptions.CheckArgumentNull(method, "method");
 			CommonExceptions.CheckArgumentNull(types, "types");
-			Contract.EndContractBlock();
+			Contract.Ensures(Contract.Result<MethodInfo>() != null);
 			if (!method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.NeedGenericMethodDefinition("method");
@@ -194,7 +174,7 @@ namespace Cyjb.Reflection
 		{
 			CommonExceptions.CheckArgumentNull(method, "method");
 			CommonExceptions.CheckArgumentNull(types, "types");
-			Contract.EndContractBlock();
+			Contract.Ensures(Contract.Result<MethodInfo>() != null);
 			if (!method.IsGenericMethodDefinition)
 			{
 				throw CommonExceptions.NeedGenericMethodDefinition("method");

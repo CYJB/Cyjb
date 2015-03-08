@@ -73,6 +73,40 @@ namespace Cyjb
 			}
 		}
 		/// <summary>
+		/// 通过使用默认的相等比较器判断序列中是否不包含重复元素。
+		/// </summary>
+		/// <typeparam name="TSource"><paramref name="source"/> 中的元素的类型。
+		/// </typeparam>
+		/// <param name="source">要判断是否不包含重复元素的序列。</param>
+		/// <returns>如果序列中不包含重复元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 判断序列中是否不包含重复元素。
+		/// </summary>
+		/// </overloads>
+		public static bool IsDistinct<TSource>(this IEnumerable<TSource> source)
+		{
+			CommonExceptions.CheckArgumentNull(source, "source");
+			Contract.EndContractBlock();
+			HashSet<TSource> set = new HashSet<TSource>();
+			return source.All(set.Add);
+		}
+		/// <summary>
+		/// 通过使用指定的 <see cref="IEqualityComparer{T}"/> 判断序列中是否不包含重复元素。
+		/// </summary>
+		/// <typeparam name="TSource"><paramref name="source"/> 中的元素的类型。</typeparam>
+		/// <param name="source">要判断是否不包含重复元素的序列。</param>
+		/// <param name="comparer">用于比较值的 <see cref="IEqualityComparer{T}"/>。</param>
+		/// <returns>如果序列中不包含重复元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> 为 <c>null</c>。</exception>
+		public static bool IsDistinct<TSource>(this IEnumerable<TSource> source, IEqualityComparer<TSource> comparer)
+		{
+			CommonExceptions.CheckArgumentNull(source, "source");
+			Contract.EndContractBlock();
+			HashSet<TSource> set = new HashSet<TSource>(comparer);
+			return source.All(set.Add);
+		}
+		/// <summary>
 		/// 返回序列中满足指定条件的第一个元素的索引。
 		/// </summary>
 		/// <typeparam name="TSource"><paramref name="source"/> 中的元素的类型。</typeparam>

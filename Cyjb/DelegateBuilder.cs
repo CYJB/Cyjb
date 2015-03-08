@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using Cyjb.Reflection;
@@ -594,7 +593,7 @@ namespace Cyjb
 			{
 				// 查找构造函数成员，此时注意只搜索实例方法。
 				ConstructorInfo ctor = target.GetConstructor(instancecBindingAttr | BindingFlags.Instance,
-					PowerBinder.CastBinder, types, null);
+					PowerBinder.Explicit, types, null);
 				if (ctor != null)
 				{
 					dlg = CreateDelegate(ctor, delegateType, (object)false);
@@ -688,12 +687,12 @@ namespace Cyjb
 		private static Delegate CreateMethodDelegate(Type type, Type target, string methodName, object firstArgument,
 			BindingFlags bindingAttr, Type[] types)
 		{
-			MethodInfo method = target.GetMethod(methodName, bindingAttr, PowerBinder.CastBinder, types, null);
+			MethodInfo method = target.GetMethod(methodName, bindingAttr, PowerBinder.Explicit, types, null);
 			if (method != null)
 			{
 				if (firstArgument == null)
 				{
-					return CreateDelegate((MethodBase)method, type, (object)false);
+					return CreateDelegate(method, type, false);
 				}
 				else
 				{
@@ -735,13 +734,13 @@ namespace Cyjb
 					}
 					types = newTypes;
 				}
-				property = target.GetProperty(propertyName, bindingAttr, PowerBinder.CastBinder,
+				property = target.GetProperty(propertyName, bindingAttr, PowerBinder.Explicit,
 					propType, types, null);
 			}
 			else
 			{
 				// 是获取属性。
-				property = target.GetProperty(propertyName, bindingAttr, PowerBinder.CastBinder,
+				property = target.GetProperty(propertyName, bindingAttr, PowerBinder.Explicit,
 					propType, types, null);
 			}
 			if (property != null)
@@ -1094,7 +1093,7 @@ namespace Cyjb
 			if (memberName.Equals(ConstructorName, StringComparison.OrdinalIgnoreCase))
 			{
 				// 查找构造函数成员，此时注意只搜索实例方法。
-				ConstructorInfo ctor = target.GetConstructor(instancecBindingAttr, PowerBinder.CastBinder, types, null);
+				ConstructorInfo ctor = target.GetConstructor(instancecBindingAttr, PowerBinder.Explicit, types, null);
 				if (ctor != null)
 				{
 					dlg = CreateDelegate(ctor, delegateType, (object)false);
