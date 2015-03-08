@@ -15,12 +15,12 @@ namespace Cyjb
 
 		/// <summary>
 		/// 创建用于表示指定静态或实例方法的指定类型的委托。
-		/// 如果是实例方法（非构造函数），需要将实例对象作为委托的第一个参数。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
+		/// <remarks>如果是实例方法（非构造函数），需要将实例对象作为委托的第一个参数。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="method"/>。</exception>
@@ -52,14 +52,14 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示指定静态或实例方法的指定类型的委托。
-		/// 如果是实例方法（非构造函数），需要将实例对象作为委托的第一个参数。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="method"/> 
 		/// 时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
+		/// <remarks>如果是实例方法（非构造函数），需要将实例对象作为委托的第一个参数。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="method"/>
@@ -86,12 +86,12 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 创建用于表示指定静态或实例方法的指定类型的委托。
-		/// 如果是实例方法（非构造函数），需要将实例对象作为委托的第一个参数。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
+		/// <remarks>如果是实例方法（非构造函数），需要将实例对象作为委托的第一个参数。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
@@ -117,14 +117,14 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示指定静态或实例方法的指定类型的委托。
-		/// 如果是实例方法（非构造函数），需要将实例对象作为委托的第一个参数。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="method"/> 
 		/// 时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
+		/// <remarks>如果是实例方法（非构造函数），需要将实例对象作为委托的第一个参数。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
@@ -151,12 +151,12 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 创建指定的静态或实例方法的指定类型的开放方法委托。
-		/// 如果是实例方法（非构造函数），需要将实例对象作为委托的第一个参数。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。方法不能是包含泛型参数的非泛型定义。
 		/// </summary>
 		/// <param name="method">要调用的方法。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <returns><paramref name="delegateType"/> 类型的委托，表示静态或实例方法的委托。</returns>
+		/// <remarks>如果是实例方法（非构造函数），需要将实例对象作为委托的第一个参数。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。方法不能是包含泛型参数的非泛型定义。</remarks>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
 		private static Delegate CreateOpenDelegate(MethodBase method, Type delegateType)
 		{
@@ -440,12 +440,12 @@ namespace Cyjb
 
 		/// <summary>
 		/// 使用指定的第一个参数，创建用于表示指定静态或实例方法的指定类型的委托。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
 		/// <param name="firstArgument">如果是实例方法（非构造函数），则作为委托要绑定到的对象；
 		/// 否则将作为方法的第一个参数。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
+		/// <remarks>支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="method"/>。</exception>
@@ -472,7 +472,6 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示指定静态或实例方法的指定类型的委托。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
 		/// <param name="firstArgument">如果是实例方法（非构造函数），则作为委托要绑定到的对象；
@@ -480,6 +479,7 @@ namespace Cyjb
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="method"/> 
 		/// 时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
+		/// <remarks>支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="method"/>
@@ -508,13 +508,13 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用指定的第一个参数，创建用于表示指定静态或实例方法的指定类型的委托。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="firstArgument">如果是实例方法（非构造函数），则作为委托要绑定到的对象；
 		/// 否则将作为方法的第一个参数。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
+		/// <remarks>支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
@@ -541,7 +541,6 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示指定静态或实例方法的指定类型的委托。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
@@ -550,6 +549,7 @@ namespace Cyjb
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="method"/> 
 		///     时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示指定的静态或实例方法。</returns>
+		/// <remarks>支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
@@ -578,13 +578,13 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 创建指定的静态或实例方法的指定类型的封闭方法委托。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。方法不能是包含泛型参数的非泛型定义。
 		/// </summary>
 		/// <param name="method">要调用的方法。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="firstArgument">如果是实例方法（非构造函数），则作为委托要绑定到的对象；
 		///     否则将作为方法的第一个参数。</param>
 		/// <returns><paramref name="delegateType"/> 类型的委托，表示静态或实例方法的委托。</returns>
+		/// <remarks>支持参数的强制类型转换，参数声明可以与实际类型不同。方法不能是包含泛型参数的非泛型定义。</remarks>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
 		private static Delegate CreateClosedDelegate(MethodBase method, Type delegateType, object firstArgument)
 		{

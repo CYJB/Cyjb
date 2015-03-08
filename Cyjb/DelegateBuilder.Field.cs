@@ -13,13 +13,13 @@ namespace Cyjb
 
 		/// <summary>
 		/// 创建用于表示获取或设置指定静态或实例字段的指定类型的委托。
-		/// 如果是实例字段，需要将实例对象作为委托的第一个参数。
-		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="field">描述委托要表示的静态或实例字段的 <see cref="FieldInfo"/>。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例字段。</returns>
+		/// <remarks>如果是实例字段，需要将实例对象作为委托的第一个参数。
+		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="field"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="field"/> 。</exception>
@@ -41,15 +41,15 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示获取或设置指定静态或实例字段的指定类型的委托。
-		/// 如果是实例字段，需要将实例对象作为委托的第一个参数。
-		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="field">描述委托要表示的静态或实例字段的 <see cref="FieldInfo"/>。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="field"/> 
 		/// 时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例字段。</returns>
+		/// <remarks>如果是实例字段，需要将实例对象作为委托的第一个参数。
+		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="field"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="field"/> 
@@ -72,13 +72,13 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示获取或设置指定静态或实例字段的指定类型的委托。
-		/// 如果是实例字段，需要将实例对象作为委托的第一个参数。
-		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="field">描述委托要表示的静态或实例字段的 <see cref="FieldInfo"/>。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例字段。</returns>
+		/// <remarks>如果是实例字段，需要将实例对象作为委托的第一个参数。
+		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="field"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
@@ -100,15 +100,15 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示获取或设置指定静态或实例字段的指定类型的委托。
-		/// 如果是实例字段，需要将实例对象作为委托的第一个参数。
-		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="field">描述委托要表示的静态或实例字段的 <see cref="FieldInfo"/>。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="field"/> 
 		/// 时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例字段。</returns>
+		/// <remarks>如果是实例字段，需要将实例对象作为委托的第一个参数。
+		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="field"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
@@ -131,13 +131,13 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 创建指定的静态或实例字段的指定类型的开放字段委托。
-		/// 如果是实例字段，需要将实例对象作为委托的第一个参数。
-		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="field">要获取或设置的字段。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <returns><paramref name="delegateType"/> 类型的委托，表示静态或实例字段的委托。</returns>
+		/// <remarks>如果是实例字段，需要将实例对象作为委托的第一个参数。
+		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		private static Delegate CreateOpenDelegate(FieldInfo field, Type delegateType)
 		{
 			Contract.Requires(field != null && delegateType != null);
@@ -231,13 +231,13 @@ namespace Cyjb
 
 		/// <summary>
 		/// 使用指定的第一个参数，创建用于表示获取或设置指定的静态或实例字段的指定类型的委托。 
-		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="field">描述委托要表示的静态或实例字段的 <see cref="FieldInfo"/>。</param>
 		/// <param name="firstArgument">如果是实例字段，则作为委托要绑定到的对象；否则将作为字段的第一个参数。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例字段。</returns>
+		/// <remarks>如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="field"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="field"/>。</exception>
@@ -259,8 +259,6 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示获取或设置指定的静态或实例字段的指定类型的委托。 
-		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="field">描述委托要表示的静态或实例字段的 <see cref="FieldInfo"/>。</param>
@@ -268,6 +266,8 @@ namespace Cyjb
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="field"/> 
 		/// 时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例字段。</returns>
+		/// <remarks>如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="field"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="field"/> 
@@ -291,13 +291,13 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用指定的第一个参数，创建用于表示获取或设置指定的静态或实例字段的指定类型的委托。 
-		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="field">描述委托要表示的静态或实例字段的 <see cref="FieldInfo"/>。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="firstArgument">如果是实例字段，则作为委托要绑定到的对象；否则将作为字段的第一个参数。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例字段。</returns>
+		/// <remarks>如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="field"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
@@ -319,8 +319,6 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示获取或设置指定的静态或实例字段的指定类型的委托。 
-		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="field">描述委托要表示的静态或实例字段的 <see cref="FieldInfo"/>。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
@@ -328,6 +326,8 @@ namespace Cyjb
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="field"/> 
 		/// 时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例字段。</returns>
+		/// <remarks>如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="field"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
@@ -351,13 +351,13 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 创建指定的静态或实例字段的指定类型的封闭字段委托。
-		/// 如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="field">要获取或设置的字段。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="firstArgument">如果是实例字段，则作为委托要绑定到的对象；否则将作为字段的第一个参数。</param>
 		/// <returns><paramref name="delegateType"/> 类型的委托，表示静态或实例字段的委托。</returns>
+		/// <remarks>如果委托具有返回值，则认为是获取字段，否则认为是设置字段。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		private static Delegate CreateClosedDelegate(FieldInfo field, Type delegateType, object firstArgument)
 		{
 			Contract.Requires(field != null && delegateType != null);

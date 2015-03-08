@@ -12,13 +12,13 @@ namespace Cyjb
 
 		/// <summary>
 		/// 创建用于表示获取或设置指定静态或实例属性的指定类型的委托。
-		/// 如果是实例属性，需要将实例对象作为委托的第一个参数。
-		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="property">描述委托要表示的静态或实例属性的 <see cref="PropertyInfo"/>。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例属性。</returns>
+		/// <remarks>如果是实例属性，需要将实例对象作为委托的第一个参数。
+		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="property"/> 。</exception>
@@ -35,15 +35,15 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示获取或设置指定静态或实例属性的指定类型的委托。
-		/// 如果是实例属性，需要将实例对象作为委托的第一个参数。
-		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="property">描述委托要表示的静态或实例属性的 <see cref="PropertyInfo"/>。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="property"/> 
 		/// 时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例属性。</returns>
+		/// <remarks>如果是实例属性，需要将实例对象作为委托的第一个参数。
+		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="property"/> 
@@ -61,13 +61,13 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示获取或设置指定静态或实例属性的指定类型的委托。
-		/// 如果是实例属性，需要将实例对象作为委托的第一个参数。
-		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="property">描述委托要表示的静态或实例属性的 <see cref="PropertyInfo"/>。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例属性。</returns>
+		/// <remarks>如果是实例属性，需要将实例对象作为委托的第一个参数。
+		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
@@ -84,15 +84,15 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用针对绑定失败的指定行为，创建用于表示获取或设置指定静态或实例属性的指定类型的委托。
-		/// 如果是实例属性，需要将实例对象作为委托的第一个参数。
-		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="property">描述委托要表示的静态或实例属性的 <see cref="PropertyInfo"/>。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="property"/> 
 		///     时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例属性。</returns>
+		/// <remarks>如果是实例属性，需要将实例对象作为委托的第一个参数。
+		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
@@ -110,15 +110,15 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 创建指定的静态或实例属性的指定类型的开放属性委托。
-		/// 如果是实例属性，需要将实例对象作为委托的第一个参数。
-		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="property">要获取或设置的属性。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="property"/> 
 		///     时引发异常；否则为 <c>false</c>。</param>
 		/// <returns><paramref name="delegateType"/> 类型的委托，表示静态或实例属性的委托。</returns>
+		/// <remarks>如果是实例属性，需要将实例对象作为委托的第一个参数。
+		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		private static Delegate CreateOpenDelegate(PropertyInfo property, Type delegateType, bool throwOnBindFailure)
 		{
 			Contract.Requires(property != null && delegateType != null);
@@ -164,13 +164,13 @@ namespace Cyjb
 
 		/// <summary>
 		/// 使用指定的第一个参数，创建用于表示获取或设置指定的静态或实例属性的指定类型的委托。 
-		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="property">描述委托要表示的静态或实例属性的 <see cref="PropertyInfo"/>。</param>
 		/// <param name="firstArgument">如果是实例属性，则作为委托要绑定到的对象；否则将作为属性的第一个参数。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例属性。</returns>
+		/// <remarks>如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="property"/>。</exception>
@@ -187,8 +187,6 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示获取或设置指定的静态或实例属性的指定类型的委托。 
-		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="property">描述委托要表示的静态或实例属性的 <see cref="PropertyInfo"/>。</param>
@@ -196,6 +194,8 @@ namespace Cyjb
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="property"/> 
 		/// 时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例属性。</returns>
+		/// <remarks>如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><typeparamref name="TDelegate"/> 不是委托类型。</exception>
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="property"/> 
@@ -214,13 +214,13 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用指定的第一个参数，创建用于表示获取或设置指定的静态或实例属性的指定类型的委托。 
-		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="property">描述委托要表示的静态或实例属性的 <see cref="PropertyInfo"/>。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="firstArgument">如果是实例属性，则作为委托要绑定到的对象；否则将作为属性的第一个参数。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例属性。</returns>
+		/// <remarks>如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
@@ -237,8 +237,6 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示获取或设置指定的静态或实例属性的指定类型的委托。 
-		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="property">描述委托要表示的静态或实例属性的 <see cref="PropertyInfo"/>。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
@@ -246,6 +244,8 @@ namespace Cyjb
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="property"/> 
 		///     时引发异常；否则为 <c>false</c>。</param>
 		/// <returns>指定类型的委托，表示获取或设置指定的静态或实例属性。</returns>
+		/// <remarks>如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="delegateType"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentException"><paramref name="delegateType"/> 不是委托类型。</exception>
@@ -264,8 +264,6 @@ namespace Cyjb
 		}
 		/// <summary>
 		/// 创建指定的静态或实例属性的指定类型的封闭属性委托。
-		/// 如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
-		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。
 		/// </summary>
 		/// <param name="property">要获取或设置的属性。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
@@ -273,6 +271,8 @@ namespace Cyjb
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="property"/> 
 		///     时引发异常；否则为 <c>false</c>。</param>
 		/// <returns><paramref name="delegateType"/> 类型的委托，表示静态或实例属性的委托。</returns>
+		/// <remarks>如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
+		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		private static Delegate CreateClosedDelegate(PropertyInfo property, Type delegateType, object firstArgument,
 			bool throwOnBindFailure)
 		{
