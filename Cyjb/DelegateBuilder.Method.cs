@@ -463,7 +463,7 @@ namespace Cyjb
 			{
 				throw CommonExceptions.UnboundGenParam("method");
 			}
-			Delegate dlg = CreateClosedDelegate(method, type, firstArgument);
+			Delegate dlg = CreateClosedDelegate(method, type, firstArgument, false);
 			if (dlg == null)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -499,7 +499,7 @@ namespace Cyjb
 			{
 				throw CommonExceptions.UnboundGenParam("method");
 			}
-			Delegate dlg = CreateClosedDelegate(method, type, firstArgument);
+			Delegate dlg = CreateClosedDelegate(method, type, firstArgument, false);
 			if (dlg == null && throwOnBindFailure)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -532,7 +532,7 @@ namespace Cyjb
 			{
 				throw CommonExceptions.UnboundGenParam("method");
 			}
-			Delegate dlg = CreateClosedDelegate(method, delegateType, firstArgument);
+			Delegate dlg = CreateClosedDelegate(method, delegateType, firstArgument, false);
 			if (dlg == null)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -569,7 +569,7 @@ namespace Cyjb
 			{
 				throw CommonExceptions.UnboundGenParam("method");
 			}
-			Delegate dlg = CreateClosedDelegate(method, delegateType, firstArgument);
+			Delegate dlg = CreateClosedDelegate(method, delegateType, firstArgument, false);
 			if (dlg == null && throwOnBindFailure)
 			{
 				throw CommonExceptions.BindTargetMethod("method");
@@ -582,14 +582,17 @@ namespace Cyjb
 		/// <param name="method">要调用的方法。</param>
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="firstArgument">如果是实例方法（非构造函数），则作为委托要绑定到的对象；
-		///     否则将作为方法的第一个参数。</param>
+		/// 否则将作为方法的第一个参数。</param>
+		/// <param name="ensureClosed">如果确认方法一定是封闭委托，则为 <c>true</c>；若 
+		/// <paramref name="firstArgument"/> 为 <c>null</c> 时可能为开放委托，则为 <c>false</c>。</param>
 		/// <returns><paramref name="delegateType"/> 类型的委托，表示静态或实例方法的委托。</returns>
 		/// <remarks>支持参数的强制类型转换，参数声明可以与实际类型不同。方法不能是包含泛型参数的非泛型定义。</remarks>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
-		private static Delegate CreateClosedDelegate(MethodBase method, Type delegateType, object firstArgument)
+		private static Delegate CreateClosedDelegate(MethodBase method, Type delegateType, object firstArgument,
+			bool ensureClosed)
 		{
 			Contract.Requires(method != null && delegateType != null);
-			if (firstArgument == null)
+			if (!ensureClosed && firstArgument == null)
 			{
 				// 开放方法。
 				Delegate dlg = CreateOpenDelegate(method, delegateType);

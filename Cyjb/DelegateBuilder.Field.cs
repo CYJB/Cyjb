@@ -334,7 +334,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentException">无法绑定 <paramref name="field"/> 
 		/// 且 <paramref name="throwOnBindFailure"/> 为 <c>true</c>。</exception>
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="field"/>。</exception>
-		public static Delegate CreateDelegate(this FieldInfo field, Type delegateType, object firstArgument, 
+		public static Delegate CreateDelegate(this FieldInfo field, Type delegateType, object firstArgument,
 			bool throwOnBindFailure)
 		{
 			CommonExceptions.CheckArgumentNull(field, "field");

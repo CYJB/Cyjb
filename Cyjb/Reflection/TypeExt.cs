@@ -524,38 +524,6 @@ namespace Cyjb.Reflection
 
 		#endregion // Invoke 方法
 
-		#region GetArrayDepth
-
-		/// <summary>
-		/// 返回获取类型的数组深度。
-		/// </summary>
-		/// <param name="type">要获取数组深度的类型。</param>
-		/// <returns>如果给定类型是数组，则为数组的深度；否则为 <c>0</c>。</returns>
-		internal static int GetArrayDepth(this Type type)
-		{
-			Type elementType;
-			return GetArrayDepth(type, out elementType);
-		}
-		/// <summary>
-		/// 返回获取类型的数组深度和数组元素类型。
-		/// </summary>
-		/// <param name="type">要获取数组深度的类型。</param>
-		/// <param name="elementType">数组元素的类型。</param>
-		/// <returns>如果给定类型是数组，则为数组的深度；否则为 <c>0</c>。</returns>
-		internal static int GetArrayDepth(this Type type, out Type elementType)
-		{
-			int depth = 0;
-			while (type.IsArray)
-			{
-				depth++;
-				type = type.GetElementType();
-			}
-			elementType = type;
-			return depth;
-		}
-
-		#endregion // GetArrayDepth
-
 		/// <summary>
 		/// 返回类型的定义层级深度。
 		/// </summary>

@@ -183,7 +183,7 @@ namespace Cyjb
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
 			CommonExceptions.CheckUnboundGenParam(property, "property");
-			return CreateClosedDelegate(property, type, firstArgument, true) as TDelegate;
+			return CreateClosedDelegate(property, type, firstArgument, true, false) as TDelegate;
 		}
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示获取或设置指定的静态或实例属性的指定类型的委托。 
@@ -210,7 +210,7 @@ namespace Cyjb
 			Type type = typeof(TDelegate);
 			CommonExceptions.CheckDelegateType(type);
 			CommonExceptions.CheckUnboundGenParam(property, "property");
-			return CreateClosedDelegate(property, type, firstArgument, throwOnBindFailure) as TDelegate;
+			return CreateClosedDelegate(property, type, firstArgument, throwOnBindFailure, false) as TDelegate;
 		}
 		/// <summary>
 		/// 使用指定的第一个参数，创建用于表示获取或设置指定的静态或实例属性的指定类型的委托。 
@@ -233,7 +233,7 @@ namespace Cyjb
 			Contract.Ensures(Contract.Result<Delegate>() != null);
 			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
 			CommonExceptions.CheckUnboundGenParam(property, "property");
-			return CreateClosedDelegate(property, delegateType, firstArgument, true);
+			return CreateClosedDelegate(property, delegateType, firstArgument, true, false);
 		}
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示获取或设置指定的静态或实例属性的指定类型的委托。 
@@ -260,7 +260,7 @@ namespace Cyjb
 			Contract.EndContractBlock();
 			CommonExceptions.CheckDelegateType(delegateType, "delegateType");
 			CommonExceptions.CheckUnboundGenParam(property, "property");
-			return CreateClosedDelegate(property, delegateType, firstArgument, throwOnBindFailure);
+			return CreateClosedDelegate(property, delegateType, firstArgument, throwOnBindFailure, false);
 		}
 		/// <summary>
 		/// 创建指定的静态或实例属性的指定类型的封闭属性委托。
@@ -269,12 +269,14 @@ namespace Cyjb
 		/// <param name="delegateType">要创建的委托的类型。</param>
 		/// <param name="firstArgument">如果是实例属性，则作为委托要绑定到的对象；否则将作为属性的第一个参数。</param>
 		/// <param name="throwOnBindFailure">为 <c>true</c>，表示无法绑定 <paramref name="property"/> 
-		///     时引发异常；否则为 <c>false</c>。</param>
+		/// 时引发异常；否则为 <c>false</c>。</param>
+		/// <param name="ensureClosed">如果确认属性一定是封闭委托，则为 <c>true</c>；若 
+		/// <paramref name="firstArgument"/> 为 <c>null</c> 时可能为开放委托，则为 <c>false</c>。</param>
 		/// <returns><paramref name="delegateType"/> 类型的委托，表示静态或实例属性的委托。</returns>
 		/// <remarks>如果委托具有返回值，则认为是获取属性，否则认为是设置属性。
 		/// 支持参数的强制类型转换，参数声明可以与实际类型不同。</remarks>
 		private static Delegate CreateClosedDelegate(PropertyInfo property, Type delegateType, object firstArgument,
-			bool throwOnBindFailure)
+			bool throwOnBindFailure, bool ensureClosed)
 		{
 			Contract.Requires(property != null && delegateType != null);
 			MethodInfo invoke = delegateType.GetInvokeMethod();
@@ -305,7 +307,7 @@ namespace Cyjb
 				}
 			}
 			// 创建委托。
-			Delegate dlg = CreateClosedDelegate(method, delegateType, firstArgument);
+			Delegate dlg = CreateClosedDelegate(method, delegateType, firstArgument, ensureClosed);
 			if (dlg == null && throwOnBindFailure)
 			{
 				throw CommonExceptions.BindTargetProperty("property");

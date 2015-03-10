@@ -259,6 +259,9 @@
     <Compile Include="DelegateBuilder.Method.cs">
       <DependentUpon>DelegateBuilder.cs</DependentUpon>
     </Compile>
+    <Compile Include="DelegateBuilder.Type.cs">
+      <DependentUpon>DelegateBuilder.cs</DependentUpon>
+    </Compile>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
