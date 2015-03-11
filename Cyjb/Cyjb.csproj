@@ -226,7 +226,6 @@
     <Compile Include="Utility\CacheElement.cs" />
     <Compile Include="Utility\CacheElementCollection.cs" />
     <Compile Include="Utility\CacheFactory.cs" />
-    <Compile Include="Utility\CacheResolveEventArgs.cs" />
     <Compile Include="Utility\CacheSection.cs" />
     <Compile Include="Utility\Hash.cs" />
     <Compile Include="Utility\LruCache`2.cs" />
@@ -246,7 +245,7 @@
     <Compile Include="Tristate.cs" />
     <Compile Include="Utility\LruCacheNoSync`2.cs" />
     <Compile Include="Utility\LruNodeNoSync`2.cs" />
-    <Compile Include="Utility\CacheDefaultEventArgs.cs" />
+    <Compile Include="Utility\CacheResolveEventArgs.cs" />
     <Compile Include="Utility\SimplyCache`2.cs" />
     <Compile Include="MemberAccessor`2.cs" />
     <Compile Include="FloatComparer.cs" />

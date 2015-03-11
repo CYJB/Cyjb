@@ -14,12 +14,12 @@ namespace Cyjb.Utility
 		/// </summary>
 		public CacheElementCollection() { }
 		/// <summary>
-		/// 创建一个新的 <see cref="System.Configuration.ConfigurationElement"/>。
+		/// 创建一个新的 <see cref="ConfigurationElement"/>。
 		/// </summary>
-		/// <returns>新的 <see cref="System.Configuration.ConfigurationElement"/>。</returns>
+		/// <returns>新的 <see cref="ConfigurationElement"/>。</returns>
 		/// <overloads>
 		/// <summary>
-		/// 创建一个新的 <see cref="System.Configuration.ConfigurationElement"/>。
+		/// 创建一个新的 <see cref="ConfigurationElement"/>。
 		/// </summary>
 		/// </overloads>
 		protected override ConfigurationElement CreateNewElement()
@@ -29,10 +29,8 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 获取指定配置元素的元素键。
 		/// </summary>
-		/// <param name="element">要为其返回键的 
-		/// <see cref="System.Configuration.ConfigurationElement"/>。</param>
-		/// <returns>一个 <see cref="Object"/>，用作指定 
-		/// <see cref="System.Configuration.ConfigurationElement"/> 的键。
+		/// <param name="element">要为其返回键的 <see cref="ConfigurationElement"/>。</param>
+		/// <returns>一个 <see cref="Object"/>，用作指定 <see cref="ConfigurationElement"/> 的键。
 		/// </returns>
 		protected override object GetElementKey(ConfigurationElement element)
 		{

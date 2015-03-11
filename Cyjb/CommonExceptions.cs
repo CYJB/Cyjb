@@ -1244,13 +1244,6 @@ namespace Cyjb
 
 		#endregion // MethodSwitcher 异常
 
-
-
-
-
-
-
-
 		#region 缓冲池工厂异常
 
 		/// <summary>
@@ -1261,8 +1254,10 @@ namespace Cyjb
 		internal static ConfigurationErrorsException InvalidCacheType(CacheElement element)
 		{
 			Contract.Requires(element != null);
-			string message = Format(ExceptionResources.InvalidCacheType, element.CacheType);
-			return GetConfigurationErrorsException(message, element.ElementInformation);
+			Contract.Ensures(Contract.Result<ConfigurationErrorsException>() != null);
+			string message = Format(Resources.InvalidCacheType, element.CacheType);
+			return new ConfigurationErrorsException(message,
+				element.ElementInformation.Source, element.ElementInformation.LineNumber);
 		}
 		/// <summary>
 		/// 返回缓冲池类型无效的异常。
@@ -1273,8 +1268,10 @@ namespace Cyjb
 		internal static ConfigurationErrorsException InvalidCacheType(CacheElement element, Exception innerException)
 		{
 			Contract.Requires(element != null);
-			string message = Format(ExceptionResources.InvalidCacheType, element.CacheType);
-			return GetConfigurationErrorsException(message, innerException, element.ElementInformation);
+			Contract.Ensures(Contract.Result<ConfigurationErrorsException>() != null);
+			string message = Format(Resources.InvalidCacheType, element.CacheType);
+			return new ConfigurationErrorsException(message, innerException,
+				element.ElementInformation.Source, element.ElementInformation.LineNumber);
 		}
 		/// <summary>
 		/// 返回缓冲池类型无效-未实现 ICache 接口的异常。
@@ -1284,8 +1281,10 @@ namespace Cyjb
 		internal static ConfigurationErrorsException InvalidCacheType_ICache(CacheElement element)
 		{
 			Contract.Requires(element != null);
-			string message = Format(ExceptionResources.InvalidCacheType_ICache, element.CacheType);
-			return GetConfigurationErrorsException(message, element.ElementInformation);
+			Contract.Ensures(Contract.Result<ConfigurationErrorsException>() != null);
+			string message = Format(Resources.InvalidCacheType_ICache, element.CacheType);
+			return new ConfigurationErrorsException(message,
+				element.ElementInformation.Source, element.ElementInformation.LineNumber);
 		}
 		/// <summary>
 		/// 返回缓冲池选项无效的异常。
@@ -1295,11 +1294,16 @@ namespace Cyjb
 		internal static ConfigurationErrorsException InvalidCacheOptions(CacheElement element)
 		{
 			Contract.Requires(element != null);
-			string message = Format(ExceptionResources.InvalidCacheOptions, element.CacheType);
-			return GetConfigurationErrorsException(message, element.ElementInformation);
+			Contract.Ensures(Contract.Result<ConfigurationErrorsException>() != null);
+			string message = Format(Resources.InvalidCacheOptions, element.CacheType);
+			return new ConfigurationErrorsException(message,
+				element.ElementInformation.Source, element.ElementInformation.LineNumber);
 		}
 
 		#endregion // 缓冲池工厂异常
+
+
+
 
 
 		#region 词法分析异常
@@ -1354,35 +1358,6 @@ namespace Cyjb
 		}
 
 		#endregion // 词法分析异常
-
-		#region 辅助方法
-
-		/// <summary>
-		/// 返回配置系统错误的异常。
-		/// </summary>
-		/// <param name="message">异常的信息。</param>
-		/// <param name="info">配置元素的信息。</param>
-		/// <returns><see cref="ConfigurationErrorsException"/> 对象。</returns>
-		private static ConfigurationErrorsException GetConfigurationErrorsException(string message, ElementInformation info)
-		{
-			Contract.Requires(message != null && info != null);
-			return new ConfigurationErrorsException(message, info.Source, info.LineNumber);
-		}
-		/// <summary>
-		/// 返回配置系统错误的异常。
-		/// </summary>
-		/// <param name="message">异常的信息。</param>
-		/// <param name="innerException">导致当前异常的异常。</param>
-		/// <param name="info">配置元素的信息。</param>
-		/// <returns><see cref="ConfigurationErrorsException"/> 对象。</returns>
-		private static ConfigurationErrorsException GetConfigurationErrorsException(string message,
-			Exception innerException, ElementInformation info)
-		{
-			Contract.Requires(message != null && innerException != null && info != null);
-			return new ConfigurationErrorsException(message, innerException, info.Source, info.LineNumber);
-		}
-
-		#endregion // 辅助方法
 
 
 		/// <summary>

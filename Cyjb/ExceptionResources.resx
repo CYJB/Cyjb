@@ -141,18 +141,6 @@
     <value>'{0}' is not a valid value for '{1}'.</value>
     <comment>转换无效。</comment>
   </data>
-  <data name="InvalidCacheOptions" xml:space="preserve">
-    <value>Can not find constructor matchs options in type '{0}'.</value>
-    <comment>缓冲池选项无效。</comment>
-  </data>
-  <data name="InvalidCacheType" xml:space="preserve">
-    <value>Invalid cache type '{0}'.</value>
-    <comment>缓冲池类型无效。</comment>
-  </data>
-  <data name="InvalidCacheType_ICache" xml:space="preserve">
-    <value>Invalid cache type '{0}', did not implement ICache{TKey, TValue}.</value>
-    <comment>缓冲池类型无效-未实现 ICache 接口。</comment>
-  </data>
   <data name="InvalidLexerContext" xml:space="preserve">
     <value>Invalid lexer context '{0}'.</value>
     <comment>无效的词法分析上下文。</comment>

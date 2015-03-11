@@ -141,18 +141,6 @@
     <value>'{0}' 不是 '{1}' 的有效值。</value>
     <comment>转换无效。</comment>
   </data>
-  <data name="InvalidCacheOptions" xml:space="preserve">
-    <value>在缓冲池类型 '{0}' 中找不到与选项匹配的构造函数。</value>
-    <comment>缓冲池选项无效。</comment>
-  </data>
-  <data name="InvalidCacheType" xml:space="preserve">
-    <value>无效的缓冲池类型 '{0}'。</value>
-    <comment>缓冲池类型无效。</comment>
-  </data>
-  <data name="InvalidCacheType_ICache" xml:space="preserve">
-    <value>无效的缓冲池类型 '{0}'，没有实现 ICache{TKey, TValue} 接口。</value>
-    <comment>缓冲池类型无效-未实现 ICache 接口。</comment>
-  </data>
   <data name="InvalidLexerContext" xml:space="preserve">
     <value>无效的词法分析上下文 '{0}'。</value>
     <comment>无效的词法分析上下文。</comment>

@@ -403,6 +403,33 @@ namespace Cyjb {
         }
         
         /// <summary>
+        ///   查找类似 Can not find constructor matchs options in type &apos;{0}&apos;. 的本地化字符串。
+        /// </summary>
+        internal static string InvalidCacheOptions {
+            get {
+                return ResourceManager.GetString("InvalidCacheOptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Invalid cache type &apos;{0}&apos;. 的本地化字符串。
+        /// </summary>
+        internal static string InvalidCacheType {
+            get {
+                return ResourceManager.GetString("InvalidCacheType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Invalid cache type &apos;{0}&apos;, did not implement ICache{TKey, TValue}. 的本地化字符串。
+        /// </summary>
+        internal static string InvalidCacheType_ICache {
+            get {
+                return ResourceManager.GetString("InvalidCacheType_ICache", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Specified cast is not valid. 的本地化字符串。
         /// </summary>
         internal static string InvalidCast {
