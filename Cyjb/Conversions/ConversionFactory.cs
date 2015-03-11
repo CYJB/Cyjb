@@ -69,7 +69,7 @@ namespace Cyjb.Conversions
 			if (providers.TryGetValue(inputType, out provider))
 			{
 				Delegate dlg = provider.GetConverterTo(outputType);
-				if (!provider.IsValidConverterTo(dlg, outputType))
+				if (provider.IsValidConverterTo(dlg, outputType))
 				{
 					converterDelegate = dlg;
 				}
@@ -82,11 +82,8 @@ namespace Cyjb.Conversions
 					converterDelegate = dlg;
 				}
 			}
-			if (converterDelegate != null)
-			{
-				return userDefinedConverers.GetOrAdd(key, new DelegateConversion(converterDelegate));
-			}
-			return null;
+			return converterDelegate == null ? null : 
+				userDefinedConverers.GetOrAdd(key, new DelegateConversion(converterDelegate));
 		}
 		/// <summary>
 		/// 添加指定的类型转换器提供者。
