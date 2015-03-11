@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace Cyjb.Utility
@@ -19,6 +21,7 @@ namespace Cyjb.Utility
 		/// </summary>
 		/// <param name="seed">要合并的种子 Hash 值。</param>
 		/// <param name="hash">要合并的 Hash 值。</param>
+		/// <returns>结果 Hash 值。</returns>
 		/// <remarks>算法来自 boost::hash_combine。</remarks>
 		public static int Combine(int seed, int hash)
 		{
@@ -29,6 +32,7 @@ namespace Cyjb.Utility
 		/// </summary>
 		/// <param name="seed">要合并的种子 Hash 值。</param>
 		/// <param name="obj">要合并 Hash 值的对象。</param>
+		/// <returns>结果 Hash 值。</returns>
 		/// <remarks>算法来自 boost::hash_combine。</remarks>
 		public static int Combine<T>(int seed, T obj)
 		{
@@ -39,9 +43,13 @@ namespace Cyjb.Utility
 		/// </summary>
 		/// <param name="seed">要合并的种子 Hash 值。</param>
 		/// <param name="objs">要合并 Hash 值的对象集合。</param>
+		/// <returns>结果 Hash 值。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="objs"/> 为 <c>null</c>。</exception>
 		/// <remarks>算法来自 boost::hash_range。</remarks>
 		public static int Combine<T>(int seed, IEnumerable<T> objs)
 		{
+			CommonExceptions.CheckArgumentNull(objs, "objs");
+			Contract.EndContractBlock();
 			return objs.Aggregate(seed, Combine);
 		}
 	}

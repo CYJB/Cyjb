@@ -35,6 +35,7 @@ namespace Cyjb.Utility
 		/// <returns>如果在缓存中找到该键，则为对应的对象；否则为 <paramref name="valueFactory"/> 
 		/// 返回的新对象。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="valueFactory"/> 为 <c>null</c>。</exception>
 		/// <overloads>
 		/// <summary>
 		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
@@ -51,6 +52,7 @@ namespace Cyjb.Utility
 		/// <returns>如果在缓存中找到该键，则为对应的对象；否则为 <paramref name="valueFactory"/> 
 		/// 返回的新对象。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="valueFactory"/> 为 <c>null</c>。</exception>
 		TValue GetOrAdd<TArg>(TKey key, TArg arg, Func<TKey, TArg, TValue> valueFactory);
 		/// <summary>
 		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
@@ -64,13 +66,13 @@ namespace Cyjb.Utility
 		/// <returns>如果在缓存中找到该键，则为对应的对象；
 		/// 否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="valueFactory"/> 为 <c>null</c>。</exception>
 		TValue GetOrAdd<TArg0, TArg1>(TKey key, TArg0 arg0, TArg1 arg1, Func<TKey, TArg0, TArg1, TValue> valueFactory);
 		/// <summary>
 		/// 从缓存中移除具有指定键的对象。
 		/// </summary>
 		/// <param name="key">要移除的对象的键。</param>
-		/// <exception cref="ArgumentNullException">
-		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		void Remove(TKey key);
 		/// <summary>
 		/// 尝试从缓存中获取与指定的键关联的对象。

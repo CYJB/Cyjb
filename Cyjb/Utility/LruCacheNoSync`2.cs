@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 
 namespace Cyjb.Utility
 {
@@ -23,11 +24,11 @@ namespace Cyjb.Utility
 		/// 缓冲池中可以保存的最大对象数目。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private int maxSize;
+		private readonly int maxSize;
 		/// <summary>
 		/// 缓冲池中热端的最大对象数目。
 		/// </summary>
-		private int hotSize;
+		private readonly int hotSize;
 		/// <summary>
 		/// 缓冲池中当前存储的对象数目。
 		/// </summary>
@@ -36,7 +37,7 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 缓存对象的字典。
 		/// </summary>
-		private Dictionary<TKey, LruNodeNoSync<TKey, TValue>> cacheDict =
+		private readonly Dictionary<TKey, LruNodeNoSync<TKey, TValue>> cacheDict =
 			new Dictionary<TKey, LruNodeNoSync<TKey, TValue>>();
 		/// <summary>
 		/// 链表的头节点，也是热端的头。
@@ -63,18 +64,23 @@ namespace Cyjb.Utility
 		/// <see cref="LruCacheNoSync{TKey,TValue}"/> 类的新实例。
 		/// </summary>
 		/// <param name="maxSize">缓存中可以保存的最大对象数目，必须大于等于 2。</param>
-		/// <param name="hotPrecent">热对象所占的百分比，必须保证热对象和冷对象的实际值能够大于等于 1。</param>
+		/// <param name="hotPrecent">热对象所占的百分比。</param>
 		public LruCacheNoSync(int maxSize, double hotPrecent)
 		{
 			if (maxSize < 2)
 			{
 				throw CommonExceptions.ArgumentOutOfRange("maxSize", maxSize);
 			}
+			Contract.EndContractBlock();
 			this.maxSize = maxSize;
 			this.hotSize = (int)(maxSize * hotPrecent);
-			if (this.hotSize < 1 || this.maxSize - this.hotSize < 1)
+			if (this.hotSize < 1)
 			{
-				throw CommonExceptions.ArgumentOutOfRange("hotPrecent", hotPrecent);
+				this.hotSize = 1;
+			}
+			else if (maxSize - this.hotSize < 1)
+			{
+				this.hotSize = this.maxSize - 1;
 			}
 		}
 		/// <summary>
@@ -95,10 +101,11 @@ namespace Cyjb.Utility
 		/// </summary>
 		/// <param name="key">要添加的对象的键。</param>
 		/// <param name="value">要添加的对象。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		public void Add(TKey key, TValue value)
 		{
+			CommonExceptions.CheckArgumentNull(key, "key");
+			Contract.EndContractBlock();
 			LruNodeNoSync<TKey, TValue> node;
 			if (cacheDict.TryGetValue(key, out node))
 			{
@@ -124,12 +131,12 @@ namespace Cyjb.Utility
 		/// 确定缓存中是否包含指定的键。
 		/// </summary>
 		/// <param name="key">要在缓存中查找的键。</param>
-		/// <returns>如果缓存中包含具有指定键的元素，则为 <c>true</c>；
-		/// 否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <returns>如果缓存中包含具有指定键的元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		public bool Contains(TKey key)
 		{
+			CommonExceptions.CheckArgumentNull(key, "key");
+			Contract.EndContractBlock();
 			return cacheDict.ContainsKey(key);
 		}
 		/// <summary>
@@ -137,10 +144,10 @@ namespace Cyjb.Utility
 		/// </summary>
 		/// <param name="key">要获取的对象的键。</param>
 		/// <param name="valueFactory">用于根据键生成新对象的函数。</param>
-		/// <returns>如果在缓存中找到该键，则为对应的对象；
-		/// 否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <returns>如果在缓存中找到该键，则为对应的对象；否则为 <paramref name="valueFactory"/> 
+		/// 返回的新对象。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="valueFactory"/> 为 <c>null</c>。</exception>
 		/// <overloads>
 		/// <summary>
 		/// 从缓存中获取与指定的键关联的对象，如果不存在则将新对象添加到缓存中。
@@ -148,7 +155,9 @@ namespace Cyjb.Utility
 		/// </overloads>
 		public TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory)
 		{
+			CommonExceptions.CheckArgumentNull(key, "key");
 			CommonExceptions.CheckArgumentNull(valueFactory, "valueFactory");
+			Contract.EndContractBlock();
 			TValue value;
 			if (this.TryGet(key, out value))
 			{
@@ -165,12 +174,13 @@ namespace Cyjb.Utility
 		/// <param name="key">要获取的对象的键。</param>
 		/// <param name="arg">用于生成新对象的参数。</param>
 		/// <param name="valueFactory">用于根据键和参数生成新对象的函数。</param>
-		/// <returns>如果在缓存中找到该键，则为对应的对象；
-		/// 否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <returns>如果在缓存中找到该键，则为对应的对象；否则为 <paramref name="valueFactory"/> 
+		/// 返回的新对象。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="valueFactory"/> 为 <c>null</c>。</exception>
 		public TValue GetOrAdd<TArg>(TKey key, TArg arg, Func<TKey, TArg, TValue> valueFactory)
 		{
+			CommonExceptions.CheckArgumentNull(key, "key");
 			CommonExceptions.CheckArgumentNull(valueFactory, "valueFactory");
 			TValue value;
 			if (this.TryGet(key, out value))
@@ -192,12 +202,13 @@ namespace Cyjb.Utility
 		/// <param name="valueFactory">用于根据键和参数生成新对象的函数。</param>
 		/// <returns>如果在缓存中找到该键，则为对应的对象；
 		/// 否则为 <paramref name="valueFactory"/> 返回的新对象。</returns>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="key"/> 为 <c>null</c>。</exception>
-		public TValue GetOrAdd<TArg0, TArg1>(TKey key, TArg0 arg0, TArg1 arg1,
-			Func<TKey, TArg0, TArg1, TValue> valueFactory)
+		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="valueFactory"/> 为 <c>null</c>。</exception>
+		public TValue GetOrAdd<TArg0, TArg1>(TKey key, TArg0 arg0, TArg1 arg1, Func<TKey, TArg0, TArg1, TValue> valueFactory)
 		{
+			CommonExceptions.CheckArgumentNull(key, "key");
 			CommonExceptions.CheckArgumentNull(valueFactory, "valueFactory");
+			Contract.EndContractBlock();
 			TValue value;
 			if (this.TryGet(key, out value))
 			{
@@ -211,10 +222,11 @@ namespace Cyjb.Utility
 		/// 从缓存中移除具有指定键的对象。
 		/// </summary>
 		/// <param name="key">要移除的对象的键。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		public void Remove(TKey key)
 		{
+			CommonExceptions.CheckArgumentNull(key, "key");
+			Contract.EndContractBlock();
 			LruNodeNoSync<TKey, TValue> node;
 			if (cacheDict.TryGetValue(key, out node))
 			{
@@ -231,10 +243,11 @@ namespace Cyjb.Utility
 		/// 如果操作失败，则包含默认值。</param>
 		/// <returns>如果在缓存中找到该键，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</returns>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
 		public bool TryGet(TKey key, out TValue value)
 		{
+			CommonExceptions.CheckArgumentNull(key, "key");
+			Contract.EndContractBlock();
 			LruNodeNoSync<TKey, TValue> node;
 			if (cacheDict.TryGetValue(key, out node))
 			{
@@ -256,6 +269,7 @@ namespace Cyjb.Utility
 		/// <param name="node">要移除的节点。</param>
 		private void Remove(LruNodeNoSync<TKey, TValue> node)
 		{
+			Contract.Requires(node != null);
 			if (node.Next == node)
 			{
 				this.head = null;
@@ -280,6 +294,7 @@ namespace Cyjb.Utility
 		/// <param name="node">要添加的节点。</param>
 		private void AddHotFirst(LruNodeNoSync<TKey, TValue> node)
 		{
+			Contract.Requires(node != null);
 			if (this.head == null)
 			{
 				node.Next = node.Prev = node;
@@ -301,6 +316,8 @@ namespace Cyjb.Utility
 		/// <param name="node">要添加的节点。</param>
 		private void AddCodeFirst(LruNodeNoSync<TKey, TValue> node)
 		{
+			Contract.Requires(node != null);
+			Contract.Assume(this.codeHead != null);
 			// 这里 codeHead != null，在调用的时候已经保证了这一点。
 			this.codeHead.AddBefore(node);
 			this.codeHead = node;
@@ -315,6 +332,7 @@ namespace Cyjb.Utility
 		/// <param name="value">要添加的对象。</param>
 		private void AddInternal(TKey key, TValue value)
 		{
+			Contract.Requires(key != null && value != null);
 			LruNodeNoSync<TKey, TValue> node;
 			if (count < maxSize)
 			{

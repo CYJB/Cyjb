@@ -1,4 +1,6 @@
-﻿namespace Cyjb.Utility
+﻿using System.Diagnostics.Contracts;
+
+namespace Cyjb.Utility
 {
 	/// <summary>
 	/// 表示改进的最近最少使用算法的节点，不包含多线程同步。
@@ -34,6 +36,7 @@
 		/// <param name="value">被缓存的对象。</param>
 		public LruNodeNoSync(TKey key, TValue value)
 		{
+			Contract.Requires(key != null);
 			this.Key = key;
 			this.Value = value;
 			this.VisitCount = 1;
@@ -44,6 +47,7 @@
 		/// <param name="node">要添加的新节点。</param>
 		public void AddBefore(LruNodeNoSync<TKey, TValue> node)
 		{
+			Contract.Requires(node != null);
 			node.Next = this;
 			node.Prev = this.Prev;
 			this.Prev.Next = node;
