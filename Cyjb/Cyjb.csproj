@@ -149,11 +149,6 @@
     <Compile Include="DelegateBuilder.Property.cs">
       <DependentUpon>DelegateBuilder.cs</DependentUpon>
     </Compile>
-    <Compile Include="ExceptionResources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ExceptionResources.resx</DependentUpon>
-    </Compile>
     <Compile Include="DoubleComparer.cs" />
     <Compile Include="IntegerExt.cs" />
     <Compile Include="IntegerExt.Byte.cs">
@@ -267,11 +262,6 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ExceptionResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ExceptionResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ExceptionResources.zh-CN.resx" />
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

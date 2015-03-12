@@ -46,6 +46,24 @@ namespace Cyjb.Utility
 		/// <returns>结果 Hash 值。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="objs"/> 为 <c>null</c>。</exception>
 		/// <remarks>算法来自 boost::hash_range。</remarks>
+		public static int Combine<T>(int seed, params T[] objs)
+		{
+			CommonExceptions.CheckArgumentNull(objs, "objs");
+			Contract.EndContractBlock();
+			for (int i = 0; i < objs.Length; i++)
+			{
+				seed = Combine(seed, objs[1]);
+			}
+			return seed;
+		}
+		/// <summary>
+		/// 合并种子 Hash 值和一系列对象。
+		/// </summary>
+		/// <param name="seed">要合并的种子 Hash 值。</param>
+		/// <param name="objs">要合并 Hash 值的对象集合。</param>
+		/// <returns>结果 Hash 值。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="objs"/> 为 <c>null</c>。</exception>
+		/// <remarks>算法来自 boost::hash_range。</remarks>
 		public static int Combine<T>(int seed, IEnumerable<T> objs)
 		{
 			CommonExceptions.CheckArgumentNull(objs, "objs");

@@ -517,4 +517,28 @@
     <value>Invalid cache type '{0}', did not implement ICache{TKey, TValue}.</value>
     <comment>缓冲池类型无效-未实现 ICache 接口。</comment>
   </data>
+  <data name="ConflictingAcceptAction" xml:space="preserve">
+    <value>Accept action is conflicted with Reject action.</value>
+    <comment>冲突的接受动作。</comment>
+  </data>
+  <data name="ConflictingRejectAction" xml:space="preserve">
+    <value>Reject action is conflicted with Accept action.</value>
+    <comment>冲突的拒绝动作。</comment>
+  </data>
+  <data name="InvalidLexerContext" xml:space="preserve">
+    <value>Invalid lexer context '{0}'.</value>
+    <comment>无效的词法分析上下文。</comment>
+  </data>
+  <data name="InvalidSourceLocatable" xml:space="preserve">
+    <value>Argument is not a valid instance of ISourceLocatable.</value>
+    <comment>无效的源文件范围。</comment>
+  </data>
+  <data name="InvalidSourceRange" xml:space="preserve">
+    <value>From {0} to {1} is not a valid source range.</value>
+    <comment>不是有效的源文件范围。</comment>
+  </data>
+  <data name="UnrecognizedToken" xml:space="preserve">
+    <value>Unrecognized token '{0}'.</value>
+    <comment>未识别的词法单元异常。</comment>
+  </data>
 </root>

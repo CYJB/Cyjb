@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using Cyjb.IO;
 
 namespace Cyjb.Text
@@ -20,14 +21,16 @@ namespace Cyjb.Text
 		/// <summary>
 		/// 是否已读取下一个词法单元。
 		/// </summary>
-		private bool peekToken = false;
+		private bool peekToken;
 		/// <summary>
 		/// 使用要扫描的源文件初始化 <see cref="TokenReader{T}"/> 类的新实例。
 		/// </summary>
 		/// <param name="reader">要使用的源文件读取器。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="reader"/> 为 <c>null</c>。</exception>
 		protected TokenReader(SourceReader reader)
 		{
 			CommonExceptions.CheckArgumentNull(reader, "reader");
+			Contract.EndContractBlock();
 			this.Source = reader;
 		}
 
@@ -76,10 +79,7 @@ namespace Cyjb.Text
 				this.peekToken = false;
 				return this.nextToken;
 			}
-			else
-			{
-				return InternalReadToken();
-			}
+			return InternalReadToken();
 		}
 		/// <summary>
 		/// 读取输入流中的下一个词法单元，但是并不更改读取器的状态。
@@ -105,10 +105,10 @@ namespace Cyjb.Text
 		/// <summary>
 		/// 返回一个循环访问集合的枚举器。
 		/// </summary>
-		/// <returns>可用于循环访问集合的 <see cref="System.Collections.Generic.IEnumerator{T}"/>。</returns>
+		/// <returns>可用于循环访问集合的 <see cref="IEnumerator{T}"/>。</returns>
 		/// <remarks>在枚举的时候，<see cref="TokenReader{T}"/> 会不断的读出词法单元，
-		/// 应当只使用一个枚举器。在使用多个枚举器时，他们之间会相互干扰，导致枚举值与期望的不同。
-		/// 要解决这一问题，需要将词法单元缓存到数组中，再进行枚举。</remarks>
+		/// 应当总是只使用一个枚举器。在使用多个枚举器时，他们之间会相互干扰，导致枚举值与期望的不同。
+		/// 如果需要多次枚举，必须将词法单元缓存到数组中，再进行枚举。</remarks>
 		public IEnumerator<Token<T>> GetEnumerator()
 		{
 			while (true)
@@ -129,7 +129,7 @@ namespace Cyjb.Text
 		/// <summary>
 		/// 返回一个循环访问集合的枚举器。
 		/// </summary>
-		/// <returns>可用于循环访问集合的 <see cref="System.Collections.IEnumerator"/>。</returns>
+		/// <returns>可用于循环访问集合的 <see cref="IEnumerator"/>。</returns>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return this.GetEnumerator();

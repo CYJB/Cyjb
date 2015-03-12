@@ -517,4 +517,28 @@
     <value>无效的缓冲池类型 '{0}'，没有实现 ICache&lt;TKey, TValue&gt; 接口。</value>
     <comment>缓冲池类型无效-未实现 ICache 接口。</comment>
   </data>
+  <data name="ConflictingAcceptAction" xml:space="preserve">
+    <value>接受动作与拒绝动作冲突。</value>
+    <comment>冲突的接受动作。</comment>
+  </data>
+  <data name="ConflictingRejectAction" xml:space="preserve">
+    <value>拒绝动作与接受动作冲突。</value>
+    <comment>冲突的拒绝动作。</comment>
+  </data>
+  <data name="InvalidLexerContext" xml:space="preserve">
+    <value>无效的词法分析上下文 '{0}'。</value>
+    <comment>无效的词法分析上下文。</comment>
+  </data>
+  <data name="InvalidSourceLocatable" xml:space="preserve">
+    <value>参数不是 ISourceLocatable 的有效实例。</value>
+    <comment>无效的源文件范围。</comment>
+  </data>
+  <data name="InvalidSourceRange" xml:space="preserve">
+    <value>从 {0} 到 {1} 不是有效的源文件范围。</value>
+    <comment>不是有效的源文件范围。</comment>
+  </data>
+  <data name="UnrecognizedToken" xml:space="preserve">
+    <value>未识别的词法单元 '{0}'。</value>
+    <comment>未识别的词法单元异常。</comment>
+  </data>
 </root>

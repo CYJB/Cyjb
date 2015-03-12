@@ -1302,10 +1302,6 @@ namespace Cyjb
 
 		#endregion // 缓冲池工厂异常
 
-
-
-
-
 		#region 词法分析异常
 
 		/// <summary>
@@ -1314,9 +1310,54 @@ namespace Cyjb
 		/// <param name="start">范围的起始位置。</param>
 		/// <param name="end">范围的结束位置。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
-		internal static ArgumentException InvalidSourceRange(SourcePosition start, SourcePosition end)
+		/// <overloads>
+		/// <summary>
+		/// 返回无效的源文件范围的异常。
+		/// </summary>
+		/// </overloads>
+		public static ArgumentException InvalidSourceRange(SourcePosition start, SourcePosition end)
 		{
-			return new ArgumentException(Format(ExceptionResources.InvalidSourceRange, start, end));
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
+			return new ArgumentException(Format(Resources.InvalidSourceRange, start, end));
+		}
+		/// <summary>
+		/// 返回无效的源文件范围的异常。
+		/// </summary>
+		/// <param name="paramName">无效的参数名称。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		public static ArgumentException InvalidSourceLocatable([InvokerParameterName]string paramName)
+		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
+			return new ArgumentException(Resources.InvalidSourceLocatable, paramName);
+		}
+		/// <summary>
+		/// 检查指定的源文件范围，如果无效则抛出相应异常。
+		/// </summary>
+		/// <param name="start">要检查的范围的起始位置。</param>
+		/// <param name="end">要检查的范围的结束位置。</param>
+		[ContractArgumentValidator]
+		public static void CheckSourceRange(SourcePosition start, SourcePosition end)
+		{
+			if (start.IsUnknown != end.IsUnknown || (!start.IsUnknown && start > end))
+			{
+				throw new ArgumentException(Format(Resources.InvalidSourceRange, start, end));
+			}
+			Contract.EndContractBlock();
+		}
+		/// <summary>
+		/// 检查指定的源文件范围，如果无效则抛出相应异常。
+		/// </summary>
+		/// <param name="range">要检查的范围。</param>
+		/// <param name="paramName">参数的名称。</param>
+		[ContractArgumentValidator]
+		public static void CheckSourceLocatable(ISourceLocatable range, [InvokerParameterName] string paramName)
+		{
+			if (range != null &&
+				((range.Start.IsUnknown != range.End.IsUnknown) || (!range.Start.IsUnknown && range.Start > range.End)))
+			{
+				throw new ArgumentException(Resources.InvalidSourceLocatable, paramName);
+			}
+			Contract.EndContractBlock();
 		}
 		/// <summary>
 		/// 返回冲突的接受动作的异常。
@@ -1324,7 +1365,8 @@ namespace Cyjb
 		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
 		public static InvalidOperationException ConflictingAcceptAction()
 		{
-			return new InvalidOperationException(ExceptionResources.ConflictingAcceptAction);
+			Contract.Ensures(Contract.Result<InvalidOperationException>() != null);
+			return new InvalidOperationException(Resources.ConflictingAcceptAction);
 		}
 		/// <summary>
 		/// 返回冲突的拒绝动作的异常。
@@ -1332,7 +1374,8 @@ namespace Cyjb
 		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
 		public static InvalidOperationException ConflictingRejectAction()
 		{
-			return new InvalidOperationException(ExceptionResources.ConflictingRejectAction);
+			Contract.Ensures(Contract.Result<InvalidOperationException>() != null);
+			return new InvalidOperationException(Resources.ConflictingRejectAction);
 		}
 		/// <summary>
 		/// 返回词法分析器的上下文无效的异常。
@@ -1342,8 +1385,8 @@ namespace Cyjb
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
 		public static ArgumentException InvalidLexerContext([InvokerParameterName]string paramName, string context)
 		{
-			return null;
-			//return GetArgumentException(firstParamName, ExceptionResources.InvalidLexerContext, context);
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
+			return new ArgumentException(Format(Resources.InvalidLexerContext, context), paramName);
 		}
 		/// <summary>
 		/// 返回未识别的词法单元的异常。
@@ -1354,11 +1397,13 @@ namespace Cyjb
 		/// <returns><see cref="SourceException"/> 对象。</returns>
 		public static SourceException UnrecognizedToken(string text, SourcePosition start, SourcePosition end)
 		{
-			return new SourceException(Format(ExceptionResources.UnrecognizedToken, text), new SourceRange(start, end));
+			Contract.Ensures(Contract.Result<SourceException>() != null);
+			return new SourceException(Format(Resources.UnrecognizedToken, text), new SourceRange(start, end));
 		}
 
 		#endregion // 词法分析异常
 
+		#region 格式化异常信息
 
 		/// <summary>
 		/// 格式化指定的异常信息。
@@ -1396,5 +1441,8 @@ namespace Cyjb
 			}
 			return args;
 		}
+
+		#endregion // 格式化异常信息
+
 	}
 }
