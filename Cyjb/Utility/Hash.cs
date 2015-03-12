@@ -30,6 +30,7 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 合并两个 Hash 值。
 		/// </summary>
+		/// <typeparam name="T">要合并 Hash 值的对象的类型。</typeparam>
 		/// <param name="seed">要合并的种子 Hash 值。</param>
 		/// <param name="obj">要合并 Hash 值的对象。</param>
 		/// <returns>结果 Hash 值。</returns>
@@ -41,6 +42,7 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 合并种子 Hash 值和一系列对象。
 		/// </summary>
+		/// <typeparam name="T">要合并 Hash 值的对象的类型。</typeparam>
 		/// <param name="seed">要合并的种子 Hash 值。</param>
 		/// <param name="objs">要合并 Hash 值的对象集合。</param>
 		/// <returns>结果 Hash 值。</returns>
@@ -59,6 +61,7 @@ namespace Cyjb.Utility
 		/// <summary>
 		/// 合并种子 Hash 值和一系列对象。
 		/// </summary>
+		/// <typeparam name="T">要合并 Hash 值的对象的类型。</typeparam>
 		/// <param name="seed">要合并的种子 Hash 值。</param>
 		/// <param name="objs">要合并 Hash 值的对象集合。</param>
 		/// <returns>结果 Hash 值。</returns>

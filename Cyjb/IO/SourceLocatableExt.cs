@@ -11,7 +11,8 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 获取指定对象在源文件中的字符长度。
 		/// </summary>
-		/// <value>指定对象在源文件中的字符长度。</value>
+		/// <param name="locatable">要检查的对象。</param>
+		/// <returns>指定对象在源文件中的字符长度。</returns>
 		public static int Length(this ISourceLocatable locatable)
 		{
 			CommonExceptions.CheckArgumentNull(locatable, "locatable");
@@ -21,7 +22,8 @@ namespace Cyjb.IO
 		/// <summary>
 		/// 获取指定对象是否表示未知范围。
 		/// </summary>
-		/// <value>如果指定对象表示未知范围，则为 <c>true</c>；否则为 <c>false</c>。</value>
+		/// <param name="locatable">要检查的对象。</param>
+		/// <returns>如果指定对象表示未知范围，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public static bool IsUnknown(this ISourceLocatable locatable)
 		{
 			CommonExceptions.CheckArgumentNull(locatable, "locatable");

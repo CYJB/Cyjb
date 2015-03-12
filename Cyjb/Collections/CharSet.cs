@@ -104,6 +104,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 使用指定的是否区分大小写初始化 <see cref="CharSet"/> 类的新实例。
 		/// </summary>
+		/// <param name="ignoreCase">是否不区分字符的大小写。</param>
 		public CharSet(bool ignoreCase)
 			: this(ignoreCase, null)
 		{ }

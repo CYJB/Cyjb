@@ -188,6 +188,8 @@ namespace Cyjb
 		/// <summary>
 		/// 获取将对象从 <typeparamref name="TInput"/> 类型转换为 <typeparamref name="TOutput"/> 类型的转换器。
 		/// </summary>
+		/// <typeparam name="TInput">输入对象的类型。</typeparam>
+		/// <typeparam name="TOutput">输出对象的类型。</typeparam>
 		/// <returns>将对象从 <typeparamref name="TInput"/> 类型转换为 <typeparamref name="TOutput"/> 类型的转换器。
 		/// 如果不存在则为 <c>null</c>。</returns>
 		public static Converter<TInput, TOutput> GetConverter<TInput, TOutput>()
@@ -280,6 +282,8 @@ namespace Cyjb
 		/// <summary>
 		/// 添加将对象从 <typeparamref name="TInput"/> 类型转换为 <typeparamref name="TOutput"/> 类型的转换器。
 		/// </summary>
+		/// <typeparam name="TInput">输入对象的类型。</typeparam>
+		/// <typeparam name="TOutput">输出对象的类型。</typeparam>
 		/// <param name="converter">将对象从 <typeparamref name="TInput"/> 类型转换为 
 		/// <typeparamref name="TOutput"/> 类型的转换器。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="converter"/> 为 <c>null</c>。</exception>

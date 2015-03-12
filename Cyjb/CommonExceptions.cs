@@ -49,6 +49,7 @@ namespace Cyjb
 		/// <summary>
 		/// 检查指定参数的值，如果为 <c>null</c> 则抛出相应异常。
 		/// </summary>
+		/// <typeparam name="T">要检查的参数类型。</typeparam>
 		/// <param name="value">要检查是否为 <c>null</c> 的参数值。</param>
 		/// <overloads>
 		/// <summary>
@@ -68,6 +69,7 @@ namespace Cyjb
 		/// <summary>
 		/// 检查指定参数的值，如果为 <c>null</c> 则抛出相应异常。
 		/// </summary>
+		/// <typeparam name="T">要检查的参数类型。</typeparam>
 		/// <param name="value">要检查是否为 <c>null</c> 的参数值。</param>
 		/// <param name="paramName">被检查的参数名。</param>
 		[ContractArgumentValidator]
@@ -217,6 +219,7 @@ namespace Cyjb
 		/// <summary>
 		/// 检查指定的数组，如果为 <c>null</c>、长度为零或包含为 <c>null</c> 的元素则抛出相应异常。
 		/// </summary>
+		/// <typeparam name="T">要检查的数组元素类型。</typeparam>
 		/// <param name="array">要检查的数组。</param>
 		/// <param name="paramName">数组参数的名称。</param>
 		[ContractArgumentValidator]

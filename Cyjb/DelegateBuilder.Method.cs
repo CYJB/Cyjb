@@ -441,6 +441,7 @@ namespace Cyjb
 		/// <summary>
 		/// 使用指定的第一个参数，创建用于表示指定静态或实例方法的指定类型的委托。
 		/// </summary>
+		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
 		/// <param name="firstArgument">如果是实例方法（非构造函数），则作为委托要绑定到的对象；
 		/// 否则将作为方法的第一个参数。</param>
@@ -473,6 +474,7 @@ namespace Cyjb
 		/// <summary>
 		/// 使用指定的第一个参数和针对绑定失败的指定行为，创建用于表示指定静态或实例方法的指定类型的委托。
 		/// </summary>
+		/// <typeparam name="TDelegate">要创建的委托的类型。</typeparam>
 		/// <param name="method">描述委托要表示的静态或实例方法的 <see cref="MethodBase"/>。</param>
 		/// <param name="firstArgument">如果是实例方法（非构造函数），则作为委托要绑定到的对象；
 		/// 否则将作为方法的第一个参数。</param>

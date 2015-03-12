@@ -272,6 +272,7 @@ namespace Cyjb.IO
 		/// 返回文本读取器中之后的 <paramref name="idx"/> 索引的字符，但不使用它。
 		/// Peek(0) 就相当于 Peek()，但效率不如 Peek()。
 		/// </summary>
+		/// <param name="idx">要读取的索引。</param>
 		/// <returns>文本读取器中之后的 <paramref name="idx"/> 索引的字符，
 		/// 或为 <c>-1</c>（如果没有更多的可用字符）。</returns>
 		/// <exception cref="ObjectDisposedException">当前 <see cref="SourceReader"/> 已关闭。</exception>
@@ -331,6 +332,7 @@ namespace Cyjb.IO
 		/// 读取文本读取器中之后的 <paramref name="idx"/> 索引的字符，并使该字符的位置提升。
 		/// <c>Read(0)</c> 与 <see cref="Read()"/> 等价。
 		/// </summary>
+		/// <param name="idx">要读取的索引。</param>
 		/// <returns>文本读取器中之后的 <paramref name="idx"/> 索引的字符，
 		/// 或为 <c>-1</c>（如果没有更多的可用字符）。</returns>
 		/// <exception cref="ObjectDisposedException">当前 <see cref="SourceReader"/> 已关闭。</exception>
