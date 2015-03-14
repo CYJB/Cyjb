@@ -20,7 +20,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\bin\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CONTRACTS_FULL</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CONTRACTS_FULL, JETBRAINS_ANNOTATIONS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\bin\Cyjb.XML</DocumentationFile>
@@ -217,6 +217,7 @@
     <Compile Include="Text\TokenParser`1.cs" />
     <Compile Include="Text\TokenReader`1.cs" />
     <Compile Include="Text\Token`1.cs" />
+    <Compile Include="Threading\RemoteCancellationTokenSource.cs" />
     <Compile Include="UniqueValue`1.cs" />
     <Compile Include="Utility\CacheElement.cs" />
     <Compile Include="Utility\CacheElementCollection.cs" />

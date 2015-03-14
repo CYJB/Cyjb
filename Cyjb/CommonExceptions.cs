@@ -562,7 +562,7 @@ namespace Cyjb
 		public static void CheckDelegateType(Type type)
 		{
 			CheckArgumentNull(type);
-			if (!type.IsSubclassOf(typeof(Delegate)))
+			if (!type.IsDelegate())
 			{
 				throw new ArgumentException(Format(Resources.MustBeDelegate_Type, type));
 			}

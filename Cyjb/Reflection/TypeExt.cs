@@ -551,6 +551,15 @@ namespace Cyjb.Reflection
 			return type == typeof(IList<>) || type == typeof(ICollection<>) || type == typeof(IEnumerable<>);
 		}
 		/// <summary>
+		/// 检查当前 <see cref="Type"/> 是否表示委托。
+		/// </summary>
+		/// <param name="type">要检查的类型。</param>
+		/// <returns>如果当前 <see cref="Type"/> 表示委托，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		public static bool IsDelegate(this Type type)
+		{
+			return type != null && type.IsSubclassOf(typeof(Delegate));
+		}
+		/// <summary>
 		/// 获取 <see cref="Type"/> 的完全限定名，包括 <see cref="Type"/> 的命名空间，但不包括程序集。
 		/// </summary>
 		/// <param name="type">要获取完全限定名的类型。</param>
