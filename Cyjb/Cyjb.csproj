@@ -192,6 +192,7 @@
     <Compile Include="Configurations\ConfigurationElementCollection`2.cs" />
     <Compile Include="EnumerableExt.cs" />
     <Compile Include="EnumExt.cs" />
+    <Compile Include="Predicate.cs" />
     <Compile Include="RandomExt.cs" />
     <Compile Include="ProcessorAttribute.cs" />
     <Compile Include="Reflection\Converter.cs" />
