@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.Threading;
 
 namespace Cyjb.Collections.ObjectModel
 {
@@ -13,7 +12,7 @@ namespace Cyjb.Collections.ObjectModel
 	/// <typeparam name="T">列表中的元素类型。</typeparam>
 	[Serializable, DebuggerDisplay("Count = {Count}")]
 	[DebuggerTypeProxy(typeof(CollectionDebugView<>))]
-	public class ListBase<T> : IList<T>, IList
+	public class ListBase<T> : IList<T>, IReadOnlyList<T>, IList
 	{
 		/// <summary>
 		/// 用于同步列表访问的对象。

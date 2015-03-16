@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 
 namespace Cyjb.Collections.ObjectModel
 {
@@ -12,7 +11,7 @@ namespace Cyjb.Collections.ObjectModel
 	/// <typeparam name="T">集合中元素的类型。</typeparam>
 	[Serializable, DebuggerDisplay("Count = {Count}")]
 	[DebuggerTypeProxy(typeof(CollectionDebugView<>))]
-	public class CollectionBase<T> : ICollection<T>, ICollection
+	public class CollectionBase<T> : ICollection<T>, IReadOnlyCollection<T>, ICollection
 	{
 		/// <summary>
 		/// 用于同步集合访问的对象。

@@ -16,7 +16,7 @@ namespace Cyjb.Collections.ObjectModel
 	/// <typeparam name="T">列表中的元素类型。</typeparam>
 	[Serializable, DebuggerDisplay("Count = {Count}")]
 	[DebuggerTypeProxy(typeof(CollectionDebugView<>))]
-	public class ReadOnlyList<T> : IList<T>, IList
+	public class ReadOnlyList<T> : IList<T>, IReadOnlyList<T>, IList
 	{
 		/// <summary>
 		/// 用于同步列表访问的对象。
