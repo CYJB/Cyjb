@@ -80,7 +80,7 @@ namespace Cyjb.Reflection
 		public static Type[] GetParameterTypes(this MethodBase method)
 		{
 			CommonExceptions.CheckArgumentNull(method, "method");
-			Contract.EndContractBlock();
+			Contract.Ensures(Contract.Result<Type[]>() != null);
 			ParameterInfo[] parameters = method.GetParametersNoCopy();
 			if (parameters.Length == 0)
 			{
@@ -102,7 +102,7 @@ namespace Cyjb.Reflection
 		public static Type[] GetParameterTypesWithReturn(this MethodInfo method)
 		{
 			CommonExceptions.CheckArgumentNull(method, "method");
-			Contract.EndContractBlock();
+			Contract.Ensures(Contract.Result<Type[]>() != null);
 			ParameterInfo[] parameters = method.GetParametersNoCopy();
 			if (parameters.Length == 0)
 			{

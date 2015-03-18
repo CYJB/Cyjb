@@ -205,6 +205,7 @@
       <DependentUpon>ILExt.cs</DependentUpon>
     </Compile>
     <Compile Include="Reflection\ILManager.cs" />
+    <Compile Include="Reflection\PropertyExt.cs" />
     <Compile Include="Reflection\MethodExt.cs" />
     <Compile Include="Reflection\PowerBinder.cs" />
     <Compile Include="Reflection\TypeBounds.cs" />
