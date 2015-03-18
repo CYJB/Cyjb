@@ -18,7 +18,7 @@ namespace Cyjb.Reflection
 		/// <param name="property">要获取索引参数类型列表的属性。</param>
 		/// <returns>属性的参数类型列表。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
-		public static Type[] GetParameterTypes(this PropertyInfo property)
+		public static Type[] GetIndexParameterTypes(this PropertyInfo property)
 		{
 			CommonExceptions.CheckArgumentNull(property, "property");
 			Contract.Ensures(Contract.Result<Type[]>() != null);
