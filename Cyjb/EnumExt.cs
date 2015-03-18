@@ -608,7 +608,7 @@ namespace Cyjb
 			{
 				throw CommonExceptions.EnumTypeDoesNotMatch("value", value.GetType(), baseEnum.GetType());
 			}
-			return ((ToUInt64(baseEnum) & ToUInt64(value)) != 0);
+			return ((ToUInt64((object)baseEnum) & ToUInt64((object)value)) != 0);
 		}
 		/// <summary>
 		/// 获取 <see cref="ulong"/> 类型的枚举值，<see cref="long"/> 会隐式转换为 <see cref="ulong"/>。
