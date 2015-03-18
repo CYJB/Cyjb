@@ -38,11 +38,10 @@ namespace Cyjb
 		/// <returns>要求当前条件与指定条件进行同时满足的条件。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="predicate"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="others"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentException"><paramref name="others"/> 中包含为 <c>null</c> 的元素。</exception>
 		public static Predicate<T> And<T>(this Predicate<T> predicate, params Predicate<T>[] others)
 		{
 			CommonExceptions.CheckArgumentNull(predicate, "predicate");
-			CommonExceptions.CheckCollectionItemNull(others, "others");
+			CommonExceptions.CheckArgumentNull(others, "others");
 			Contract.Ensures(Contract.Result<Predicate<T>>() != null);
 			return obj =>
 			{
@@ -52,7 +51,7 @@ namespace Cyjb
 				}
 				for (int i = 0; i < others.Length; i++)
 				{
-					if (!others[i](obj))
+					if (others[i] != null && !others[i](obj))
 					{
 						return false;
 					}
@@ -90,11 +89,10 @@ namespace Cyjb
 		/// <returns>返回要求当前条件与指定条件满足任意一个的条件。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="predicate"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="others"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentException"><paramref name="others"/> 中包含为 <c>null</c> 的元素。</exception>
 		public static Predicate<T> Or<T>(this Predicate<T> predicate, params Predicate<T>[] others)
 		{
 			CommonExceptions.CheckArgumentNull(predicate, "predicate");
-			CommonExceptions.CheckCollectionItemNull(others, "others");
+			CommonExceptions.CheckArgumentNull(others, "others");
 			Contract.Ensures(Contract.Result<Predicate<T>>() != null);
 			return obj =>
 			{
@@ -104,7 +102,7 @@ namespace Cyjb
 				}
 				for (int i = 0; i < others.Length; i++)
 				{
-					if (others[i](obj))
+					if (others[i] != null && !others[i](obj))
 					{
 						return true;
 					}
