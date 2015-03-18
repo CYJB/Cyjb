@@ -66,7 +66,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		/// <param name="index">要获取的元素从零开始的索引。</param>
 		/// <value>指定索引处的元素。</value>
-		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="index"/> 不是 <see cref="ReadOnlyList{T}"/> 中的有效索引。</exception>
 		[Pure]
 		public T this[int index]
@@ -259,7 +259,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// </summary>
 		/// <param name="index">从零开始的索引，应在该位置插入 <paramref name="value"/>。</param>
 		/// <param name="value">要插入到 <see cref="ReadOnlyList{T}"/> 中的对象。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="index"/> 不是 <see cref="ReadOnlyList{T}"/> 中的有效索引。</exception>
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void IList.Insert(int index, object value)
@@ -281,7 +281,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// 此实现总是引发 <see cref="NotSupportedException"/>。
 		/// </summary>
 		/// <param name="index">要移除的元素的从零开始的索引。</param>
-		/// <exception cref="System.ArgumentOutOfRangeException">
+		/// <exception cref="ArgumentOutOfRangeException">
 		/// <paramref name="index"/> 不是 <see cref="ReadOnlyList{T}"/> 中的有效索引。</exception>
 		/// <exception cref="NotSupportedException">总是引发。</exception>
 		void IList.RemoveAt(int index)
@@ -341,20 +341,17 @@ namespace Cyjb.Collections.ObjectModel
 			return this.IndexOf(item) >= 0;
 		}
 		/// <summary>
-		/// 从特定的 <see cref="System.Array"/> 索引处开始，
-		/// 将 <see cref="ReadOnlyList{T}"/> 的元素复制到一个 <see cref="System.Array"/> 中。
+		/// 从特定的 <see cref="Array"/> 索引处开始，
+		/// 将 <see cref="ReadOnlyList{T}"/> 的元素复制到一个 <see cref="Array"/> 中。
 		/// </summary>
 		/// <param name="array">从 <see cref="ReadOnlyList{T}"/> 
-		/// 复制的元素的目标位置的一维 <see cref="System.Array"/>。
+		/// 复制的元素的目标位置的一维 <see cref="Array"/>。
 		/// <paramref name="array"/> 必须具有从零开始的索引。</param>
 		/// <param name="arrayIndex"><paramref name="array"/> 中从零开始的索引，在此处开始复制。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="array"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="arrayIndex"/> 小于零。</exception>
-		/// <exception cref="System.ArgumentException">
-		/// <paramref name="array"/> 是多维的。</exception>
-		/// <exception cref="System.ArgumentException"><see cref="ReadOnlyList{T}"/> 
+		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="arrayIndex"/> 小于零。</exception>
+		/// <exception cref="ArgumentException"><paramref name="array"/> 是多维的。</exception>
+		/// <exception cref="ArgumentException"><see cref="ReadOnlyList{T}"/> 
 		/// 中的元素数目大于从 <paramref name="arrayIndex"/> 到目标 <paramref name="array"/> 
 		/// 末尾之间的可用空间。</exception>
 		public void CopyTo(T[] array, int arrayIndex)
