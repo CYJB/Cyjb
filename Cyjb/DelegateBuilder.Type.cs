@@ -850,7 +850,6 @@ namespace Cyjb
 			if (firstArgument == null && (property = openFinder.FindProperty()) != null)
 			{
 				return CreateOpenDelegate(property, delegateType, false);
-
 			}
 			if ((property = closedFinder.FindProperty()) != null)
 			{
