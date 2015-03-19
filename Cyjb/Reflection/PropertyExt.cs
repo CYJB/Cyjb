@@ -37,5 +37,55 @@ namespace Cyjb.Reflection
 
 		#endregion // 属性参数
 
+		#region 基定义
+
+		/// <summary>
+		/// 返回在派生类中重写的属性，在其直接或间接的基类中首先声明的 <see cref="PropertyInfo"/>。
+		/// </summary>
+		/// <param name="property">要检查的属性。</param>
+		/// <returns>当前属性的第一次实现。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
+		/// <remarks>
+		/// <para>若当前属性是在接口上声明的，则 <see cref="GetBaseDefinition"/> 返回当前属性。</para>
+		/// <para>若当前属性是在基类中声明的，则 <see cref="GetBaseDefinition"/> 将以下列方式运行：
+		/// <list type="bubble">
+		/// <item><description>如果当前属性重写基类中的虚拟定义，则返回该虚拟定义。</description></item>
+		/// <item><description>如果当前属性是用 <c>new</c> 关键字指定的，则返回当前属性。</description></item>
+		/// <item><description>如果当前属性不是在调用 <see cref="GetBaseDefinition"/> 的对象中定义的，
+		/// 则返回类结构层次中最高一级的属性定义。</description></item>
+		/// </list></para></remarks>
+		/// <seealso cref="MethodInfo.GetBaseDefinition"/>
+		public static PropertyInfo GetBaseDefinition(this PropertyInfo property)
+		{
+			CommonExceptions.CheckArgumentNull(property, "property");
+			Contract.Ensures(Contract.Result<PropertyInfo>() != null);
+			MethodInfo method;
+			if (property.CanRead)
+			{
+				method = property.GetGetMethod(true);
+			}
+			else if (property.CanWrite)
+			{
+				method = property.GetSetMethod(true);
+			}
+			else
+			{
+				return property;
+			}
+			MethodInfo baseMethod = method.GetBaseDefinition();
+			if (baseMethod == method)
+			{
+				return property;
+			}
+			// 找到方法对应的属性。
+			Type baseType = method.DeclaringType;
+			Contract.Assume(baseType != null);
+			PropertyInfo baseProperty = baseType.GetProperty(property.Name, TypeExt.AllMemberFlag | BindingFlags.ExactBinding,
+				null, property.PropertyType, property.GetIndexParameterTypes(), null);
+			return baseProperty ?? property;
+		}
+
+		#endregion // 基定义
+
 	}
 }
