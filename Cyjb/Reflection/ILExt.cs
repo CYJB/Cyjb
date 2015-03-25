@@ -651,6 +651,11 @@ namespace Cyjb.Reflection
 		/// <param name="method">要调用的方法。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 调用指定的方法。
+		/// </summary>
+		/// </overloads>
 		public static void EmitCall(this ILGenerator il, MethodInfo method)
 		{
 			CommonExceptions.CheckArgumentNull(il, "il");

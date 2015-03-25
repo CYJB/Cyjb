@@ -61,6 +61,11 @@ namespace Cyjb.Reflection
 		/// <see cref="TypeCode.UInt32"/>、<see cref="TypeCode.Int64"/>、<see cref="TypeCode.UInt64"/>、
 		/// <see cref="TypeCode.Single"/>、<see cref="TypeCode.Double"/> 和 <see cref="TypeCode.Decimal"/>，
 		/// 或者基础类型为其中之一的枚举类型。</remarks>
+		/// <overloads>
+		/// <summary>
+		/// 返回当前类型是否表示数字类型。
+		/// </summary>
+		/// </overloads>
 		[Pure]
 		public static bool IsNumeric(this TypeCode typeCode)
 		{
@@ -74,6 +79,11 @@ namespace Cyjb.Reflection
 		/// <remarks>无符号整数类型为 <see cref="TypeCode.Char"/>、<see cref="TypeCode.Byte"/>、
 		/// <see cref="TypeCode.UInt16"/>、<see cref="TypeCode.UInt32"/> 和 <see cref="TypeCode.UInt64"/>，
 		/// 或者基础类型为其中之一的枚举类型。</remarks>
+		/// <overloads>
+		/// <summary>
+		/// 返回当前类型是否表示无符号整数类型。
+		/// </summary>
+		/// </overloads>
 		[Pure]
 		public static bool IsUnsigned(this TypeCode typeCode)
 		{
@@ -87,6 +97,11 @@ namespace Cyjb.Reflection
 		/// <returns>如果当前 <see cref="TypeCode"/> 表示有符号整数类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		/// <remarks>有符号整数类型为 <see cref="TypeCode.SByte"/>、<see cref="TypeCode.Int16"/>、
 		/// <see cref="TypeCode.Int32"/> 和 <see cref="TypeCode.Int64"/>，或者基础类型为其中之一的枚举类型。</remarks>
+		/// <overloads>
+		/// <summary>
+		/// 返回当前类型是否表示有符号整数类型。
+		/// </summary>
+		/// </overloads>
 		[Pure]
 		public static bool IsSigned(this TypeCode typeCode)
 		{

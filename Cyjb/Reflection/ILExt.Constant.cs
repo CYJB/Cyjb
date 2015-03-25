@@ -263,6 +263,11 @@ namespace Cyjb.Reflection
 		/// </summary>
 		/// <param name="value">要判断的常量。</param>
 		/// <returns>如果常量能写入到 IL 中，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 获取指定的常量能否写入到 IL 中。
+		/// </summary>
+		/// </overloads>
 		public static bool CanEmitConstant(object value)
 		{
 			return value == null || CanEmitConstant(value, value.GetType());
@@ -308,6 +313,11 @@ namespace Cyjb.Reflection
 		/// <param name="value">要写入的常量。</param>
 		/// <returns>如果常量成功写入到 IL 中，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 将指定的常量写入 IL 中。
+		/// </summary>
+		/// </overloads>
 		public static bool EmitConstant(this ILGenerator il, object value)
 		{
 			CommonExceptions.CheckArgumentNull(il, "il");

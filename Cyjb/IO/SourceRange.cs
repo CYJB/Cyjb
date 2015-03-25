@@ -77,18 +77,13 @@ namespace Cyjb.IO
 		/// <exception cref="ArgumentException"><paramref name="range"/> 表的不是有效的范围。</exception>
 		public SourceRange(ISourceLocatable range)
 		{
-			CommonExceptions.CheckArgumentNull(range, "range");
-			if (range.Start.IsUnknown != range.End.IsUnknown)
-			{
-				throw CommonExceptions.InvalidSourceRange(range.Start, range.End);
-			}
-			if (!range.Start.IsUnknown && range.Start > range.End)
-			{
-				throw CommonExceptions.ReversedArgument("locatable.Start", "locatable.End");
-			}
+			CommonExceptions.CheckSourceLocatable(range, "range");
 			Contract.EndContractBlock();
-			this.start = range.Start;
-			this.end = range.End;
+			if (range != null)
+			{
+				this.start = range.Start;
+				this.end = range.End;
+			}
 		}
 		/// <summary>
 		/// 获取在源文件中的起始位置。
@@ -137,11 +132,11 @@ namespace Cyjb.IO
 		/// <returns>如果指定的范围完全包含在当前范围中，则为 <c>true</c>；否则为 <c>false</c>。
 		/// 对于未知的范围，也会返回 <c>false</c>。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="locatable"/> 为 <c>null</c>。</exception>
-		/// <override>
+		/// <overloads>
 		/// <summary>
 		/// 返回指定的范围或位置是否完全包含在当前范围中。
 		/// </summary>
-		/// </override>
+		/// </overloads>
 		public bool Contains(ISourceLocatable locatable)
 		{
 			CommonExceptions.CheckArgumentNull(locatable, "locatable");
@@ -248,11 +243,11 @@ namespace Cyjb.IO
 		/// </summary>
 		/// <param name="ranges">要进行合并的范围集合。</param>
 		/// <returns>合并后的结果。</returns>
-		/// <override>
+		/// <overloads>
 		/// <summary>
 		/// 返回将指定的一个或多个范围合并的结果，忽略无效范围。
 		/// </summary>
-		/// </override>
+		/// </overloads>
 		public static SourceRange Merge(params ISourceLocatable[] ranges)
 		{
 			return Merge(ranges as IEnumerable<ISourceLocatable>);

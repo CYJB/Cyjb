@@ -137,6 +137,12 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentException">不能从 <paramref name="types"/> 推断得到类型参数。</exception>
 		/// <exception cref="ArgumentException">根据 <paramref name="types"/>
 		/// 推断出来的类型参数中的某个元素不满足为当前泛型方法定义的相应类型参数指定的约束。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 根据实参参数类型推断当前泛型方法定义的类型参数，
+		/// 并返回表示结果封闭构造方法的 <see cref="MethodInfo"/> 对象。
+		/// </summary>
+		/// </overloads>
 		public static MethodInfo MakeGenericMethodFromParamTypes(this MethodInfo method, params Type[] types)
 		{
 			CommonExceptions.CheckArgumentNull(method, "method");
@@ -196,6 +202,11 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="types"/> 为 <c>null</c>。</exception>
 		/// <exception cref="InvalidOperationException">当前 <see cref="MethodInfo"/> 不表示泛型方法定义。
 		/// 也就是说，<see cref="MethodBase.IsGenericMethodDefinition "/> 返回 <c>false</c>。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 根据给定的方法实参类型数组推断泛型方法的泛型类型。
+		/// </summary>
+		/// </overloads>
 		public static Type[] GenericArgumentsInferences(this MethodBase method, params Type[] types)
 		{
 			CommonExceptions.CheckArgumentNull(method, "method");

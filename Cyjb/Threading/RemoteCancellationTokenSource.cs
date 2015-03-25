@@ -31,6 +31,11 @@ namespace Cyjb.Threading
 		/// 使用指定的延迟初始化 <see cref="RemoteCancellationTokenSource"/> 类的新实例。
 		/// </summary>
 		/// <param name="millisecondsDelay">取消  <see cref="RemoteCancellationTokenSource"/> 前的等待时间（毫秒）。</param>
+		/// <overloads>
+		/// <summary>
+		/// 初始化 <see cref="RemoteCancellationTokenSource"/> 类的新实例。
+		/// </summary>
+		/// </overloads>
 		public RemoteCancellationTokenSource(int millisecondsDelay)
 		{
 			this.tokenSource = new CancellationTokenSource(millisecondsDelay);
@@ -69,6 +74,11 @@ namespace Cyjb.Threading
 		/// <summary>
 		/// 传达取消请求。
 		/// </summary>
+		/// <overloads>
+		/// <summary>
+		/// 传达取消请求。
+		/// </summary>
+		/// </overloads>
 		public void Cancel()
 		{
 			this.tokenSource.Cancel();
@@ -85,6 +95,11 @@ namespace Cyjb.Threading
 		/// 在指定等待时间后执行取消操作。
 		/// </summary>
 		/// <param name="millisecondsDelay">取消  <see cref="RemoteCancellationTokenSource"/> 前的等待时间（毫秒）。</param>
+		/// <overloads>
+		/// <summary>
+		/// 在指定等待时间后执行取消操作。
+		/// </summary>
+		/// </overloads>
 		public void CancelAfter(int millisecondsDelay)
 		{
 			this.tokenSource.CancelAfter(millisecondsDelay);

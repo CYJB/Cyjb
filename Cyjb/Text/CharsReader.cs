@@ -41,6 +41,11 @@ namespace Cyjb.Text
 		/// 执行与释放或重置非托管资源相关的应用程序定义的任务。
 		/// </summary>
 		/// <param name="disposing">是否释放托管资源。</param>
+		/// <overloads>
+		/// <summary>
+		/// 执行与释放或重置非托管资源相关的应用程序定义的任务。
+		/// </summary>
+		/// </overloads>
 		protected override void Dispose(bool disposing)
 		{
 			if (disposing && this.chars != null)
@@ -67,6 +72,11 @@ namespace Cyjb.Text
 		/// 读取文本读取器中的下一个字符并使该字符的位置提升一个字符。
 		/// </summary>
 		/// <returns>文本读取器中的下一个字符，或为 <c>-1</c>（如果没有更多的可用字符）。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 读取文本读取器中的字符，并提升字符的位置。
+		/// </summary>
+		/// </overloads>
 		public override int Read()
 		{
 			CheckDisposed();

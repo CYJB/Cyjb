@@ -353,6 +353,11 @@ namespace Cyjb
 		/// <param name="length">要扩展到的长度，如果小于等于当前数组的长度，则什么都不做。</param>
 		/// <returns>扩展得到的新数组；如果 <paramref name="length"/> 小于等于原数组的长度，则返回原数组。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 将当前数组扩展到指定长度，并返回新数组。
+		/// </summary>
+		/// </overloads>
 		public static T[] Extend<T>(this T[] array, int length)
 		{
 			CommonExceptions.CheckArgumentNull(array, "array");

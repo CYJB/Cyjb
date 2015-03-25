@@ -42,11 +42,11 @@ namespace Cyjb.IO
 		/// 对于未知的范围，也会返回 <c>false</c>。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="thisObj"/> 或 
 		/// <paramref name="locatable"/> 为 <c>null</c>。</exception>
-		/// <override>
+		/// <overloads>
 		/// <summary>
 		/// 返回指定的范围或位置是否完全包含在当前范围中。
 		/// </summary>
-		/// </override>
+		/// </overloads>
 		public static bool Contains(this ISourceLocatable thisObj, ISourceLocatable locatable)
 		{
 			CommonExceptions.CheckArgumentNull(thisObj, "thisObj");

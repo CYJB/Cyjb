@@ -106,6 +106,11 @@ namespace Cyjb.Collections.ObjectModel
 		/// 则为 <c>true</c>；否则为 <c>false</c>。如果在原始 <see cref="KeyedCollectionBase{TKey,TItem}"/> 
 		/// 中没有找到指定的键，该方法也会返回 <c>false</c>。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="key"/> 为 <c>null</c>。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 从 <see cref="KeyedCollectionBase{TKey,TItem}"/> 中移除特定元素。
+		/// </summary>
+		/// </overloads>
 		public virtual bool Remove(TKey key)
 		{
 			CommonExceptions.CheckArgumentNull(key, "key");

@@ -67,6 +67,11 @@ namespace Cyjb
 		/// <remarks>如果多个枚举成员具有相同的基础值，则 <see cref="GetName{TValue}"/> 
 		/// 方法可保证它将返回其中一个枚举成员的描述。但是，它并不保证它将始终返回相同枚举成员的描述。
 		/// 因此，如果多个枚举成员具有相同的值，应用程序代码决不应依赖于返回特定成员描述的方法。</remarks>
+		/// <overloads>
+		/// <summary>
+		/// 在指定枚举中检索具有指定值的常数的描述。如果不存在描述，则使用其名称。
+		/// </summary>
+		/// </overloads>
 		public static string GetDescription(Type enumType, object value)
 		{
 			CommonExceptions.CheckArgumentNull(enumType, "enumType");
@@ -218,7 +223,7 @@ namespace Cyjb
 		public static TextValuePairCollection<TEnum> GetNameValues<TEnum>()
 		{
 			Contract.Ensures(Contract.Result<TextValuePairCollection<TEnum>>() != null);
-			CommonExceptions.CheckEnumType(typeof (TEnum));
+			CommonExceptions.CheckEnumType(typeof(TEnum));
 			return GetTextValues<TEnum>(false);
 		}
 		/// <summary>
@@ -251,7 +256,7 @@ namespace Cyjb
 		public static TextValuePairCollection<TEnum> GetDescValues<TEnum>()
 		{
 			Contract.Ensures(Contract.Result<TextValuePairCollection<TEnum>>() != null);
-			CommonExceptions.CheckEnumType(typeof (TEnum));
+			CommonExceptions.CheckEnumType(typeof(TEnum));
 			return GetTextValues<TEnum>(true);
 		}
 		/// <summary>
@@ -430,7 +435,7 @@ namespace Cyjb
 		{
 			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.EndContractBlock();
-			CommonExceptions.CheckEnumType(typeof (TEnum));
+			CommonExceptions.CheckEnumType(typeof(TEnum));
 			ulong ulValue = ParseToULong(typeof(TEnum), value, false);
 			if (typeof(TEnum).IsUnsigned())
 			{
@@ -457,7 +462,7 @@ namespace Cyjb
 		{
 			CommonExceptions.CheckArgumentNull(value, "value");
 			Contract.EndContractBlock();
-			CommonExceptions.CheckEnumType(typeof (TEnum));
+			CommonExceptions.CheckEnumType(typeof(TEnum));
 			ulong ulValue = ParseToULong(typeof(TEnum), value, ignoreCase);
 			if (typeof(TEnum).IsUnsigned())
 			{

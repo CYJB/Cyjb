@@ -80,19 +80,14 @@ namespace Cyjb.IO
 		/// <exception cref="ArgumentException"><paramref name="range"/> 表的不是有效的范围。</exception>
 		public SourceFileRange(string fileName, ISourceLocatable range)
 		{
-			CommonExceptions.CheckArgumentNull(range, "range");
-			if (range.Start.IsUnknown != range.End.IsUnknown)
-			{
-				throw CommonExceptions.InvalidSourceRange(range.Start, range.End);
-			}
-			if (!range.Start.IsUnknown && range.Start > range.End)
-			{
-				throw CommonExceptions.ReversedArgument("locatable.Start", "locatable.End");
-			}
+			CommonExceptions.CheckSourceLocatable(range, "range");
 			Contract.EndContractBlock();
 			this.fileName = fileName;
-			this.start = range.Start;
-			this.end = range.End;
+			if (range != null)
+			{
+				this.start = range.Start;
+				this.end = range.End;
+			}
 		}
 		/// <summary>
 		/// 获取源文件的名称。
@@ -166,6 +161,11 @@ namespace Cyjb.IO
 		/// <param name="index">要检查的索引。</param>
 		/// <returns>如果指定的索引包含在当前范围中，则为 <c>true</c>；否则为 <c>false</c>。
 		/// 对于未知的范围，也会返回 <c>false</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 返回指定的位置是否完全包含在当前范围中。
+		/// </summary>
+		/// </overloads>
 		public bool Contains(int index)
 		{
 			if (index < 0 || this.IsUnknown)
@@ -245,11 +245,11 @@ namespace Cyjb.IO
 		/// <param name="fileName">源文件的名称。</param>
 		/// <param name="ranges">要进行合并的范围集合。</param>
 		/// <returns>合并后的结果。</returns>
-		/// <override>
+		/// <overloads>
 		/// <summary>
 		/// 返回将指定的一个或多个范围合并的结果，忽略无效范围。
 		/// </summary>
-		/// </override>
+		/// </overloads>
 		public static SourceFileRange Merge(string fileName, params ISourceLocatable[] ranges)
 		{
 			CommonExceptions.CheckArgumentNull(fileName, "fileName");

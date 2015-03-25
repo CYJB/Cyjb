@@ -1040,7 +1040,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 获取 <see cref="BitList"/> 中包含的元素数。
 		/// </summary>
-		/// <list><see cref="BitList"/> 中包含的元素数。</list>
+		/// <value><see cref="BitList"/> 中包含的元素数。</value>
 		public override int Count
 		{
 			get { return this.count; }

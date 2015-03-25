@@ -192,6 +192,11 @@ namespace Cyjb
 		/// <typeparam name="TOutput">输出对象的类型。</typeparam>
 		/// <returns>将对象从 <typeparamref name="TInput"/> 类型转换为 <typeparamref name="TOutput"/> 类型的转换器。
 		/// 如果不存在则为 <c>null</c>。</returns>
+		/// <overloads>
+		/// <summary>
+		/// 获取将对象从一种类型转换为另一种类型的转换器。
+		/// </summary>
+		/// </overloads>
 		public static Converter<TInput, TOutput> GetConverter<TInput, TOutput>()
 		{
 			Type inputType = typeof(TInput);
@@ -330,6 +335,11 @@ namespace Cyjb
 		/// <returns>一个对象，其类型为 <typeparamref name="TOutput"/>，
 		/// 并且其值等效于 <paramref name="value"/>。</returns>
 		/// <exception cref="InvalidCastException">不支持此转换。</exception>
+		/// <overloads>
+		/// <summary>
+		/// 返回指定类型的对象，其值等效于指定对象。
+		/// </summary>
+		/// </overloads>
 		public static TOutput ChangeType<TInput, TOutput>(TInput value)
 		{
 			Converter<TInput, TOutput> converter = GetConverter<TInput, TOutput>();

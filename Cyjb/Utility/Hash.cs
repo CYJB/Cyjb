@@ -23,6 +23,11 @@ namespace Cyjb.Utility
 		/// <param name="hash">要合并的 Hash 值。</param>
 		/// <returns>结果 Hash 值。</returns>
 		/// <remarks>算法来自 boost::hash_combine。</remarks>
+		/// <overloads>
+		/// <summary>
+		/// 合并两个或多个 Hash 值。
+		/// </summary>
+		/// </overloads>
 		public static int Combine(int seed, int hash)
 		{
 			return seed ^ (hash + GoldenRatio + (seed << 6) + (seed >> 2));
