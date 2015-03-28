@@ -98,6 +98,15 @@ namespace Cyjb
 			Contract.Ensures(Contract.Result<ArgumentException>() != null);
 			return new ArgumentException(Format(Resources.ReversedArgument, firstParam, secondParam));
 		}
+		/// <summary>
+		/// 返回不能为带有闭包的匿名方法创建弱引用委托的异常。
+		/// </summary>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		internal static ArgumentException WeakDelegateForMethodWithClosure()
+		{
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
+			return new ArgumentException(Resources.WeakDelegateForMethodWithClosure);
+		}
 
 		#endregion // 参数异常
 
@@ -539,6 +548,18 @@ namespace Cyjb
 		/// <summary>
 		/// 返回类型必须从委托派生的异常。
 		/// </summary>
+		/// <param name="type">异常的类型。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
+		public static ArgumentException MustBeDelegate(Type type)
+		{
+			CheckArgumentNull(type, "type");
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
+			return new ArgumentException(Format(Resources.MustBeDelegate_Type, type));
+		}
+		/// <summary>
+		/// 返回类型必须从委托派生的异常。
+		/// </summary>
 		/// <param name="paramName">产生异常的参数名称。</param>
 		/// <param name="type">异常的类型。</param>
 		/// <returns><see cref="ArgumentException"/> 对象。</returns>
@@ -809,11 +830,14 @@ namespace Cyjb
 		/// <summary>
 		/// 返回对象已释放资源的异常。
 		/// </summary>
+		/// <param name="objectType">对象的类型。</param>
 		/// <returns><see cref="ObjectDisposedException"/> 对象。</returns>
-		public static ObjectDisposedException ObjectDisposed()
+		/// <exception cref="ArgumentNullException"><paramref name="objectType"/> 为 <c>null</c>。</exception>
+		public static ObjectDisposedException ObjectDisposed(Type objectType)
 		{
+			CheckArgumentNull(objectType, "objectType");
 			Contract.Ensures(Contract.Result<ObjectDisposedException>() != null);
-			return new ObjectDisposedException(Resources.ObjectDisposed);
+			return new ObjectDisposedException(Format(objectType));
 		}
 		/// <summary>
 		/// 返回流已关闭的异常。
@@ -825,7 +849,7 @@ namespace Cyjb
 		{
 			CheckArgumentNull(streamType, "streamType");
 			Contract.Ensures(Contract.Result<ObjectDisposedException>() != null);
-			return new ObjectDisposedException(Format(Resources.StreamClosed, streamType));
+			return new ObjectDisposedException(Format(streamType), Format(Resources.StreamClosed, streamType));
 		}
 
 		#endregion // 对象状态异常
@@ -1418,31 +1442,28 @@ namespace Cyjb
 		{
 			Contract.Requires(message != null && args != null);
 			Contract.Ensures(Contract.Result<string>() != null);
-			return string.Format(Resources.Culture, message, Format(args));
-		}
-		/// <summary>
-		/// 将指定数组中的对象格式化为相应的字符串。
-		/// </summary>
-		/// <param name="args">要转换的对象数组。</param>
-		private static object[] Format(object[] args)
-		{
-			Contract.Requires(args != null);
-			Contract.Ensures(Contract.Result<object[]>() != null);
 			for (int i = 0; i < args.Length; i++)
 			{
-				object value = args[i];
-				if (value == null)
-				{
-					args[i] = "(null)";
-					continue;
-				}
-				Type type = value as Type;
-				if (type != null)
-				{
-					args[i] = type.FullName();
-				}
+				args[i] = Format(args[i]);
 			}
-			return args;
+			return string.Format(Resources.Culture, message, args);
+		}
+		/// <summary>
+		/// 将指定对象格式化为字符串。
+		/// </summary>
+		/// <param name="value">要格式化的对象。</param>
+		private static string Format(object value)
+		{
+			if (value == null)
+			{
+				return "(null)";
+			}
+			Type type = value as Type;
+			if (type != null)
+			{
+				return type.FullName();
+			}
+			return value.ToString();
 		}
 
 		#endregion // 格式化异常信息

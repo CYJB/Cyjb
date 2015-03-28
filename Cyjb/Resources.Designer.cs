@@ -655,15 +655,6 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 The object has been disposed. 的本地化字符串。
-        /// </summary>
-        internal static string ObjectDisposed {
-            get {
-                return ResourceManager.GetString("ObjectDisposed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 One or more errors existed. 的本地化字符串。
         /// </summary>
         internal static string OneOrMoreErrorsExisted {
@@ -1011,6 +1002,15 @@ namespace Cyjb {
         internal static string WarningText {
             get {
                 return ResourceManager.GetString("WarningText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Cannot create weak delegate for anonymous method with closure. 的本地化字符串。
+        /// </summary>
+        internal static string WeakDelegateForMethodWithClosure {
+            get {
+                return ResourceManager.GetString("WeakDelegateForMethodWithClosure", resourceCulture);
             }
         }
     }

@@ -277,10 +277,6 @@
     <value>Could not find any recognizable digits.</value>
     <comment>未能找到任何可识别的数字。</comment>
   </data>
-  <data name="ObjectDisposed" xml:space="preserve">
-    <value>The object has been disposed.</value>
-    <comment>对象已释放资源。</comment>
-  </data>
   <data name="OneOrMoreErrorsExisted" xml:space="preserve">
     <value>One or more errors existed.</value>
     <comment>存在一个或多个错误。</comment>
@@ -540,5 +536,9 @@
   <data name="UnrecognizedToken" xml:space="preserve">
     <value>Unrecognized token '{0}'.</value>
     <comment>未识别的词法单元异常。</comment>
+  </data>
+  <data name="WeakDelegateForMethodWithClosure" xml:space="preserve">
+    <value>Cannot create weak delegate for anonymous method with closure.</value>
+    <comment>不能创建弱引用委托。</comment>
   </data>
 </root>

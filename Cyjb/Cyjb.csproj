@@ -216,6 +216,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Runtime.CompilerServices\DependentHandle`2.cs" />
+    <Compile Include="Runtime.CompilerServices\WeakDelegate.cs" />
     <Compile Include="Text\CharsReader.cs" />
     <Compile Include="Text\TokenParser`1.cs" />
     <Compile Include="Text\TokenReader`1.cs" />

@@ -277,10 +277,6 @@
     <value>未能找到任何可识别的数字。</value>
     <comment>未能找到任何可识别的数字。</comment>
   </data>
-  <data name="ObjectDisposed" xml:space="preserve">
-    <value>已释放该对象。</value>
-    <comment>对象已释放资源。</comment>
-  </data>
   <data name="OneOrMoreErrorsExisted" xml:space="preserve">
     <value>存在一个或多个错误。</value>
     <comment>存在一个或多个错误。</comment>
@@ -540,5 +536,9 @@
   <data name="UnrecognizedToken" xml:space="preserve">
     <value>未识别的词法单元 '{0}'。</value>
     <comment>未识别的词法单元异常。</comment>
+  </data>
+  <data name="WeakDelegateForMethodWithClosure" xml:space="preserve">
+    <value>不能为带有闭包的匿名方法创建弱引用委托。</value>
+    <comment>不能创建弱引用委托。</comment>
   </data>
 </root>
