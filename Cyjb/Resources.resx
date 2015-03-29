@@ -541,4 +541,8 @@
     <value>Cannot create weak delegate for anonymous method with closure.</value>
     <comment>不能创建弱引用委托。</comment>
   </data>
+  <data name="PropertyNotFound" xml:space="preserve">
+    <value>Property '{0}' not found.</value>
+    <comment>未找到属性。</comment>
+  </data>
 </root>

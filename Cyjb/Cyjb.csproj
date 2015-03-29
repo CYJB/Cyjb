@@ -120,6 +120,9 @@
     <Compile Include="Collections\ObjectModel\SetBase`1.cs" />
     <Compile Include="Collections\BitListEqualityComparer.cs" />
     <Compile Include="ComponentModel\EnumDescConverter.cs" />
+    <Compile Include="ComponentModel\ObservableObject.cs" />
+    <Compile Include="Configurations\ValueConfigurationCollection.cs" />
+    <Compile Include="Configurations\ValueConfigurationElement.cs" />
     <Compile Include="Conversions\BetweenNullableConversion.cs" />
     <Compile Include="Conversions\BoxConversion.cs" />
     <Compile Include="Conversions\Convert.Base.cs" />
@@ -193,6 +196,7 @@
     <Compile Include="EnumerableExt.cs" />
     <Compile Include="EnumExt.cs" />
     <Compile Include="Predicate.cs" />
+    <Compile Include="Threading\RemoteProgress`1.cs" />
     <Compile Include="RandomExt.cs" />
     <Compile Include="ProcessorAttribute.cs" />
     <Compile Include="Reflection\Converter.cs" />

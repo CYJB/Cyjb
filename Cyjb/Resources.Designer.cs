@@ -844,6 +844,15 @@ namespace Cyjb {
         }
         
         /// <summary>
+        ///   查找类似 Property &apos;{0}&apos; not found. 的本地化字符串。
+        /// </summary>
+        internal static string PropertyNotFound {
+            get {
+                return ResourceManager.GetString("PropertyNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Public property or field named &apos;{0}&apos; not exists. 的本地化字符串。
         /// </summary>
         internal static string PropertyOrFieldNotFound {

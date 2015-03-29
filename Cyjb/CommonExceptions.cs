@@ -83,6 +83,17 @@ namespace Cyjb
 			Contract.EndContractBlock();
 		}
 		/// <summary>
+		/// 返回未找到属性的异常。
+		/// </summary>
+		/// <param name="propertyName">未找到的属性名称。</param>
+		/// <returns><see cref="ArgumentException"/> 对象。</returns>
+		internal static ArgumentException PropertyNotFound(string propertyName)
+		{
+			Contract.Requires(!string.IsNullOrEmpty(propertyName));
+			Contract.Ensures(Contract.Result<ArgumentException>() != null);
+			return new ArgumentException(Format(Resources.PropertyNotFound, propertyName));
+		}
+		/// <summary>
 		/// 返回参数顺序颠倒的异常。
 		/// </summary>
 		/// <param name="firstParam">第一个异常参数的名称。</param>

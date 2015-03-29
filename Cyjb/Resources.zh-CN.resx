@@ -541,4 +541,8 @@
     <value>不能为带有闭包的匿名方法创建弱引用委托。</value>
     <comment>不能创建弱引用委托。</comment>
   </data>
+  <data name="PropertyNotFound" xml:space="preserve">
+    <value>未找到属性 '{0}'。</value>
+    <comment>未找到属性。</comment>
+  </data>
 </root>

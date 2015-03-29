@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using Cyjb.ComponentModel;
 using Cyjb.Utility;
 
 namespace Cyjb
@@ -11,8 +12,7 @@ namespace Cyjb
 	/// </summary>
 	/// <typeparam name="TValue">值的数据类型。</typeparam>
 	[Serializable]
-	public sealed class TextValuePair<TValue> : IEditableObject, INotifyPropertyChanged,
-		INotifyPropertyChanging, IEquatable<TextValuePair<TValue>>
+	public sealed class TextValuePair<TValue> : ObservableObject, IEditableObject, IEquatable<TextValuePair<TValue>>
 	{
 		/// <summary>
 		/// 文本。
@@ -68,9 +68,7 @@ namespace Cyjb
 			get { return text; }
 			set
 			{
-				OnPropertyChanging("Text");
-				text = value;
-				OnPropertyChanged("Text");
+				UpdateValue("Text", ref text, value, !isInEdit);
 			}
 		}
 		/// <summary>
@@ -82,9 +80,7 @@ namespace Cyjb
 			get { return pairValue; }
 			set
 			{
-				OnPropertyChanging("Value");
-				this.pairValue = value;
-				OnPropertyChanged("Value");
+				UpdateValue("Value", ref pairValue, value, !isInEdit);
 			}
 		}
 
@@ -98,48 +94,6 @@ namespace Cyjb
 		{
 			return string.Concat(text, ": ", pairValue);
 		}
-
-		#region INotifyPropertyChanged 成员
-
-		/// <summary>
-		/// 当属性更改后发生。
-		/// </summary>
-		public event PropertyChangedEventHandler PropertyChanged;
-		/// <summary>
-		/// 调度属性更改后的事件。
-		/// </summary>
-		/// <param name="propertyName">已经更改的属性名。</param>
-		private void OnPropertyChanged(string propertyName)
-		{
-			PropertyChangedEventHandler changed = PropertyChanged;
-			if (!isInEdit && changed != null)
-			{
-				changed(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-
-		#endregion
-
-		#region INotifyPropertyChanging 成员
-
-		/// <summary>
-		/// 当属性值将要更改时发生。
-		/// </summary>
-		public event PropertyChangingEventHandler PropertyChanging;
-		/// <summary>
-		/// 调度属性值将要更改的事件。
-		/// </summary>
-		/// <param name="propertyName">将要更改的属性名。</param>
-		private void OnPropertyChanging(string propertyName)
-		{
-			PropertyChangingEventHandler changing = PropertyChanging;
-			if (!isInEdit && changing != null)
-			{
-				changing(this, new PropertyChangingEventArgs(propertyName));
-			}
-		}
-
-		#endregion
 
 		#region IEditableObject 成员
 
