@@ -545,4 +545,8 @@
     <value>Property '{0}' not found.</value>
     <comment>未找到属性。</comment>
   </data>
+  <data name="PropertyNotSupported" xml:space="preserve">
+    <value>Specified property is not supported.</value>
+    <comment>属性不被支持。</comment>
+  </data>
 </root>

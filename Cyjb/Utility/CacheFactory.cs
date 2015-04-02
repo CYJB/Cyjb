@@ -54,11 +54,11 @@ namespace Cyjb.Utility
 			try
 			{
 				ICache<TKey, TValue> cache = CreateInternal<TKey, TValue>(key);
-				return cache ?? OnCacheResolve<TKey, TValue>(key, null);
+				return cache ?? RaiseCacheResolve<TKey, TValue>(key, null);
 			}
 			catch (ConfigurationErrorsException ex)
 			{
-				return OnCacheResolve<TKey, TValue>(key, ex);
+				return RaiseCacheResolve<TKey, TValue>(key, ex);
 			}
 		}
 		/// <summary>
@@ -90,7 +90,7 @@ namespace Cyjb.Utility
 			{
 				options.Add(nv.Name, nv.Value);
 			}
-			return CreateCacheType(cacheType, options) as ICache<TKey, TValue> ?? OnCacheResolve<TKey, TValue>(key, null);
+			return CreateCacheType(cacheType, options) as ICache<TKey, TValue> ?? RaiseCacheResolve<TKey, TValue>(key, null);
 		}
 		/// <summary>
 		/// 获取缓冲池的类型。
@@ -198,7 +198,7 @@ namespace Cyjb.Utility
 		/// <typeparam name="TValue">缓冲对象的类型。</typeparam>
 		/// <param name="key">缓冲池的键。</param>
 		/// <param name="innerException">发生的内部异常。</param>
-		private static ICache<TKey, TValue> OnCacheResolve<TKey, TValue>(string key,
+		private static ICache<TKey, TValue> RaiseCacheResolve<TKey, TValue>(string key,
 			ConfigurationErrorsException innerException)
 		{
 			Contract.Requires(key != null);

@@ -148,10 +148,10 @@ namespace Cyjb
 					}
 					else
 					{
-						OnPropertyChanging(string.Empty);
+						RaisePropertyChanging(string.Empty);
 						text = tmpText;
 						pairValue = tmpValue;
-						OnPropertyChanged(string.Empty);
+						RaisePropertyChanged(string.Empty);
 					}
 				}
 			}

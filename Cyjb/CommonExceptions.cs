@@ -877,6 +877,15 @@ namespace Cyjb
 			return new NotSupportedException(Resources.MethodNotSupported);
 		}
 		/// <summary>
+		/// 返回属性不支持的异常。
+		/// </summary>
+		/// <returns><see cref="NotSupportedException"/> 对象。</returns>
+		public static NotSupportedException PropertyNotSupported()
+		{
+			Contract.Ensures(Contract.Result<NotSupportedException>() != null);
+			return new NotSupportedException(Resources.PropertyNotSupported);
+		}
+		/// <summary>
 		/// 返回代码不应到达这里的异常。
 		/// </summary>
 		/// <returns><see cref="InvalidOperationException"/> 对象。</returns>

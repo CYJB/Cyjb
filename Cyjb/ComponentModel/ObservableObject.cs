@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 
 namespace Cyjb.ComponentModel
 {
@@ -21,7 +20,7 @@ namespace Cyjb.ComponentModel
 		/// 调度属性更改后的事件。
 		/// </summary>
 		/// <param name="propertyName">已经更改的属性名。</param>
-		protected virtual void OnPropertyChanged(string propertyName)
+		protected virtual void RaisePropertyChanged(string propertyName)
 		{
 			if (string.IsNullOrEmpty(propertyName))
 			{
@@ -50,7 +49,7 @@ namespace Cyjb.ComponentModel
 		/// 调度属性值将要更改的事件。
 		/// </summary>
 		/// <param name="propertyName">将要更改的属性名。</param>
-		protected virtual void OnPropertyChanging(string propertyName)
+		protected virtual void RaisePropertyChanging(string propertyName)
 		{
 			if (string.IsNullOrEmpty(propertyName))
 			{
@@ -79,14 +78,7 @@ namespace Cyjb.ComponentModel
 		/// <returns>如果指定的值被更新，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		protected bool UpdateValue<T>(string propertyName, ref T value, T newValue)
 		{
-			if (EqualityComparer<T>.Default.Equals(value, newValue))
-			{
-				return false;
-			}
-			OnPropertyChanging(propertyName);
-			value = newValue;
-			OnPropertyChanged(propertyName);
-			return true;
+			return UpdateValue(propertyName, ref value, newValue, true);
 		}
 		/// <summary>
 		/// 更新指定的值，并引发属性更改事件。
@@ -97,17 +89,18 @@ namespace Cyjb.ComponentModel
 		/// <param name="newValue">属性的新值。</param>
 		/// <param name="raiseEvent">是否引发属性更改事件。</param>
 		/// <returns>如果指定的值被更新，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		protected bool UpdateValue<T>(string propertyName, ref T value, T newValue, bool raiseEvent)
+		protected virtual bool UpdateValue<T>(string propertyName, ref T value, T newValue, bool raiseEvent)
 		{
+			CheckPropertyName(propertyName);
 			if (EqualityComparer<T>.Default.Equals(value, newValue))
 			{
 				return false;
 			}
 			if (raiseEvent)
 			{
-				OnPropertyChanging(propertyName);
+				RaisePropertyChanging(propertyName);
 				value = newValue;
-				OnPropertyChanged(propertyName);
+				RaisePropertyChanged(propertyName);
 			}
 			else
 			{
@@ -121,10 +114,9 @@ namespace Cyjb.ComponentModel
 		/// <param name="propertyName">要检查的属性名称。</param>
 		[Conditional("DEBUG")]
 		[DebuggerStepThrough]
-		private void CheckPropertyName(string propertyName)
+		protected void CheckPropertyName(string propertyName)
 		{
-			Contract.Requires(!string.IsNullOrEmpty(propertyName));
-			if (TypeDescriptor.GetProperties(this)[propertyName] == null)
+			if (string.IsNullOrEmpty(propertyName) || TypeDescriptor.GetProperties(this)[propertyName] == null)
 			{
 				throw CommonExceptions.PropertyNotFound(propertyName);
 			}

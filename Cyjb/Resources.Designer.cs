@@ -853,6 +853,15 @@ namespace Cyjb {
         }
         
         /// <summary>
+        ///   查找类似 Specified property is not supported. 的本地化字符串。
+        /// </summary>
+        internal static string PropertyNotSupported {
+            get {
+                return ResourceManager.GetString("PropertyNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Public property or field named &apos;{0}&apos; not exists. 的本地化字符串。
         /// </summary>
         internal static string PropertyOrFieldNotFound {

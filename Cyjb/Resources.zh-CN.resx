@@ -242,7 +242,7 @@
     <comment>指定的键不存在。</comment>
   </data>
   <data name="MethodNotSupported" xml:space="preserve">
-    <value>不支持所指定的方法。</value>
+    <value>不支持指定的方法。</value>
     <comment>方法不被支持。</comment>
   </data>
   <data name="MultidimensionalArrayNotSupported" xml:space="preserve">
@@ -544,5 +544,9 @@
   <data name="PropertyNotFound" xml:space="preserve">
     <value>未找到属性 '{0}'。</value>
     <comment>未找到属性。</comment>
+  </data>
+  <data name="PropertyNotSupported" xml:space="preserve">
+    <value>不支持指定的属性。</value>
+    <comment>属性不被支持。</comment>
   </data>
 </root>

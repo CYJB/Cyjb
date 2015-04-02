@@ -104,6 +104,7 @@
       <DependentUpon>ArrayExt.cs</DependentUpon>
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="AsyncEventHandler.cs" />
     <Compile Include="Collections\BitList.cs" />
     <Compile Include="Collections\CharSet.cs" />
     <Compile Include="Collections\DictionaryExt.cs" />
