@@ -421,24 +421,6 @@ namespace Cyjb.Collections
 		#region 批量添加
 
 		/// <summary>
-		/// 将指定集合的元素添加到当前列表中。
-		/// </summary>
-		/// <typeparam name="T">列表中元素的类型。</typeparam>
-		/// <param name="list">要添加到的列表。</param>
-		/// <param name="collection">要添加的元素集合。</param>
-		/// <exception cref="ArgumentNullException"><paramref name="list"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
-		public static void AddRange<T>(this IList<T> list, IEnumerable<T> collection)
-		{
-			CommonExceptions.CheckArgumentNull(list, "list");
-			CommonExceptions.CheckArgumentNull(collection, "collection");
-			Contract.EndContractBlock();
-			foreach (T item in collection)
-			{
-				list.Add(item);
-			}
-		}
-		/// <summary>
 		/// 将指定集合的元素插入到当前列表的指定索引处。
 		/// </summary>
 		/// <typeparam name="T">列表中元素的类型。</typeparam>

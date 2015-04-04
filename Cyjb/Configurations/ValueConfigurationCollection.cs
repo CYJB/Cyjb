@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
+using Cyjb.Collections;
 using Cyjb.Collections.ObjectModel;
 
 namespace Cyjb.Configurations
@@ -12,6 +13,18 @@ namespace Cyjb.Configurations
 	public sealed class ValueConfigurationCollection : ConfigurationElementCollection<ValueConfigurationElement>,
 		IList<string>, IList
 	{
+		/// <summary>
+		/// 初始化 <see cref="ValueConfigurationCollection"/> 类的新实例。
+		/// </summary>
+		public ValueConfigurationCollection() { }
+		/// <summary>
+		/// 使用指定的值的集合，初始化 <see cref="ValueConfigurationCollection"/> 类的新实例。
+		/// </summary>
+		/// <param name="values">初始化的值的集合。</param>
+		public ValueConfigurationCollection(IEnumerable<string> values)
+		{
+			this.AddRange(values);
+		}
 
 		#region ConfigurationElementCollection 成员
 
