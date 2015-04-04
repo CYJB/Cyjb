@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Reflection;
+using Cyjb.Collections;
 using JetBrains.Annotations;
 
 namespace Cyjb.Reflection

@@ -1,17 +1,17 @@
 ﻿using System.Linq;
-using Cyjb;
+using Cyjb.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTestCyjb
 {
 	/// <summary>
-	/// <see cref="Cyjb.EnumerableExt"/> 类的单元测试。
+	/// <see cref="EnumerableExt"/> 类的单元测试。
 	/// </summary>
 	[TestClass]
 	public class UnitTestEnumerableExt
 	{
 		/// <summary>
-		/// 对 <see cref="Cyjb.EnumerableExt.Iterative"/> 方法进行测试。
+		/// 对 <see cref="EnumerableExt.Iterative"/> 方法进行测试。
 		/// </summary>
 		[TestMethod]
 		public void TestIterative()

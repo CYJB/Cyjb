@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace Cyjb
+namespace Cyjb.Collections
 {
 	/// <summary>
 	/// 提供对 <see cref="IEnumerable{T}"/> 接口的扩展方法。

@@ -108,6 +108,7 @@
     <Compile Include="Collections\BitList.cs" />
     <Compile Include="Collections\CharSet.cs" />
     <Compile Include="Collections\DictionaryExt.cs" />
+    <Compile Include="Collections\CollectionExt.cs" />
     <Compile Include="Collections\ListExt.cs" />
     <Compile Include="Collections\ListQueue`1.cs" />
     <Compile Include="Collections\ListStack`1.cs" />
@@ -194,7 +195,7 @@
     <Compile Include="Collections\ObjectModel\IteratorBase`1.cs" />
     <Compile Include="Configurations\ConfigurationElementCollection`1.cs" />
     <Compile Include="Configurations\ConfigurationElementCollection`2.cs" />
-    <Compile Include="EnumerableExt.cs" />
+    <Compile Include="Collections\EnumerableExt.cs" />
     <Compile Include="EnumExt.cs" />
     <Compile Include="Predicate.cs" />
     <Compile Include="Threading\RemoteProgress`1.cs" />
