@@ -15,7 +15,7 @@ namespace Cyjb
 		/// 默认的单精度浮点数比较器。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static readonly FloatComparer defaultComparer = new FloatComparer(DefaultEpsilon);
+		private static readonly FloatComparer defaultComparer = new(DefaultEpsilon);
 
 		/// <summary>
 		/// 获取默认的单精度浮点数比较器。

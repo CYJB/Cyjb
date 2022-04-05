@@ -34,14 +34,14 @@ namespace Cyjb.Conversions
 		public override void Emit(ILGenerator generator, Type inputType, Type outputType, bool isChecked)
 		{
 			Contract.Assume(outputType.IsNullable());
-			Type outputUnderlyingType = Nullable.GetUnderlyingType(outputType);
+			Type outputUnderlyingType = Nullable.GetUnderlyingType(outputType)!;
 			if (inputType != outputUnderlyingType)
 			{
-				Conversion conversion = ConversionFactory.GetConversion(inputType, outputUnderlyingType);
+				Conversion conversion = ConversionFactory.GetConversion(inputType, outputUnderlyingType)!;
 				Contract.Assume(conversion != null);
 				conversion.Emit(generator, inputType, outputUnderlyingType, isChecked);
 			}
-			ConstructorInfo ctor = outputType.GetConstructor(new[] { outputUnderlyingType });
+			ConstructorInfo ctor = outputType.GetConstructor(new[] { outputUnderlyingType })!;
 			Contract.Assume(ctor != null);
 			generator.Emit(OpCodes.Newobj, ctor);
 		}

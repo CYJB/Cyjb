@@ -256,6 +256,7 @@ namespace Cyjb
 		{
 			return Combine(text, char.IsWhiteSpace, " ");
 		}
+
 		/// <summary>
 		/// 合并字符串中的空白，并使用指定字符串替换空白字符串。
 		/// </summary>
@@ -266,6 +267,7 @@ namespace Cyjb
 		{
 			return Combine(text, char.IsWhiteSpace, replace);
 		}
+
 		/// <summary>
 		/// 使用指定字符串，替换原字符串中连续的满足指定条件的字符。
 		/// </summary>
@@ -279,7 +281,7 @@ namespace Cyjb
 			{
 				return text;
 			}
-			StringBuilder builder = new StringBuilder(text.Length);
+			StringBuilder builder = new(text.Length);
 			// 0：起始位置。
 			// 1：正常添加字符。
 			// 2：需要添加替代字符。

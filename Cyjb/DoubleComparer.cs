@@ -15,7 +15,7 @@ namespace Cyjb
 		/// 默认的双精度浮点数比较器。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static readonly DoubleComparer defaultComparer = new DoubleComparer(DefaultEpsilon);
+		private static readonly DoubleComparer defaultComparer = new(DefaultEpsilon);
 
 		/// <summary>
 		/// 获取默认的双精度浮点数比较器。
