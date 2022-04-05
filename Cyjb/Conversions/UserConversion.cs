@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Reflection.Emit;
 using Cyjb.Reflection;
 
@@ -14,17 +12,19 @@ namespace Cyjb.Conversions
 		/// <summary>
 		/// 用户自定义类型转换方法。
 		/// </summary>
-		private readonly MethodInfo method;
+		public readonly MethodInfo Method;
+
 		/// <summary>
 		/// 使用指定的类型转换方法初始化 <see cref="UserConversion"/> 类的新实例。
 		/// </summary>
 		/// <param name="method">类型转换方法。</param>
-		public UserConversion(MethodInfo method)
-			: base(ConversionType.UserDefined)
+		/// <param name="isImplicit">是否是隐式类型转换。</param>
+		public UserConversion(MethodInfo method, bool isImplicit)
+			: base(isImplicit ? ConversionType.ImplicitUserDefined : ConversionType.ExplicitUserDefined)
 		{
-			Contract.Requires(method != null);
-			this.method = method;
+			Method = method;
 		}
+
 		/// <summary>
 		/// 写入类型转换的 IL 指令。
 		/// </summary>
@@ -34,17 +34,25 @@ namespace Cyjb.Conversions
 		/// <param name="isChecked">是否执行溢出检查。</param>
 		public override void Emit(ILGenerator generator, Type inputType, Type outputType, bool isChecked)
 		{
-			Type methodType = method.GetParametersNoCopy()[0].ParameterType;
-			Conversion conv = ConversionFactory.GetPreDefinedConversionNotVoid(inputType, methodType);
-			conv.Emit(generator, inputType, methodType, isChecked);
-			generator.EmitCall(method);
-			methodType = method.ReturnType;
-			conv = ConversionFactory.GetPreDefinedConversionNotVoid(methodType, outputType);
-			if (conv is FromNullableConversion)
+			Type methodType = Method.GetParametersNoCopy()[0].ParameterType;
+			// 额外的入参转换
+			Conversion? conv = ConversionFactory.GetPreDefinedConversion(inputType, methodType);
+			if (conv != null)
 			{
-				generator.EmitGetAddress(methodType);
+				conv.Emit(generator, inputType, methodType, isChecked);
 			}
-			conv.Emit(generator, methodType, outputType, isChecked);
+			generator.EmitCall(Method);
+			methodType = Method.ReturnType;
+			// 额外的出参转换
+			conv = ConversionFactory.GetPreDefinedConversion(methodType, outputType);
+			if (conv != null)
+			{
+				if (conv is FromNullableConversion)
+				{
+					generator.EmitGetAddress(methodType);
+				}
+				conv.Emit(generator, methodType, outputType, isChecked);
+			}
 		}
 	}
 }

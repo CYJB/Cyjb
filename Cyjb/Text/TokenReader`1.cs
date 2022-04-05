@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using Cyjb.IO;
+﻿using System.Collections;
 
 namespace Cyjb.Text
 {
@@ -11,28 +7,67 @@ namespace Cyjb.Text
 	/// </summary>
 	/// <seealso cref="Token{T}"/>
 	/// <typeparam name="T">词法单元标识符的类型，必须是一个枚举类型。</typeparam>
-	public abstract class TokenReader<T> : IDisposable, IEnumerable<Token<T>>
+	public abstract class TokenReader<T> : IDisposable
 		where T : struct
 	{
 		/// <summary>
 		/// 要读取的下一个词法单元。
 		/// </summary>
-		private Token<T> nextToken;
+		private Token<T>? nextToken;
 		/// <summary>
 		/// 是否已读取下一个词法单元。
 		/// </summary>
 		private bool peekToken;
+
 		/// <summary>
 		/// 使用要扫描的源文件初始化 <see cref="TokenReader{T}"/> 类的新实例。
 		/// </summary>
-		/// <param name="reader">要使用的源文件读取器。</param>
-		/// <exception cref="ArgumentNullException"><paramref name="reader"/> 为 <c>null</c>。</exception>
-		protected TokenReader(SourceReader reader)
+		/// <param name="source">要使用的源文件读取器。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="source"/> 为 <c>null</c>。</exception>
+		protected TokenReader(SourceReader source)
 		{
-			CommonExceptions.CheckArgumentNull(reader, "reader");
-			Contract.EndContractBlock();
-			this.Source = reader;
+			CommonExceptions.CheckArgumentNull(source);
+			Source = source;
 		}
+
+		/// <summary>
+		/// 要扫描的源文件。
+		/// </summary>
+		protected SourceReader Source { get; }
+
+		/// <summary>
+		/// 读取输入流中的下一个词法单元并提升输入流的字符位置。
+		/// </summary>
+		/// <returns>输入流中的下一个词法单元。</returns>
+		public Token<T>? Read()
+		{
+			if (peekToken)
+			{
+				peekToken = false;
+				return nextToken;
+			}
+			return InternalRead();
+		}
+
+		/// <summary>
+		/// 读取输入流中的下一个词法单元，但是并不更改读取器的状态。
+		/// </summary>
+		/// <returns>输入流中的下一个词法单元。</returns>
+		public Token<T>? Peek()
+		{
+			if (!peekToken)
+			{
+				peekToken = true;
+				nextToken = InternalRead();
+			}
+			return nextToken;
+		}
+
+		/// <summary>
+		/// 读取输入流中的下一个词法单元并提升输入流的字符位置。
+		/// </summary>
+		/// <returns>输入流中的下一个词法单元。</returns>
+		protected abstract Token<T>? InternalRead();
 
 		#region IDisposable 成员
 
@@ -46,9 +81,10 @@ namespace Cyjb.Text
 		/// </overloads>
 		public void Dispose()
 		{
-			this.Dispose(true);
+			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
+
 		/// <summary>
 		/// 执行与释放或重置非托管资源相关的应用程序定义的任务。
 		/// </summary>
@@ -57,85 +93,11 @@ namespace Cyjb.Text
 		{
 			if (disposing)
 			{
-				this.Source.Dispose();
+				Source.Dispose();
 			}
 		}
 
 		#endregion // IDisposable 成员
-
-		/// <summary>
-		/// 获取要扫描的源文件。
-		/// </summary>
-		/// <value>要扫描的源文件。</value>
-		public SourceReader Source { get; private set; }
-		/// <summary>
-		/// 读取输入流中的下一个词法单元并提升输入流的字符位置。
-		/// </summary>
-		/// <returns>输入流中的下一个词法单元。</returns>
-		public Token<T> ReadToken()
-		{
-			if (this.peekToken)
-			{
-				this.peekToken = false;
-				return this.nextToken;
-			}
-			return InternalReadToken();
-		}
-		/// <summary>
-		/// 读取输入流中的下一个词法单元，但是并不更改读取器的状态。
-		/// </summary>
-		/// <returns>输入流中的下一个词法单元。</returns>
-		public Token<T> PeekToken()
-		{
-			if (!this.peekToken)
-			{
-				this.peekToken = true;
-				this.nextToken = InternalReadToken();
-			}
-			return this.nextToken;
-		}
-		/// <summary>
-		/// 读取输入流中的下一个词法单元并提升输入流的字符位置。
-		/// </summary>
-		/// <returns>输入流中的下一个词法单元。</returns>
-		protected abstract Token<T> InternalReadToken();
-
-		#region IEnumerable<Token<T>> 成员
-
-		/// <summary>
-		/// 返回一个循环访问集合的枚举器。
-		/// </summary>
-		/// <returns>可用于循环访问集合的 <see cref="IEnumerator{T}"/>。</returns>
-		/// <remarks>在枚举的时候，<see cref="TokenReader{T}"/> 会不断的读出词法单元，
-		/// 应当总是只使用一个枚举器。在使用多个枚举器时，他们之间会相互干扰，导致枚举值与期望的不同。
-		/// 如果需要多次枚举，必须将词法单元缓存到数组中，再进行枚举。</remarks>
-		public IEnumerator<Token<T>> GetEnumerator()
-		{
-			while (true)
-			{
-				Token<T> token = this.ReadToken();
-				yield return token;
-				if (token.IsEndOfFile)
-				{
-					break;
-				}
-			}
-		}
-
-		#endregion // IEnumerable<Token<T>> 成员
-
-		#region IEnumerable 成员
-
-		/// <summary>
-		/// 返回一个循环访问集合的枚举器。
-		/// </summary>
-		/// <returns>可用于循环访问集合的 <see cref="IEnumerator"/>。</returns>
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return this.GetEnumerator();
-		}
-
-		#endregion // IEnumerable 成员
 
 	}
 }

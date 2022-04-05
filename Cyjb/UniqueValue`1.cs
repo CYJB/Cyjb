@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
+﻿using System.Diagnostics;
 
 namespace Cyjb
 {
@@ -14,16 +12,17 @@ namespace Cyjb
 		/// 要获取的唯一值。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private TValue uniqueValue;
+		private TValue? uniqueValue;
 		/// <summary>
 		/// 获取的值是否是唯一的。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private Tristate isUnique = Tristate.NotSure;
+		private bool? isUnique;
 		/// <summary>
 		/// 值相等的比较器。
 		/// </summary>
 		private readonly IEqualityComparer<TValue> comparer;
+
 		/// <summary>
 		/// 初始化 <see cref="UniqueValue{TValue}"/> 类的新实例。
 		/// </summary>
@@ -34,7 +33,7 @@ namespace Cyjb
 		/// </overloads>
 		public UniqueValue()
 		{
-			this.comparer = EqualityComparer<TValue>.Default;
+			comparer = EqualityComparer<TValue>.Default;
 		}
 		/// <summary>
 		/// 使用指定的比较器初始化 <see cref="UniqueValue{TValue}"/> 类的新实例。
@@ -42,7 +41,7 @@ namespace Cyjb
 		/// <param name="comparer">值相等的比较器。</param>
 		public UniqueValue(IEqualityComparer<TValue> comparer)
 		{
-			this.comparer = comparer ?? EqualityComparer<TValue>.Default;
+			this.comparer = comparer;
 		}
 		/// <summary>
 		/// 使用指定的初始值初始化 <see cref="UniqueValue{TValue}"/> 类的新实例。
@@ -52,7 +51,7 @@ namespace Cyjb
 			: this()
 		{
 			uniqueValue = value;
-			isUnique = Tristate.True;
+			isUnique = true;
 		}
 		/// <summary>
 		/// 使用指定的初始值和比较器初始化 <see cref="UniqueValue{TValue}"/> 类的新实例。
@@ -63,39 +62,31 @@ namespace Cyjb
 			: this(comparer)
 		{
 			uniqueValue = value;
-			isUnique = Tristate.True;
+			isUnique = true;
 		}
+
 		/// <summary>
 		/// 获取或设置唯一的值。
 		/// </summary>
-		/// <value>
-		/// 如果值是唯一的，则为唯一的值；如果值是重复的，则为第一次设置的值；
-		/// 如果值未设置，则返回值是不可预料的。
-		/// </value>
-		public TValue Value
+		/// <value>如果值是唯一的，则为唯一的值；否则返回 <typeparamref name="TValue"/> 的默认值。</value>
+		public TValue? Value
 		{
 			get { return uniqueValue; }
 			set
 			{
-				if (isUnique == Tristate.NotSure)
+				if (isUnique == null)
 				{
 					uniqueValue = value;
-					isUnique = Tristate.True;
+					isUnique = true;
 				}
-				else if (!comparer.Equals(Value, value))
+				else if (isUnique == true && !comparer.Equals(Value, value))
 				{
-					isUnique = Tristate.False;
+					isUnique = false;
+					uniqueValue = default;
 				}
 			}
 		}
-		/// <summary>
-		/// 获取唯一的值。
-		/// </summary>
-		/// <value>如果值是唯一的，则为唯一的值；否则返回 <typeparamref name="TValue"/> 的默认值。</value>
-		public TValue ValueOrDefault
-		{
-			get { return IsUnique ? uniqueValue : default(TValue); }
-		}
+
 		/// <summary>
 		/// 获取被设置的值是否是唯一的。
 		/// </summary>
@@ -103,8 +94,9 @@ namespace Cyjb
 		/// 如果值未被设置，或者不唯一，则为 <c>false</c>。</value>
 		public bool IsUnique
 		{
-			get { return isUnique == Tristate.True; }
+			get { return isUnique == true; }
 		}
+
 		/// <summary>
 		/// 获取被设置的值是否是冲突的。
 		/// </summary>
@@ -112,38 +104,39 @@ namespace Cyjb
 		/// 如果值未被设置，或者值唯一，则为 <c>false</c>。</value>
 		public bool IsAmbig
 		{
-			get { return isUnique == Tristate.False; }
+			get { return isUnique == false; }
 		}
+
 		/// <summary>
 		/// 获取是否还未设置值。
 		/// </summary>
 		/// <value>如果值已被设置，则为 <c>true</c>；否则为 <c>false</c>。</value>
 		public bool IsEmpty
 		{
-			get { return isUnique == Tristate.NotSure; }
+			get { return isUnique == null; }
 		}
+
 		/// <summary>
 		/// 将值重置为未设置状态。
 		/// </summary>
 		public void Reset()
 		{
-			isUnique = Tristate.NotSure;
+			isUnique = null;
+			uniqueValue = default;
 		}
+
 		/// <summary>
 		/// 返回当前对象的字符串表示形式。
 		/// </summary>
 		/// <returns>当前对象的字符串表示形式。</returns>
 		public override string ToString()
 		{
-			switch (isUnique)
+			return isUnique switch
 			{
-				case Tristate.True:
-					return string.Format(CultureInfo.InvariantCulture, Resources.UniqueValue_Unique, uniqueValue);
-				case Tristate.False:
-					return Resources.UniqueValue_Ambig;
-				default:
-					return Resources.UniqueValue_Empty;
-			}
+				true => ResourcesUtil.Format(Resources.UniqueValue_Unique, uniqueValue),
+				false => Resources.UniqueValue_Ambig,
+				_ => Resources.UniqueValue_Empty,
+			};
 		}
 	}
 }

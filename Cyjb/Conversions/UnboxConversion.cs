@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
-using System.Reflection.Emit;
+﻿using System.Reflection.Emit;
 
 namespace Cyjb.Conversions
 {
@@ -13,10 +11,12 @@ namespace Cyjb.Conversions
 		/// <see cref="UnboxConversion"/> 的默认实例。
 		/// </summary>
 		public static readonly Conversion Default = new UnboxConversion();
+
 		/// <summary>
 		/// 初始化 <see cref="UnboxConversion"/> 类的新实例。
 		/// </summary>
 		private UnboxConversion() : base(ConversionType.Unbox) { }
+
 		/// <summary>
 		/// 写入类型转换的 IL 指令。
 		/// </summary>

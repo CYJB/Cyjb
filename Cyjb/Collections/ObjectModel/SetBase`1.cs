@@ -1,77 +1,60 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-
 namespace Cyjb.Collections.ObjectModel
 {
 	/// <summary>
 	/// 为泛型集合提供基类。
 	/// </summary>
 	/// <typeparam name="T">集合中的元素类型。</typeparam>
-	[Serializable, DebuggerDisplay("Count = {Count}")]
-	[DebuggerTypeProxy(typeof(CollectionDebugView<>))]
-	public class SetBase<T> : ISet<T>, ICollection
+	public abstract class SetBase<T> : CollectionBase<T>, ISet<T>
 	{
 		/// <summary>
-		/// 提供同步的对象。
-		/// </summary>
-		[NonSerialized, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private object syncRoot;
-		/// <summary>
-		/// 被包装的内部 <see cref="ISet{T}"/>。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private readonly ISet<T> items;
-		/// <summary>
 		/// 初始化 <see cref="SetBase{T}"/> 类的新实例。
 		/// </summary>
-		/// <overloads>
+		protected SetBase() : base() { }
+
 		/// <summary>
-		/// 初始化 <see cref="SetBase{T}"/> 类的新实例。
+		/// 确定当前集与指定集合相比，相同的和未包含的元素数目。
 		/// </summary>
-		/// </overloads>
-		protected SetBase()
-			: this(new HashSet<T>())
-		{ }
-		/// <summary>
-		/// 将 <see cref="SetBase{T}"/> 类的新实例初始化为指定集合的包装。
-		/// </summary>
-		/// <param name="set">由新的集合包装的集合。</param>
-		/// <remarks>如果 <paramref name="set"/> 实现了 <see cref="ISet{T}"/>
-		/// 接口，则使用 <paramref name="set"/> 作为内部集合；否则使用 
-		/// <see cref="HashSet{T}"/> 作为内部集合。</remarks>
-		protected SetBase(IEnumerable<T> set)
+		/// <param name="other">要与当前集进行比较的集合。</param>
+		/// <param name="returnIfUnfound">是否遇到未包含的元素就返回。</param>
+		/// <returns>当前集合中相同元素和为包含的元素数目。</returns>
+		protected virtual (int sameCount, int unfoundCount) CountElements(IEnumerable<T> other,
+			bool returnIfUnfound)
 		{
-			if (set != null)
+			int sameCount = 0, unfoundCount = 0;
+			HashSet<T> uniqueSet = new();
+			foreach (T item in other)
 			{
-				this.items = set as ISet<T> ?? new HashSet<T>(set);
+				if (Contains(item))
+				{
+					if (uniqueSet.Add(item))
+					{
+						sameCount++;
+					}
+				}
+				else
+				{
+					unfoundCount++;
+					if (returnIfUnfound)
+					{
+						break;
+					}
+				}
 			}
-		}
-		/// <summary>
-		/// 获取被 <see cref="SetBase{T}"/> 包装的内部 <see cref="ISet{T}"/>。
-		/// </summary>
-		/// <value>被 <see cref="SetBase{T}"/> 包装的内部 <see cref="ISet{T}"/>。</value>
-		protected ISet<T> Items
-		{
-			get { return items; }
+			return (sameCount, unfoundCount);
 		}
 
-		#region SetBase<T> 成员
+		#region CollectionBase<T> 成员
 
 		/// <summary>
-		/// 向当前集合内添加元素，并返回一个指示是否已成功添加元素的值。
+		/// 将指定对象添加到当前集合中。
 		/// </summary>
-		/// <param name="item">要添加到 <see cref="SetBase{T}"/> 的中的对象。</param>
-		/// <returns>如果该元素已添加到集合内，则为 <c>true</c>；
-		/// 如果该元素已在集合内，则为 <c>false</c>。</returns>
-		protected virtual bool AddItem(T item)
+		/// <param name="item">要添加到当前集合的对象。</param>
+		protected override void AddItem(T item)
 		{
-			return this.items.Add(item);
+			Add(item);
 		}
 
-		#endregion // SetBase<T> 成员
+		#endregion // CollectionBase<T> 成员
 
 		#region ISet<T> 成员
 
@@ -79,149 +62,197 @@ namespace Cyjb.Collections.ObjectModel
 		/// 向当前集合内添加元素，并返回一个指示是否已成功添加元素的值。
 		/// </summary>
 		/// <param name="item">要添加到集合内的元素。</param>
-		/// <returns>如果该元素已添加到集合内，则为 <c>true</c>；
-		/// 如果该元素已在集合内，则为 <c>false</c>。</returns>
-		public bool Add(T item)
-		{
-			return this.AddItem(item);
-		}
+		/// <returns>如果该元素已添加到集合内，则为 <c>true</c>；如果该元素已在集合内，则为 <c>false</c>。</returns>
+		public new abstract bool Add(T item);
+
 		/// <summary>
 		/// 从当前集合内移除指定集合中的所有元素。
 		/// </summary>
 		/// <param name="other">要从集合内移除的项的集合。</param>
-		/// <exception cref="ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual void ExceptWith(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			this.items.ExceptWith(other);
+			CommonExceptions.CheckArgumentNull(other);
+			foreach (T item in other)
+			{
+				Remove(item);
+			}
 		}
+
 		/// <summary>
-		/// 修改当前集合，使该集合仅包含指定集合中也存在的元素。
+		/// 修改当前集合，使当前集合仅包含指定集合中也存在的元素。
 		/// </summary>
 		/// <param name="other">要与当前集合进行比较的集合。</param>
-		/// <exception cref="ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual void IntersectWith(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			this.items.IntersectWith(other);
+			CommonExceptions.CheckArgumentNull(other);
+			ISet<T> set = other as ISet<T> ?? new HashSet<T>(other);
+			List<T> removeList = new();
+			foreach (T item in this)
+			{
+				if (!set.Contains(item))
+				{
+					removeList.Add(item);
+				}
+			}
+			foreach (T item in removeList)
+			{
+				Remove(item);
+			}
 		}
+
 		/// <summary>
 		/// 确定当前集合是否为指定集合的真子集合。
 		/// </summary>
 		/// <param name="other">要与当前集合进行比较的集合。</param>
 		/// <returns>如果当前集合是 <paramref name="other"/> 的真子集合，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</returns>
-		/// <exception cref="ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
-		[Pure]
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool IsProperSubsetOf(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			return this.items.IsProperSubsetOf(other);
+			CommonExceptions.CheckArgumentNull(other);
+			if (Count == 0)
+			{
+				return other.Any();
+			}
+			var (sameCount, unfoundCount) = CountElements(other, false);
+			return sameCount == Count && unfoundCount > 0;
 		}
+
 		/// <summary>
 		/// 确定当前集合是否为指定集合的真超集合。
 		/// </summary>
 		/// <param name="other">要与当前集合进行比较的集合。</param>
 		/// <returns>如果当前集合是 <paramref name="other"/> 的真超集合，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</returns>
-		/// <exception cref="ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
-		[Pure]
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool IsProperSupersetOf(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			return this.items.IsProperSubsetOf(other);
+			CommonExceptions.CheckArgumentNull(other);
+			if (Count == 0)
+			{
+				return false;
+			}
+			var (sameCount, unfoundCount) = CountElements(other, true);
+			return sameCount < Count && unfoundCount == 0;
 		}
+
 		/// <summary>
 		/// 确定当前集合是否为指定集合的子集合。
 		/// </summary>
 		/// <param name="other">要与当前集合进行比较的集合。</param>
 		/// <returns>如果当前集合是 <paramref name="other"/> 的子集合，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</returns>
-		/// <exception cref="ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
-		[Pure]
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool IsSubsetOf(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			return this.items.IsSubsetOf(other);
+			CommonExceptions.CheckArgumentNull(other);
+			if (Count == 0)
+			{
+				return true;
+			}
+			var (sameCount, unfoundCount) = CountElements(other, false);
+			return sameCount == Count && unfoundCount >= 0;
 		}
+
 		/// <summary>
 		/// 确定当前集合是否为指定集合的超集合。
 		/// </summary>
 		/// <param name="other">要与当前集合进行比较的集合。</param>
 		/// <returns>如果当前集合是 <paramref name="other"/> 的超集合，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</returns>
-		/// <exception cref="ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
-		[Pure]
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool IsSupersetOf(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			return this.items.IsSupersetOf(other);
+			CommonExceptions.CheckArgumentNull(other);
+			if (Count == 0)
+			{
+				return !other.Any();
+			}
+			return other.All(Contains);
 		}
+
 		/// <summary>
 		/// 确定当前集合是否与指定的集合重叠。
 		/// </summary>
 		/// <param name="other">要与当前集合进行比较的集合。</param>
 		/// <returns>如果当前集合与 <paramref name="other"/> 
 		/// 至少共享一个通用元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <exception cref="ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
-		[Pure]
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool Overlaps(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			return this.items.Overlaps(other);
+			CommonExceptions.CheckArgumentNull(other);
+			if (Count == 0)
+			{
+				return false;
+			}
+			return other.Any(Contains);
 		}
+
 		/// <summary>
 		/// 确定当前集合与指定的集合中是否包含相同的元素。
 		/// </summary>
 		/// <param name="other">要与当前集合进行比较的集合。</param>
 		/// <returns>如果当前集合等于 <paramref name="other"/>，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</returns>
-		/// <exception cref="ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
-		[Pure]
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool SetEquals(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			return this.items.SetEquals(other);
+			CommonExceptions.CheckArgumentNull(other);
+			if (Count == 0)
+			{
+				return !other.Any();
+			}
+			var (sameCount, unfoundCount) = CountElements(other, true);
+			return (sameCount == Count && unfoundCount == 0);
 		}
+
 		/// <summary>
 		/// 修改当前集合，使该集合仅包含当前集合或指定集合中存在的元素（但不可包含两者共有的元素）。
 		/// </summary>
 		/// <param name="other">要与当前集合进行比较的集合。</param>
-		/// <exception cref="ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual void SymmetricExceptWith(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			this.items.SymmetricExceptWith(other);
+			CommonExceptions.CheckArgumentNull(other);
+			if (Count == 0)
+			{
+				UnionWith(other);
+			}
+			else if (ReferenceEquals(this, other))
+			{
+				Clear();
+			}
+			List<T> commonSet = new();
+			List<T> restSet = new();
+			foreach (T item in other)
+			{
+				if (Contains(item))
+				{
+					commonSet.Add(item);
+				}
+				else
+				{
+					restSet.Add(item);
+				}
+			}
+			ExceptWith(commonSet);
+			UnionWith(restSet);
 		}
+
 		/// <summary>
 		/// 修改当前集合，使该集合包含当前集合和指定集合中同时存在的所有元素。
 		/// </summary>
 		/// <param name="other">要与当前集合进行比较的集合。</param>
-		/// <exception cref="ArgumentNullException">
-		/// <paramref name="other"/> 为 <c>null</c>。</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual void UnionWith(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			this.items.UnionWith(other);
+			CommonExceptions.CheckArgumentNull(other);
+			foreach (T item in other)
+			{
+				Add(item);
+			}
 		}
 
 		#endregion
@@ -229,160 +260,15 @@ namespace Cyjb.Collections.ObjectModel
 		#region ICollection<T> 成员
 
 		/// <summary>
-		/// 获取 <see cref="SetBase{T}"/> 中包含的元素数。
-		/// </summary>
-		/// <value><see cref="SetBase{T}"/> 中包含的元素数。</value>
-		public virtual int Count
-		{
-			get { return this.items.Count; }
-		}
-		/// <summary>
-		/// 获取一个值，该值指示 <see cref="SetBase{T}"/> 是否为只读。
-		/// </summary>
-		/// <value>如果 <see cref="SetBase{T}"/> 为只读，则为 <c>true</c>；
-		/// 否则为 <c>false</c>。</value>
-		bool ICollection<T>.IsReadOnly
-		{
-			get { return false; }
-		}
-		/// <summary>
 		/// 将指定对象添加到 <see cref="SetBase{T}"/> 中。
 		/// </summary>
 		/// <param name="item">要添加到 <see cref="SetBase{T}"/> 的对象。</param>
 		void ICollection<T>.Add(T item)
 		{
-			this.AddItem(item);
-		}
-		/// <summary>
-		/// 从 <see cref="SetBase{T}"/> 中移除所有元素。
-		/// </summary>
-		public virtual void Clear()
-		{
-			this.items.Clear();
-		}
-		/// <summary>
-		/// 确定 <see cref="SetBase{T}"/> 是否包含特定值。
-		/// </summary>
-		/// <param name="item">要在 <see cref="SetBase{T}"/> 中定位的对象。</param>
-		/// <returns>如果在 <see cref="SetBase{T}"/> 中找到 <paramref name="item"/>，
-		/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		[Pure]
-		public virtual bool Contains(T item)
-		{
-			return this.items.Contains(item);
-		}
-		/// <summary>
-		/// 从特定的 <see cref="Array"/> 索引处开始，将 <see cref="SetBase{T}"/> 
-		/// 的元素复制到一个 <see cref="Array"/> 中。
-		/// </summary>
-		/// <param name="array">从 <see cref="SetBase{T}"/> 
-		/// 复制的元素的目标位置的一维 <see cref="Array"/>。
-		/// <paramref name="array"/> 必须具有从零开始的索引。</param>
-		/// <param name="arrayIndex"><paramref name="array"/> 中从零开始的索引，在此处开始复制。</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// <paramref name="array"/> 为 <c>null</c>。</exception>
-		/// <exception cref="System.ArgumentOutOfRangeException">
-		/// <paramref name="arrayIndex"/> 小于零。</exception>
-		/// <exception cref="System.ArgumentException">
-		/// <paramref name="array"/> 是多维的。</exception>
-		/// <exception cref="System.ArgumentException"><see cref="SetBase{T}"/> 
-		/// 中的元素数目大于从 <paramref name="arrayIndex"/> 到目标 <paramref name="array"/> 
-		/// 末尾之间的可用空间。</exception>
-		public void CopyTo(T[] array, int arrayIndex)
-		{
-			CollectionHelper.CopyTo(this, array, arrayIndex);
-		}
-		/// <summary>
-		/// 从 <see cref="SetBase{T}"/> 中移除特定对象的第一个匹配项。
-		/// </summary>
-		/// <param name="item">要从 <see cref="SetBase{T}"/> 中移除的对象。</param>
-		/// <returns>如果已从 <see cref="SetBase{T}"/> 中成功移除 <paramref name="item"/>，
-		/// 则为 <c>true</c>；否则为 <c>false</c>。如果在原始 <see cref="SetBase{T}"/> 
-		/// 中没有找到 <paramref name="item"/>，该方法也会返回 <c>false</c>。</returns>
-		public virtual bool Remove(T item)
-		{
-			return this.items.Remove(item);
+			Add(item);
 		}
 
 		#endregion // ICollection<T> 成员
-
-		#region ICollection 成员
-
-		/// <summary>
-		/// 获取一个值，该值指示是否同步对 <see cref="SetBase{T}"/> 的访问（线程安全）。
-		/// </summary>
-		/// <value>如果对 <see cref="SetBase{T}"/> 的访问是同步的（线程安全），
-		/// 则为 <c>true</c>；否则为 <c>false</c>。</value>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		bool ICollection.IsSynchronized
-		{
-			get { return false; }
-		}
-		/// <summary>
-		/// 获取一个可用于同步对 <see cref="SetBase{T}"/> 的访问的对象。
-		/// </summary>
-		/// <value>可用于同步对 <see cref="SetBase{T}"/> 的访问的对象。</value>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		object ICollection.SyncRoot
-		{
-			get
-			{
-				if (this.syncRoot == null)
-				{
-					CollectionHelper.CreateSyncRoot(this.items, ref this.syncRoot);
-				}
-				return this.syncRoot;
-			}
-		}
-		/// <summary>
-		/// 从特定的 <see cref="Array"/> 索引处开始，将 <see cref="SetBase{T}"/> 
-		/// 的元素复制到一个 <see cref="Array"/> 中。
-		/// </summary>
-		/// <param name="array">从 <see cref="SetBase{T}"/> 
-		/// 复制的元素的目标位置的一维 <see cref="System.Array"/>。
-		/// <paramref name="array"/> 必须具有从零开始的索引。</param>
-		/// <param name="index"><paramref name="array"/> 中从零开始的索引，在此处开始复制。</param>
-		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
-		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于零。</exception>
-		/// <exception cref="ArgumentException"><paramref name="array"/> 是多维的。</exception>
-		/// <exception cref="ArgumentException"><see cref="SetBase{T}"/> 
-		/// 中的元素数目大于从 <paramref name="index"/> 到目标 <paramref name="array"/> 
-		/// 末尾之间的可用空间。</exception>
-		/// <exception cref="ArgumentException">源 <see cref="SetBase{T}"/> 
-		/// 的类型无法自动转换为目标 <paramref name="array"/> 的类型。</exception>
-		void ICollection.CopyTo(Array array, int index)
-		{
-			CollectionHelper.CopyTo(this, array, index);
-		}
-
-		#endregion // ICollection 成员
-
-		#region IEnumerable<T> 成员
-
-		/// <summary>
-		/// 返回一个循环访问集合的枚举器。
-		/// </summary>
-		/// <returns>可用于循环访问集合的 <see cref="IEnumerator{T}"/>。</returns>
-		[Pure]
-		public virtual IEnumerator<T> GetEnumerator()
-		{
-			return this.items.GetEnumerator();
-		}
-
-		#endregion // IEnumerable<T> 成员
-
-		#region IEnumerable 成员
-
-		/// <summary>
-		/// 返回一个循环访问集合的枚举器。
-		/// </summary>
-		/// <returns>可用于循环访问集合的 <see cref="IEnumerator"/>。</returns>
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return this.GetEnumerator();
-		}
-
-		#endregion // IEnumerable 成员
 
 	}
 }

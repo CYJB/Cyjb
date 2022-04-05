@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Reflection.Emit;
 using Cyjb.Reflection;
 
@@ -23,6 +21,7 @@ namespace Cyjb.Conversions
 		/// 显式枚举转换的实例。
 		/// </summary>
 		public static readonly Conversion ExplicitEnum = new DecimalConversion(ConversionType.Enum);
+
 		/// <summary>
 		/// 使用指定的转换类型初始化 <see cref="DecimalConversion"/> 类的新实例。
 		/// </summary>
@@ -30,6 +29,7 @@ namespace Cyjb.Conversions
 		private DecimalConversion(ConversionType conversionType)
 			: base(conversionType)
 		{ }
+
 		/// <summary>
 		/// 写入类型转换的 IL 指令。
 		/// </summary>
@@ -39,16 +39,15 @@ namespace Cyjb.Conversions
 		/// <param name="isChecked">是否执行溢出检查。</param>
 		public override void Emit(ILGenerator generator, Type inputType, Type outputType, bool isChecked)
 		{
-			Contract.Assume((inputType == typeof(decimal) && outputType.IsNumeric()) ||
-				(outputType == typeof(decimal) && inputType.IsNumeric()));
 			MethodInfo method;
+			UserConversionCache cache = UserConversionCache.GetConversions(typeof(decimal))!;
 			if (inputType == typeof(decimal))
 			{
 				if (outputType.IsEnum)
 				{
 					outputType = Enum.GetUnderlyingType(outputType);
 				}
-				method = UserConversionCache.GetConversionTo(inputType, outputType);
+				method = cache.GetConversionTo(outputType)!;
 			}
 			else
 			{
@@ -56,7 +55,7 @@ namespace Cyjb.Conversions
 				{
 					inputType = Enum.GetUnderlyingType(inputType);
 				}
-				method = UserConversionCache.GetConversionFrom(outputType, inputType);
+				method = cache.GetConversionFrom(inputType)!;
 			}
 			generator.EmitCall(method);
 		}

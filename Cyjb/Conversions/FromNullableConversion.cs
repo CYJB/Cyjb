@@ -1,7 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
-using System.Reflection;
-using System.Reflection.Emit;
+﻿using System.Reflection.Emit;
 using Cyjb.Reflection;
 
 namespace Cyjb.Conversions
@@ -18,12 +15,19 @@ namespace Cyjb.Conversions
 		/// <summary>
 		/// <see cref="FromNullableConversion"/> 的用户自定义类型转换实例。
 		/// </summary>
-		public static readonly Conversion UserDefined = new FromNullableConversion(ConversionType.UserDefined);
+		public static readonly Conversion UserDefined = new FromNullableConversion(ConversionType.ExplicitUserDefined);
+
 		/// <summary>
 		/// 使用指定的转换类型初始化 <see cref="FromNullableConversion"/> 类的新实例。
 		/// </summary>
 		/// <param name="conversionType">当前转换的类型。</param>
 		private FromNullableConversion(ConversionType conversionType) : base(conversionType) { }
+
+		/// <summary>
+		/// 是否需要使用地址作为入参。
+		/// </summary>
+		public override bool PassByAddr => true;
+
 		/// <summary>
 		/// 写入类型转换的 IL 指令。
 		/// </summary>
@@ -33,13 +37,13 @@ namespace Cyjb.Conversions
 		/// <param name="isChecked">是否执行溢出检查。</param>
 		public override void Emit(ILGenerator generator, Type inputType, Type outputType, bool isChecked)
 		{
-			Contract.Assume(inputType.IsNullable());
-			Type inputUnderlyingType = Nullable.GetUnderlyingType(inputType);
-			generator.EmitCall(inputType.GetMethod("get_Value"));
+			// 调用方已保证这里是 Nullable<T>，且 inputType 可以转换到 outputType。
+			Type inputUnderlyingType = Nullable.GetUnderlyingType(inputType)!;
+			// 会由调用方确保这里是地址。
+			generator.EmitCall(inputType.GetMethod("get_Value")!);
 			if (inputUnderlyingType != outputType)
 			{
-				Conversion conversion = ConversionFactory.GetConversion(inputUnderlyingType, outputType);
-				Contract.Assume(conversion != null);
+				Conversion conversion = ConversionFactory.GetConversion(inputUnderlyingType, outputType)!;
 				conversion.Emit(generator, inputUnderlyingType, outputType, isChecked);
 			}
 		}

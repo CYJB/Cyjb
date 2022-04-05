@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Reflection;
-using Cyjb.Collections;
 
 namespace Cyjb.Reflection
 {
@@ -17,50 +12,36 @@ namespace Cyjb.Reflection
 		/// 返回方法的参数信息。
 		/// </summary>
 		/// <param name="method">要获取参数信息的方法。</param>
-		/// <param name="types">方法实参类型数组，其长度必须大于等于方法的参数个数。
-		/// 使用 <see cref="Missing"/> 表示无需进行类型检查，<c>null</c> 表示引用类型标志。</param>
+		/// <param name="arguments">方法实参类型数组，其长度必须大于等于方法的必选参数个数。
+		/// 使用 <c>null</c> 表示无需对指定位置进行类型检查。</param>
 		/// <param name="options">方法参数信息的选项。</param>
 		/// <returns>方法的参数信息。</returns>
-		public static MethodArgumentsInfo GetInfo(MethodBase method, Type[] types, MethodArgumentsOption options)
+		public static MethodArgumentsInfo? GetInfo(MethodBase method, Type?[] arguments, MethodArgumentsOption options)
 		{
-			Contract.Requires(method != null && types != null);
-			MethodArgumentsInfo result = new MethodArgumentsInfo(method, types);
-			bool optionalParamBinding = options.HasFlag(MethodArgumentsOption.OptionalParamBinding);
+			MethodArgumentsInfo result = new(method, arguments);
 			bool isExplicit = options.HasFlag(MethodArgumentsOption.Explicit);
 			bool convertRefType = options.HasFlag(MethodArgumentsOption.ConvertRefType);
-			// 填充方法实例。
-			int offset = 0;
 			if (options.HasFlag(MethodArgumentsOption.ContainsInstance))
 			{
-				if (!result.MarkInstanceType(isExplicit, convertRefType))
+				if (!result.DetectInstanceType(isExplicit, convertRefType))
 				{
 					return null;
 				}
-				offset++;
 			}
 			// 填充 params 参数和可变参数。
-			if (!result.FillParamArray(isExplicit, convertRefType))
+			if (!result.DetectParamArray(isExplicit))
 			{
 				return null;
 			}
-			// 检查实参是否与形参对应，未对应的参数是否包含默认值。
-			ParameterInfo[] parameters = method.GetParametersNoCopy();
-			int paramLen = parameters.Length;
-			if (result.ParamArrayType != null)
+			// 检查固定实参类型。
+			bool optionalParamBinding = options.HasFlag(MethodArgumentsOption.OptionalParamBinding);
+			if (!result.DetectFixedArguments(optionalParamBinding, isExplicit, convertRefType))
 			{
-				paramLen--;
-				Contract.Assume(paramLen >= 0);
+				return null;
 			}
-			for (int i = 0, j = offset; i < paramLen; i++, j++)
-			{
-				if (!CheckParameter(parameters[i], types[j], optionalParamBinding, isExplicit, convertRefType))
-				{
-					return null;
-				}
-			}
-			result.fixedArguments = new ArrayAdapter<Type>(types, offset, paramLen);
 			return result;
 		}
+
 		/// <summary>
 		/// 方法信息。
 		/// </summary>
@@ -70,118 +51,70 @@ namespace Cyjb.Reflection
 		/// 方法实参类型列表。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private readonly Type[] arguments;
+		private readonly Type?[] arguments;
 		/// <summary>
 		/// 方法实例实参类型。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private Type instanceType;
+		private Type? instanceType;
 		/// <summary>
 		/// 方法的固定实参列表。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private ArrayAdapter<Type> fixedArguments;
+		private ArraySegment<Type?> fixedArguments = new();
 		/// <summary>
 		/// params 形参的类型。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private Type paramArrayType;
+		private Type? paramArrayType;
 		/// <summary>
 		/// params 实参的类型。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private IList<Type> paramArgumentTypes;
+		private ArraySegment<Type?>? paramArgumentTypes;
 		/// <summary>
 		/// 可变参数的类型。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private IList<Type> optionalArgumentTypes;
-		/// <summary>
-		/// 方法泛型参数类型的推断结果。
-		/// </summary>
-		public Type[] GenericArguments;
+		private ArraySegment<Type?>? optionalArgumentTypes;
+
 		/// <summary>
 		/// 使用指定的方法信息和实参类型列表初始化 <see cref="MethodArgumentsInfo"/> 类的新实例。
 		/// </summary>
 		/// <param name="method">方法信息。</param>
-		/// <param name="types">方法实参类型列表。</param>
-		private MethodArgumentsInfo(MethodBase method, Type[] types)
+		/// <param name="arguments">方法实参类型列表。</param>
+		private MethodArgumentsInfo(MethodBase method, Type?[] arguments)
 		{
-			Contract.Requires(method != null && types != null);
 			this.method = method;
-			this.arguments = types;
+			this.arguments = arguments;
 		}
+
 		/// <summary>
 		/// 获取方法实例实参类型。
 		/// </summary>
 		/// <value>方法实例实参类型。<c>null</c> 表示不是实例方法。</value>
-		public Type InstanceType
-		{
-			get { return this.instanceType; }
-		}
+		public Type? InstanceType => instanceType;
 		/// <summary>
 		/// 获取方法的固定实参列表。
 		/// </summary>
 		/// <value>方法的固定实参列表。如果 <see cref="ParamArrayType"/> 不为 <c>null</c>，
 		/// 则不包含最后的 params 参数。</value>
-		/// <remarks>列表元素为 <see cref="Missing"/> 表示使用参数默认值或空数组（对于 params 参数）；
-		/// 为 <c>null</c> 表示实参值是 <c>null</c>，仅具有引用类型的约束。</remarks>
-		public IList<Type> FixedArguments
-		{
-			get { return this.fixedArguments; }
-		}
+		public IList<Type?> FixedArguments => fixedArguments;
 		/// <summary>
 		/// 获取 params 形参的类型。
 		/// </summary>
 		/// <value>params 形参的类型，如果为 <c>null</c> 表示无需特殊处理 params 参数。</value>
-		public Type ParamArrayType
-		{
-			get { return this.paramArrayType; }
-		}
+		public Type? ParamArrayType => paramArrayType;
 		/// <summary>
 		/// 获取 params 实参的类型列表。
 		/// </summary>
 		/// <value>params 实参的类型列表，如果为 <c>null</c> 表示无需特殊处理 params 参数。</value>
-		/// <remarks>列表元素为 <c>null</c> 表示实参值是 <c>null</c>，仅具有引用类型的约束。</remarks>
-		public IList<Type> ParamArgumentTypes
-		{
-			get { return this.paramArgumentTypes; }
-		}
+		public IList<Type?>? ParamArgumentTypes => paramArgumentTypes;
 		/// <summary>
 		/// 获取可变参数的类型。
 		/// </summary>
 		/// <value>可变参数的类型，如果为 <c>null</c> 表示没有可变参数。</value>
-		/// <remarks>列表元素为 <c>null</c> 表示实参值是 <c>null</c>，仅具有引用类型的约束。</remarks>
-		public IList<Type> OptionalArgumentTypes
-		{
-			get { return this.optionalArgumentTypes; }
-		}
-		/// <summary>
-		/// 清除 params 参数信息，表示无需特殊处理该参数。
-		/// </summary>
-		public void ClearParamArrayType()
-		{
-			if (this.paramArrayType != null)
-			{
-				this.paramArrayType = null;
-				this.paramArgumentTypes = null;
-				this.fixedArguments = new ArrayAdapter<Type>(this.arguments, this.fixedArguments.Offset,
-					this.fixedArguments.Count + 1);
-			}
-		}
-		/// <summary>
-		/// 更新 params 参数信息，因为该参数类型中可能包含泛型类型参数。
-		/// </summary>
-		/// <param name="newMethod">方法信息。</param>
-		public void UpdateParamArrayType(MethodBase newMethod)
-		{
-			Contract.Requires(newMethod != null);
-			if (this.paramArrayType != null)
-			{
-				ParameterInfo[] parameters = newMethod.GetParametersNoCopy();
-				this.paramArrayType = parameters[parameters.Length - 1].ParameterType;
-			}
-		}
+		public IList<Type?>? OptionalArgumentTypes => optionalArgumentTypes;
 
 		#region 获取方法参数类型
 
@@ -191,203 +124,267 @@ namespace Cyjb.Reflection
 		/// <param name="isExplicit">类型检查时，使用显式类型转换，而不是默认的隐式类型转换。</param>
 		/// <param name="convertRefType">是否允许对按引用传递的类型进行类型转换。</param>
 		/// <returns>如果第一个参数可以作为方法的实例，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private bool MarkInstanceType(bool isExplicit, bool convertRefType)
+		private bool DetectInstanceType(bool isExplicit, bool convertRefType)
 		{
-			if (method.IsStatic)
+			// 静态方法没有实例入参，也需要至少有一个实参。
+			if (method.IsStatic || arguments.Length == 0)
 			{
 				return false;
 			}
-			if (this.arguments.Length == 0)
+			instanceType = arguments[0];
+			Type declaringType = method.DeclaringType!;
+			if (instanceType == null)
 			{
-				return false;
-			}
-			this.instanceType = this.arguments[0];
-			if (this.instanceType == null)
-			{
-				this.instanceType = this.method.DeclaringType;
-				Contract.Assume(this.instanceType != null);
-				return !this.instanceType.IsValueType;
-			}
-			if (this.instanceType == typeof(Missing))
-			{
+				instanceType = declaringType;
 				return true;
 			}
-			if (this.instanceType.IsByRef)
+			if (instanceType.IsByRef)
 			{
-				this.instanceType = this.instanceType.GetElementType();
+				instanceType = instanceType.GetElementType()!;
 				if (!convertRefType)
 				{
-					return method.DeclaringType == this.instanceType;
+					// 按引用传递时不支持逆变和协变。
+					return instanceType == declaringType;
 				}
 			}
-			Type declaringType = method.DeclaringType;
-			Contract.Assume(declaringType != null);
-			return declaringType.IsConvertFrom(this.instanceType, isExplicit);
+			return declaringType.IsConvertFrom(instanceType, isExplicit);
 		}
+
 		/// <summary>
-		/// 填充 params 参数和可变参数。
+		/// 检测 params 参数和可变参数，params 参数和可变参数均不支持按引用传递。
 		/// </summary>
 		/// <param name="isExplicit">类型检查时，使用显式类型转换，而不是默认的隐式类型转换。</param>
+		/// <returns>如果检测参数成功，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		private bool DetectParamArray(bool isExplicit)
+		{
+			ParameterInfo[] parameters = method.GetParametersNoCopy();
+			int argLen = arguments.Length;
+			int offset = parameters.Length + (instanceType == null ? 0 : 1);
+			if (method.CallingConvention.HasFlag(CallingConventions.VarArgs))
+			{
+				// 未传入可变参数。
+				if (offset >= argLen) { return true; }
+				optionalArgumentTypes = new ArraySegment<Type?>(arguments, offset, argLen - offset);
+				return true;
+			}
+			if (parameters.Length > 0)
+			{
+				ParameterInfo lastParam = parameters[^1];
+				if (lastParam.IsParamArray())
+				{
+					// 未传入 params 参数。
+					if (offset - 1 >= argLen) { return true; }
+					Type paramArrayType = lastParam.ParameterType;
+					if (offset == argLen)
+					{
+						// 只有一个 params 实参，可能是数组或者数组元素。
+						Type? type = arguments[^1];
+						// 是数组，不需要特殊处理 params 参数
+						if (type == null || paramArrayType.IsConvertFrom(type, isExplicit))
+						{
+							return true;
+						}
+						// 包含泛型参数时，无法确认类型兼容，认为实参是数组元素。
+						if (paramArrayType.ContainsGenericParameters ||
+							paramArrayType.GetElementType()!.IsConvertFrom(type, isExplicit))
+						{
+							this.paramArrayType = paramArrayType;
+							paramArgumentTypes = new ArraySegment<Type?>(arguments, offset - 1, 1);
+							return true;
+						}
+						return false;
+					}
+					// 有多个 params 实参，只能是数组元素。
+					this.paramArrayType = paramArrayType;
+					paramArgumentTypes = new(arguments, offset - 1, argLen + 1 - offset);
+					Type paramElementType = paramArrayType.GetElementType()!;
+					if (paramElementType.ContainsGenericParameters)
+					{
+						// 包含泛型参数时，无法确认类型兼容。
+						return true;
+					}
+					foreach (Type? type in paramArgumentTypes)
+					{
+						if (type != null && !paramElementType.IsConvertFrom(type, isExplicit))
+						{
+							return false;
+						}
+					}
+					return true;
+				}
+			}
+			return true;
+		}
+
+		/// <summary>
+		/// 检测固定实参类型。
+		/// </summary>
+		/// <param name="optionalParamBinding">是否对可选参数进行绑定。</param>
+		/// <param name="isExplicit">类型检查时，使用显式类型转换，而不是默认的隐式类型转换。</param>
 		/// <param name="convertRefType">是否允许对按引用传递的类型进行类型转换。</param>
-		/// <returns>如果第一个参数可以作为方法的实例，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		/// <returns>如果填充参数成功，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private bool FillParamArray(bool isExplicit, bool convertRefType)
+		/// <returns>如果成功检测固定实参类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		private bool DetectFixedArguments(bool optionalParamBinding, bool isExplicit, bool convertRefType)
 		{
 			ParameterInfo[] parameters = method.GetParametersNoCopy();
 			int paramLen = parameters.Length;
-			int offset = this.instanceType == null ? 0 : 1;
-			offset += paramLen;
-			if (method.CallingConvention.HasFlag(CallingConventions.VarArgs))
+			if (paramArrayType != null)
 			{
-				this.optionalArgumentTypes = new ArrayAdapter<Type>(this.arguments, offset);
-				return this.optionalArgumentTypes.All(type => type != null);
+				paramLen--;
 			}
-			if (paramLen > 0)
+			int offset = (instanceType == null ? 0 : 1);
+			fixedArguments = new ArraySegment<Type?>(arguments, offset, Math.Min(paramLen, arguments.Length - offset));
+			for (int i = 0; i < paramLen; i++)
 			{
-				ParameterInfo lastParam = parameters[paramLen - 1];
-				if (lastParam.IsParamArray())
+				ParameterInfo parameter = parameters[i];
+				if (i >= fixedArguments.Count)
 				{
-					this.paramArrayType = lastParam.ParameterType;
-					this.paramArgumentTypes = new ArrayAdapter<Type>(this.arguments, offset - 1);
-					return lastParam.ParameterType.ContainsGenericParameters || CheckParamArrayType(isExplicit, convertRefType);
-				}
-			}
-			// 检测方法实参数量。
-			return arguments.Length <= offset;
-		}
-		/// <summary>
-		/// 检查 params 参数类型。
-		/// </summary>
-		/// <param name="isExplicit">类型检查时，如果考虑显式类型转换，则为 <c>true</c>；
-		/// 否则只考虑隐式类型转换。</param>
-		/// <param name="convertRefType">是否允许对按引用传递的类型进行类型转换。</param>
-		/// <returns>如果 params 参数类型匹配，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private bool CheckParamArrayType(bool isExplicit, bool convertRefType)
-		{
-			int paramCnt = this.paramArgumentTypes.Count;
-			if (paramCnt == 0)
-			{
-				return true;
-			}
-			Type paramElementType = this.paramArrayType.GetElementType();
-			if (paramCnt == 1)
-			{
-				// 只有一个实参，可能是数组或数组元素。
-				Type type = this.paramArgumentTypes[0];
-				bool isTypeMatch;
-				if (type == null || type == typeof(Missing))
-				{
-					isTypeMatch = true;
-				}
-				else
-				{
-					if (type.IsByRef)
+					// 未指定实参，检查可选参数（有默认值）和 params 参数（可指定为空数组）。
+					if (!parameter.IsParamArray() && !(optionalParamBinding && parameter.HasDefaultValue))
 					{
-						type = type.GetElementType();
-						if (!convertRefType)
-						{
-							return false;
-						}
+						return false;
 					}
-					isTypeMatch = paramArrayType.IsConvertFrom(type, isExplicit);
+					continue;
 				}
-				if (isTypeMatch)
-				{
-					// 实参是数组，无需进行特殊处理。
-					this.paramArrayType = null;
-					this.paramArgumentTypes = null;
-					return true;
-				}
-				return paramElementType.IsConvertFrom(type, isExplicit);
-			}
-			// 有多个实参，必须是数组元素。
-			for (int i = 0; i < paramCnt; i++)
-			{
-				Type type = this.paramArgumentTypes[i];
+				Type? type = fixedArguments[i];
 				if (type == null)
 				{
-					if (paramElementType.IsValueType)
-					{
-						return false;
-					}
+					continue;
 				}
-				else if (type.IsByRef)
+				Type paramType = parameter.ParameterType;
+				if (paramType.ContainsGenericParameters)
 				{
-					if (convertRefType)
-					{
-						if (!paramElementType.IsConvertFrom(type, isExplicit))
-						{
-							return false;
-						}
-					}
-					else if (paramElementType != type)
-					{
-						return false;
-					}
+					// 泛型参数无法检查类型。
+					continue;
 				}
-				else if (type == typeof(Missing) || !paramElementType.IsConvertFrom(type, isExplicit))
+				bool isByRef = false;
+				if (paramType.IsByRef)
+				{
+					paramType = paramType.GetElementType()!;
+					isByRef = true;
+				}
+				if (type.IsByRef)
+				{
+					type = type.GetElementType()!;
+				}
+				if (isByRef && !convertRefType && type != paramType)
+				{
+					return false;
+				}
+				if (!paramType.IsConvertFrom(type, isExplicit))
 				{
 					return false;
 				}
 			}
 			return true;
 		}
-		/// <summary>
-		/// 检查方法参数。
-		/// </summary>
-		/// <param name="parameter">要检查的方法参数。</param>
-		/// <param name="type">方法实参类型。</param>
-		/// <param name="optionalParamBinding">是否对可选参数进行绑定。</param>
-		/// <param name="isExplicit">类型检查时，如果考虑显式类型转换，则为 <c>true</c>；
-		/// 否则只考虑隐式类型转换。</param>
-		/// <param name="convertRefType">是否允许对按引用传递的类型进行类型转换。</param>
-		/// <returns>如果方法参数与实参兼容，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private static bool CheckParameter(ParameterInfo parameter, Type type, bool optionalParamBinding,
-			bool isExplicit, bool convertRefType)
-		{
-			Type paramType = parameter.ParameterType;
-			if (paramType.ContainsGenericParameters)
-			{
-				return true;
-			}
-			if (type == typeof(Missing))
-			{
-				// 检查可选参数和 params 参数。
-				return parameter.IsParamArray() || (optionalParamBinding && parameter.HasDefaultValue);
-			}
-			bool isByRef = false;
-			if (paramType.IsByRef)
-			{
-				paramType = paramType.GetElementType();
-				isByRef = true;
-			}
-			if (type == null)
-			{
-				if (isByRef && !convertRefType)
-				{
-					return false;
-				}
-				// 检查引用类型。
-				return !paramType.IsValueType;
-			}
-			if (type.IsByRef)
-			{
-				if (isByRef)
-				{
-					return type.GetElementType() == paramType;
-				}
-				if (!convertRefType)
-				{
-					return false;
-				}
-				type = type.GetElementType();
-			}
-			return paramType.IsConvertFrom(type, isExplicit);
-		}
 
 		#endregion // 获取方法参数类型
 
+		/// <summary>
+		/// 根据给定的方法实参类型数组推断泛型方法的泛型类型。
+		/// </summary>
+		/// <param name="returnType">方法的实际返回类型，如果不存在则传入 <c>null</c>。</param>
+		/// <param name="options">方法参数信息的选项。</param>
+		/// <returns>如果成功推断泛型方法的类型参数，则为推断结果；否则为 <c>null</c>。</returns>
+		public Type[]? GetGenericArguments(Type? returnType, MethodArgumentsOption options)
+		{
+			// 对方法返回值进行推断。
+			bool isExplicit = options.HasFlag(MethodArgumentsOption.Explicit);
+			TypeBounds bounds = new(method.GetGenericArguments());
+			if (!CheckReturnType(returnType, bounds, isExplicit))
+			{
+				return null;
+			}
+			// 对方法固定参数进行推断。
+			ParameterInfo[] parameters = method.GetParametersNoCopy();
+			int paramLen = fixedArguments.Count;
+			for (int i = 0; i < paramLen; i++)
+			{
+				Type paramType = parameters[i].ParameterType;
+				if (i < fixedArguments.Count && paramType.ContainsGenericParameters)
+				{
+					Type? argType = fixedArguments[i];
+					if (argType != null && !bounds.TypeInferences(paramType, argType))
+					{
+						return null;
+					}
+				}
+			}
+			IList<Type>? paramArgTypes = paramArgumentTypes;
+			if (paramArrayType == null || paramArgTypes == null || paramArgTypes.Count == 0)
+			{
+				return bounds.FixTypeArguments();
+			}
+			// 对 params 参数进行推断。
+			Type paramElementType = paramArrayType.GetElementType()!;
+			int paramArgCnt = paramArgTypes.Count;
+			if (paramArgCnt > 1)
+			{
+				// 多个实参对应一个形参，做多次类型推断。
+				for (int i = 0; i < paramArgCnt; i++)
+				{
+					if (!bounds.TypeInferences(paramElementType, paramArgTypes[i]))
+					{
+						return null;
+					}
+				}
+				return bounds.FixTypeArguments();
+			}
+			// 一个实参对应一个形参，需要判断是否需要展开 params 参数。
+			TypeBounds newBounds = new(bounds);
+			Type type = paramArgTypes[0];
+			// 首先尝试对 paramArrayType 进行推断。
+			if (bounds.TypeInferences(paramArrayType, type))
+			{
+				Type[]? args = bounds.FixTypeArguments();
+				if (args != null)
+				{
+					// 推断成功的话，则无需展开 params 参数。
+					if (paramArrayType != null)
+					{
+						paramArrayType = null;
+						paramArgumentTypes = null;
+						fixedArguments = new ArraySegment<Type?>(arguments, fixedArguments.Offset, fixedArguments.Count + 1);
+					}
+					return args;
+				}
+			}
+			// 然后尝试对 paramElementType 进行推断。
+			if (newBounds.TypeInferences(paramElementType, type))
+			{
+				return newBounds.FixTypeArguments();
+			}
+			return null;
+		}
+
+		/// <summary>
+		/// 检查方法的返回类型。
+		/// </summary>
+		/// <param name="returnType">方法的实际返回类型，如果不存在则传入 <c>null</c>。</param>
+		/// <param name="bounds">界限集集合。</param>
+		/// <param name="isExplicit">类型检查时，如果考虑显式类型转换，则为 <c>true</c>；
+		/// 否则只考虑隐式类型转换。</param>
+		/// <returns>如果成功检查返回类型，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		private bool CheckReturnType(Type? returnType, TypeBounds bounds, bool isExplicit)
+		{
+			if (returnType == null)
+			{
+				return true;
+			}
+			if (method is not MethodInfo methodInfo)
+			{
+				return true;
+			}
+			Type type = methodInfo.ReturnType;
+			if (type.ContainsGenericParameters)
+			{
+				// 对方法返回类型进行上限推断。
+				return bounds.TypeInferences(type, returnType, true);
+			}
+			return returnType.IsConvertFrom(type, isExplicit);
+		}
 	}
+
 	/// <summary>
 	/// 方法实参的选项。
 	/// </summary>
@@ -401,22 +398,27 @@ namespace Cyjb.Reflection
 		/// <summary>
 		/// 方法的第一个实参表示方法实例。
 		/// </summary>
-		ContainsInstance = 1,
+		ContainsInstance = 1 << 0,
 		/// <summary>
 		/// 对可选参数进行绑定。
 		/// </summary>
-		OptionalParamBinding = 2,
+		OptionalParamBinding = 1 << 1,
 		/// <summary>
 		/// 类型检查时，使用显式类型转换，而不是默认的隐式类型转换。
 		/// </summary>
-		Explicit = 4,
+		Explicit = 1 << 2,
 		/// <summary>
 		/// 允许对按引用传递的类型进行类型转换。
 		/// </summary>
-		ConvertRefType = 8,
+		ConvertRefType = 1 << 3,
 		/// <summary>
 		/// 对可选参数进行绑定，且使用显式类型转换。
 		/// </summary>
-		OptionalAndExplicit = 6,
+		OptionalAndExplicit = OptionalParamBinding | Explicit,
+		/// <summary>
+		/// 对可变参数（VarArgs）进行绑定，注意 <see cref="Type.InvokeMember(string, BindingFlags, Binder, object, object[])"/> 
+		/// 并不支持可变参数。
+		/// </summary>
+		VarArgsParamBinding = 1 << 4,
 	}
 }

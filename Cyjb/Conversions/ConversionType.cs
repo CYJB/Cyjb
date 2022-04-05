@@ -1,11 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace Cyjb
+﻿namespace Cyjb
 {
 	/// <summary>
 	/// 表示类型转换的类型。
 	/// </summary>
-	[SuppressMessage("Microsoft.Design", "CA1028:EnumStorageShouldBeInt32")]
 	internal enum ConversionType : byte
 	{
 		/// <summary>
@@ -33,9 +30,13 @@ namespace Cyjb
 		/// </summary>
 		ImplicitReference,
 		/// <summary>
+		/// 表示用户定义的隐式类型转换。
+		/// </summary>
+		ImplicitUserDefined,
+		/// <summary>
 		/// 表示任意隐式类型转换。
 		/// </summary>
-		Implicit = ImplicitReference,
+		Implicit = ImplicitUserDefined,
 		/// <summary>
 		/// 表示显式数值转换。
 		/// </summary>
@@ -57,18 +58,19 @@ namespace Cyjb
 		/// </summary>
 		ExplicitReference,
 		/// <summary>
+		/// 表示用户定义的显式类型转换。
+		/// </summary>
+		ExplicitUserDefined,
+		/// <summary>
 		/// 表示任意显式类型转换。
 		/// </summary>
-		Explicit = ExplicitReference,
-		/// <summary>
-		/// 表示用户定义的转换。
-		/// </summary>
-		UserDefined,
+		Explicit = ExplicitUserDefined,
 	}
+
 	/// <summary>
 	/// 提供 <see cref="ConversionType"/> 枚举的扩展方法。
 	/// </summary>
-	internal static class ConversionTypeExt
+	internal static class ConversionTypeUtil
 	{
 		/// <summary>
 		/// 获取当前类型转换是否是隐式类型转换。
@@ -79,6 +81,7 @@ namespace Cyjb
 		{
 			return conversionType > ConversionType.None && conversionType <= ConversionType.Implicit;
 		}
+
 		/// <summary>
 		/// 获取当前类型转换是否是显式类型转换。
 		/// </summary>
@@ -86,8 +89,9 @@ namespace Cyjb
 		/// <returns>如果当前类型转换是显式类型转换，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public static bool IsExplicit(this ConversionType conversionType)
 		{
-			return conversionType >= ConversionType.ExplicitNumeric;
+			return conversionType > ConversionType.Implicit;
 		}
+
 		/// <summary>
 		/// 获取当前类型转换是否是标识转换或引用类型转换。
 		/// </summary>

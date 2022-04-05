@@ -117,25 +117,49 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AggregateSourceException_InnerException" xml:space="preserve">
-    <value>---&gt; (Inner Exception #{0}) {1} &lt;---</value>
-    <comment>内部异常的字符串表示。</comment>
+  <data name="AmbiguousMatchField" xml:space="preserve">
+    <value>More than one field is found with the specified name and matching the specified binding constraints.</value>
+    <comment>找到多个有指定名称且与指定绑定约束匹配的字段。</comment>
+  </data>
+  <data name="AmbiguousMatchMethod" xml:space="preserve">
+    <value>More than one method is found with the specified name and matching the specified binding constraints.</value>
+    <comment>找到多个有指定名称且与指定绑定约束匹配的方法。</comment>
+  </data>
+  <data name="AmbiguousMatchProperty" xml:space="preserve">
+    <value>More than one property is found with the specified name and matching the specified binding constraints.</value>
+    <comment>找到多个有指定名称且与指定绑定约束匹配的属性。</comment>
+  </data>
+  <data name="AmbiguousUserDefinedConverter" xml:space="preserve">
+    <value>Ambiguous user-defined converter found when convert '{0}' to '{1}'.</value>
+    <comment>找到多个用户自定义的类型转换。</comment>
+  </data>
+  <data name="ArgumentMinMaxValue" xml:space="preserve">
+    <value>'{0}' cannot be greater than '{1}'.</value>
+    <comment>参数上下界不能颠倒。</comment>
   </data>
   <data name="ArgumentMustBePositive" xml:space="preserve">
-    <value>Parameter values must be greater than zero.</value>
+    <value>'{0}' must be greater than zero.</value>
     <comment>参数值必须大于 0。</comment>
   </data>
   <data name="ArgumentNegative" xml:space="preserve">
-    <value>Parameter values can not be negative.</value>
+    <value>'{0}' can not be negative.</value>
     <comment>参数值不能为负。</comment>
   </data>
   <data name="ArgumentOutOfRange" xml:space="preserve">
-    <value>Parameter values was out of range.</value>
+    <value>'{0}' out of range.</value>
     <comment>参数超出范围。</comment>
   </data>
-  <data name="ArgumentOutOfRangeBetween" xml:space="preserve">
-    <value>Parameter values must be between '{0}' and '{1}'.</value>
+  <data name="ArgumentOutOfRange_Between" xml:space="preserve">
+    <value>'{0}' must be between '{1}' and '{2}'.</value>
     <comment>参数超出范围。</comment>
+  </data>
+  <data name="ArgumentOutOfRange_Count" xml:space="preserve">
+    <value>Count must be positive and count must refer to a location within the string/array/collection.</value>
+    <comment>长度超出范围。</comment>
+  </data>
+  <data name="ArgumentOutOfRange_Index" xml:space="preserve">
+    <value>Index was out of range. Must be non-negative and less than the size of the collection.</value>
+    <comment>索引超出范围。</comment>
   </data>
   <data name="ArgumentWrongType" xml:space="preserve">
     <value>The parameter value is not a valid type.</value>
@@ -143,7 +167,7 @@
   </data>
   <data name="ArgumentWrongType_Specific" xml:space="preserve">
     <value>The parameter value '{0}' is not of type '{1}'.</value>
-    <comment>参数值不是特定类型。</comment>
+    <comment>参数值不是有效类型。</comment>
   </data>
   <data name="ArrayNonZeroLowerBound" xml:space="preserve">
     <value>The lower bound of array must be zero.</value>
@@ -153,57 +177,61 @@
     <value>Destination array is not long enough, check array index and length.</value>
     <comment>目标数组太小。</comment>
   </data>
-  <data name="AtText" xml:space="preserve">
-    <value>  At</value>
-    <comment>所在位置的文本。</comment>
+  <data name="BindOpenConstructedMethod" xml:space="preserve">
+    <value>Cannot bind to open constructed method.</value>
+    <comment>不能绑定到开放构造方法。</comment>
+  </data>
+  <data name="BindTargetField" xml:space="preserve">
+    <value>Cannot bind to the target field because its type is not compatible with that of the delegate type.</value>
+    <comment>绑定到目标字段时出错。</comment>
+  </data>
+  <data name="BindTargetMethod" xml:space="preserve">
+    <value>Cannot bind to the target method because its signature is not compatible with that of the delegate type.</value>
+    <comment>绑定到目标方法时出错。</comment>
+  </data>
+  <data name="BindTargetProperty" xml:space="preserve">
+    <value>Cannot bind to the target property because its signature is not compatible with that of the delegate type.</value>
+    <comment>绑定到目标属性时出错。</comment>
+  </data>
+  <data name="BindTargetPropertyNoGet" xml:space="preserve">
+    <value>Cannot bind to the target property because no get accessor exists.</value>
+    <comment>绑定到目标属性时出错。</comment>
+  </data>
+  <data name="BindTargetPropertyNoSet" xml:space="preserve">
+    <value>Cannot bind to the target property because no set accessor exists.</value>
+    <comment>绑定到目标属性时出错。</comment>
   </data>
   <data name="CannotCastNullToValueType" xml:space="preserve">
     <value>null cannot be converted to a value type.</value>
     <comment>null 不能转换为值类型。</comment>
+  </data>
+  <data name="CannotInferenceGenericArguments" xml:space="preserve">
+    <value>Can not infer type argument from parameters.</value>
+    <comment>无效的泛型参数推断。</comment>
   </data>
   <data name="CollectionCountDiffer" xml:space="preserve">
     <value>Collection element count must be the same as current colection.</value>
     <comment>集合元素数必须与当前集合相同。</comment>
   </data>
   <data name="CollectionEmpty" xml:space="preserve">
-    <value>Collection may not be empty.</value>
+    <value>'{0}' may not be empty.</value>
     <comment>集合不能为空。</comment>
-  </data>
-  <data name="CollectionFixedSize" xml:space="preserve">
-    <value>Collection was of a fixed size.</value>
-    <comment>集合是固定大小的。</comment>
   </data>
   <data name="CollectionItemCompareFailed" xml:space="preserve">
     <value>Failed to compare two elements in the collection.</value>
     <comment>比较集合元素失败。</comment>
   </data>
-  <data name="CollectionItemNotExist" xml:space="preserve">
-    <value>The specified item does not exist in collection.</value>
-    <comment>集合中不存在指定的项。</comment>
-  </data>
   <data name="CollectionItemNull" xml:space="preserve">
-    <value>An element of collection was null.</value>
+    <value>An element of '{0}' was null.</value>
     <comment>集合中存在 null 元素。</comment>
   </data>
-  <data name="CollectionReadOnly" xml:space="preserve">
-    <value>Collection is read-only.</value>
-    <comment>集合是只读的。</comment>
+  <data name="DelegateIncompatible" xml:space="preserve">
+    <value>Delegate type '{0}' not compatible with '{1}'.</value>
+    <comment>委托的类型不兼容。</comment>
   </data>
-  <data name="EnumerationFailed" xml:space="preserve">
-    <value>Collection was modified, enumeration operation may not execute.</value>
-    <comment>无法执行枚举操作。</comment>
-  </data>
-  <data name="EnumTypeDoesNotMatch" xml:space="preserve">
-    <value>The argument type '{0}' is not the same as the enum type '{1}'.</value>
-    <comment>枚举参数类型不匹配。</comment>
-  </data>
-  <data name="EnumValueNotFound" xml:space="preserve">
-    <value>Requested value '{1}' was not found in enum type '{0}'.</value>
-    <comment>未识别的枚举值。</comment>
-  </data>
-  <data name="ErrorText" xml:space="preserve">
-    <value>[Error] </value>
-    <comment>错误的文本。</comment>
+  <data name="DuplicateName" xml:space="preserve">
+    <value>A parameter with the same name has already existed.</value>
+    <comment>参数名相同。</comment>
   </data>
   <data name="ExtraJunkAtEnd" xml:space="preserve">
     <value>Additional non-parsable characters are at the end of the string.</value>
@@ -225,25 +253,9 @@
     <value>Target element type is not compatible with the type of items in the collection.</value>
     <comment>目标元素类型与集合项的类型不兼容。</comment>
   </data>
-  <data name="InvalidOffsetLength" xml:space="preserve">
-    <value>Offset and length were out of bounds for the collection.</value>
-    <comment>偏移量和长度超出界限。</comment>
-  </data>
-  <data name="KeyDuplicate" xml:space="preserve">
-    <value>An item with the same key has already been added.</value>
-    <comment>已添加了具有相同键的项。</comment>
-  </data>
-  <data name="KeyNotFound" xml:space="preserve">
-    <value>Specific key is not exists.</value>
-    <comment>指定的键不存在。</comment>
-  </data>
-  <data name="KeyNotFound_Key" xml:space="preserve">
-    <value>Key '{0}' is not exists.</value>
-    <comment>指定的键不存在。</comment>
-  </data>
-  <data name="MethodNotSupported" xml:space="preserve">
-    <value>Specified method is not supported.</value>
-    <comment>方法不被支持。</comment>
+  <data name="InvalidThreshold" xml:space="preserve">
+    <value>The specified threshold is out of range.</value>
+    <comment>阈值超出范围。</comment>
   </data>
   <data name="MultidimensionalArrayNotSupported" xml:space="preserve">
     <value>Only single-dimensional arrays are supported.</value>
@@ -269,6 +281,18 @@
     <value>Type '{0}' must be an Enum.</value>
     <comment>必须是枚举类型。</comment>
   </data>
+  <data name="MustContainValidInfo" xml:space="preserve">
+    <value>Must specify valid information for parsing in the string.</value>
+    <comment>字符串不包含可用信息。</comment>
+  </data>
+  <data name="NamedParamTooBig" xml:space="preserve">
+    <value>Named parameter array cannot be bigger than argument array.</value>
+    <comment>命名参数数组太长。</comment>
+  </data>
+  <data name="NeedGenericMethodDefinition" xml:space="preserve">
+    <value>'{0}' is not a generic method definition.</value>
+    <comment>不表示泛型方法定义。</comment>
+  </data>
   <data name="NegativeUnsigned" xml:space="preserve">
     <value>The string was being parsed as an unsigned number and could not have a negative sign.</value>
     <comment>无符号数的字符串不能包含负号。</comment>
@@ -277,24 +301,20 @@
     <value>Could not find any recognizable digits.</value>
     <comment>未能找到任何可识别的数字。</comment>
   </data>
-  <data name="OneOrMoreErrorsExisted" xml:space="preserve">
-    <value>One or more errors existed.</value>
-    <comment>存在一个或多个错误。</comment>
-  </data>
   <data name="OverflowByte" xml:space="preserve">
     <value>Value was either too large or too small for a Byte.</value>
     <comment>值对于 Byte 太大或太小。</comment>
   </data>
   <data name="OverflowInt16" xml:space="preserve">
-    <value>Value was either too large or too small for an Int16.</value>
+    <value>Value was either too large or too small for a Int16.</value>
     <comment>值对于 Int16 太大或太小。</comment>
   </data>
   <data name="OverflowInt32" xml:space="preserve">
-    <value>Value was either too large or too small for an Int32.</value>
+    <value>Value was either too large or too small for a Int32.</value>
     <comment>值对于 Int32 太大或太小。</comment>
   </data>
   <data name="OverflowInt64" xml:space="preserve">
-    <value>Value was either too large or too small for an Int64.</value>
+    <value>Value was either too large or too small for a Int64.</value>
     <comment>值对于 Int64 太大或太小。</comment>
   </data>
   <data name="OverflowSByte" xml:space="preserve">
@@ -313,50 +333,6 @@
     <value>Value was either too large or too small for a UInt64.</value>
     <comment>值对于 UInt64 太大或太小。</comment>
   </data>
-  <data name="ReversedArgument" xml:space="preserve">
-    <value>The parameter '{0}' and '{1}' in reverse order.</value>
-    <comment>参数顺序颠倒。</comment>
-  </data>
-  <data name="StreamClosed" xml:space="preserve">
-    <value>Cannot read from a closed '{0}'.</value>
-    <comment>流已关闭。</comment>
-  </data>
-  <data name="StringEmpty" xml:space="preserve">
-    <value>Expecting non-empty string.</value>
-    <comment>需要非空的字符串。</comment>
-  </data>
-  <data name="StringWhiteSpace" xml:space="preserve">
-    <value>Expecting non-whitespace string.</value>
-    <comment>需要非空白的字符串。</comment>
-  </data>
-  <data name="Tristate_False" xml:space="preserve">
-    <value>False</value>
-    <comment>Tristate 枚举 False 项的说明。</comment>
-  </data>
-  <data name="Tristate_NotSure" xml:space="preserve">
-    <value>NotSure</value>
-    <comment>Tristate 枚举 NotSure 项的说明。</comment>
-  </data>
-  <data name="Tristate_True" xml:space="preserve">
-    <value>True</value>
-    <comment>Tristate 枚举 True 项的说明。</comment>
-  </data>
-  <data name="UniqueValue_Ambig" xml:space="preserve">
-    <value>[Ambig]</value>
-    <comment>冲突的文本。</comment>
-  </data>
-  <data name="UniqueValue_Empty" xml:space="preserve">
-    <value>[Empty]</value>
-    <comment>空的文本。</comment>
-  </data>
-  <data name="UniqueValue_Unique" xml:space="preserve">
-    <value>[Unique {0}]</value>
-    <comment>唯一的文本。</comment>
-  </data>
-  <data name="WarningText" xml:space="preserve">
-    <value>[Warning] </value>
-    <comment>警告的文本。</comment>
-  </data>
   <data name="PropertyNoGetter" xml:space="preserve">
     <value>Property '{0}' has no get accessor exists.</value>
     <comment>属性不存在 get 访问器。</comment>
@@ -373,180 +349,36 @@
     <value>Property or field named '{0}' not exists.</value>
     <comment>找不到属性或字段。</comment>
   </data>
-  <data name="TypeMemberNotFound" xml:space="preserve">
-    <value>Type member '{0}' not exists.</value>
-    <comment>找不到类型成员。</comment>
-  </data>
-  <data name="DelegateIncompatible" xml:space="preserve">
-    <value>Delegate type '{0}' not compatible with '{1}'.</value>
-    <comment>委托的类型不兼容。</comment>
-  </data>
-  <data name="ProcessorNotFound_Id" xml:space="preserve">
-    <value>Can not find processor identified '{1}' of type '{0}'.</value>
-    <comment>与特定类型相关的处理器未能找到。</comment>
-  </data>
-  <data name="ProcessorKeyAmbigus_TypeId" xml:space="preserve">
-    <value>More than one key parameter is found of processors identified '{1}' of type '{0}'.</value>
-    <comment>处理器找到多个关键参数。</comment>
-  </data>
-  <data name="ProcessorKeyNotFound_TypeId" xml:space="preserve">
-    <value>Key parameter of processors identified '{1}' of type '{0}' not found.</value>
-    <comment>处理器找不到关键参数。</comment>
-  </data>
-  <data name="ProcessorMismatch" xml:space="preserve">
-    <value>Processor identified '{1}' of type '{0}', does not match the needed static / instance.</value>
-    <comment>处理器静态/实例不匹配。</comment>
-  </data>
-  <data name="ProcessorMixed" xml:space="preserve">
-    <value>Existing static and instance method in processors identified '{1}' of type '{0}'.</value>
-    <comment>处理器中混杂着静态和实例方法。</comment>
-  </data>
-  <data name="ProcessorParameterMismatch_TypeId" xml:space="preserve">
-    <value>Processors identified '{1}' of type '{0}' have different parameter length or parameter type.</value>
-    <comment>处理器参数不匹配。</comment>
-  </data>
-  <data name="ProcessorKeyAmbigus" xml:space="preserve">
-    <value>More than one key parameter is found of processors.</value>
-    <comment>处理器找到多个关键参数。</comment>
-  </data>
-  <data name="ProcessorKeyNotFound" xml:space="preserve">
-    <value>Key parameter of processors not found.</value>
-    <comment>处理器找不到关键参数。</comment>
-  </data>
-  <data name="ProcessorParameterMismatch" xml:space="preserve">
-    <value>Processors have different parameter length or parameter type.</value>
-    <comment>处理器参数不匹配。</comment>
-  </data>
-  <data name="ProcessorNotFound" xml:space="preserve">
-    <value>Can not find processor of type '{0}'.</value>
-    <comment>与特定类型相关的处理器未能找到。</comment>
-  </data>
-  <data name="AmbiguousUserDefinedConverter" xml:space="preserve">
-    <value>Ambiguous user-defined converter found when convert '{0}' to '{1}'.</value>
-    <comment>找到多个用户自定义的类型转换。</comment>
-  </data>
-  <data name="MustContainValidInfo" xml:space="preserve">
-    <value>Must specify valid information for parsing in the string.</value>
-    <comment>字符串不包含可用信息。</comment>
-  </data>
-  <data name="InvalidThreshold" xml:space="preserve">
-    <value>The specified threshold is out of range.</value>
-    <comment>阈值超出范围。</comment>
-  </data>
-  <data name="BindOpenConstructedMethod" xml:space="preserve">
-    <value>Cannot bind to open constructed method.</value>
-    <comment>不能绑定到开放构造方法。</comment>
-  </data>
-  <data name="TypeMissingDefaultConstructor" xml:space="preserve">
-    <value>Type '{0}' does not have a default constructor.</value>
-    <comment>类型不包含默认构造函数。</comment>
+  <data name="StreamClosed" xml:space="preserve">
+    <value>Cannot read from a closed '{0}'.</value>
+    <comment>流已关闭。</comment>
   </data>
   <data name="TypeContainsGenericParameters" xml:space="preserve">
     <value>Type '{0}' contains generic parameters.</value>
     <comment>类型包含泛型参数。</comment>
   </data>
-  <data name="BindTargetField" xml:space="preserve">
-    <value>Cannot bind to the target field because its type is not compatible with that of the delegate type.</value>
-    <comment>绑定到目标字段时出错。</comment>
+  <data name="TypeMemberNotFound" xml:space="preserve">
+    <value>Type member '{0}' not exists.</value>
+    <comment>找不到类型成员。</comment>
   </data>
-  <data name="BindTargetMethod" xml:space="preserve">
-    <value>Cannot bind to the target method because its signature is not compatible with that of the delegate type.</value>
-    <comment>绑定到目标方法时出错。</comment>
-  </data>
-  <data name="BindTargetProperty" xml:space="preserve">
-    <value>Cannot bind to the target property because its signature is not compatible with that of the delegate type.</value>
-    <comment>绑定到目标属性时出错。</comment>
-  </data>
-  <data name="BindTargetPropertyNoGet" xml:space="preserve">
-    <value>Cannot bind to the target property because no get accessor exists.</value>
-    <comment>绑定到目标属性时出错。</comment>
-  </data>
-  <data name="BindTargetPropertyNoSet" xml:space="preserve">
-    <value>Cannot bind to the target property because no set accessor exists.</value>
-    <comment>绑定到目标属性时出错。</comment>
-  </data>
-  <data name="NeedGenericMethodDefinition" xml:space="preserve">
-    <value>'{0}' is not a generic method definition.</value>
-    <comment>不表示泛型方法定义。</comment>
-  </data>
-  <data name="CannotInferenceGenericArguments" xml:space="preserve">
-    <value>Can not infer type argument from parameters.</value>
-    <comment>无效的泛型参数推断。</comment>
+  <data name="TypeMissingDefaultConstructor" xml:space="preserve">
+    <value>Type '{0}' does not have a default constructor.</value>
+    <comment>类型不包含默认构造函数。</comment>
   </data>
   <data name="UnboundGenParam" xml:space="preserve">
     <value>Late bound operations cannot be performed on types or methods for which ContainsGenericParameters is true.</value>
     <comment>不能对包含未赋值的泛型类型参数的类型和方法进行后期绑定。</comment>
   </data>
-  <data name="ArgumentBothNull" xml:space="preserve">
-    <value>Value of parameter '{0}' and '{1}' can not botn be null.</value>
-    <comment>参数全部为 null。</comment>
+  <data name="UniqueValue_Ambig" xml:space="preserve">
+    <value>[Ambig]</value>
+    <comment>冲突的文本。</comment>
   </data>
-  <data name="AmbiguousMatchField" xml:space="preserve">
-    <value>More than one field is found with the specified name and matching the specified binding constraints.</value>
-    <comment>找到多个有指定名称且与指定绑定约束匹配的字段。</comment>
+  <data name="UniqueValue_Empty" xml:space="preserve">
+    <value>[Empty]</value>
+    <comment>空的文本。</comment>
   </data>
-  <data name="AmbiguousMatchMethod" xml:space="preserve">
-    <value>More than one method is found with the specified name and matching the specified binding constraints.</value>
-    <comment>找到多个有指定名称且与指定绑定约束匹配的方法。</comment>
-  </data>
-  <data name="AmbiguousMatchProperty" xml:space="preserve">
-    <value>More than one property is found with the specified name and matching the specified binding constraints.</value>
-    <comment>找到多个有指定名称且与指定绑定约束匹配的属性。</comment>
-  </data>
-  <data name="DuplicateName" xml:space="preserve">
-    <value>A parameter with the same name has already existed.</value>
-    <comment>参数名相同。</comment>
-  </data>
-  <data name="NamedParamTooBig" xml:space="preserve">
-    <value>Named parameter array cannot be bigger than argument array.</value>
-    <comment>命名参数数组太长。</comment>
-  </data>
-  <data name="InvalidCacheOptions" xml:space="preserve">
-    <value>Can not find constructor matchs options in type '{0}'.</value>
-    <comment>缓冲池选项无效。</comment>
-  </data>
-  <data name="InvalidCacheType" xml:space="preserve">
-    <value>Invalid cache type '{0}'.</value>
-    <comment>缓冲池类型无效。</comment>
-  </data>
-  <data name="InvalidCacheType_ICache" xml:space="preserve">
-    <value>Invalid cache type '{0}', did not implement ICache{TKey, TValue}.</value>
-    <comment>缓冲池类型无效-未实现 ICache 接口。</comment>
-  </data>
-  <data name="ConflictingAcceptAction" xml:space="preserve">
-    <value>Accept action is conflicted with Reject action.</value>
-    <comment>冲突的接受动作。</comment>
-  </data>
-  <data name="ConflictingRejectAction" xml:space="preserve">
-    <value>Reject action is conflicted with Accept action.</value>
-    <comment>冲突的拒绝动作。</comment>
-  </data>
-  <data name="InvalidLexerContext" xml:space="preserve">
-    <value>Invalid lexer context '{0}'.</value>
-    <comment>无效的词法分析上下文。</comment>
-  </data>
-  <data name="InvalidSourceLocatable" xml:space="preserve">
-    <value>Argument is not a valid instance of ISourceLocatable.</value>
-    <comment>无效的源文件范围。</comment>
-  </data>
-  <data name="InvalidSourceRange" xml:space="preserve">
-    <value>From {0} to {1} is not a valid source range.</value>
-    <comment>不是有效的源文件范围。</comment>
-  </data>
-  <data name="UnrecognizedToken" xml:space="preserve">
-    <value>Unrecognized token '{0}'.</value>
-    <comment>未识别的词法单元异常。</comment>
-  </data>
-  <data name="WeakDelegateForMethodWithClosure" xml:space="preserve">
-    <value>Cannot create weak delegate for anonymous method with closure.</value>
-    <comment>不能创建弱引用委托。</comment>
-  </data>
-  <data name="PropertyNotFound" xml:space="preserve">
-    <value>Property '{0}' not found.</value>
-    <comment>未找到属性。</comment>
-  </data>
-  <data name="PropertyNotSupported" xml:space="preserve">
-    <value>Specified property is not supported.</value>
-    <comment>属性不被支持。</comment>
+  <data name="UniqueValue_Unique" xml:space="preserve">
+    <value>[Unique {0}]</value>
+    <comment>唯一的文本。</comment>
   </data>
 </root>

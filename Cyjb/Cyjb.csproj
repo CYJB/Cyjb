@@ -1,291 +1,40 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{25D5ACF0-54C0-48BB-85CA-0FFE56B0628F}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cyjb</RootNamespace>
-    <AssemblyName>Cyjb</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-    <CodeContractsAssemblyMode>0</CodeContractsAssemblyMode>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>../CYJB_Code_Key.snk</AssemblyOriginatorKeyFile>
+    <PackageProjectUrl>https://github.com/CYJB/Cyjb</PackageProjectUrl>
+    <Description>提供基础的功能扩展</Description>
+    <Copyright>﻿Copyright (c) 2013, CYJB</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>../LICENSE</PackageLicenseFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\bin\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CONTRACTS_FULL, JETBRAINS_ANNOTATIONS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\bin\Cyjb.XML</DocumentationFile>
-    <CodeAnalysisRuleSet>..\CyjbRules.ruleset</CodeAnalysisRuleSet>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
-    <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
-    <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
-    <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
-    <CodeContractsRuntimeSkipQuantifiers>False</CodeContractsRuntimeSkipQuantifiers>
-    <CodeContractsRunCodeAnalysis>True</CodeContractsRunCodeAnalysis>
-    <CodeContractsNonNullObligations>True</CodeContractsNonNullObligations>
-    <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
-    <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
-    <CodeContractsEnumObligations>True</CodeContractsEnumObligations>
-    <CodeContractsRedundantAssumptions>True</CodeContractsRedundantAssumptions>
-    <CodeContractsMissingPublicRequiresAsWarnings>True</CodeContractsMissingPublicRequiresAsWarnings>
-    <CodeContractsInferRequires>True</CodeContractsInferRequires>
-    <CodeContractsInferEnsures>True</CodeContractsInferEnsures>
-    <CodeContractsInferObjectInvariants>True</CodeContractsInferObjectInvariants>
-    <CodeContractsSuggestAssumptions>True</CodeContractsSuggestAssumptions>
-    <CodeContractsSuggestRequires>True</CodeContractsSuggestRequires>
-    <CodeContractsSuggestObjectInvariants>True</CodeContractsSuggestObjectInvariants>
-    <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
-    <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
-    <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
-    <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
-    <CodeContractsCustomRewriterAssembly />
-    <CodeContractsCustomRewriterClass />
-    <CodeContractsLibPaths />
-    <CodeContractsExtraRewriteOptions />
-    <CodeContractsExtraAnalysisOptions />
-    <CodeContractsSQLServerOption />
-    <CodeContractsBaseLineFile />
-    <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
-    <CodeContractsFailBuildOnWarnings>False</CodeContractsFailBuildOnWarnings>
-    <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
-    <CodeContractsReferenceAssembly>Build</CodeContractsReferenceAssembly>
-    <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <CodeContractsAssertsToContractsCheckBox>True</CodeContractsAssertsToContractsCheckBox>
-    <CodeContractsRedundantTests>True</CodeContractsRedundantTests>
-    <CodeContractsMissingPublicEnsuresAsWarnings>True</CodeContractsMissingPublicEnsuresAsWarnings>
-    <CodeContractsSuggestAssumptionsForCallees>True</CodeContractsSuggestAssumptionsForCallees>
-    <CodeContractsNecessaryEnsures>True</CodeContractsNecessaryEnsures>
-    <CodeContractsSuggestReadonly>True</CodeContractsSuggestReadonly>
-    <CodeContractsSkipAnalysisIfCannotConnectToCache>False</CodeContractsSkipAnalysisIfCannotConnectToCache>
-    <CodeContractsBeingOptimisticOnExternal>True</CodeContractsBeingOptimisticOnExternal>
-    <CodeContractsInferEnsuresAutoProperties>True</CodeContractsInferEnsuresAutoProperties>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\bin\Cyjb.XML</DocumentationFile>
-    <CodeAnalysisRuleSet>..\CyjbRules.ruleset</CodeAnalysisRuleSet>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>CYJB_Code_Key.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="JetBrains.Annotations">
-      <HintPath>..\packages\JetBrains.Annotations.8.0.5.0\lib\net20\JetBrains.Annotations.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.XML" />
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="ArrayExt.cs" />
-    <Compile Include="ArrayExt.Fill.cs">
-      <DependentUpon>ArrayExt.cs</DependentUpon>
-    </Compile>
-    <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="AsyncEventHandler.cs" />
-    <Compile Include="Collections\BitList.cs" />
-    <Compile Include="Collections\CharSet.cs" />
-    <Compile Include="Collections\DictionaryExt.cs" />
-    <Compile Include="Collections\CollectionExt.cs" />
-    <Compile Include="Collections\ListExt.cs" />
-    <Compile Include="Collections\ListQueue`1.cs" />
-    <Compile Include="Collections\ListStack`1.cs" />
-    <Compile Include="Collections\ObjectModel\KeyedCollectionBase`2.cs" />
-    <Compile Include="Collections\ObjectModel\KeyedListBase`2.cs" />
-    <Compile Include="Collections\ObjectModel\ReadOnlyKeyedCollectionBase`2.cs" />
-    <Compile Include="Collections\SetEqualityComparer`1.cs" />
-    <Compile Include="Collections\ListEqualityComparer`1.cs" />
-    <Compile Include="Collections\ObjectModel\CollectionHelper.cs" />
-    <Compile Include="Collections\ObjectModel\ReadOnlySet`1.cs" />
-    <Compile Include="Collections\ObjectModel\SetBase`1.cs" />
-    <Compile Include="Collections\BitListEqualityComparer.cs" />
-    <Compile Include="ComponentModel\EnumDescConverter.cs" />
-    <Compile Include="ComponentModel\ObservableObject.cs" />
-    <Compile Include="Configurations\ValueConfigurationCollection.cs" />
-    <Compile Include="Configurations\ValueConfigurationElement.cs" />
-    <Compile Include="Conversions\BetweenNullableConversion.cs" />
-    <Compile Include="Conversions\BoxConversion.cs" />
-    <Compile Include="Conversions\Convert.Base.cs" />
-    <Compile Include="Conversions\StringConverterProvider.cs" />
-    <Compile Include="Conversions\UserConversion.cs" />
-    <Compile Include="Conversions\DecimalConversion.cs" />
-    <Compile Include="Conversions\DelegateConversion.cs" />
-    <Compile Include="Conversions\CastClassConversion.cs" />
-    <Compile Include="Conversions\Conversion.cs" />
-    <Compile Include="Conversions\ConversionFactory.cs" />
-    <Compile Include="Conversions\ConversionType.cs" />
-    <Compile Include="Conversions\Convert.cs" />
-    <Compile Include="Conversions\ConverterProvider.cs" />
-    <Compile Include="Conversions\IConverterProvider.cs" />
-    <Compile Include="Conversions\FromNullableConversion.cs" />
-    <Compile Include="Conversions\IdentityConversion.cs" />
-    <Compile Include="Conversions\NumericConversion.cs" />
-    <Compile Include="Conversions\ToNullableConversion.cs" />
-    <Compile Include="Conversions\UnboxConversion.cs" />
-    <Compile Include="Conversions\UserConversionCache.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DelegateBuilder.cs" />
-    <Compile Include="DelegateBuilder.Field.cs">
-      <DependentUpon>DelegateBuilder.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DelegateBuilder.Property.cs">
-      <DependentUpon>DelegateBuilder.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DoubleComparer.cs" />
-    <Compile Include="IntegerExt.cs" />
-    <Compile Include="IntegerExt.Byte.cs">
-      <DependentUpon>IntegerExt.cs</DependentUpon>
-    </Compile>
-    <Compile Include="IntegerExt.Int32.cs">
-      <DependentUpon>IntegerExt.cs</DependentUpon>
-    </Compile>
-    <Compile Include="IntegerExt.Int64.cs">
-      <DependentUpon>IntegerExt.cs</DependentUpon>
-    </Compile>
-    <Compile Include="IntegerExt.UInt32.cs">
-      <DependentUpon>IntegerExt.cs</DependentUpon>
-    </Compile>
-    <Compile Include="IntegerExt.UInt64.cs">
-      <DependentUpon>IntegerExt.cs</DependentUpon>
-    </Compile>
-    <Compile Include="IO\AggregateSourceException.cs" />
-    <Compile Include="IO\DirectoryExt.cs" />
-    <Compile Include="IO\FileExt.cs" />
-    <Compile Include="IO\ISourceFileLocatable.cs" />
-    <Compile Include="IO\SourceFileRange.cs" />
-    <Compile Include="IO\SourceLocatableExt.cs" />
-    <Compile Include="IO\ISourceLocatable.cs" />
-    <Compile Include="IO\PathExt.cs" />
-    <Compile Include="IO\SourceException.cs" />
-    <Compile Include="IO\SourcePosition.cs" />
-    <Compile Include="IO\SourceLocator.cs" />
-    <Compile Include="IO\SourceRange.cs" />
-    <Compile Include="IO\SourceReader.cs" />
-    <Compile Include="MemberAccessor`1.cs" />
-    <Compile Include="MethodSwitcher.cs" />
-    <Compile Include="Net\HttpWebClient.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="CharExt.cs" />
-    <Compile Include="Collections\ArrayAdapter`1.cs" />
-    <Compile Include="Collections\CollectionDebugView`1.cs" />
-    <Compile Include="Collections\ObjectModel\IteratorBase`1.cs" />
-    <Compile Include="Configurations\ConfigurationElementCollection`1.cs" />
-    <Compile Include="Configurations\ConfigurationElementCollection`2.cs" />
-    <Compile Include="Collections\EnumerableExt.cs" />
-    <Compile Include="EnumExt.cs" />
-    <Compile Include="Predicate.cs" />
-    <Compile Include="Threading\RemoteProgress`1.cs" />
-    <Compile Include="RandomExt.cs" />
-    <Compile Include="ProcessorAttribute.cs" />
-    <Compile Include="Reflection\Converter.cs" />
-    <Compile Include="Reflection\MethodArgumentsInfo.cs" />
-    <Compile Include="Reflection\ILExt.Constant.cs">
-      <DependentUpon>ILExt.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Reflection\ILExt.cs" />
-    <Compile Include="Reflection\ILExt.Exception.cs">
-      <DependentUpon>ILExt.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Reflection\ILManager.cs" />
-    <Compile Include="Reflection\EventExt.cs" />
-    <Compile Include="Reflection\PropertyExt.cs" />
-    <Compile Include="Reflection\MethodExt.cs" />
-    <Compile Include="Reflection\PowerBinder.cs" />
-    <Compile Include="Reflection\TypeBounds.cs" />
-    <Compile Include="Reflection\TypeExt.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
+    <Compile Update="Resources.Designer.cs">
       <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Runtime.CompilerServices\DependentHandle`2.cs" />
-    <Compile Include="Runtime.CompilerServices\WeakDelegate.cs" />
-    <Compile Include="Text\CharsReader.cs" />
-    <Compile Include="Text\TokenParser`1.cs" />
-    <Compile Include="Text\TokenReader`1.cs" />
-    <Compile Include="Text\Token`1.cs" />
-    <Compile Include="Threading\RemoteCancellationTokenSource.cs" />
-    <Compile Include="UniqueValue`1.cs" />
-    <Compile Include="Utility\CacheElement.cs" />
-    <Compile Include="Utility\CacheElementCollection.cs" />
-    <Compile Include="Utility\CacheFactory.cs" />
-    <Compile Include="Utility\CacheSection.cs" />
-    <Compile Include="Utility\Hash.cs" />
-    <Compile Include="Utility\LruCache`2.cs" />
-    <Compile Include="Utility\LruNode`2.cs" />
-    <Compile Include="Collections\ObjectModel\CollectionBase`1.cs" />
-    <Compile Include="Collections\ObjectModel\ListBase`1.cs" />
-    <Compile Include="Collections\ObjectModel\ReadOnlyCollection`1.cs" />
-    <Compile Include="Collections\ObjectModel\ReadOnlyList`1.cs" />
-    <Compile Include="CommonExceptions.cs" />
-    <Compile Include="Utility\ICache`2.cs" />
-    <Compile Include="ResDescriptionAttribute.cs" />
-    <Compile Include="StringExt.cs" />
-    <Compile Include="TextValuePair.cs" />
-    <Compile Include="TextValuePairCollection.cs" />
-    <Compile Include="TextValuePairCollection`1.cs" />
-    <Compile Include="TextValuePair`1.cs" />
-    <Compile Include="Tristate.cs" />
-    <Compile Include="Utility\LruCacheNoSync`2.cs" />
-    <Compile Include="Utility\LruNodeNoSync`2.cs" />
-    <Compile Include="Utility\CacheResolveEventArgs.cs" />
-    <Compile Include="Utility\SimplyCache`2.cs" />
-    <Compile Include="MemberAccessor`2.cs" />
-    <Compile Include="FloatComparer.cs" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="ArrayExt.Order.cs">
-      <DependentUpon>ArrayExt.cs</DependentUpon>
-    </Compile>
-    <None Include="CYJB_Code_Key.snk" />
-    <Compile Include="DelegateBuilder.Method.cs">
-      <DependentUpon>DelegateBuilder.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DelegateBuilder.Type.cs">
-      <DependentUpon>DelegateBuilder.cs</DependentUpon>
-    </Compile>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
+    <EmbeddedResource Update="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources.zh-CN.resx" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

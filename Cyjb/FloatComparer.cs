@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics;
 
 namespace Cyjb
 {
@@ -19,6 +16,7 @@ namespace Cyjb
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private static readonly FloatComparer defaultComparer = new FloatComparer(DefaultEpsilon);
+
 		/// <summary>
 		/// 获取默认的单精度浮点数比较器。
 		/// </summary>
@@ -27,22 +25,23 @@ namespace Cyjb
 		{
 			get { return defaultComparer; }
 		}
+
 		/// <summary>
 		/// 比较时使用的精度。
 		/// </summary>
 		private readonly float epsilon;
+
 		/// <summary>
 		/// 使用比较时要使用的精度，初始化 <see cref="FloatComparer"/> 类的新实例。
 		/// </summary>
-		/// <param name="epsilon">比较时使用的精度。</param>
+		/// <param name="epsilon">比较时使用的精度，是比较值的相对差异。</param>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="epsilon"/> 小于 <c>0</c>。</exception>
 		public FloatComparer(float epsilon)
 		{
 			if (epsilon <= 0)
 			{
-				throw CommonExceptions.ArgumentMustBePositive("epsilon", epsilon);
+				throw CommonExceptions.ArgumentMustBePositive(epsilon);
 			}
-			Contract.EndContractBlock();
 			this.epsilon = epsilon;
 		}
 
@@ -56,7 +55,15 @@ namespace Cyjb
 		/// <returns>一个有符号整数，指示 <paramref name="x"/> 与 <paramref name="y"/> 的相对值。</returns>
 		public override int Compare(float x, float y)
 		{
-			if (x > y)
+			if (float.IsNaN(x))
+			{
+				return float.IsNaN(y) ? 0 : -1;
+			}
+			else if (float.IsNaN(y))
+			{
+				return 1;
+			}
+			else if (x > y)
 			{
 				float eps = x;
 				if (x < 0 || (y < 0 && x + y < 0))
@@ -65,7 +72,7 @@ namespace Cyjb
 				}
 				return (x - y) < eps * this.epsilon ? 0 : 1;
 			}
-			if (x < y)
+			else if (x < y)
 			{
 				float eps = y;
 				if (y < 0 || (x < 0 && x + y < 0))
@@ -74,11 +81,10 @@ namespace Cyjb
 				}
 				return (y - x) < eps * this.epsilon ? 0 : -1;
 			}
-			if (float.IsNaN(x))
+			else
 			{
-				return float.IsNaN(y) ? 0 : -1;
+				return 0;
 			}
-			return float.IsNaN(y) ? 1 : 0;
 		}
 
 		#endregion

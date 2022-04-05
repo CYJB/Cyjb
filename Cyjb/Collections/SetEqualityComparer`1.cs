@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Threading;
+﻿using System.Diagnostics;
 
 namespace Cyjb.Collections
 {
@@ -18,13 +12,12 @@ namespace Cyjb.Collections
 		/// 默认的相等比较器。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static SetEqualityComparer<T> defaultValue;
+		private static SetEqualityComparer<T>? defaultValue;
 		/// <summary>
 		/// 获取默认的相等比较器。
 		/// </summary>
 		/// <value>一个默认的 <see cref="SetEqualityComparer{T}"/> 比较器。</value>
-		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
-		public new static SetEqualityComparer<T> Default
+		public new static IEqualityComparer<ISet<T>> Default
 		{
 			get
 			{
@@ -53,18 +46,22 @@ namespace Cyjb.Collections
 		/// 确定指定的对象是否相等。
 		/// </summary>
 		/// </overloads>
-		public override bool Equals(ISet<T> x, ISet<T> y)
+		public override bool Equals(ISet<T>? x, ISet<T>? y)
 		{
 			if (x == null)
 			{
 				return y == null;
 			}
-			if (y == null)
+			else if (y == null)
 			{
 				return false;
 			}
-			return x == y || x.SetEquals(y);
+			else
+			{
+				return x == y || x.SetEquals(y);
+			}
 		}
+
 		/// <summary>
 		/// 返回指定对象的哈希代码。
 		/// </summary>
@@ -78,10 +75,16 @@ namespace Cyjb.Collections
 		/// </overloads>
 		public override int GetHashCode(ISet<T> obj)
 		{
-			CommonExceptions.CheckArgumentNull(obj, "obj");
-			Contract.EndContractBlock();
 			// 使用与位置无关的弱哈希。
-			return obj.Count ^ obj.Select(o => o.GetHashCode()).Aggregate((x, y) => x ^ y);
+			int hashCode = obj.Count;
+			foreach (T item in obj)
+			{
+				if (item != null)
+				{
+					hashCode ^= item.GetHashCode();
+				}
+			}
+			return hashCode;
 		}
 
 		#endregion // EqualityComparer<ISet<T>> 成员

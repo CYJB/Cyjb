@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# IDE0180: 使用元组交换值
+csharp_style_prefer_tuple_swap = false

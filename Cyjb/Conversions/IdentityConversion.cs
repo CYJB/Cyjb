@@ -25,6 +25,12 @@
 		/// 隐式引用转换的实例。
 		/// </summary>
 		public static readonly Conversion ImplicitReference = new IdentityConversion(ConversionType.ImplicitReference);
+
+		/// <summary>
+		/// 获取是否需要写入 IL（一些类型转换并不需要写入 IL）。
+		/// </summary>
+		public override bool NeedEmit => false;
+
 		/// <summary>
 		/// 使用指定的转换类型初始化 <see cref="IdentityConversion"/> 类的新实例。
 		/// </summary>

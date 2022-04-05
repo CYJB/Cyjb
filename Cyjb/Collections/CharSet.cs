@@ -1,965 +1,468 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Security;
-using System.Security.Permissions;
+﻿using System.Diagnostics;
+using System.Text;
 using Cyjb.Collections.ObjectModel;
+using Node = Cyjb.Collections.AVLTree<char, char>.Node;
 
 namespace Cyjb.Collections
 {
 	/// <summary>
-	/// 表示特定于字符的集合，可以按字母顺序遍历集合。
+	/// 表示字符的有序集合。
 	/// </summary>
-	/// <remarks><see cref="CharSet"/> 类采用类似位示图的树状位压缩数组判断字符是否存在，
-	/// 关于该数据结构的更多解释，请参见我的博文
-	/// <see href="http://www.cnblogs.com/cyjb/archive/p/CharSet.html">
-	/// 《基于树状位压缩数组的字符集合》</see>。</remarks>
-	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/CharSet.html">
-	/// 《基于树状位压缩数组的字符集合》</seealso>
-	[Serializable]
-	public sealed class CharSet : SetBase<char>, ISerializable
+	[Serializable, DebuggerDisplay("{ToString()} Count = {Count}")]
+	public sealed class CharSet : SetBase<char>, IEquatable<CharSet>
 	{
-
-		#region 常量定义
-
 		/// <summary>
-		/// 顶层数组的长度。
+		/// 字符集合内的字符范围列表（Key 为 Start，Value 为 End）。
 		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private const int TopLen = 64;
+		private readonly AVLTree<char, char> ranges = new();
 		/// <summary>
-		/// 底层数组的长度。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private const int BtmLen = 32;
-		/// <summary>
-		/// 顶层数组索引的位移。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private const int TopShift = 10;
-		/// <summary>
-		/// 底层数组索引的位移。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private const int BtmShift = 5;
-		/// <summary>
-		/// 底间层数组索引的掩码。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private const int BtmMask = 0x1F;
-		/// <summary>
-		/// UInt32 索引的掩码。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private const int IndexMask = 0x1F;
-
-		#endregion // 常量定义
-
-		/// <summary>
-		/// 0x0000 ~ 0xFFFF 的数据。
-		/// </summary>
-		private uint[][] data;
-		/// <summary>
-		/// 集合中元素的个数。
+		/// 集合中字符的个数。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private int count;
-		/// <summary>
-		/// 底层数组的完整长度。
-		/// </summary>
-		private readonly int btmFullLen;
-		/// <summary>
-		/// 集合是否不区分大小写。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private readonly bool ignoreCase;
-		/// <summary>
-		/// 判断字符大小写使用的区域信息。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private readonly CultureInfo culture;
-		/// <summary>
-		/// 获取字符索引的方法。
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private readonly Func<char, int> getIndex;
-
-		#region 构造函数
 
 		/// <summary>
 		/// 初始化 <see cref="CharSet"/> 类的新实例。
 		/// </summary>
-		/// <overloads>
+		public CharSet() : base() { }
 		/// <summary>
-		/// 初始化 <see cref="CharSet"/> 类的新实例。
+		/// 使用指定的元素初始化 <see cref="CharSet"/> 类的新实例。
 		/// </summary>
-		/// </overloads>
-		public CharSet()
-			: this(false, null)
-		{ }
-		/// <summary>
-		/// 使用指定的是否区分大小写初始化 <see cref="CharSet"/> 类的新实例。
-		/// </summary>
-		/// <param name="ignoreCase">是否不区分字符的大小写。</param>
-		public CharSet(bool ignoreCase)
-			: this(ignoreCase, null)
-		{ }
-		/// <summary>
-		/// 使用指定的是否区分大小写和区域信息初始化 <see cref="CharSet"/> 类的新实例。
-		/// </summary>
-		/// <param name="ignoreCase">是否不区分字符的大小写。</param>
-		/// <param name="culture">不区分字符大小写时使用的区域信息。</param>
-		public CharSet(bool ignoreCase, CultureInfo culture)
-			: base(null)
+		public CharSet(IEnumerable<char> collection) : base()
 		{
-			this.ignoreCase = ignoreCase;
-			this.data = new uint[TopLen][];
-			if (this.ignoreCase)
+			UnionWith(collection);
+		}
+
+		/// <summary>
+		/// 将指定字符范围添加到当前集合中。
+		/// </summary>
+		/// <param name="start">要添加到当前集合的字符范围起始（包含）。</param>
+		/// <param name="end">要添加到当前集合的字符范围结束（包含）。</param>
+		/// <returns>如果该字符范围内的<b>任何</b>字符已添加到集合内，则为 <c>true</c>；如果该字符范围已全部在集合内，则为 <c>false</c>。</returns>
+		/// <exception cref="ArgumentOutOfRangeException">字符范围的起始大于结束。</exception>
+		public bool Add(char start, char end)
+		{
+			if (start > end)
 			{
-				this.culture = culture ?? CultureInfo.InvariantCulture;
-				this.getIndex = GetIndexIgnoreCase;
-				this.btmFullLen = BtmLen << 1;
+				throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
+			}
+			Node? node = ranges.FindLE(start);
+			if (node == null || node.Value + 1 < start)
+			{
+				// 之前的节点不能覆盖或连接 [start, end] 的范围。
+				count += end - start + 1;
+				node = ranges.Add(start, end);
+			}
+			else if (node.Value < end)
+			{
+				// 存在可以覆盖部分 [start, end] 的范围。
+				count += end - node.Value;
+				node.Value = end;
 			}
 			else
 			{
-				this.getIndex = GetIndex;
-				this.btmFullLen = BtmLen;
+				// 已存在可以覆盖 [start, end] 的范围。
+				return false;
+			}
+			MergeRange(node);
+			return true;
+		}
+
+		/// <summary>
+		/// 从当前集合中移除指定字符范围。
+		/// </summary>
+		/// <param name="start">要从当前集合中移除的字符范围起始（包含）。</param>
+		/// <param name="end">要从当前集合中移除的字符范围结束（包含）。</param>
+		/// <returns>如果已从当前集合中成功移除该字符范围内的<b>任何</b>字符，则为 <c>true</c>；否则为 <c>false</c>。
+		/// 如果在原始当前集合中没有找到字符范围内的字符，该方法也会返回 <c>false</c>。</returns>
+		/// <exception cref="ArgumentOutOfRangeException">字符范围的起始大于结束。</exception>
+		public bool Remove(char start, char end)
+		{
+			if (start > end)
+			{
+				throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
+			}
+			int oldCount = count;
+			// 从 node 开始向后遍历，移除范围。
+			Node? next;
+			for (Node? node = ranges.FindLE(start) ?? ranges.First; node != null && node.Key <= end; node = next)
+			{
+				next = node.Next;
+				if (node.Value < start)
+				{
+					// 未在要移除的范围内。
+					continue;
+				}
+				else if (node.Key < start)
+				{
+					// 保留前面部分字符。
+					char oldEnd = node.Value;
+					count -= node.Value - start + 1;
+					node.Value = (char)(start - 1);
+					if (oldEnd > end)
+					{
+						// 同时需要保留后面部分字符。
+						count += oldEnd - end;
+						ranges.Add((char)(end + 1), oldEnd);
+						break;
+					}
+				}
+				else if (node.Value <= end)
+				{
+					// 全部移除。
+					count -= node.Value - node.Key + 1;
+					ranges.Remove(node);
+				}
+				else
+				{
+					// 保留后面部分字符。
+					count -= end - node.Key + 1;
+					ranges.Remove(node);
+					ranges.Add((char)(end + 1), node.Value);
+					break;
+				}
+			}
+			return count < oldCount;
+		}
+
+		/// <summary>
+		/// 返回一个循环访问字符范围的枚举器。
+		/// </summary>
+		/// <returns>可用于循环访问字符范围的 <see cref="IEnumerable{Tuple}"/>。</returns>
+		public IEnumerable<(char start, char end)> Ranges()
+		{
+			foreach (var node in ranges)
+			{
+				yield return (node.Key, node.Value);
 			}
 		}
+
+		#region 字符范围操作
+
 		/// <summary>
-		/// 初始化 <see cref="CharSet"/> 类的新实例，该实例包含从指定的集合复制的元素。
+		/// 从指定节点开始合并重叠的字符范围。
 		/// </summary>
-		/// <param name="collection">其元素被复制到新集中的集合。</param>
-		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
-		public CharSet(IEnumerable<char> collection)
-			: this(false, null)
+		/// <param name="node">合并的起始节点。</param>
+		private void MergeRange(Node node)
 		{
-			CommonExceptions.CheckArgumentNull(collection, "collection");
-			Contract.EndContractBlock();
-			this.UnionWith(collection);
-		}
-		/// <summary>
-		/// 使用指定的是否区分大小写初始化 <see cref="CharSet"/> 类的新实例，
-		/// 该实例包含从指定的集合复制的元素。
-		/// </summary>
-		/// <param name="collection">其元素被复制到新集中的集合。</param>
-		/// <param name="ignoreCase">是否不区分字符的大小写。</param>
-		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
-		public CharSet(IEnumerable<char> collection, bool ignoreCase)
-			: this(ignoreCase, null)
-		{
-			CommonExceptions.CheckArgumentNull(collection, "collection");
-			Contract.EndContractBlock();
-			this.UnionWith(collection);
-		}
-		/// <summary>
-		/// 使用指定的是否区分大小写和区域信息初始化 
-		/// <see cref="CharSet"/> 类的新实例，
-		/// 该实例包含从指定的集合复制的元素。
-		/// </summary>
-		/// <param name="collection">其元素被复制到新集中的集合。</param>
-		/// <param name="ignoreCase">是否不区分字符的大小写。</param>
-		/// <param name="culture">不区分字符大小写时使用的区域信息。</param>
-		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
-		public CharSet(IEnumerable<char> collection, bool ignoreCase, CultureInfo culture)
-			: this(ignoreCase, culture)
-		{
-			CommonExceptions.CheckArgumentNull(collection, "collection");
-			Contract.EndContractBlock();
-			this.UnionWith(collection);
-		}
-		/// <summary>
-		/// 用指定的序列化信息和上下文初始化 <see cref="CharSet"/> 类的新实例。
-		/// </summary>
-		/// <param name="info"><see cref="SerializationInfo"/> 对象，包含序列化 
-		/// <see cref="CharSet"/> 所需的信息。</param>
-		/// <param name="context"><see cref="StreamingContext"/> 对象，
-		/// 该对象包含与 <see cref="CharSet"/> 相关联的序列化流的源和目标。</param>
-		/// <exception cref="ArgumentNullException"><paramref name="info"/> 参数为 <c>null</c>。</exception>
-		private CharSet(SerializationInfo info, StreamingContext context)
-			: base(null)
-		{
-			CommonExceptions.CheckArgumentNull(info, "info");
-			Contract.EndContractBlock();
-			this.data = (uint[][])info.GetValue("Data", typeof(uint[][]));
-			this.count = info.GetInt32("Count");
-			this.ignoreCase = info.GetBoolean("IgnoreCase");
-			if (this.ignoreCase)
+			Node? next;
+			while ((next = node.Next) != null)
 			{
-				this.culture = (CultureInfo)info.GetValue("Culture", typeof(CultureInfo));
-				this.getIndex = GetIndexIgnoreCase;
-				this.btmFullLen = BtmLen << 1;
-			}
-			else
-			{
-				this.getIndex = GetIndex;
-				this.btmFullLen = BtmLen;
+				if (node.Value + 1 < next.Key)
+				{
+					// 无法覆盖下一范围。
+					break;
+				}
+				ranges.Remove(next);
+				count -= next.Value - next.Key + 1;
+				if (node.Value < next.Value)
+				{
+					count += next.Value - node.Value;
+					node.Value = next.Value;
+					break;
+				}
 			}
 		}
 
-		#endregion // 构造函数
-
 		/// <summary>
-		/// 获取是否使用不区分大小写的比较。
+		/// 确定当前集合是否包含指定的集合中的所有字符。
 		/// </summary>
-		/// <value>如果使用不区分大小写的比较，则为 <c>true</c>；否则为 <c>false</c>；</value>
-		public bool IgnoreCase
+		/// <param name="other">要与当前集进行比较的集合。</param>
+		/// <returns>如果包含 <paramref name="other"/> 中的所有字符，则返回 
+		/// <c>true</c>，否则返回 <c>false</c>。</returns>
+		private bool ContainsAllElements(CharSet other)
 		{
-			get { return ignoreCase; }
-		}
-		/// <summary>
-		/// 获取不区分大小写时使用的区域性信息。
-		/// </summary>
-		/// <value>在进行不区分大小写的比较时，使用的区域性信息。</value>
-		public CultureInfo Culture
-		{
-			get { return culture; }
-		}
-		/// <summary>
-		/// 对象不变量。
-		/// </summary>
-		[ContractInvariantMethod]
-		private void ObjectInvariant()
-		{
-			Contract.Invariant(this.data != null && this.data.Length == TopLen);
-		}
-
-		#region 数据操作
-
-		/// <summary>
-		/// 返回指定的底层存储单元是否都是 0。
-		/// </summary>
-		/// <param name="array">要判断的底层存储单元。</param>
-		/// <returns>如果单元中的元素都是 0，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private static bool IsEmpty(uint[] array)
-		{
-			Contract.Requires(array != null && array.Length >= BtmLen);
-			for (int i = 0; i < BtmLen; i++)
+			foreach (var (start, end) in other.Ranges())
 			{
-				if (array[i] != 0)
+				Node? node = ranges.FindLE(start);
+				if (node == null || node.Value < end)
 				{
 					return false;
 				}
 			}
 			return true;
 		}
-		/// <summary>
-		/// 计算指定的底层存储单元中包含的字符个数。
-		/// </summary>
-		/// <param name="array">要计算字符个数的底层存储单元。</param>
-		/// <returns>指定的底层存储单元中包含的字符个数。</returns>
-		private static int CountChar(uint[] array)
-		{
-			Contract.Requires(array != null && array.Length >= BtmLen);
-			Contract.Ensures(Contract.Result<int>() >= 0);
-			int cnt = 0;
-			for (int i = 0; i < BtmLen; i++)
-			{
-				if (array[i] != 0)
-				{
-					cnt += array[i].CountBits();
-				}
-			}
-			return cnt;
-		}
-		/// <summary>
-		/// 复制指定的底层存储单元
-		/// </summary>
-		/// <param name="array">要复制底层存储单元。</param>
-		/// <param name="count">实际被复制的字符个数。</param>
-		/// <returns>复制得到的底层存储单元。。</returns>
-		private static uint[] CopyChar(uint[] array, out int count)
-		{
-			Contract.Requires(array != null && array.Length >= BtmLen);
-			Contract.Ensures(Contract.Result<uint[]>() != null && 
-				Contract.Result<uint[]>().Length == array.Length);
-			Contract.Ensures(Contract.ValueAtReturn(out count) >= 0);
-			uint[] newArr = new uint[array.Length];
-			array.CopyTo(newArr, 0);
-			count = CountChar(array);
-			return newArr;
-		}
-		/// <summary>
-		/// 默认的获取字符索引的方法。
-		/// </summary>
-		/// <param name="ch">要获取索引的字符。</param>
-		/// <returns>指定字符的索引。</returns>
-		private static int GetIndex(char ch)
-		{
-			Contract.Ensures(Contract.Result<int>() >= 0);
-			return ch;
-		}
-		/// <summary>
-		/// 不区分大小写的获取字符索引的方法。
-		/// </summary>
-		/// <param name="ch">要获取索引的字符。</param>
-		/// <returns>指定字符的索引。</returns>
-		private int GetIndexIgnoreCase(char ch)
-		{
-			Contract.Ensures(Contract.Result<int>() >= 0);
-			return char.ToUpper(ch, culture);
-		}
-		/// <summary>
-		/// 获取指定字符对应的数据及相应掩码。如果不存在，则返回 <c>null</c>。
-		/// </summary>
-		/// <param name="ch">要获取数据及相应掩码的字符。</param>
-		/// <param name="idx">数据的索引位置。</param>
-		/// <param name="binIdx">数据的二进制位置。</param>
-		/// <returns>数据数组。</returns>
-		private uint[] FindMask(int ch, out int idx, out uint binIdx)
-		{
-			Contract.Requires(ch >= 0 && (ch >> TopShift) < TopLen);
-			Contract.Ensures(Contract.Result<uint[]>() == null ||
-				Contract.Result<uint[]>().Length == btmFullLen);
-			idx = ch >> TopShift;
-			uint[] arr = this.data[idx];
-			if (arr == null)
-			{
-				binIdx = 0;
-			}
-			else
-			{
-				idx = (ch >> BtmShift) & BtmMask;
-				binIdx = 1U << (ch & IndexMask);
-			}
-			return arr;
-		}
-		/// <summary>
-		/// 获取指定字符对应的掩码位置。如果掩码位置不存在，则创建指定的掩码位置。
-		/// </summary>
-		/// <param name="ch">要获取数据及相应掩码的字符。</param>
-		/// <param name="idx">数据的索引位置。</param>
-		/// <param name="binIdx">数据的二进制位置。</param>
-		/// <returns>数据数组。</returns>
-		private uint[] FindAndCreateMask(int ch, out int idx, out uint binIdx)
-		{
-			Contract.Requires(ch >= 0 && (ch >> TopShift) < TopLen);
-			Contract.Ensures(Contract.Result<uint[]>() != null &&
-				Contract.Result<uint[]>().Length == btmFullLen);
-			Contract.Ensures(Contract.ValueAtReturn(out idx) >= 0 &&
-				Contract.ValueAtReturn(out idx) < TopLen);
-			idx = ch >> TopShift;
-			uint[] arr = this.data[idx];
-			if (arr == null)
-			{
-				arr = new uint[btmFullLen];
-				this.data[idx] = arr;
-			}
-			idx = (ch >> BtmShift) & BtmMask;
-			binIdx = 1u << (ch & IndexMask);
-			return arr;
-		}
-		/// <summary>
-		/// 确定当前集与指定集合相比，相同的和未包含的元素数目。
-		/// </summary>
-		/// <param name="other">要与当前集进行比较的集合。</param>
-		/// <param name="returnIfUnfound">是否遇到未包含的元素就返回。</param>
-		/// <param name="sameCount">当前集合中相同元素的数目。</param>
-		/// <param name="unfoundCount">当前集合中未包含的元素数目。</param>
-		private void CountElements(IEnumerable<char> other,
-			bool returnIfUnfound, out int sameCount, out int unfoundCount)
-		{
-			Contract.Requires(other != null);
-			Contract.Ensures(Contract.ValueAtReturn(out sameCount) >= 0);
-			Contract.Ensures(Contract.ValueAtReturn(out unfoundCount) >= 0);
-			sameCount = unfoundCount = 0;
-			CharSet uniqueSet = new CharSet(ignoreCase, culture);
-			foreach (char ch in other)
-			{
-				if (this.Contains(ch))
-				{
-					if (uniqueSet.Add(ch))
-					{
-						sameCount++;
-					}
-				}
-				else
-				{
-					unfoundCount++;
-					if (returnIfUnfound)
-					{
-						break;
-					}
-				}
-			}
-		}
-		/// <summary>
-		/// 确定当前集是否包含指定的集合中的所有元素。
-		/// </summary>
-		/// <param name="other">要与当前集进行比较的集合。</param>
-		/// <returns>如果包含 <paramref name="other"/> 中的所有元素，则返回 
-		/// <c>true</c>，否则返回 <c>false</c>。</returns>
-		private bool ContainsAllElements(CharSet other)
-		{
-			Contract.Requires(other != null);
-			for (int i = 0; i < TopLen; i++)
-			{
-				uint[] otherArr = other.data[i];
-				if (otherArr == null)
-				{
-					continue;
-				}
-				uint[] arr = data[i];
-				if (arr == null)
-				{
-					if (!IsEmpty(otherArr))
-					{
-						return false;
-					}
-					continue;
-				}
-				for (int j = 0; j < BtmLen; j++)
-				{
-					if ((arr[j] | otherArr[j]) != arr[j])
-					{
-						return false;
-					}
-				}
-			}
-			return true;
-		}
 
-		#endregion
-
-		/// <summary>
-		/// 将 <see cref="CharSet"/> 对象的容量设置为它所包含
-		/// 的元素的实际个数，向上舍入为接近的特定于实现的值。
-		/// </summary>
-		public void TrimExcess()
-		{
-			for (int i = 0; i < TopLen; i++)
-			{
-				if (data[i] != null && IsEmpty(data[i]))
-				{
-					data[i] = null;
-				}
-			}
-		}
-
-		#region SetBase<char> 成员
-
-		/// <summary>
-		/// 向当前集内添加元素，并返回一个指示是否已成功添加元素的值。
-		/// </summary>
-		/// <param name="item">要添加到 <see cref="CharSet"/> 的中的对象。
-		/// 对于引用类型，该值可以为 <c>null</c>。</param>
-		/// <returns>如果该元素已添加到集内，则为 <c>true</c>；
-		/// 如果该元素已在集内，则为 <c>false</c>。</returns>
-		protected override bool AddItem(char item)
-		{
-			int cIdx = getIndex(item);
-			int idx;
-			uint binIdx;
-			uint[] arr = FindAndCreateMask(cIdx, out idx, out binIdx);
-			if ((arr[idx] & binIdx) != 0U)
-			{
-				return false;
-			}
-			arr[idx] |= binIdx;
-			count++;
-			if (ignoreCase && cIdx != item)
-			{
-				// 添加的是小写字母。
-				arr[idx + BtmLen] |= binIdx;
-			}
-			return true;
-		}
-
-		#endregion // SetBase<char> 成员
+		#endregion // 字符范围操作
 
 		#region ISet<char> 成员
 
 		/// <summary>
-		/// 从当前集内移除指定集合中的所有元素。
+		/// 向当前集内添加字符，并返回一个指示是否已成功添加字符的值。
 		/// </summary>
-		/// <param name="other">要从集内移除的项的集合。</param>
+		/// <param name="ch">要添加到 <see cref="CharSet"/> 的中的字符。</param>
+		/// <returns>如果该字符已添加到集内，则为 <c>true</c>；如果该字符已在集内，则为 <c>false</c>。</returns>
+		public override bool Add(char ch)
+		{
+			return Add(ch, ch);
+		}
+
+		/// <summary>
+		/// 从当前集合内移除指定集合中的所有元素。
+		/// </summary>
+		/// <param name="other">要从集合内移除的项的集合。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void ExceptWith(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			if (this.count <= 0)
+			CommonExceptions.CheckArgumentNull(other);
+			if (count <= 0)
 			{
 				return;
 			}
 			if (ReferenceEquals(this, other))
 			{
-				this.Clear();
+				Clear();
+				return;
+			}
+			if (other is CharSet otherSet)
+			{
+				// CharSet 可以范围操作。
+				foreach (var (start, end) in otherSet.Ranges())
+				{
+					Remove(start, end);
+				}
 			}
 			else
 			{
-				CharSet otherSet = other as CharSet;
-				if (otherSet != null &&
-					this.ignoreCase == otherSet.ignoreCase &&
-					Equals(this.culture, otherSet.culture))
+				foreach (char ch in other)
 				{
-					// 针对 CharSet 的操作更快。
-					this.ExceptWith(otherSet);
-				}
-				else
-				{
-					foreach (char c in other)
-					{
-						this.Remove(c);
-					}
+					Remove(ch);
 				}
 			}
 		}
+
 		/// <summary>
-		/// 从当前集内移除指定集合中的所有元素。
+		/// 修改当前集合，使当前集合仅包含指定集合中也存在的元素。
 		/// </summary>
-		/// <param name="other">要从集内移除的项的集合。</param>
-		private void ExceptWith(CharSet other)
-		{
-			Contract.Requires(other != null);
-			for (int i = 0; i < TopLen; i++)
-			{
-				uint[] arr = data[i];
-				if (arr == null)
-				{
-					continue;
-				}
-				uint[] otherArr = other.data[i];
-				if (otherArr == null)
-				{
-					continue;
-				}
-				for (int j = 0; j < BtmLen; j++)
-				{
-					uint removed = arr[j] & otherArr[j];
-					if (removed > 0U)
-					{
-						this.count -= removed.CountBits();
-						arr[j] &= ~removed;
-						if (ignoreCase)
-						{
-							arr[j + BtmLen] &= ~removed;
-						}
-					}
-				}
-			}
-		}
-		/// <summary>
-		/// 修改当前集，使该集仅包含指定集合中也存在的元素。
-		/// </summary>
-		/// <param name="other">要与当前集进行比较的集合。</param>
+		/// <param name="other">要与当前集合进行比较的集合。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void IntersectWith(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			if (this.count <= 0 || ReferenceEquals(this, other))
+			if (other is CharSet otherSet)
 			{
-				return;
-			}
-			CharSet otherSet = other as CharSet;
-			if (otherSet != null &&
-				this.ignoreCase == otherSet.ignoreCase &&
-				Equals(this.culture, otherSet.culture))
-			{
-				// 针对 CharSet 的操作更快。
-				IntersectWith(otherSet);
+				// 移除不在 otherSet 里的字符范围。
+				char begin = '\0';
+				foreach (var (start, end) in otherSet.Ranges())
+				{
+					if (begin < start)
+					{
+						Remove(begin, (char)(start - 1));
+					}
+					begin = (char)(end + 1);
+				}
+				if (begin < char.MaxValue)
+				{
+					Remove(begin, char.MaxValue);
+				}
 			}
 			else
 			{
-				otherSet = new CharSet(other.Where(this.Contains), ignoreCase, culture);
-				// 替换当前集合。
-				this.data = otherSet.data;
-				this.count = otherSet.count;
+				base.IntersectWith(other);
 			}
 		}
+
 		/// <summary>
-		/// 修改当前集，使该集仅包含指定集合中也存在的元素。
+		/// 确定当前集合是否为指定集合的真子集合。
 		/// </summary>
-		/// <param name="other">要与当前集进行比较的集合。</param>
-		private void IntersectWith(CharSet other)
-		{
-			Contract.Requires(other != null);
-			// 针对 CharSet 的操作更快。
-			for (int i = 0; i < TopLen; i++)
-			{
-				uint[] arr = data[i];
-				if (arr == null)
-				{
-					continue;
-				}
-				uint[] otherArr = other.data[i];
-				if (otherArr == null)
-				{
-					data[i] = null;
-					// 计算被移除的元素数量。
-					this.count -= CountChar(arr);
-					continue;
-				}
-				for (int j = 0; j < BtmLen; j++)
-				{
-					uint removed = arr[j] & ~otherArr[j];
-					if (removed > 0U)
-					{
-						this.count -= removed.CountBits();
-						arr[j] &= otherArr[j];
-						if (ignoreCase)
-						{
-							arr[j + BtmLen] &= otherArr[j];
-						}
-					}
-				}
-			}
-		}
-		/// <summary>
-		/// 确定当前集是否为指定集合的真（严格）子集。
-		/// </summary>
-		/// <param name="other">要与当前集进行比较的集合。</param>
-		/// <returns>如果当前集是 <paramref name="other"/> 的真子集，则为 
-		/// <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <param name="other">要与当前集合进行比较的集合。</param>
+		/// <returns>如果当前集合是 <paramref name="other"/> 的真子集合，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsProperSubsetOf(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			ICollection<char> col = other as ICollection<char>;
-			if (this.count == 0)
+			CommonExceptions.CheckArgumentNull(other);
+			if (count == 0)
 			{
-				if (col == null)
-				{
-					return other.Any();
-				}
-				return col.Count > 0;
+				return other.Any();
 			}
-			CharSet otherSet = other as CharSet;
-			if (otherSet != null &&
-				this.ignoreCase == otherSet.ignoreCase &&
-				Equals(this.culture, otherSet.culture))
+			if (other is CharSet otherSet)
 			{
-				return this.count < otherSet.count && otherSet.ContainsAllElements(this);
+				return count < otherSet.Count && otherSet.ContainsAllElements(this);
 			}
-			int sameCount, unfoundCount;
-			CountElements(other, false, out sameCount, out unfoundCount);
-			return sameCount == count && unfoundCount > 0;
+			else
+			{
+				var (sameCount, unfoundCount) = CountElements(other, false);
+				return sameCount == Count && unfoundCount > 0;
+			}
 		}
+
 		/// <summary>
-		/// 确定当前集是否为指定集合的真（严格）超集。
+		/// 确定当前集合是否为指定集合的真超集合。
 		/// </summary>
-		/// <param name="other">要与当前集进行比较的集合。</param>
-		/// <returns>如果当前集是 <paramref name="other"/> 的真超集，则为 
-		/// <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <param name="other">要与当前集合进行比较的集合。</param>
+		/// <returns>如果当前集合是 <paramref name="other"/> 的真超集合，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsProperSupersetOf(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			if (this.count == 0)
+			CommonExceptions.CheckArgumentNull(other);
+			if (count == 0)
 			{
 				return false;
 			}
-			ICollection<char> col = other as ICollection<char>;
-			if (col != null && col.Count == 0)
+			if (other is CharSet otherSet)
 			{
-				return true;
+				return count > otherSet.Count && ContainsAllElements(otherSet);
 			}
-			CharSet otherSet = other as CharSet;
-			if (otherSet != null &&
-				this.ignoreCase == otherSet.ignoreCase &&
-				Equals(this.culture, otherSet.culture))
+			else
 			{
-				return otherSet.count < count && ContainsAllElements(otherSet);
+				var (sameCount, unfoundCount) = CountElements(other, true);
+				return sameCount < Count && unfoundCount == 0;
 			}
-			int sameCount, unfoundCount;
-			CountElements(other, true, out sameCount, out unfoundCount);
-			return sameCount < Count && unfoundCount == 0;
 		}
+
 		/// <summary>
-		/// 确定当前集是否为指定集合的子集。
+		/// 确定当前集合是否为指定集合的子集合。
 		/// </summary>
-		/// <param name="other">要与当前集进行比较的集合。</param>
-		/// <returns>如果当前集是 <paramref name="other"/> 的子集，则为 
-		/// <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <param name="other">要与当前集合进行比较的集合。</param>
+		/// <returns>如果当前集合是 <paramref name="other"/> 的子集合，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsSubsetOf(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			if (this.count == 0)
+			CommonExceptions.CheckArgumentNull(other);
+			if (count == 0)
 			{
 				return true;
 			}
-			CharSet otherSet = other as CharSet;
-			if (otherSet != null &&
-				this.ignoreCase == otherSet.ignoreCase &&
-				Equals(this.culture, otherSet.culture))
+			if (other is CharSet otherSet)
 			{
-				return this.count <= otherSet.Count && otherSet.ContainsAllElements(this);
+				return count <= otherSet.Count && otherSet.ContainsAllElements(this);
 			}
-			int sameCount, unfoundCount;
-			CountElements(other, false, out sameCount, out unfoundCount);
-			return sameCount == count && unfoundCount >= 0;
+			else
+			{
+				var (sameCount, unfoundCount) = CountElements(other, false);
+				return sameCount == Count && unfoundCount >= 0;
+			}
 		}
+
 		/// <summary>
-		/// 确定当前集是否为指定集合的超集。
+		/// 确定当前集合是否为指定集合的超集合。
 		/// </summary>
-		/// <param name="other">要与当前集进行比较的集合。</param>
-		/// <returns>如果当前集是 <paramref name="other"/> 的超集，则为 
-		/// <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <param name="other">要与当前集合进行比较的集合。</param>
+		/// <returns>如果当前集合是 <paramref name="other"/> 的超集合，则为 <c>true</c>；
+		/// 否则为 <c>false</c>。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsSupersetOf(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			ICollection<char> col = other as ICollection<char>;
-			if (col != null)
+			CommonExceptions.CheckArgumentNull(other);
+			if (count == 0)
 			{
-				if (col.Count == 0)
-				{
-					return true;
-				}
-				if (this.count == 0)
-				{
-					return false;
-				}
+				return !other.Any();
 			}
-			CharSet otherSet = other as CharSet;
-			if (otherSet == null ||
-				this.ignoreCase != otherSet.ignoreCase ||
-				!Equals(this.culture, otherSet.culture))
+			if (other is CharSet otherSet)
 			{
-				return other.All(this.Contains);
+				return count >= otherSet.Count && ContainsAllElements(otherSet);
 			}
-			return otherSet.Count <= this.count && this.ContainsAllElements(otherSet);
+			else
+			{
+				return other.All(Contains);
+			}
 		}
+
 		/// <summary>
-		/// 确定当前集是否与指定的集合重叠。
+		/// 确定当前集合是否与指定的集合重叠。
 		/// </summary>
-		/// <param name="other">要与当前集进行比较的集合。</param>
-		/// <returns>如果当前集与 <paramref name="other"/> 
+		/// <param name="other">要与当前集合进行比较的集合。</param>
+		/// <returns>如果当前集合与 <paramref name="other"/> 
 		/// 至少共享一个通用元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool Overlaps(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			if (this.count <= 0)
+			CommonExceptions.CheckArgumentNull(other);
+			if (count == 0)
 			{
 				return false;
 			}
-			CharSet otherSet = other as CharSet;
-			if (otherSet == null ||
-				this.ignoreCase != otherSet.ignoreCase ||
-				!Equals(this.culture, otherSet.culture))
+			if (other is CharSet otherSet)
 			{
-				return other.Any(this.Contains);
-			}
-			// 针对 CharSet 的操作更快。
-			return this.Overlaps(otherSet);
-		}
-		/// <summary>
-		/// 确定当前集是否与指定的集合重叠。
-		/// </summary>
-		/// <param name="other">要与当前集进行比较的集合。</param>
-		/// <returns>如果当前集与 <paramref name="other"/> 
-		/// 至少共享一个通用元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		private bool Overlaps(CharSet other)
-		{
-			Contract.Requires(other != null);
-			for (int i = 0; i < TopLen; i++)
-			{
-				uint[] arr = data[i];
-				if (arr == null)
+				// CharSet 可以范围操作。
+				foreach (var (start, end) in otherSet.Ranges())
 				{
-					continue;
-				}
-				uint[] otherArr = other.data[i];
-				if (otherArr == null)
-				{
-					continue;
-				}
-				for (int j = 0; j < BtmLen; j++)
-				{
-					if ((arr[j] & otherArr[j]) > 0U)
+					Node? node = ranges.FindLE(start);
+					if (node != null && node.Key <= end && node.Value >= start)
 					{
 						return true;
 					}
 				}
+				return false;
 			}
-			return false;
+			else
+			{
+				return other.Any(Contains);
+			}
 		}
+
 		/// <summary>
-		/// 确定当前集与指定的集合中是否包含相同的元素。
+		/// 确定当前集合与指定的集合中是否包含相同的元素。
 		/// </summary>
-		/// <param name="other">要与当前集进行比较的集合。</param>
-		/// <returns>如果当前集等于 <paramref name="other"/>，则为 <c>true</c>；
+		/// <param name="other">要与当前集合进行比较的集合。</param>
+		/// <returns>如果当前集合等于 <paramref name="other"/>，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool SetEquals(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			CharSet otherSet = other as CharSet;
-			if (otherSet != null &&
-				this.ignoreCase == otherSet.ignoreCase &&
-				Equals(this.culture, otherSet.culture))
+			CommonExceptions.CheckArgumentNull(other);
+			if (count == 0)
 			{
-				return count == otherSet.count && this.ContainsAllElements(otherSet);
+				return !other.Any();
 			}
-			ICollection<char> col = other as ICollection<char>;
-			if (this.count == 0)
+			if (other is CharSet otherSet)
 			{
-				if (col == null)
-				{
-					return !other.Any();
-				}
-				if (col.Count > 0)
-				{
-					return false;
-				}
-			}
-			int sameCount, unfoundCount;
-			CountElements(other, true, out sameCount, out unfoundCount);
-			return (sameCount == count && unfoundCount == 0);
-		}
-		/// <summary>
-		/// 修改当前集，使该集仅包含当前集或指定集合中存在的元素（但不可包含两者共有的元素）。
-		/// </summary>
-		/// <param name="other">要与当前集进行比较的集合。</param>
-		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
-		public override void SymmetricExceptWith(IEnumerable<char> other)
-		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
-			if (this.count == 0)
-			{
-				this.UnionWith(other);
-			}
-			else if (ReferenceEquals(this, other))
-			{
-				this.Clear();
+				return count == otherSet.Count && ContainsAllElements(otherSet);
 			}
 			else
 			{
-				CharSet otherSet = other as CharSet;
-				if (otherSet == null ||
-					this.ignoreCase != otherSet.ignoreCase ||
-					!Equals(this.culture, otherSet.culture))
-				{
-					otherSet = new CharSet(other, ignoreCase, culture);
-				}
-				// 针对 CharSet 的操作更快。
-				SymmetricExceptWith(otherSet);
+				var (sameCount, unfoundCount) = CountElements(other, true);
+				return (sameCount == Count && unfoundCount == 0);
 			}
 		}
+
 		/// <summary>
-		/// 修改当前集，使该集仅包含当前集或指定集合中存在的元素（但不可包含两者共有的元素）。
+		/// 修改当前集合，使该集合仅包含当前集合或指定集合中存在的元素（但不可包含两者共有的元素）。
 		/// </summary>
-		/// <param name="other">要与当前集进行比较的集合。</param>
-		private void SymmetricExceptWith(CharSet other)
+		/// <param name="other">要与当前集合进行比较的集合。</param>
+		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
+		public override void SymmetricExceptWith(IEnumerable<char> other)
 		{
-			Contract.Requires(other != null);
-			for (int i = 0; i < TopLen; i++)
+			if (other is CharSet otherSet)
 			{
-				uint[] otherArr = other.data[i];
-				if (otherArr == null)
-				{
-					continue;
-				}
-				uint[] arr = data[i];
-				if (arr == null)
-				{
-					// 复制数据。
-					int cnt;
-					data[i] = CopyChar(otherArr, out cnt);
-					this.count += cnt;
-					continue;
-				}
-				for (int j = 0; j < BtmLen; j++)
-				{
-					int oldCnt = 0;
-					if (arr[j] > 0)
-					{
-						oldCnt = arr[j].CountBits();
-					}
-					if (ignoreCase)
-					{
-						arr[j + BtmLen] &= ~otherArr[j];
-						arr[j + BtmLen] |= otherArr[j + BtmLen] & ~arr[j];
-					}
-					arr[j] ^= otherArr[j];
-					int newCnt = 0;
-					if (arr[j] > 0)
-					{
-						newCnt = arr[j].CountBits();
-					}
-					this.count += newCnt - oldCnt;
-				}
+				CharSet newSet = new(otherSet);
+				newSet.ExceptWith(this);
+				ExceptWith(otherSet);
+				UnionWith(newSet);
+			}
+			else
+			{
+				base.SymmetricExceptWith(other);
 			}
 		}
+
 		/// <summary>
-		/// 修改当前集，使该集包含当前集和指定集合中同时存在的所有元素。
+		/// 修改当前集合，使该集合包含当前集合和指定集合中同时存在的所有元素。
 		/// </summary>
-		/// <param name="other">要与当前集进行比较的集合。</param>
+		/// <param name="other">要与当前集合进行比较的集合。</param>
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void UnionWith(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
-			Contract.EndContractBlock();
+			CommonExceptions.CheckArgumentNull(other);
 			if (ReferenceEquals(this, other))
 			{
 				return;
 			}
-			CharSet otherSet = other as CharSet;
-			if (otherSet != null &&
-				this.ignoreCase == otherSet.ignoreCase &&
-				Equals(this.culture, otherSet.culture))
+			if (other is CharSet otherSet)
 			{
-				// 针对 CharSet 的操作更快。
-				this.UnionWith(otherSet);
+				// CharSet 可以范围操作。
+				foreach (var (start, end) in otherSet.Ranges())
+				{
+					Add(start, end);
+				}
 			}
 			else
 			{
-				foreach (char c in other)
+				foreach (char ch in other)
 				{
-					this.AddItem(c);
-				}
-			}
-		}
-		/// <summary>
-		/// 修改当前集，使该集包含当前集和指定集合中同时存在的所有元素。
-		/// </summary>
-		/// <param name="other">要与当前集进行比较的集合。</param>
-		private void UnionWith(CharSet other)
-		{
-			Contract.Requires(other != null);
-			for (int i = 0; i < TopLen; i++)
-			{
-				uint[] otherArr = other.data[i];
-				if (otherArr == null)
-				{
-					continue;
-				}
-				uint[] arr = data[i];
-				if (arr == null)
-				{
-					// 复制数据。
-					int cnt;
-					data[i] = CopyChar(otherArr, out cnt);
-					this.count += cnt;
-					continue;
-				}
-				for (int j = 0; j < BtmLen; j++)
-				{
-					// 后来添加的字符数。
-					uint added = (~arr[j]) & otherArr[j];
-					if (added > 0)
-					{
-						this.count += added.CountBits();
-						arr[j] |= added;
-						if (ignoreCase)
-						{
-							arr[j + BtmLen] |= otherArr[j + BtmLen] & added;
-						}
-					}
+					Add(ch, ch);
 				}
 			}
 		}
@@ -969,63 +472,40 @@ namespace Cyjb.Collections
 		#region ICollection<char> 成员
 
 		/// <summary>
-		/// 获取 <see cref="CharSet"/> 中包含的元素数。
+		/// 获取当前集合包含的字符数。
 		/// </summary>
-		/// <value><see cref="CharSet"/> 中包含的元素数。</value>
-		public override int Count
-		{
-			get { return this.count; }
-		}
+		/// <value>当前集合中包含的字符数。</value>
+		public override int Count => count;
+
 		/// <summary>
-		/// 从 <see cref="CharSet"/> 中移除所有元素。
+		/// 从当前集合中移除所有字符。
 		/// </summary>
 		public override void Clear()
 		{
-			this.count = 0;
-			for (int i = 0; i < TopLen; i++)
-			{
-				data[i] = null;
-			}
+			count = 0;
+			ranges.Clear();
 		}
+
 		/// <summary>
-		/// 确定 <see cref="CharSet"/> 是否包含特定值。
+		/// 确定当前集合是否包含指定字符。
 		/// </summary>
-		/// <param name="item">要在 <see cref="CharSet"/> 
-		/// 中定位的对象。</param>
-		/// <returns>如果在 <see cref="CharSet"/> 
-		/// 中找到 <paramref name="item"/>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-		public override bool Contains(char item)
+		/// <param name="ch">要在当前集合中定位的字符。</param>
+		/// <returns>如果在当前集合中找到 <paramref name="ch"/>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		public override bool Contains(char ch)
 		{
-			int idx;
-			uint binIdx;
-			uint[] arr = FindMask(getIndex(item), out idx, out binIdx);
-			return (arr != null) && ((arr[idx] & binIdx) != 0U);
+			Node? node = ranges.FindLE(ch);
+			return node != null && node.Value >= ch;
 		}
+
 		/// <summary>
-		/// 从 <see cref="CharSet"/> 中移除特定对象的第一个匹配项。
+		/// 从当前集合中移除指定字符。
 		/// </summary>
-		/// <param name="item">要从 <see cref="CharSet"/> 中移除的对象。</param>
-		/// <returns>如果已从 <see cref="CharSet"/> 中成功移除 <paramref name="item"/>，
-		/// 则为 <c>true</c>；否则为 <c>false</c>。如果在原始 <see cref="CharSet"/> 
-		/// 中没有找到 <paramref name="item"/>，该方法也会返回 <c>false</c>。</returns>
-		public override bool Remove(char item)
+		/// <param name="ch">要从当前集合中移除的字符。</param>
+		/// <returns>如果已从当前集合中成功移除 <paramref name="ch"/>，则为 <c>true</c>；否则为 <c>false</c>。
+		/// 如果在原始当前集合中没有找到 <paramref name="ch"/>，该方法也会返回 <c>false</c>。</returns>
+		public override bool Remove(char ch)
 		{
-			int cIdx = getIndex(item);
-			int idx;
-			uint binIdx;
-			uint[] arr = FindMask(cIdx, out idx, out binIdx);
-			if (arr == null || (arr[idx] & binIdx) == 0U)
-			{
-				return false;
-			}
-			arr[idx] &= ~binIdx;
-			count--;
-			if (ignoreCase && cIdx != item)
-			{
-				// 删除的是小写字母。
-				arr[idx + BtmLen] &= ~binIdx;
-			}
-			return true;
+			return Remove(ch, ch);
 		}
 
 		#endregion // ICollection<char> 成员
@@ -1035,73 +515,100 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 返回一个循环访问集合的枚举器。
 		/// </summary>
-		/// <returns>可用于循环访问集合的 <see cref="IEnumerator{T}"/>。</returns>
+		/// <returns>可用于循环访问集合的 <see cref="IEnumerator{Char}"/>。</returns>
 		public override IEnumerator<char> GetEnumerator()
 		{
-			for (int i = 0; i < TopLen; i++)
+			foreach (var node in ranges)
 			{
-				uint[] arr = this.data[i];
-				if (arr == null)
+				char end = node.Value;
+				// 避免 end 正好是 char.MaxValue 时导致死循环。
+				for (char ch = node.Key; ch < end; ch++)
 				{
-					continue;
+					yield return ch;
 				}
-				int highPart = i << TopShift;
-				for (int k = 0; k < BtmLen; k++)
-				{
-					int midPart = highPart | (k << BtmShift);
-					uint value = arr[k];
-					uint ignoreCaseFlags = ignoreCase ? arr[k + BtmLen] : 0U;
-					for (int n = -1; value > 0U; )
-					{
-						int oneIdx = (value & 1U) == 1U ? 1 : value.CountTrailingZeroBits() + 1;
-						if (oneIdx == 32)
-						{
-							// C# 中 uint 右移 32 位会不变。
-							value = 0U;
-						}
-						else
-						{
-							value = value >> oneIdx;
-						}
-						n += oneIdx;
-						char lowPart = (char)(midPart | n);
-						if ((ignoreCaseFlags & (1U << n)) > 0U)
-						{
-							lowPart = char.ToLower(lowPart, culture);
-						}
-						yield return lowPart;
-					}
-				}
+				yield return end;
 			}
 		}
 
 		#endregion // IEnumerable<char> 成员
 
-		#region ISerializable 成员
+		#region IEquatable<CharSet> 成员
 
 		/// <summary>
-		/// 使用将目标对象序列化所需的数据填充 <see cref="SerializationInfo"/>。
+		/// 指示当前对象是否等于同一类型的另一个对象。
 		/// </summary>
-		/// <param name="info">要填充数据的 <see cref="SerializationInfo"/>。
-		/// </param>
-		/// <param name="context">此序列化的目标。</param>
-		/// <exception cref="SecurityException">调用方没有所要求的权限。</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="info"/> 参数为 <c>null</c>。</exception>
-		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
-		void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
+		/// <param name="other">一个与此对象进行比较的对象。</param>
+		/// <returns>如果当前对象等于 <paramref name="other"/>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <exception cref="NotImplementedException"></exception>
+		public bool Equals(CharSet? other)
 		{
-			CommonExceptions.CheckArgumentNull(info, "info");
-			Contract.EndContractBlock();
-			info.AddValue("Data", this.data);
-			info.AddValue("Count", this.count);
-			info.AddValue("IgnoreCase", this.ignoreCase);
-			if (this.ignoreCase)
+			if (other == null)
 			{
-				info.AddValue("Culture", this.culture);
+				return false;
+			}
+			return count == other.Count && ContainsAllElements(other);
+		}
+
+		#endregion // IEquatable<CharSet> 成员
+
+		/// <summary>
+		/// 返回当前集合的字符串表示。
+		/// </summary>
+		/// <returns>当前集合的字符串表示。</returns>
+		public override string ToString()
+		{
+			StringBuilder builder = new();
+			builder.Append('[');
+			foreach (var node in ranges)
+			{
+				builder.Append(node.Key);
+				if (node.Key + 1 < node.Value)
+				{
+					builder.Append('-');
+				}
+				if (node.Key != node.Value)
+				{
+					builder.Append(node.Value);
+				}
+			}
+			builder.Append(']');
+			return builder.ToString();
+		}
+
+		/// <summary>
+		/// 确定指定对象是否等于当前对象。
+		/// </summary>
+		/// <param name="obj">要与当前对象进行比较的对象。</param>
+		/// <returns>如果指定的对象等于当前对象，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		public override bool Equals(object? obj)
+		{
+			if (obj == null)
+			{
+				return false;
+			}
+			else if (obj is CharSet set)
+			{
+				return Equals(set);
+			}
+			else
+			{
+				return false;
 			}
 		}
 
-		#endregion
-
+		/// <summary>
+		/// 返回当前对象的哈希代码。
+		/// </summary>
+		/// <returns>当前对象的哈希代码。</returns>
+		public override int GetHashCode()
+		{
+			HashCode hashCode = new();
+			foreach (Node node in ranges)
+			{
+				hashCode.Add(node.Key);
+				hashCode.Add(node.Value);
+			}
+			return hashCode.GetHashCode();
+		}
 	}
 }

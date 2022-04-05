@@ -12,10 +12,12 @@ namespace Cyjb.Conversions
 		/// <see cref="BoxConversion"/> 的默认实例。
 		/// </summary>
 		public static readonly Conversion Default = new BoxConversion();
+
 		/// <summary>
 		/// 初始化 <see cref="BoxConversion"/> 类的新实例。
 		/// </summary>
 		private BoxConversion() : base(ConversionType.Box) { }
+
 		/// <summary>
 		/// 写入类型转换的 IL 指令。
 		/// </summary>

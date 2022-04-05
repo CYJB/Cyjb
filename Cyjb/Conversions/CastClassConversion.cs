@@ -12,10 +12,12 @@ namespace Cyjb.Conversions
 		/// <see cref="CastClassConversion"/> 的默认实例。
 		/// </summary>
 		public static readonly Conversion Default = new CastClassConversion();
+
 		/// <summary>
 		/// 初始化 <see cref="CastClassConversion"/> 类的新实例。
 		/// </summary>
 		private CastClassConversion() : base(ConversionType.ExplicitReference) { }
+
 		/// <summary>
 		/// 写入类型转换的 IL 指令。
 		/// </summary>
