@@ -28,6 +28,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 使用指定的元素初始化 <see cref="CharSet"/> 类的新实例。
 		/// </summary>
+		/// <param name="collection">初始化的字符集合。</param>
 		public CharSet(IEnumerable<char> collection) : base()
 		{
 			UnionWith(collection);

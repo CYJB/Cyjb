@@ -9,8 +9,8 @@
     <AssemblyOriginatorKeyFile>../CYJB_Code_Key.snk</AssemblyOriginatorKeyFile>
     <PackageProjectUrl>https://github.com/CYJB/Cyjb</PackageProjectUrl>
     <Description>提供基础的功能扩展</Description>
-    <Copyright>﻿Copyright (c) 2013, CYJB</Copyright>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Copyright>﻿Copyright (c) 2022, CYJB</Copyright>
+    <PackageReadmeFile>../README.md</PackageReadmeFile>
     <PackageLicenseFile>../LICENSE</PackageLicenseFile>
   </PropertyGroup>
 

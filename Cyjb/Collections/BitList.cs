@@ -198,6 +198,7 @@ namespace Cyjb.Collections
 		/// </summary>
 		/// <param name="collection">一个集合，其元素应被添加到 <see cref="BitList"/> 的末尾，
 		/// 其中每个整数表示 32 个连续位。</param>
+		/// <returns>当前 <see cref="BitList"/> 集合。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		/// <overloads>
 		/// <summary>
@@ -217,6 +218,7 @@ namespace Cyjb.Collections
 		/// </summary>
 		/// <param name="collection">一个集合，其元素应被添加到 <see cref="BitList"/> 的末尾，
 		/// 其中每个整数表示 32 个连续位。</param>
+		/// <returns>当前 <see cref="BitList"/> 集合。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public BitList AddRange(IEnumerable<int> collection)
 		{
@@ -230,6 +232,7 @@ namespace Cyjb.Collections
 		/// </summary>
 		/// <param name="collection">一个集合，其元素应被添加到 <see cref="BitList"/> 的末尾，
 		/// 其中每个字节表示 8 个连续位。</param>
+		/// <returns>当前 <see cref="BitList"/> 集合。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public BitList AddRange(IEnumerable<byte> collection)
 		{
@@ -242,6 +245,7 @@ namespace Cyjb.Collections
 		/// 将指定集合的元素添加到 <see cref="BitList"/> 的末尾。
 		/// </summary>
 		/// <param name="collection">一个集合，其元素应被添加到 <see cref="BitList"/> 的末尾。</param>
+		/// <returns>当前 <see cref="BitList"/> 集合。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public BitList AddRange(IEnumerable<bool> collection)
 		{
@@ -255,6 +259,7 @@ namespace Cyjb.Collections
 		/// </summary>
 		/// <param name="length">要添加的值的长度。</param>
 		/// <param name="value">要添加的值。</param>
+		/// <returns>当前 <see cref="BitList"/> 集合。</returns>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> 小于 <c>0</c>。</exception>
 		public BitList AddRange(int length, bool value)
 		{
@@ -373,6 +378,7 @@ namespace Cyjb.Collections
 		/// <param name="index">应在此处插入新元素的从零开始的索引。</param>
 		/// <param name="collection">一个集合，应将其元素插入到 
 		/// <see cref="BitList"/> 中，其中每个整数表示 32 个连续位。</param>
+		/// <returns>当前 <see cref="BitList"/> 集合。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 大于 <see cref="Count"/>。</exception>
@@ -398,6 +404,7 @@ namespace Cyjb.Collections
 		/// <param name="index">应在此处插入新元素的从零开始的索引。</param>
 		/// <param name="collection">一个集合，应将其元素插入到 
 		/// <see cref="BitList"/> 中，其中每个整数表示 32 个连续位。</param>
+		/// <returns>当前 <see cref="BitList"/> 集合。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 大于 <see cref="Count"/>。</exception>
@@ -419,6 +426,7 @@ namespace Cyjb.Collections
 		/// <param name="index">应在此处插入新元素的从零开始的索引。</param>
 		/// <param name="collection">一个集合，应将其元素插入到 
 		/// <see cref="BitList"/> 中，其中每个整数表示 8 个连续位。</param>
+		/// <returns>当前 <see cref="BitList"/> 集合。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 大于 <see cref="Count"/>。</exception>
@@ -437,8 +445,8 @@ namespace Cyjb.Collections
 		/// 将指定集合中的元素插入 <see cref="BitList"/> 的指定索引处。
 		/// </summary>
 		/// <param name="index">应在此处插入新元素的从零开始的索引。</param>
-		/// <param name="collection">一个集合，应将其元素插入到 
-		/// <see cref="BitList"/> 中。</param>
+		/// <param name="collection">一个集合，应将其元素插入到 <see cref="BitList"/> 中。</param>
+		/// <returns>当前 <see cref="BitList"/> 集合。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 大于 <see cref="Count"/>。</exception>
@@ -459,6 +467,7 @@ namespace Cyjb.Collections
 		/// <param name="index">应在此处插入值的从零开始的索引。</param>
 		/// <param name="length">要插入的值的长度。</param>
 		/// <param name="value">要插入的值。</param>
+		/// <returns>当前 <see cref="BitList"/> 集合。</returns>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> 小于 <c>0</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 大于 <see cref="Count"/>。</exception>
@@ -489,6 +498,7 @@ namespace Cyjb.Collections
 		/// <param name="index">应在此处插入新元素的从零开始的索引。</param>
 		/// <param name="length">要插入的位数。</param>
 		/// <param name="uintList">一个集合，应将其元素插入到 <see cref="BitList"/> 中。</param>
+		/// <returns>当前 <see cref="BitList"/> 集合。</returns>
 		private BitList InsertRange(int index, int length, IList<uint> uintList)
 		{
 			int cnt = count + length;
@@ -527,6 +537,7 @@ namespace Cyjb.Collections
 		/// </summary>
 		/// <param name="index">要移除的元素的范围从零开始的起始索引。</param>
 		/// <param name="length">要移除的元素数。</param>
+		/// <returns>当前 <see cref="BitList"/> 集合。</returns>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> 小于 <c>0</c>。</exception>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 和 <paramref name="length"/> 不表示
@@ -595,6 +606,7 @@ namespace Cyjb.Collections
 		/// 将所有位填充为指定的值。
 		/// </summary>
 		/// <param name="value">要填充的值。</param>
+		/// <returns>当前 <see cref="BitList"/> 集合。</returns>
 		public BitList FillAll(bool value)
 		{
 			if (count == 0)
@@ -611,12 +623,10 @@ namespace Cyjb.Collections
 		/// <param name="index">要填充的范围的从零开始的起始索引。</param>
 		/// <param name="length">要填充的范围内的元素数。</param>
 		/// <param name="value">要填充的值。</param>
-		/// <exception cref="ArgumentOutOfRangeException">
-		/// <paramref name="index"/> 小于 <c>0</c>。</exception>
-		/// <exception cref="ArgumentOutOfRangeException">
-		/// <paramref name="length"/> 小于 <c>0</c>。</exception>
-		/// <exception cref="System.ArgumentException">
-		/// <paramref name="index"/> 和 <paramref name="length"/>
+		/// <returns>当前 <see cref="BitList"/> 集合。</returns>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> 小于 <c>0</c>。</exception>
+		/// <exception cref="System.ArgumentException"><paramref name="index"/> 和 <paramref name="length"/>
 		/// 不表示 <see cref="BitList"/> 中元素的有效范围。</exception>
 		public BitList Fill(int index, int length, bool value)
 		{

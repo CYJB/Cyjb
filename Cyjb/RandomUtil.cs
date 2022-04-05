@@ -8,6 +8,7 @@
 		/// <summary>
 		/// 返回随机布尔值。
 		/// </summary>
+		/// <param name="random">随机数发生器。</param>
 		/// <returns>随机布尔值。</returns>
 		public static bool NextBoolean(this Random random)
 		{
