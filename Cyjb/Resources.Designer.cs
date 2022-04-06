@@ -376,6 +376,15 @@ namespace Cyjb {
         }
         
         /// <summary>
+        ///   查找类似 Specified method is not supported. 的本地化字符串。
+        /// </summary>
+        internal static string MethodNotSupported {
+            get {
+                return ResourceManager.GetString("MethodNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Only single-dimensional arrays are supported. 的本地化字符串。
         /// </summary>
         internal static string MultidimensionalArrayNotSupported {

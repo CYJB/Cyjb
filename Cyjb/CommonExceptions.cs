@@ -233,6 +233,19 @@ namespace Cyjb
 
 		#endregion // 对象状态异常
 
+		#region 编码异常
+
+		/// <summary>
+		/// 返回方法不支持的异常。
+		/// </summary>
+		/// <returns><see cref="NotSupportedException"/> 对象。</returns>
+		public static NotSupportedException MethodNotSupported()
+		{
+			return new NotSupportedException(Resources.MethodNotSupported);
+		}
+
+		#endregion // 编码异常
+
 		#region 数组、集合异常
 
 		/// <summary>

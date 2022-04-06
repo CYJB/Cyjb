@@ -257,6 +257,10 @@
     <value>指定的阈值超出范围。</value>
     <comment>阈值超出范围。</comment>
   </data>
+  <data name="MethodNotSupported" xml:space="preserve">
+    <value>不支持指定的方法。</value>
+    <comment>方法不被支持。</comment>
+  </data>
   <data name="MultidimensionalArrayNotSupported" xml:space="preserve">
     <value>只支持一维数组。</value>
     <comment>多维数组不被支持。</comment>
