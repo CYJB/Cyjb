@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Cyjb
 {
@@ -240,77 +241,45 @@ namespace Cyjb
 			return new string(strArr);
 		}
 
-		#region 合并
-
 		/// <summary>
-		/// 合并字符串中的空白。
+		/// 使用指定的字符串替换与指定正则表达式模式匹配的所有字符串。
 		/// </summary>
-		/// <param name="text">要合并空白的字符串。</param>
-		/// <returns>合并完成的字符串。</returns>
+		/// <param name="text">要搜索匹配项的字符串。</param>
+		/// <param name="pattern">要匹配的正则表达式模式。</param>
+		/// <param name="replacement">替换字符串。</param>
+		/// <returns>被替换后的新字符串。</returns>
 		/// <overloads>
 		/// <summary>
-		/// 合并字符串中的空白。
+		/// 使用指定的字符串替换与指定正则表达式模式匹配的所有字符串。
 		/// </summary>
 		/// </overloads>
-		public static string CombineWhiteSpace(this string text)
+		[return: NotNullIfNotNull("text")]
+		public static string? ReplacePattern(this string? text, string pattern, string replacement)
 		{
-			return Combine(text, char.IsWhiteSpace, " ");
+			if (text == null)
+			{
+				return null;
+			}
+			return Regex.Replace(text, pattern, replacement);
 		}
 
 		/// <summary>
-		/// 合并字符串中的空白，并使用指定字符串替换空白字符串。
+		/// 使用指定的字符串替换与指定正则表达式模式匹配的所有字符串。
 		/// </summary>
-		/// <param name="text">要合并空白的字符串。</param>
-		/// <param name="replace">要替换空白的字符串。</param>
-		/// <returns>合并完成的字符串。</returns>
-		public static string CombineWhiteSpace(this string text, string replace)
+		/// <param name="text">要搜索匹配项的字符串。</param>
+		/// <param name="pattern">要匹配的正则表达式模式。</param>
+		/// <param name="replacement">替换字符串。</param>
+		/// <param name="options">正则表达式的匹配选项。</param>
+		/// <returns>被替换后的新字符串。</returns>
+		[return: NotNullIfNotNull("text")]
+		public static string? ReplacePattern(this string? text, string pattern, string replacement, RegexOptions options)
 		{
-			return Combine(text, char.IsWhiteSpace, replace);
-		}
-
-		/// <summary>
-		/// 使用指定字符串，替换原字符串中连续的满足指定条件的字符。
-		/// </summary>
-		/// <param name="text">要合并连续字符的字符串。</param>
-		/// <param name="predicate">要合并的字符满足的条件。</param>
-		/// <param name="replace">要替换连续字符的字符串。</param>
-		/// <returns>合并完成的字符串。</returns>
-		public static string Combine(this string text, Predicate<char> predicate, string replace)
-		{
-			if (string.IsNullOrEmpty(text))
+			if (text == null)
 			{
-				return text;
+				return null;
 			}
-			StringBuilder builder = new(text.Length);
-			// 0：起始位置。
-			// 1：正常添加字符。
-			// 2：需要添加替代字符。
-			int state = 0;
-			for (int i = 0; i < text.Length; i++)
-			{
-				if (predicate(text[i]))
-				{
-					if (state == 1)
-					{
-						state = 2;
-					}
-				}
-				else
-				{
-					if (state == 2)
-					{
-						builder.Append(replace);
-					}
-					builder.Append(text[i]);
-					state = 1;
-				}
-			}
-			return builder.ToString();
+			return Regex.Replace(text, pattern, replacement, options);
 		}
-
-		#endregion // 合并
-
-		#region 字符串检查
 
 		/// <summary>
 		/// 判断指定的字符串是否是 <c>null</c> 或者 <see cref="string.Empty"/>。
@@ -333,8 +302,5 @@ namespace Cyjb
 		{
 			return string.IsNullOrWhiteSpace(value);
 		}
-
-		#endregion // 字符串检查
-
 	}
 }

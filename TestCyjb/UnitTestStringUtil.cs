@@ -73,5 +73,17 @@ namespace TestCyjb
 		{
 			Assert.AreEqual(expected, str.Reverse());
 		}
+
+		/// <summary>
+		/// 对 <see cref="StringUtil.ReplacePattern"/> 方法进行测试。
+		/// </summary>
+		[DataTestMethod]
+		[DataRow(null, "", "", null)]
+		[DataRow("abc", "", "", "abc")]
+		[DataRow("abc    def   g h", @"\s+", " ", "abc def g h")]
+		public void TestReplacePattern(string? text, string pattern, string replacement, string expected)
+		{
+			Assert.AreEqual(expected, text.ReplacePattern(pattern, replacement));
+		}
 	}
 }
