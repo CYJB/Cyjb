@@ -138,6 +138,21 @@ namespace Cyjb.Collections
 			}
 		}
 
+		/// <summary>
+		/// 返回当前集合的只读副本。
+		/// </summary>
+		/// <returns>当前集合的只读副本。</returns>
+		public ReadOnlyCharSet ReadOnlyClone()
+		{
+			StringBuilder builder = new(ranges.Count * 2);
+			foreach (var node in ranges)
+			{
+				builder.Append(node.Key);
+				builder.Append(node.Value);
+			}
+			return new ReadOnlyCharSet(builder.ToString(), count);
+		}
+
 		#region 字符范围操作
 
 		/// <summary>
@@ -173,10 +188,10 @@ namespace Cyjb.Collections
 		/// <c>true</c>，否则返回 <c>false</c>。</returns>
 		private bool ContainsAllElements(CharSet other)
 		{
-			foreach (var (start, end) in other.Ranges())
+			foreach (var node in other.ranges)
 			{
-				Node? node = ranges.FindLE(start);
-				if (node == null || node.Value < end)
+				Node? curNode = ranges.FindLE(node.Key);
+				if (curNode == null || curNode.Value < node.Value)
 				{
 					return false;
 				}
@@ -218,9 +233,9 @@ namespace Cyjb.Collections
 			if (other is CharSet otherSet)
 			{
 				// CharSet 可以范围操作。
-				foreach (var (start, end) in otherSet.Ranges())
+				foreach (var node in otherSet.ranges)
 				{
-					Remove(start, end);
+					Remove(node.Key, node.Value);
 				}
 			}
 			else
@@ -243,13 +258,13 @@ namespace Cyjb.Collections
 			{
 				// 移除不在 otherSet 里的字符范围。
 				char begin = '\0';
-				foreach (var (start, end) in otherSet.Ranges())
+				foreach (var node in otherSet.ranges)
 				{
-					if (begin < start)
+					if (begin < node.Key)
 					{
-						Remove(begin, (char)(start - 1));
+						Remove(begin, (char)(node.Key - 1));
 					}
-					begin = (char)(end + 1);
+					begin = (char)(node.Value + 1);
 				}
 				if (begin < char.MaxValue)
 				{
@@ -378,10 +393,10 @@ namespace Cyjb.Collections
 			if (other is CharSet otherSet)
 			{
 				// CharSet 可以范围操作。
-				foreach (var (start, end) in otherSet.Ranges())
+				foreach (var node in otherSet.ranges)
 				{
-					Node? node = ranges.FindLE(start);
-					if (node != null && node.Key <= end && node.Value >= start)
+					Node? curNode = ranges.FindLE(node.Key);
+					if (curNode != null && curNode.Value >= node.Key)
 					{
 						return true;
 					}
@@ -454,9 +469,9 @@ namespace Cyjb.Collections
 			if (other is CharSet otherSet)
 			{
 				// CharSet 可以范围操作。
-				foreach (var (start, end) in otherSet.Ranges())
+				foreach (var node in otherSet.ranges)
 				{
-					Add(start, end);
+					Add(node.Key, node.Value);
 				}
 			}
 			else

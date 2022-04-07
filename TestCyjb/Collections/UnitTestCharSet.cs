@@ -106,6 +106,116 @@ namespace TestCyjb.Collections
 		}
 
 		/// <summary>
+		/// 对 <see cref="CharSet.ReadOnlyClone"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestReadOnlyClone()
+		{
+			CharSet set = new();
+			ReadOnlyCharSet set1 = set.ReadOnlyClone();
+			Assert.IsTrue(set.Add('a', 'c'));
+			ReadOnlyCharSet set2 = set.ReadOnlyClone();
+			Assert.IsTrue(set.Add('e'));
+			ReadOnlyCharSet set3 = set.ReadOnlyClone();
+			Assert.IsFalse(set.Add('b', 'c'));
+			ReadOnlyCharSet set4 = set.ReadOnlyClone();
+			Assert.IsTrue(set.Add('\0'));
+			ReadOnlyCharSet set5 = set.ReadOnlyClone();
+			Assert.IsTrue(set.Add('d', 'g'));
+			ReadOnlyCharSet set6 = set.ReadOnlyClone();
+			Assert.IsTrue(set.Remove('d', 'f'));
+			ReadOnlyCharSet set7 = set.ReadOnlyClone();
+			Assert.IsTrue(set.Add('h', 'l'));
+			ReadOnlyCharSet set8 = set.ReadOnlyClone();
+			Assert.IsTrue(set.Add('o', 'q'));
+			ReadOnlyCharSet set9 = set.ReadOnlyClone();
+			Assert.IsTrue(set.Remove('k', 'p'));
+			ReadOnlyCharSet set10 = set.ReadOnlyClone();
+			Assert.IsFalse(set.Remove('d', 'f'));
+			ReadOnlyCharSet set11 = set.ReadOnlyClone();
+			Assert.IsTrue(set.Add(char.MaxValue));
+			ReadOnlyCharSet set12 = set.ReadOnlyClone();
+			Assert.IsTrue(set.Remove('\0', char.MaxValue));
+			ReadOnlyCharSet set13 = set.ReadOnlyClone();
+
+			SortedSet<char> expected = new();
+			Assert.AreEqual(0, set1.Count);
+			Assert.AreEqual("[]", set1.ToString());
+			Assert.IsTrue(expected.SetEquals(set));
+
+			expected.UnionWith("abc");
+			Assert.AreEqual("[a-c]", set2.ToString());
+			Assert.AreEqual(expected.Count, set2.Count);
+			Assert.IsTrue(expected.SetEquals(set2));
+
+			expected.UnionWith("e");
+			Assert.AreEqual("[a-ce]", set3.ToString());
+			Assert.AreEqual(expected.Count, set3.Count);
+			Assert.IsTrue(expected.SetEquals(set3));
+
+			Assert.AreEqual("[a-ce]", set4.ToString());
+			Assert.AreEqual(expected.Count, set4.Count);
+			Assert.IsTrue(expected.SetEquals(set4));
+			Assert.IsTrue(set3.Equals(set4));
+
+			Assert.IsTrue(set4.SetEquals(expected));
+			Assert.IsTrue(set4.IsSubsetOf(expected));
+			Assert.IsTrue(set4.IsSupersetOf(expected));
+			Assert.IsFalse(set4.IsProperSubsetOf(expected));
+			Assert.IsFalse(set4.IsProperSupersetOf(expected));
+
+			expected.UnionWith("\0");
+			Assert.AreEqual("[\0a-ce]", set5.ToString());
+			Assert.AreEqual(expected.Count, set5.Count);
+			Assert.IsTrue(expected.SetEquals(set5));
+
+			expected.UnionWith("dfg");
+			Assert.AreEqual("[\0a-g]", set6.ToString());
+			Assert.AreEqual(expected.Count, set6.Count);
+			Assert.IsTrue(expected.SetEquals(set6));
+
+			expected.ExceptWith("def");
+			Assert.AreEqual("[\0a-cg]", set7.ToString());
+			Assert.AreEqual(expected.Count, set7.Count);
+			Assert.IsTrue(expected.SetEquals(set7));
+
+			expected.UnionWith("hijkl");
+			Assert.AreEqual("[\0a-cg-l]", set8.ToString());
+			Assert.AreEqual(expected.Count, set8.Count);
+			Assert.IsTrue(expected.SetEquals(set8));
+
+			expected.UnionWith("opq");
+			Assert.AreEqual("[\0a-cg-lo-q]", set9.ToString());
+			Assert.AreEqual(expected.Count, set9.Count);
+			Assert.IsTrue(expected.SetEquals(set9));
+
+			expected.ExceptWith("klmnop");
+			Assert.AreEqual("[\0a-cg-jq]", set10.ToString());
+			Assert.AreEqual(expected.Count, set10.Count);
+			Assert.IsTrue(expected.SetEquals(set10));
+
+			Assert.IsTrue(set10.SetEquals(expected));
+			Assert.IsTrue(set10.IsSubsetOf(expected));
+			Assert.IsTrue(set10.IsSupersetOf(expected));
+			Assert.IsFalse(set10.IsProperSubsetOf(expected));
+			Assert.IsFalse(set10.IsProperSupersetOf(expected));
+
+			Assert.AreEqual("[\0a-cg-jq]", set11.ToString());
+			Assert.AreEqual(expected.Count, set11.Count);
+			Assert.IsTrue(expected.SetEquals(set11));
+
+			expected.Add(char.MaxValue);
+			Assert.AreEqual("[\0a-cg-jq\uFFFF]", set12.ToString());
+			Assert.AreEqual(expected.Count, set12.Count);
+			Assert.IsTrue(expected.SetEquals(set12));
+
+			expected.Clear();
+			Assert.AreEqual("[]", set13.ToString());
+			Assert.AreEqual(expected.Count, set13.Count);
+			Assert.IsTrue(expected.SetEquals(set13));
+		}
+
+		/// <summary>
 		/// 对 <see cref="CharSet.ExceptWith"/> 方法进行测试。
 		/// </summary>
 		[DataTestMethod]
@@ -120,6 +230,11 @@ namespace TestCyjb.Collections
 		public void TestExceptWith(string initial, string other, string expected, int expectedCount)
 		{
 			CharSet set = new(initial);
+			set.ExceptWith(other);
+			Assert.AreEqual(expected, set.ToString());
+			Assert.AreEqual(expectedCount, set.Count);
+
+			set = new(initial);
 			set.ExceptWith(new CharSet(other));
 			Assert.AreEqual(expected, set.ToString());
 			Assert.AreEqual(expectedCount, set.Count);
@@ -141,6 +256,11 @@ namespace TestCyjb.Collections
 		public void TestIntersectWith(string initial, string other, string expected, int expectedCount)
 		{
 			CharSet set = new(initial);
+			set.IntersectWith(other);
+			Assert.AreEqual(expected, set.ToString());
+			Assert.AreEqual(expectedCount, set.Count);
+
+			set = new(initial);
 			set.IntersectWith(new CharSet(other));
 			Assert.AreEqual(expected, set.ToString());
 			Assert.AreEqual(expectedCount, set.Count);
@@ -164,7 +284,10 @@ namespace TestCyjb.Collections
 		public void TestIsProperSubsetOf(string initial, string other, bool expected)
 		{
 			CharSet set = new(initial);
+			Assert.AreEqual(expected, set.IsProperSubsetOf(other));
 			Assert.AreEqual(expected, set.IsProperSubsetOf(new CharSet(other)));
+			Assert.AreEqual(expected, set.ReadOnlyClone().IsProperSubsetOf(other));
+			Assert.AreEqual(expected, set.ReadOnlyClone().IsProperSubsetOf(new CharSet(other).ReadOnlyClone()));
 		}
 
 		/// <summary>
@@ -185,7 +308,10 @@ namespace TestCyjb.Collections
 		public void TestIsProperSupersetOf(string initial, string other, bool expected)
 		{
 			CharSet set = new(initial);
+			Assert.AreEqual(expected, set.IsProperSupersetOf(other));
 			Assert.AreEqual(expected, set.IsProperSupersetOf(new CharSet(other)));
+			Assert.AreEqual(expected, set.ReadOnlyClone().IsProperSupersetOf(other));
+			Assert.AreEqual(expected, set.ReadOnlyClone().IsProperSupersetOf(new CharSet(other).ReadOnlyClone()));
 		}
 
 		/// <summary>
@@ -206,7 +332,10 @@ namespace TestCyjb.Collections
 		public void TestIsSubsetOf(string initial, string other, bool expected)
 		{
 			CharSet set = new(initial);
+			Assert.AreEqual(expected, set.IsSubsetOf(other));
 			Assert.AreEqual(expected, set.IsSubsetOf(new CharSet(other)));
+			Assert.AreEqual(expected, set.ReadOnlyClone().IsSubsetOf(other));
+			Assert.AreEqual(expected, set.ReadOnlyClone().IsSubsetOf(new CharSet(other).ReadOnlyClone()));
 		}
 
 		/// <summary>
@@ -227,7 +356,10 @@ namespace TestCyjb.Collections
 		public void TestIsSupersetOf(string initial, string other, bool expected)
 		{
 			CharSet set = new(initial);
+			Assert.AreEqual(expected, set.IsSupersetOf(other));
 			Assert.AreEqual(expected, set.IsSupersetOf(new CharSet(other)));
+			Assert.AreEqual(expected, set.ReadOnlyClone().IsSupersetOf(other));
+			Assert.AreEqual(expected, set.ReadOnlyClone().IsSupersetOf(new CharSet(other).ReadOnlyClone()));
 		}
 
 		/// <summary>
@@ -248,7 +380,10 @@ namespace TestCyjb.Collections
 		public void TestOverlaps(string initial, string other, bool expected)
 		{
 			CharSet set = new(initial);
+			Assert.AreEqual(expected, set.Overlaps(other));
 			Assert.AreEqual(expected, set.Overlaps(new CharSet(other)));
+			Assert.AreEqual(expected, set.ReadOnlyClone().Overlaps(other));
+			Assert.AreEqual(expected, set.ReadOnlyClone().Overlaps(new CharSet(other).ReadOnlyClone()));
 		}
 
 		/// <summary>
@@ -270,7 +405,10 @@ namespace TestCyjb.Collections
 		public void TestSetEquals(string initial, string other, bool expected)
 		{
 			CharSet set = new(initial);
+			Assert.AreEqual(expected, set.SetEquals(other));
 			Assert.AreEqual(expected, set.SetEquals(new CharSet(other)));
+			Assert.AreEqual(expected, set.ReadOnlyClone().SetEquals(other));
+			Assert.AreEqual(expected, set.ReadOnlyClone().SetEquals(new CharSet(other).ReadOnlyClone()));
 		}
 
 		/// <summary>
@@ -292,6 +430,11 @@ namespace TestCyjb.Collections
 		public void TestSymmetricExceptWith(string initial, string other, string expected, int expectedCount)
 		{
 			CharSet set = new(initial);
+			set.SymmetricExceptWith(other);
+			Assert.AreEqual(expected, set.ToString());
+			Assert.AreEqual(expectedCount, set.Count);
+
+			set = new(initial);
 			set.SymmetricExceptWith(new CharSet(other));
 			Assert.AreEqual(expected, set.ToString());
 			Assert.AreEqual(expectedCount, set.Count);
@@ -311,6 +454,11 @@ namespace TestCyjb.Collections
 		public void TestUnionWith(string initial, string other, string expected, int expectedCount)
 		{
 			CharSet set = new(initial);
+			set.UnionWith(other);
+			Assert.AreEqual(expected, set.ToString());
+			Assert.AreEqual(expectedCount, set.Count);
+
+			set = new(initial);
 			set.UnionWith(new CharSet(other));
 			Assert.AreEqual(expected, set.ToString());
 			Assert.AreEqual(expectedCount, set.Count);

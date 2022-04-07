@@ -219,6 +219,7 @@ namespace Cyjb.Collections.ObjectModel
 			if (Count == 0)
 			{
 				UnionWith(other);
+				return;
 			}
 			else if (ReferenceEquals(this, other))
 			{
