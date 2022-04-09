@@ -9,7 +9,7 @@ namespace Cyjb.Collections
 	/// 表示字符的有序集合。
 	/// </summary>
 	[Serializable, DebuggerDisplay("{ToString()} Count = {Count}")]
-	public sealed class CharSet : SetBase<char>, IEquatable<CharSet>
+	public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollection<char>
 	{
 		/// <summary>
 		/// 字符集合内的字符范围列表（Key 为 Start，Value 为 End）。
@@ -144,13 +144,14 @@ namespace Cyjb.Collections
 		/// <returns>当前集合的只读副本。</returns>
 		public ReadOnlyCharSet ReadOnlyClone()
 		{
-			StringBuilder builder = new(ranges.Count * 2);
+			StringBuilder builder = new(ranges.Count * 2 + 1);
+			builder.Append((char)count);
 			foreach (var node in ranges)
 			{
 				builder.Append(node.Key);
 				builder.Append(node.Value);
 			}
-			return new ReadOnlyCharSet(builder.ToString(), count);
+			return new ReadOnlyCharSet(builder.ToString());
 		}
 
 		#region 字符范围操作
@@ -186,12 +187,12 @@ namespace Cyjb.Collections
 		/// <param name="other">要与当前集进行比较的集合。</param>
 		/// <returns>如果包含 <paramref name="other"/> 中的所有字符，则返回 
 		/// <c>true</c>，否则返回 <c>false</c>。</returns>
-		private bool ContainsAllElements(CharSet other)
+		internal bool ContainsAllElements(IRangeCollection<char> other)
 		{
-			foreach (var node in other.ranges)
+			foreach (var (start, end) in other.Ranges())
 			{
-				Node? curNode = ranges.FindLE(node.Key);
-				if (curNode == null || curNode.Value < node.Value)
+				Node? curNode = ranges.FindLE(start);
+				if (curNode == null || curNode.Value < end)
 				{
 					return false;
 				}
@@ -230,12 +231,11 @@ namespace Cyjb.Collections
 				Clear();
 				return;
 			}
-			if (other is CharSet otherSet)
+			if (other is IRangeCollection<char> otherRange)
 			{
-				// CharSet 可以范围操作。
-				foreach (var node in otherSet.ranges)
+				foreach (var (start, end) in otherRange.Ranges())
 				{
-					Remove(node.Key, node.Value);
+					Remove(start, end);
 				}
 			}
 			else
@@ -254,17 +254,17 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void IntersectWith(IEnumerable<char> other)
 		{
-			if (other is CharSet otherSet)
+			if (other is IRangeCollection<char> otherRange)
 			{
-				// 移除不在 otherSet 里的字符范围。
+				// 移除不在 otherRange 里的字符范围。
 				char begin = '\0';
-				foreach (var node in otherSet.ranges)
+				foreach (var (start, end) in otherRange.Ranges())
 				{
-					if (begin < node.Key)
+					if (begin < start)
 					{
-						Remove(begin, (char)(node.Key - 1));
+						Remove(begin, (char)(start - 1));
 					}
-					begin = (char)(node.Value + 1);
+					begin = (char)(end + 1);
 				}
 				if (begin < char.MaxValue)
 				{
@@ -295,6 +295,10 @@ namespace Cyjb.Collections
 			{
 				return count < otherSet.Count && otherSet.ContainsAllElements(this);
 			}
+			else if (other is ReadOnlyCharSet otherSSet)
+			{
+				return count < otherSSet.Count && otherSSet.ContainsAllElements(this);
+			}
 			else
 			{
 				var (sameCount, unfoundCount) = CountElements(other, false);
@@ -316,9 +320,9 @@ namespace Cyjb.Collections
 			{
 				return false;
 			}
-			if (other is CharSet otherSet)
+			if (other is IRangeCollection<char> otherRange)
 			{
-				return count > otherSet.Count && ContainsAllElements(otherSet);
+				return count > otherRange.Count && ContainsAllElements(otherRange);
 			}
 			else
 			{
@@ -345,6 +349,10 @@ namespace Cyjb.Collections
 			{
 				return count <= otherSet.Count && otherSet.ContainsAllElements(this);
 			}
+			else if (other is ReadOnlyCharSet otherRSet)
+			{
+				return count <= otherRSet.Count && otherRSet.ContainsAllElements(this);
+			}
 			else
 			{
 				var (sameCount, unfoundCount) = CountElements(other, false);
@@ -366,9 +374,9 @@ namespace Cyjb.Collections
 			{
 				return !other.Any();
 			}
-			if (other is CharSet otherSet)
+			if (other is IRangeCollection<char> otherRange)
 			{
-				return count >= otherSet.Count && ContainsAllElements(otherSet);
+				return count >= otherRange.Count && ContainsAllElements(otherRange);
 			}
 			else
 			{
@@ -390,13 +398,12 @@ namespace Cyjb.Collections
 			{
 				return false;
 			}
-			if (other is CharSet otherSet)
+			if (other is IRangeCollection<char> otherRange)
 			{
-				// CharSet 可以范围操作。
-				foreach (var node in otherSet.ranges)
+				foreach (var (start, end) in otherRange.Ranges())
 				{
-					Node? curNode = ranges.FindLE(node.Key);
-					if (curNode != null && curNode.Value >= node.Key)
+					Node? curNode = ranges.FindLE(start);
+					if (curNode != null && curNode.Value >= start)
 					{
 						return true;
 					}
@@ -423,9 +430,9 @@ namespace Cyjb.Collections
 			{
 				return !other.Any();
 			}
-			if (other is CharSet otherSet)
+			if (other is IRangeCollection<char> otherRange)
 			{
-				return count == otherSet.Count && ContainsAllElements(otherSet);
+				return count == otherRange.Count && ContainsAllElements(otherRange);
 			}
 			else
 			{
@@ -441,11 +448,11 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void SymmetricExceptWith(IEnumerable<char> other)
 		{
-			if (other is CharSet otherSet)
+			if (other is IRangeCollection<char>)
 			{
-				CharSet newSet = new(otherSet);
+				CharSet newSet = new(other);
 				newSet.ExceptWith(this);
-				ExceptWith(otherSet);
+				ExceptWith(other);
 				UnionWith(newSet);
 			}
 			else
@@ -466,12 +473,12 @@ namespace Cyjb.Collections
 			{
 				return;
 			}
-			if (other is CharSet otherSet)
+			if (other is IRangeCollection<char> otherRange)
 			{
 				// CharSet 可以范围操作。
-				foreach (var node in otherSet.ranges)
+				foreach (var (start, end) in otherRange.Ranges())
 				{
-					Add(node.Key, node.Value);
+					Add(start, end);
 				}
 			}
 			else
@@ -565,32 +572,6 @@ namespace Cyjb.Collections
 			return count == other.Count && ContainsAllElements(other);
 		}
 
-		#endregion // IEquatable<CharSet> 成员
-
-		/// <summary>
-		/// 返回当前集合的字符串表示。
-		/// </summary>
-		/// <returns>当前集合的字符串表示。</returns>
-		public override string ToString()
-		{
-			StringBuilder builder = new();
-			builder.Append('[');
-			foreach (var node in ranges)
-			{
-				builder.Append(node.Key);
-				if (node.Key + 1 < node.Value)
-				{
-					builder.Append('-');
-				}
-				if (node.Key != node.Value)
-				{
-					builder.Append(node.Value);
-				}
-			}
-			builder.Append(']');
-			return builder.ToString();
-		}
-
 		/// <summary>
 		/// 确定指定对象是否等于当前对象。
 		/// </summary>
@@ -625,6 +606,32 @@ namespace Cyjb.Collections
 				hashCode.Add(node.Value);
 			}
 			return hashCode.GetHashCode();
+		}
+
+		#endregion // IEquatable<CharSet> 成员
+
+		/// <summary>
+		/// 返回当前集合的字符串表示。
+		/// </summary>
+		/// <returns>当前集合的字符串表示。</returns>
+		public override string ToString()
+		{
+			StringBuilder builder = new();
+			builder.Append('[');
+			foreach (var node in ranges)
+			{
+				builder.Append(node.Key);
+				if (node.Key + 1 < node.Value)
+				{
+					builder.Append('-');
+				}
+				if (node.Key != node.Value)
+				{
+					builder.Append(node.Value);
+				}
+			}
+			builder.Append(']');
+			return builder.ToString();
 		}
 	}
 }

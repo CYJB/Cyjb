@@ -51,51 +51,49 @@ namespace Cyjb
 		/// <remarks>此方法基于 Unicode 标准 13.0.0 版。详情请参见 
 		/// <see href="http://www.unicode.org/reports/tr11/">Unicode Standard Annex #11 EAST ASIAN WIDTH</see>。</remarks>
 		/// <seealso href="http://www.unicode.org/reports/tr11/">Unicode Standard Annex #11 EAST ASIAN WIDTH</seealso>。
-		private static readonly Lazy<CharSet> WidthChars = new(() =>
-		{
-			CharSet set = new();
+		private static readonly ReadOnlyCharSet WidthChars = new("\uA522" +
 			// 1100 ~ 115F Hangul Jamo
-			set.Add('\u1100', '\u115F');
+			"\u1100\u115F" +
 			// User interface symbols
-			set.Add('\u231A', '\u231B');
-			set.Add('\u2329', '\u232A');
-			set.Add('\u23E9', '\u23EC');
-			set.Add('\u23F0');
-			set.Add('\u23F3');
-			set.Add('\u25FD', '\u25FE');
-			set.Add('\u2614', '\u2615');
-			set.Add('\u2648', '\u2653');
-			set.Add('\u267F');
-			set.Add('\u2693');
-			set.Add('\u26A1');
-			set.Add('\u26AA', '\u26AB');
-			set.Add('\u26BD', '\u26BE');
-			set.Add('\u26C4', '\u26C5');
-			set.Add('\u26CE');
-			set.Add('\u26D4');
-			set.Add('\u26EA');
-			set.Add('\u26F2', '\u26F3');
-			set.Add('\u26F5');
-			set.Add('\u26FA');
-			set.Add('\u26FD');
-			set.Add('\u2705');
-			set.Add('\u270A', '\u270B');
-			set.Add('\u2728');
-			set.Add('\u274C');
-			set.Add('\u274E');
-			set.Add('\u2753', '\u2755');
-			set.Add('\u2757');
-			set.Add('\u2795', '\u2797');
-			set.Add('\u27B0');
-			set.Add('\u27BF');
-			set.Add('\u2B1B', '\u2B1C');
-			set.Add('\u2B50');
-			set.Add('\u2B55');
+			"\u231A\u231B" +
+			"\u2329\u232A" +
+			"\u23E9\u23EC" +
+			"\u23F0\u23F0" +
+			"\u23F3\u23F3" +
+			"\u25FD\u25FE" +
+			"\u2614\u2615" +
+			"\u2648\u2653" +
+			"\u267F\u267F" +
+			"\u2693\u2693" +
+			"\u26A1\u26A1" +
+			"\u26AA\u26AB" +
+			"\u26BD\u26BE" +
+			"\u26C4\u26C5" +
+			"\u26CE\u26CE" +
+			"\u26D4\u26D4" +
+			"\u26EA\u26EA" +
+			"\u26F2\u26F3" +
+			"\u26F5\u26F5" +
+			"\u26FA\u26FA" +
+			"\u26FD\u26FD" +
+			"\u2705\u2705" +
+			"\u270A\u270B" +
+			"\u2728\u2728" +
+			"\u274C\u274C" +
+			"\u274E\u274E" +
+			"\u2753\u2755" +
+			"\u2757\u2757" +
+			"\u2795\u2797" +
+			"\u27B0\u27B0" +
+			"\u27BF\u27BF" +
+			"\u2B1B\u2B1C" +
+			"\u2B50\u2B50" +
+			"\u2B55\u2B55" +
 			// 2E80 ~ 2EFF CJK Radicals Supplement
 			// 2F00 ~ 2FDF Kangxi Radicals
 			// 2FF0 ~ 2FFF Ideographic Description Characters
 			// 3000 ~ 303E CJK Symbols and Punctuation
-			set.Add('\u2E80', '\u303E');
+			"\u2E80\u303E" +
 			// 3040 ~ 309F Hiragana
 			// 30A0 ~ 30FF Katakana
 			// 3100 ~ 312F Bopomofo
@@ -107,28 +105,26 @@ namespace Cyjb
 			// 3200 ~ 32FF Enclosed CJK Letters and Months
 			// 3300 ~ 33FF CJK Compatibility
 			// 3400 ~ 4DBF CJK Unified Ideographs Extension A
-			set.Add('\u3040', '\u4DBF');
+			"\u3040\u4DBF" +
 			// 4E00 ~ 9FFC CJK Unified Ideographs
 			// A000 ~ A48F Yi Syllables
 			// A490 ~ A4CF Yi Radicals
-			set.Add('\u4E00', '\uA4CF');
+			"\u4E00\uA4CF" +
 			// A960 ~ A97F Hangul Jamo Extended-A
-			set.Add('\uA960', '\uA97F');
+			"\uA960\uA97F" +
 			// AC00 ~ D7A3 Hangul Syllables
-			set.Add('\uAC00', '\uD7A3');
+			"\uAC00\uD7A3" +
 			// F900 ~ FAFF CJK Compatibility Ideographs
-			set.Add('\uF900', '\uFAFF');
+			"\uF900\uFAFF" +
 			// FE10 ~ FE19 Vertical forms
-			set.Add('\uFE10', '\uFE19');
+			"\uFE10\uFE19" +
 			// FE30 ~ FE4F CJK Compatibility Forms
 			// FE50 ~ FE6F Small Form Variants
-			set.Add('\uFE30', '\uFE6F');
+			"\uFE30\uFE6F" +
 			// FF00 ~ FF60 Fullwidth ASCII variants
-			set.Add('\uFF01', '\uFF60');
+			"\uFF01\uFF60" +
 			// FFE0 ~ FFE6 Fullwidth symbol variants
-			set.Add('\uFFE0', '\uFFE6');
-			return set;
-		}, true);
+			"\uFFE0\uFFE6");
 
 		/// <summary>
 		/// 返回指定字符的宽度。
@@ -148,7 +144,7 @@ namespace Cyjb
 				UnicodeCategory.NonSpacingMark or
 				UnicodeCategory.EnclosingMark or
 				UnicodeCategory.Format => 0,
-				_ => WidthChars.Value.Contains(ch) ? 2 : 1,
+				_ => WidthChars.Contains(ch) ? 2 : 1,
 			};
 		}
 
@@ -183,12 +179,12 @@ namespace Cyjb
 				index += 2;
 				// 其它宽字符范围
 				// Plane 2: U+20000..U+2FFFD
-				if(ch >= 0x20000 && ch <= 0x2FFFD)
+				if (ch >= 0x20000 && ch <= 0x2FFFD)
 				{
 					return 2;
 				}
 				// Plane 3: U+30000..U+3FFFD
-				if(ch >= 0x30000 && ch <= 0x3FFFD)
+				if (ch >= 0x30000 && ch <= 0x3FFFD)
 				{
 					return 2;
 				}

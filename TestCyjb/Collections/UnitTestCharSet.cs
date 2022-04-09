@@ -462,6 +462,11 @@ namespace TestCyjb.Collections
 			set.UnionWith(new CharSet(other));
 			Assert.AreEqual(expected, set.ToString());
 			Assert.AreEqual(expectedCount, set.Count);
+
+			set = new(initial);
+			set.UnionWith(new CharSet(other).ReadOnlyClone());
+			Assert.AreEqual(expected, set.ToString());
+			Assert.AreEqual(expectedCount, set.Count);
 		}
 	}
 }
