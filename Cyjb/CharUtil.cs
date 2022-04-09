@@ -43,6 +43,50 @@ namespace Cyjb
 			};
 		}
 
+		/// <summary>
+		/// ASCII 部分的单词查找表。
+		/// </summary>
+		private static readonly byte[] WordASCIILookup = new byte[] {
+			0, 0, 0, 0, 0, 0, 255, 3, 254, 255, 255, 135, 254, 255, 255, 7
+		};
+
+		/// <summary>
+		/// 返回当前字符是否是单词字符。
+		/// </summary>
+		/// <param name="ch">要判断的字符。</param>
+		/// <returns>如果当前字符是单词字符，则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
+		/// <remarks>
+		/// 单词字符包括：
+		/// <list type="table">
+		/// <item><term>Ll</term><description>小写字母</description></item>
+		/// <item><term>Lu</term><description>大写字母</description></item>
+		/// <item><term>Lt</term><description>词首字母大写的字母</description></item>
+		/// <item><term>Lo</term><description>其它字母</description></item>
+		/// <item><term>Lm</term><description>修饰符字母</description></item>
+		/// <item><term>Mn</term><description>非间距标记</description></item>
+		/// <item><term>Nd</term><description>十进制数字</description></item>
+		/// <item><term>Pc</term><description>连接符标点</description></item>
+		/// <item><term>U+200C</term><description>ZERO WIDTH NON-JOINER</description></item>
+		/// <item><term>U+200D</term><description>ZERO WIDTH JOINER</description></item>
+		/// </list>
+		/// </remarks>
+		public static bool IsWord(this char ch)
+		{
+			if (ch <= '\x7F')
+			{
+				return (WordASCIILookup[ch >> 3] & (1 << (ch & 7))) != 0;
+			}
+			UnicodeCategory category = char.GetUnicodeCategory(ch);
+			if (category <= UnicodeCategory.NonSpacingMark ||
+				category == UnicodeCategory.DecimalDigitNumber ||
+				category == UnicodeCategory.ConnectorPunctuation)
+			{
+				return true;
+			}
+			// U+200C ZERO WIDTH NON-JOINER and U+200D ZERO WIDTH JOINER.
+			return ch == '\u200C' || ch == '\u200D';
+		}
+
 		#region Width
 
 		/// <summary>

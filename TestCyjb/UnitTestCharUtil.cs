@@ -1,4 +1,5 @@
-﻿using Cyjb;
+﻿using System.Globalization;
+using Cyjb;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestCyjb
@@ -29,6 +30,29 @@ namespace TestCyjb
 		public void TestUnicodeEscape(char ch, string expected)
 		{
 			Assert.AreEqual(expected, ch.UnicodeEscape());
+		}
+
+		/// <summary>
+		/// 对 <see cref="CharUtil.IsWord"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestIsWord()
+		{
+			for (int i = 0; i < char.MaxValue; i++)
+			{
+				char ch = (char)i;
+				UnicodeCategory category = char.GetUnicodeCategory(ch);
+				bool expected = (category == UnicodeCategory.LowercaseLetter ||
+					category == UnicodeCategory.UppercaseLetter ||
+					category == UnicodeCategory.TitlecaseLetter ||
+					category == UnicodeCategory.OtherLetter ||
+					category == UnicodeCategory.ModifierLetter ||
+					category == UnicodeCategory.NonSpacingMark ||
+					category == UnicodeCategory.DecimalDigitNumber ||
+					category == UnicodeCategory.ConnectorPunctuation ||
+					ch == '\u200C' || ch == '\u200D');
+				Assert.AreEqual(expected, ch.IsWord());
+			}
 		}
 
 		/// <summary>
