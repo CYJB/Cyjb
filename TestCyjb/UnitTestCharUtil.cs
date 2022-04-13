@@ -33,6 +33,27 @@ namespace TestCyjb
 		}
 
 		/// <summary>
+		/// 对 <see cref="CharUtil.GetBaseValue"/> 方法进行测试。
+		/// </summary>
+		[DataTestMethod]
+		[DataRow('/', 2, -1)]
+		[DataRow('0', 2, 0)]
+		[DataRow('1', 2, 1)]
+		[DataRow('2', 2, -1)]
+		[DataRow('2', 3, 2)]
+		[DataRow('9', 10, 9)]
+		[DataRow('a', 16, 10)]
+		[DataRow('A', 36, 10)]
+		[DataRow('z', 35, -1)]
+		[DataRow('Z', 35, -1)]
+		[DataRow('z', 36, 35)]
+		[DataRow('Z', 36, 35)]
+		public void TestGetBaseValue(char ch, int fromBase, int expected)
+		{
+			Assert.AreEqual(expected, ch.GetBaseValue(fromBase));
+		}
+
+		/// <summary>
 		/// 对 <see cref="CharUtil.IsWord"/> 方法进行测试。
 		/// </summary>
 		[TestMethod]

@@ -42,7 +42,7 @@
 			// 使用内置方法，会快一些。
 			if (fromBase == 2 || fromBase == 8 || fromBase == 10 || fromBase == 16)
 			{
-				return System.Convert.ToSByte(value, fromBase);
+				return Convert.ToSByte(value, fromBase);
 			}
 			uint uValue = StringToUInt32(value, fromBase);
 			// fromBase 总是不为 10。
@@ -77,7 +77,7 @@
 			// 使用内置方法，会快一些。
 			if (fromBase == 2 || fromBase == 8 || fromBase == 10 || fromBase == 16)
 			{
-				return System.Convert.ToByte(value, fromBase);
+				return Convert.ToByte(value, fromBase);
 			}
 			uint uValue = StringToUInt32(value, fromBase);
 			if (uValue > byte.MaxValue)
@@ -111,7 +111,7 @@
 			// 使用内置方法，会快一些。
 			if (fromBase == 2 || fromBase == 8 || fromBase == 10 || fromBase == 16)
 			{
-				return System.Convert.ToInt16(value, fromBase);
+				return Convert.ToInt16(value, fromBase);
 			}
 			uint uValue = StringToUInt32(value, fromBase);
 			// fromBase 总是不为 10。
@@ -147,7 +147,7 @@
 			// 使用内置方法，会快一些。
 			if (fromBase == 2 || fromBase == 8 || fromBase == 10 || fromBase == 16)
 			{
-				return System.Convert.ToUInt16(value, fromBase);
+				return Convert.ToUInt16(value, fromBase);
 			}
 			uint uValue = StringToUInt32(value, fromBase);
 			if (uValue > ushort.MaxValue)
@@ -181,7 +181,7 @@
 			// 使用内置方法，会快一些。
 			if (fromBase == 2 || fromBase == 8 || fromBase == 10 || fromBase == 16)
 			{
-				return System.Convert.ToInt32(value, fromBase);
+				return Convert.ToInt32(value, fromBase);
 			}
 			return unchecked((int)StringToUInt32(value, fromBase));
 		}
@@ -211,7 +211,7 @@
 			// 使用内置方法，会快一些。
 			if (fromBase == 2 || fromBase == 8 || fromBase == 10 || fromBase == 16)
 			{
-				return System.Convert.ToUInt32(value, fromBase);
+				return Convert.ToUInt32(value, fromBase);
 			}
 			return StringToUInt32(value, fromBase);
 		}
@@ -240,7 +240,7 @@
 			// 使用内置方法，会快一些。
 			if (fromBase == 2 || fromBase == 8 || fromBase == 10 || fromBase == 16)
 			{
-				return System.Convert.ToInt64(value, fromBase);
+				return Convert.ToInt64(value, fromBase);
 			}
 			return unchecked((long)StringToUInt64(value, fromBase));
 		}
@@ -270,7 +270,7 @@
 			// 使用内置方法，会快一些。
 			if (fromBase == 2 || fromBase == 8 || fromBase == 10 || fromBase == 16)
 			{
-				return System.Convert.ToUInt64(value, fromBase);
+				return Convert.ToUInt64(value, fromBase);
 			}
 			return StringToUInt64(value, fromBase);
 		}
@@ -306,7 +306,7 @@
 			uint uBase = (uint)fromBase;
 			for (int i = 0; i < value.Length; i++)
 			{
-				int t = GetBaseValue(value[i], fromBase);
+				int t = value[i].GetBaseValue(fromBase);
 				if (t < 0)
 				{
 					if (i == 0)
@@ -357,7 +357,7 @@
 			ulong ulBase = (ulong)fromBase;
 			for (int i = 0; i < value.Length; i++)
 			{
-				int t = GetBaseValue(value[i], fromBase);
+				int t = value[i].GetBaseValue(fromBase);
 				if (t < 0)
 				{
 					if (i == 0)
@@ -375,42 +375,6 @@
 				result = next;
 			}
 			return result;
-		}
-
-		/// <summary>
-		/// 返回指定字符以指定的基表示的值。
-		/// </summary>
-		/// <param name="ch">要获取值的字符，
-		/// 使用不区分大小写的字母表示大于 <c>10</c> 的数。</param>
-		/// <param name="fromBase"><paramref name="ch"/> 中数字的基数，
-		/// 它必须位于 <c>2</c> 到 <c>36</c> 之间。</param>
-		/// <returns>如果字符有效，则返回字符对应的值。否则返回 <c>-1</c>。</returns>
-		private static int GetBaseValue(char ch, int fromBase)
-		{
-			int value = -1;
-			if (ch < 'A')
-			{
-				if (ch >= '0' && ch <= '9')
-				{
-					value = ch - '0';
-				}
-			}
-			else if (ch < 'a')
-			{
-				if (ch <= 'Z')
-				{
-					value = ch - 'A' + 10;
-				}
-			}
-			else if (ch <= 'z')
-			{
-				value = ch - 'a' + 10;
-			}
-			if (value < fromBase)
-			{
-				return value;
-			}
-			return -1;
 		}
 
 		#endregion // 字符串转换为数字
