@@ -1,4 +1,4 @@
-﻿using Cyjb;
+using Cyjb;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestCyjb
@@ -72,6 +72,42 @@ namespace TestCyjb
 
 			value.Value = 2;
 			Assert.AreEqual(0, value.Value);
+			Assert.IsFalse(value.IsUnique);
+			Assert.IsTrue(value.IsAmbig);
+			Assert.IsFalse(value.IsEmpty);
+
+			value.Reset();
+			Assert.IsFalse(value.IsUnique);
+			Assert.IsFalse(value.IsAmbig);
+			Assert.IsTrue(value.IsEmpty);
+		}
+
+		/// <summary>
+		/// 对 <see cref="UniqueValue{TestValue}"/> 的可空值类型进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestNullableValueType()
+		{
+			UniqueValue<int?> value = new();
+			Assert.AreEqual(null, value.Value);
+			Assert.IsFalse(value.IsUnique);
+			Assert.IsFalse(value.IsAmbig);
+			Assert.IsTrue(value.IsEmpty);
+
+			value.Value = null;
+			Assert.AreEqual(null, value.Value);
+			Assert.IsTrue(value.IsUnique);
+			Assert.IsFalse(value.IsAmbig);
+			Assert.IsFalse(value.IsEmpty);
+
+			value.Value = null;
+			Assert.AreEqual(null, value.Value);
+			Assert.IsTrue(value.IsUnique);
+			Assert.IsFalse(value.IsAmbig);
+			Assert.IsFalse(value.IsEmpty);
+
+			value.Value = 2;
+			Assert.AreEqual(null, value.Value);
 			Assert.IsFalse(value.IsUnique);
 			Assert.IsTrue(value.IsAmbig);
 			Assert.IsFalse(value.IsEmpty);

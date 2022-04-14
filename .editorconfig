@@ -1,4 +1,15 @@
-﻿[*.cs]
+﻿[*]  # 对于所有文件
+# 缩进风格
+indent_style = tab
+# 缩进宽度
+tab_width = 4
+# 文件编码格式
+charset = utf-8
+# 行尾格式
+end_of_line = crlf
+# 文件结尾添加换行符
+insert_final_newline = true
 
+[*.cs]
 # IDE0180: 使用元组交换值
 csharp_style_prefer_tuple_swap = false

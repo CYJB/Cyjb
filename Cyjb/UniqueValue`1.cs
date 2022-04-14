@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Cyjb
 {
@@ -6,18 +6,18 @@ namespace Cyjb
 	/// 用于需要获取唯一值的情况。
 	/// </summary>
 	/// <typeparam name="TValue">唯一值的类型。</typeparam>
-	public class UniqueValue<TValue>
+	public struct UniqueValue<TValue>
 	{
 		/// <summary>
 		/// 要获取的唯一值。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private TValue? uniqueValue;
+		private TValue? uniqueValue = default;
 		/// <summary>
 		/// 获取的值是否是唯一的。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private bool? isUnique;
+		private bool? isUnique = null;
 		/// <summary>
 		/// 值相等的比较器。
 		/// </summary>
@@ -35,6 +35,7 @@ namespace Cyjb
 		{
 			comparer = EqualityComparer<TValue>.Default;
 		}
+
 		/// <summary>
 		/// 使用指定的比较器初始化 <see cref="UniqueValue{TValue}"/> 类的新实例。
 		/// </summary>
@@ -43,6 +44,7 @@ namespace Cyjb
 		{
 			this.comparer = comparer;
 		}
+
 		/// <summary>
 		/// 使用指定的初始值初始化 <see cref="UniqueValue{TValue}"/> 类的新实例。
 		/// </summary>
@@ -53,6 +55,7 @@ namespace Cyjb
 			uniqueValue = value;
 			isUnique = true;
 		}
+
 		/// <summary>
 		/// 使用指定的初始值和比较器初始化 <see cref="UniqueValue{TValue}"/> 类的新实例。
 		/// </summary>
