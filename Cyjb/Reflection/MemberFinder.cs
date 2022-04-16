@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace Cyjb.Reflection
 {
@@ -101,13 +101,14 @@ namespace Cyjb.Reflection
 			bindingFlags |= BindingFlagsUtil.VarArgsParamBinding;
 			this.bindingFlags = bindingFlags;
 			bindingFlags &= ~FindScopeFlags;
+			IsCtor = name == TypeUtil.ConstructorName;
 			if (this.bindingFlags.HasFlag(BindingFlags.Static))
 			{
 				staticParamTypes = paramTypes;
 				staticBindingAttr = bindingFlags | BindingFlags.Static;
 			}
-			if (this.bindingFlags.HasFlag(BindingFlags.Instance) && paramTypes.Length > 0 &&
-				(paramTypes[0] == null || type.IsExplicitFrom(paramTypes[0])))
+			if (this.bindingFlags.HasFlag(BindingFlags.Instance) &&
+				paramTypes.Length > 0 && (paramTypes[0] == null || type.IsExplicitFrom(paramTypes[0])))
 			{
 				instanceParamTypes = paramTypes[1..^0];
 				instanceBindingAttr = bindingFlags | BindingFlags.Instance;
@@ -119,16 +120,22 @@ namespace Cyjb.Reflection
 		}
 
 		/// <summary>
+		/// 获取是否是搜索构造函数
+		/// </summary>
+		public bool IsCtor { get; }
+
+		/// <summary>
 		/// 搜索构造函数。
 		/// </summary>
 		/// <returns>搜索得到的构造函数，找不到则为 <c>null</c>。</returns>
 		public ConstructorInfo? FindConstructor()
 		{
-			if (!bindingFlags.HasFlag(BindingFlags.CreateInstance) || name != TypeUtil.ConstructorName)
+			if (!IsCtor)
 			{
 				return null;
 			}
-			return type.GetConstructor(bindingFlags, binder, paramTypes, null);
+			// 避免误找到静态构造函数
+			return type.GetConstructor(bindingFlags & ~BindingFlags.Static, binder, paramTypes, null);
 		}
 
 		/// <summary>

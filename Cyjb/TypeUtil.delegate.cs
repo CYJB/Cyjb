@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Cyjb.Reflection;
 
 namespace Cyjb
@@ -192,6 +192,11 @@ namespace Cyjb
 			if (result != null)
 			{
 				return result;
+			}
+			else if (finder.IsCtor)
+			{
+				// 明确搜索构造函数，不需要继续搜索
+				return null;
 			}
 			// 搜索方法。
 			result = finder.FindMethod()?.PowerDelegate(delegateType, hasFirstArg, firstArg);
