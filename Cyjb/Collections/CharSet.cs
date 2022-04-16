@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using Cyjb.Collections.ObjectModel;
 using Node = Cyjb.Collections.AVLTree<char, char>.Node;
@@ -67,6 +68,56 @@ namespace Cyjb.Collections
 			}
 			MergeRange(node);
 			return true;
+		}
+
+		/// <summary>
+		/// 将当前集合内大写字母对应的小写字母添加到集合中。
+		/// </summary>
+		/// <param name="culture">大小写转换使用的区域信息。</param>
+		public void AddLowercase(CultureInfo culture)
+		{
+			if (culture == null)
+			{
+				culture = CultureInfo.InvariantCulture;
+			}
+			foreach (var node in ranges.ToArray())
+			{
+				char start = node.Key;
+				char end = node.Value;
+				if (start == end)
+				{
+					Add(culture.TextInfo.ToLower(start));
+				}
+				else
+				{
+					CaseConvert.AddLowercaseRange(culture, start, end, this);
+				}
+			}
+		}
+
+		/// <summary>
+		/// 将当前集合内小写字母对应的大写字母添加到集合中。
+		/// </summary>
+		/// <param name="culture">大小写转换使用的区域信息。</param>
+		public void AddUppercase(CultureInfo culture)
+		{
+			if (culture == null)
+			{
+				culture = CultureInfo.InvariantCulture;
+			}
+			foreach (var node in ranges.ToArray())
+			{
+				char start = node.Key;
+				char end = node.Value;
+				if (start == end)
+				{
+					Add(culture.TextInfo.ToUpper(start));
+				}
+				else
+				{
+					CaseConvert.AddUppercaseRange(culture, start, end, this);
+				}
+			}
 		}
 
 		/// <summary>

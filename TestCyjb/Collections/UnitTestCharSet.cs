@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
 using Cyjb.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -467,6 +471,335 @@ namespace TestCyjb.Collections
 			set.UnionWith(new CharSet(other).ReadOnlyClone());
 			Assert.AreEqual(expected, set.ToString());
 			Assert.AreEqual(expectedCount, set.Count);
+		}
+
+		/// <summary>
+		/// 对 <see cref="CharSet.AddLowercase"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestAddLowercase()
+		{
+			Stopwatch generateMappingWatch = new();
+			Stopwatch charSetWatch = new();
+			Stopwatch hashSetWatch = new();
+			CultureInfo[] cultures = new[] {
+				CultureInfo.InvariantCulture,
+				CultureInfo.CurrentCulture,
+			};
+			foreach (CultureInfo culture in cultures)
+			{
+				CharSet warmup = new("0123456789");
+				generateMappingWatch.Start();
+				warmup.AddLowercase(culture);
+				generateMappingWatch.Stop();
+				for (int i = 0; i < 10; i++)
+				{
+					CharSet set = new();
+					for (int j = 0; j < char.MaxValue; j++)
+					{
+						char ch = (char)j;
+						if (char.GetUnicodeCategory(ch) == UnicodeCategory.UppercaseLetter)
+						{
+							if (Random.Shared.NextDouble() > 0.3)
+							{
+								set.Add(ch);
+							}
+						}
+						else
+						{
+							if (Random.Shared.NextDouble() > 0.92)
+							{
+								set.Add(ch);
+							}
+						}
+					}
+					HashSet<char> expected = new(set);
+					hashSetWatch.Start();
+					foreach (char ch in set)
+					{
+						expected.Add(culture.TextInfo.ToLower(ch));
+					}
+					hashSetWatch.Stop();
+					charSetWatch.Start();
+					set.AddLowercase(culture);
+					charSetWatch.Stop();
+					if (!set.SetEquals(expected))
+					{
+						HashSet<char> surplusChars = new(set);
+						surplusChars.ExceptWith(expected);
+						HashSet<char> lackChars = new(expected);
+						lackChars.ExceptWith(set);
+						Assert.Fail("Set not equals, surplus [{0}], lack [{1}]",
+							new string(surplusChars.ToArray()),
+							new string(lackChars.ToArray())
+						);
+					}
+					Assert.IsTrue(set.SetEquals(expected));
+				}
+			}
+			Console.WriteLine("Warmup {0}\n CharSet {1}\n HashSet {2}",
+				generateMappingWatch.ElapsedMilliseconds,
+				charSetWatch.ElapsedMilliseconds,
+				hashSetWatch.ElapsedMilliseconds);
+		}
+
+		/// <summary>
+		/// 对 <see cref="CharSet.AddUppercase"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestAddUppercase()
+		{
+			Stopwatch generateMappingWatch = new();
+			Stopwatch charSetWatch = new();
+			Stopwatch hashSetWatch = new();
+			CultureInfo[] cultures = new[] {
+				CultureInfo.InvariantCulture,
+				CultureInfo.CurrentCulture,
+			};
+			foreach (CultureInfo culture in cultures)
+			{
+				CharSet warmup = new("0123456789");
+				generateMappingWatch.Start();
+				warmup.AddUppercase(culture);
+				generateMappingWatch.Stop();
+				for (int i = 0; i < 10; i++)
+				{
+					CharSet set = new();
+					for (int j = 0; j < char.MaxValue; j++)
+					{
+						char ch = (char)j;
+						if (char.GetUnicodeCategory(ch) == UnicodeCategory.LowercaseLetter)
+						{
+							if (Random.Shared.NextDouble() > 0.3)
+							{
+								set.Add(ch);
+							}
+						}
+						else
+						{
+							if (Random.Shared.NextDouble() > 0.92)
+							{
+								set.Add(ch);
+							}
+						}
+					}
+					HashSet<char> expected = new(set);
+					hashSetWatch.Start();
+					foreach (char ch in set)
+					{
+						expected.Add(culture.TextInfo.ToUpper(ch));
+					}
+					hashSetWatch.Stop();
+					charSetWatch.Start();
+					set.AddUppercase(culture);
+					charSetWatch.Stop();
+					if (!set.SetEquals(expected))
+					{
+						HashSet<char> surplusChars = new(set);
+						surplusChars.ExceptWith(expected);
+						HashSet<char> lackChars = new(expected);
+						lackChars.ExceptWith(set);
+						Assert.Fail("Set not equals, surplus [{0}], lack [{1}]",
+							new string(surplusChars.ToArray()),
+							new string(lackChars.ToArray())
+						);
+					}
+					Assert.IsTrue(set.SetEquals(expected));
+				}
+			}
+			Console.WriteLine("Warmup {0}\n CharSet {1}\n HashSet {2}",
+				generateMappingWatch.ElapsedMilliseconds,
+				charSetWatch.ElapsedMilliseconds,
+				hashSetWatch.ElapsedMilliseconds);
+		}
+
+		/// <summary>
+		/// 对 <see cref="CharSet"/> 的添加性能进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestPerformance()
+		{
+			List<char> charList = new();
+			List<(char start, char end)> smallRangeList = new();
+			List<(char start, char end)> largeRangeList = new();
+			int loopCount = 100;
+			for (int i = 0; i < 10000; i++)
+			{
+				charList.Add((char)Random.Shared.Next(0, char.MaxValue + 1));
+			}
+			for (int i = 0; i < 1000; i++)
+			{
+				int min = Random.Shared.Next(0, char.MaxValue + 1);
+				int max = min + Random.Shared.Next(0, 10);
+				if (max > char.MaxValue)
+				{
+					max = char.MaxValue;
+				}
+				smallRangeList.Add(((char)min, (char)max));
+
+				max = min + Random.Shared.Next(0, 100);
+				if (max > char.MaxValue)
+				{
+					max = char.MaxValue;
+				}
+				largeRangeList.Add(((char)min, (char)max));
+			}
+
+			Stopwatch hashSetCharWatch = new();
+			hashSetCharWatch.Start();
+			for (int i = 0; i < loopCount; i++)
+			{
+				HashSet<char> hashSet = new();
+				for (int j = 0; j < charList.Count; j++)
+				{
+					hashSet.Add(charList[j]);
+				}
+			}
+			hashSetCharWatch.Stop();
+
+			Stopwatch hashSetSmallRangeWatch = new();
+			hashSetSmallRangeWatch.Start();
+			for (int i = 0; i < loopCount; i++)
+			{
+				HashSet<char> hashSet = new();
+				for (int j = 0; j < smallRangeList.Count; j++)
+				{
+					var (start, end) = smallRangeList[j];
+					for (int k = start; k <= end; k++)
+					{
+						hashSet.Add((char)k);
+					}
+				}
+			}
+			hashSetSmallRangeWatch.Stop();
+
+			Stopwatch hashSetLargeRangeWatch = new();
+			hashSetLargeRangeWatch.Start();
+			for (int i = 0; i < loopCount; i++)
+			{
+				HashSet<char> hashSet = new();
+				for (int j = 0; j < largeRangeList.Count; j++)
+				{
+					var (start, end) = largeRangeList[j];
+					for (int k = start; k <= end; k++)
+					{
+						hashSet.Add((char)k);
+					}
+				}
+			}
+			hashSetLargeRangeWatch.Stop();
+
+			Stopwatch sortedSetCharWatch = new();
+			sortedSetCharWatch.Start();
+			for (int i = 0; i < loopCount; i++)
+			{
+				SortedSet<char> sortedSet = new();
+				for (int j = 0; j < charList.Count; j++)
+				{
+					sortedSet.Add(charList[j]);
+				}
+			}
+			sortedSetCharWatch.Stop();
+
+			Stopwatch sortedSetSmallRangeWatch = new();
+			sortedSetSmallRangeWatch.Start();
+			for (int i = 0; i < loopCount; i++)
+			{
+				SortedSet<char> sortedSet = new();
+				for (int j = 0; j < largeRangeList.Count; j++)
+				{
+					var (start, end) = smallRangeList[j];
+					for (int k = start; k <= end; k++)
+					{
+						sortedSet.Add((char)k);
+					}
+				}
+			}
+			sortedSetSmallRangeWatch.Stop();
+
+			Stopwatch sortedSetLargeRangeWatch = new();
+			sortedSetLargeRangeWatch.Start();
+			for (int i = 0; i < loopCount; i++)
+			{
+				SortedSet<char> sortedSet = new();
+				for (int j = 0; j < smallRangeList.Count; j++)
+				{
+					var (start, end) = largeRangeList[j];
+					for (int k = start; k <= end; k++)
+					{
+						sortedSet.Add((char)k);
+					}
+				}
+			}
+			sortedSetLargeRangeWatch.Stop();
+
+			Stopwatch charSetCharWatch = new();
+			charSetCharWatch.Start();
+			for (int i = 0; i < loopCount; i++)
+			{
+				CharSet charSet = new();
+				for (int j = 0; j < charList.Count; j++)
+				{
+					charSet.Add(charList[j]);
+				}
+			}
+			charSetCharWatch.Stop();
+
+			Stopwatch charSetSmallRangeWatch = new();
+			charSetSmallRangeWatch.Start();
+			for (int i = 0; i < loopCount; i++)
+			{
+				CharSet charSet = new();
+				for (int j = 0; j < smallRangeList.Count; j++)
+				{
+					var (start, end) = smallRangeList[j];
+					for (int k = start; k <= end; k++)
+					{
+						charSet.Add((char)k);
+					}
+				}
+			}
+			charSetSmallRangeWatch.Stop();
+
+			Stopwatch charSetLargeRangeWatch = new();
+			charSetLargeRangeWatch.Start();
+			for (int i = 0; i < loopCount; i++)
+			{
+				CharSet charSet = new();
+				for (int j = 0; j < largeRangeList.Count; j++)
+				{
+					var (start, end) = largeRangeList[j];
+					for (int k = start; k <= end; k++)
+					{
+						charSet.Add((char)k);
+					}
+				}
+			}
+			charSetLargeRangeWatch.Stop();
+
+			Console.WriteLine(@"CharPerformance
+Char:
+  CharSet {0}
+  HashSet {1}
+  SortedSet {2}
+SmallRange:
+  CharSet {3}
+  HashSet {4}
+  SortedSet {5}
+LargeRange:
+  CharSet {6}
+  HashSet {7}
+  SortedSet {8}
+",
+				 charSetCharWatch.ElapsedMilliseconds,
+				 hashSetCharWatch.ElapsedMilliseconds,
+				 sortedSetCharWatch.ElapsedMilliseconds,
+				 charSetSmallRangeWatch.ElapsedMilliseconds,
+				 hashSetSmallRangeWatch.ElapsedMilliseconds,
+				 sortedSetSmallRangeWatch.ElapsedMilliseconds,
+				 charSetLargeRangeWatch.ElapsedMilliseconds,
+				 hashSetLargeRangeWatch.ElapsedMilliseconds,
+				 sortedSetLargeRangeWatch.ElapsedMilliseconds);
 		}
 	}
 }
