@@ -80,17 +80,18 @@ namespace Cyjb.Collections
 			{
 				culture = CultureInfo.InvariantCulture;
 			}
+			CaseConverter converter = CaseConverter.GetLowercaseConverter(culture);
 			foreach (var node in ranges.ToArray())
 			{
 				char start = node.Key;
 				char end = node.Value;
 				if (start == end)
 				{
-					Add(culture.TextInfo.ToLower(start));
+					Add(converter.ConvertChar(start));
 				}
 				else
 				{
-					CaseConvert.AddLowercaseRange(culture, start, end, this);
+					converter.ConvertRange(start, end, this);
 				}
 			}
 		}
@@ -105,17 +106,18 @@ namespace Cyjb.Collections
 			{
 				culture = CultureInfo.InvariantCulture;
 			}
+			CaseConverter converter = CaseConverter.GetUppercaseConverter(culture);
 			foreach (var node in ranges.ToArray())
 			{
 				char start = node.Key;
 				char end = node.Value;
 				if (start == end)
 				{
-					Add(culture.TextInfo.ToUpper(start));
+					Add(converter.ConvertChar(start));
 				}
 				else
 				{
-					CaseConvert.AddUppercaseRange(culture, start, end, this);
+					converter.ConvertRange(start, end, this);
 				}
 			}
 		}

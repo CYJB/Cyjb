@@ -1,88 +1,235 @@
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Text;
 
 namespace Cyjb.Collections
 {
 	/// <summary>
-	/// 大小写转换的映射表。
+	/// 大小写转换器。
 	/// </summary>
-	internal sealed class CaseConvertMapping
+	internal sealed class CaseConverter
 	{
+		/// <summary>
+		/// 最小值的索引。
+		/// </summary>
+		private const int IndexMin = 0;
+		/// <summary>
+		/// 最大值的索引。
+		/// </summary>
+		private const int IndexMax = 1;
+		/// <summary>
+		/// 操作符的索引。
+		/// </summary>
+		private const int IndexOperator = 2;
+		/// <summary>
+		/// 数据的索引。
+		/// </summary>
+		private const int IndexData = 3;
+
 		/// <summary>
 		/// 直接设置相应的大/小写字符：Upper(ch)/Lower(ch) = constant。
 		/// </summary>
-		public const char OperatorSet = '\x00';
+		private const char OperatorSet = '\x00';
 		/// <summary>
 		/// 加上一个固定偏移的操作：ch + offset。
 		/// </summary>
-		public const char OperatorAdd = '\x01';
+		private const char OperatorAdd = '\x01';
 		/// <summary>
 		/// 字符按位或 1 的操作：ch | 1。
 		/// </summary>
 		/// <remarks>对应于 lowerCase = upperCase + 1 且 upperCase 为偶数的场景，
 		/// 此时 upperCase 或 lowerCase 都会被转换为 lowerCase。
 		/// </remarks>
-		public const char OperatorOr = '\x03';
+		private const char OperatorOr = '\x03';
 		/// <summary>
 		/// 加上按位与 1 的操作：ch + (ch &amp; 1)。
 		/// </summary>
 		/// <remarks>对应于 lowerCase = upperCase + 1 且 upperCase 为奇数的场景，
 		/// 此时 upperCase 或 lowerCase 都会被转换为 lowerCase。
 		/// </remarks>
-		public const char OperatorAddAnd = '\x04';
+		private const char OperatorAddAnd = '\x04';
 		/// <summary>
 		/// 字符按位与 -2 的操作：ch &amp; 0xFFFE。
 		/// </summary>
 		/// <remarks>对应于 lowerCase = upperCase + 1 且 lowerCase 为奇数的场景，
 		/// 此时 upperCase 或 lowerCase 都会被转换为 upperCaseCase。
 		/// </remarks>
-		public const char OperatorAnd = '\x05';
+		private const char OperatorAnd = '\x05';
 		/// <summary>
 		/// 减去上按位与 1 的操作：ch - (~ch &amp; 1)。
 		/// </summary>
 		/// <remarks>对应于 lowerCase = upperCase + 1 且 lowerCase 为偶数的场景，
 		/// 此时 upperCase 或 lowerCase 都会被转换为 upperCaseCase。
 		/// </remarks>
-		public const char OperatorSubAnd = '\x06';
+		private const char OperatorSubAnd = '\x06';
+
 		/// <summary>
-		/// 大小写转换使用的区域信息。
+		/// 大写字母到小写字母的转换器。
 		/// </summary>
-		private readonly TextInfo textInfo;
+		private static readonly ConcurrentDictionary<CultureInfo, CaseConverter> toLowerConverter = new();
 		/// <summary>
-		/// 转换到小写字母的映射表。
+		/// 小写字母到大写字母的转换器。
 		/// </summary>
-		private readonly Lazy<string[]> toLowerMapping;
+		private static readonly ConcurrentDictionary<CultureInfo, CaseConverter> toUpperConverter = new();
+
 		/// <summary>
-		/// 转换到大写字母的映射表。
+		/// 返回大写字母到小写字母的转换器。
 		/// </summary>
-		private readonly Lazy<string[]> toUpperMapping;
+		/// <param name="culture">转换用到的区域信息。</param>
+		public static CaseConverter GetLowercaseConverter(CultureInfo culture)
+		{
+			return toLowerConverter.GetOrAdd(culture, (culture) => new CaseConverter(culture, true));
+		}
+
+		/// <summary>
+		/// 返回小写字母到小写字母的转换器。
+		/// </summary>
+		/// <param name="culture">转换用到的区域信息。</param>
+		public static CaseConverter GetUppercaseConverter(CultureInfo culture)
+		{
+			return toUpperConverter.GetOrAdd(culture, (culture) => new CaseConverter(culture, false));
+		}
+
+		/// <summary>
+		/// 大小写转换的映射表。
+		/// </summary>
+		private readonly string[] mapping;
 
 		/// <summary>
 		/// 使用指定的区域信息初始化。
 		/// </summary>
 		/// <param name="culture">大小写转换使用的区域信息。</param>
-		public CaseConvertMapping(CultureInfo culture)
+		/// <param name="toLower">是否是转换为小写字母。</param>
+		private CaseConverter(CultureInfo culture, bool toLower)
 		{
-			textInfo = culture.TextInfo;
-			toLowerMapping = new(BuildToLowerMapping);
-			toUpperMapping = new(BuildToUpperMapping);
+			if (toLower)
+			{
+				mapping = BuildToLowerMapping(culture.TextInfo);
+			}
+			else
+			{
+				mapping = BuildToUpperMapping(culture.TextInfo);
+			}
 		}
 
 		/// <summary>
-		/// 获取转换到小写字母的映射表。
+		/// 添加指定字符范围对应的大/小写字符。
 		/// </summary>
-		public Lazy<string[]> ToLowerMapping => toLowerMapping;
+		/// <param name="min">字符范围的起始。</param>
+		/// <param name="max">字符范围的结束。</param>
+		/// <param name="ranges">要添加到的字符范围。</param>
+		public void ConvertRange(char min, char max, CharSet ranges)
+		{
+			int index = GetLowerBound(min);
+			if (index >= mapping.Length)
+			{
+				return;
+			}
+			char curMin, curMax;
+			string map;
+			for (; index < mapping.Length && (map = mapping[index])[IndexMin] <= max; index++)
+			{
+				if ((curMin = map[IndexMin]) < min)
+				{
+					curMin = min;
+				}
+				if ((curMax = map[IndexMax]) > max)
+				{
+					curMax = max;
+				}
+				switch (map[IndexOperator])
+				{
+					case OperatorSet:
+						curMin = map[IndexData];
+						curMax = map[IndexData];
+						break;
+					case OperatorAdd:
+						curMin += map[IndexData];
+						curMax += map[IndexData];
+						break;
+					case OperatorOr:
+						curMin |= (char)1;
+						curMax |= (char)1;
+						break;
+					case OperatorAddAnd:
+						curMin += (char)(curMin & 1u);
+						curMax += (char)(curMax & 1u);
+						break;
+					case OperatorAnd:
+						curMin &= (char)0xFFFE;
+						curMax &= (char)0xFFFE;
+						break;
+					case OperatorSubAnd:
+						curMin -= (char)(~curMin & 1u);
+						curMax -= (char)(~curMax & 1u);
+						break;
+				}
+				if (curMin < min || curMax > max)
+				{
+					ranges.Add(curMin, curMax);
+				}
+			}
+		}
 
 		/// <summary>
-		/// 获取转换到大写字母的映射表。
+		/// 返回指定字符对应的大/小写字符。
 		/// </summary>
-		public Lazy<string[]> ToUpperMapping => toUpperMapping;
+		/// <param name="ch">要转换的字符。</param>
+		/// <returns>转换后的字符。</returns>
+		public char ConvertChar(char ch)
+		{
+			int index = GetLowerBound(ch);
+			if (index >= mapping.Length)
+			{
+				return ch;
+			}
+			string map = mapping[index];
+			if (map[IndexMin] > ch)
+			{
+				return ch;
+			}
+			return map[IndexOperator] switch
+			{
+				OperatorSet => map[IndexData],
+				OperatorAdd => (char)(ch + map[IndexData]),
+				OperatorOr => (char)(ch | 1u),
+				OperatorAddAnd => (char)(ch + (ch & 1u)),
+				OperatorAnd => (char)(ch & 0xFFFE),
+				OperatorSubAnd => (char)(ch - (~ch & 1u)),
+				_ => ch,
+			};
+		}
+
+		/// <summary>
+		/// 返回指定字符在映射表中的索引下界。
+		/// </summary>
+		/// <param name="ch">要查找的字符。</param>
+		/// <returns>字符的索引下界。</returns>
+		private int GetLowerBound(char ch)
+		{
+			int low, high, mid;
+			// 二分查找匹配的映射关系。
+			for (low = 0, high = mapping.Length; low < high;)
+			{
+				mid = (low + high) >> 1;
+				if (mapping[mid][IndexMax] < ch)
+				{
+					low = mid + 1;
+				}
+				else
+				{
+					high = mid;
+				}
+			}
+			return low;
+		}
 
 		/// <summary>
 		/// 生成从大写字母转换为小写字母的映射表。
 		/// </summary>
+		/// <param name="textInfo">生成映射时使用的文本信息</param>
 		/// <returns>映射表。</returns>
-		private string[] BuildToLowerMapping()
+		private static string[] BuildToLowerMapping(TextInfo textInfo)
 		{
 			List<string> result = new(255);
 			char min = '\0', max = '\0', op = '\0', data = '\0';
@@ -190,8 +337,9 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 生成从小写字母转换为大写字母的映射表。
 		/// </summary>
+		/// <param name="textInfo">生成映射时使用的文本信息</param>
 		/// <returns>映射表。</returns>
-		private string[] BuildToUpperMapping()
+		private static string[] BuildToUpperMapping(TextInfo textInfo)
 		{
 			List<string> result = new(255);
 			char min = '\0', max = '\0', op = '\0', data = '\0';
