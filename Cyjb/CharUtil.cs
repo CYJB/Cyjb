@@ -278,5 +278,46 @@ namespace Cyjb
 
 		#endregion // Width
 
+		/// <summary>
+		/// 返回当前字符对应的全角字符。
+		/// </summary>
+		/// <param name="ch">要转换的字符。</param>
+		/// <returns>当前字符对应的全角字符，如果不存在则返回当前字符。</returns>
+		public static char ToFullWidth(this char ch)
+		{
+			if (ch <= '~' && ch >= '!')
+			{
+				return (char)(ch + 0xFEE0);
+			}
+			else if (ch == ' ')
+			{
+				return '　';
+			}
+			else
+			{
+				return ch;
+			}
+		}
+
+		/// <summary>
+		/// 返回当前字符对应的半角字符。
+		/// </summary>
+		/// <param name="ch">要转换的字符。</param>
+		/// <returns>当前字符对应的半角字符，如果不存在则返回当前字符。</returns>
+		public static char ToHalfWidth(this char ch)
+		{
+			if (ch >= '！' && ch <= '～')
+			{
+				return (char)(ch - 0xFEE0);
+			}
+			else if (ch == '　')
+			{
+				return ' ';
+			}
+			else
+			{
+				return ch;
+			}
+		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Cyjb;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -151,6 +151,24 @@ namespace TestCyjb
 			Assert.AreEqual(2, CharUtil.Width(target, ref index));
 			Assert.AreEqual(2, CharUtil.Width(target, ref index));
 			Assert.AreEqual(1, CharUtil.Width(target, ref index));
+		}
+
+		/// <summary>
+		/// 对 <see cref="CharUtil.ToHalfWidth"/> 和 <see cref="CharUtil.ToFullWidth"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestChangeWidth()
+		{
+			string halfWidth = "ƒ“ !\"#$%&'()*+,-./0123456789:;<=>?@" +
+				"ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~”中";
+			string fullWidth = "ƒ“　！＂＃＄％＆＇（）＊＋，－．／０１２３４５６７８９：；＜＝＞？＠" +
+				"ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ［＼］＾＿｀" +
+				"ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ｛｜｝～”中";
+			for (int i = 0; i < halfWidth.Length; i++)
+			{
+				Assert.AreEqual(halfWidth[i], fullWidth[i].ToHalfWidth());
+				Assert.AreEqual(fullWidth[i], halfWidth[i].ToFullWidth());
+			}
 		}
 	}
 }
