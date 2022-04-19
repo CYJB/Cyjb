@@ -40,7 +40,8 @@ namespace Cyjb.Collections
 		/// </summary>
 		/// <param name="start">要添加到当前集合的字符范围起始（包含）。</param>
 		/// <param name="end">要添加到当前集合的字符范围结束（包含）。</param>
-		/// <returns>如果该字符范围内的<b>任何</b>字符已添加到集合内，则为 <c>true</c>；如果该字符范围已全部在集合内，则为 <c>false</c>。</returns>
+		/// <returns>如果该字符范围内的<b>任何</b>字符已添加到集合内，则为 <c>true</c>；
+		/// 如果该字符范围已全部在集合内，则为 <c>false</c>。</returns>
 		/// <exception cref="ArgumentOutOfRangeException">字符范围的起始大于结束。</exception>
 		public bool Add(char start, char end)
 		{
@@ -68,6 +69,69 @@ namespace Cyjb.Collections
 			}
 			MergeRange(node);
 			return true;
+		}
+
+		/// <summary>
+		/// 向当前集内添加字符及其相应的大/小写字母，并返回一个指示是否已成功添加字符的值。
+		/// </summary>
+		/// <param name="ch">要添加到 <see cref="CharSet"/> 的中的字符。</param>
+		/// <param name="culture">大小写转换使用的区域信息。</param>
+		/// <returns>如果该字符的任意大/小写已添加到集内，则为 <c>true</c>；
+		/// 如果该字符的全部大小写都已在集内，则为 <c>false</c>。</returns>
+		public bool AddIgnoreCase(char ch, CultureInfo? culture = null)
+		{
+			if (culture == null)
+			{
+				culture = CultureInfo.InvariantCulture;
+			}
+			int startCount = count;
+			Add(ch);
+			TextInfo textInfo = culture.TextInfo;
+			switch (char.GetUnicodeCategory(ch))
+			{
+				case UnicodeCategory.TitlecaseLetter:
+					Add(textInfo.ToLower(ch));
+					break;
+				case UnicodeCategory.LowercaseLetter:
+					Add(textInfo.ToUpper(ch));
+					break;
+				case UnicodeCategory.UppercaseLetter:
+				// UppercaseLetter 存在 ToUpper 不是自身的情况
+				// \u01C5 \u01C8 \u01CB \u01F2
+				case UnicodeCategory.NonSpacingMark:
+				case UnicodeCategory.LetterNumber:
+				case UnicodeCategory.OtherSymbol:
+					Add(textInfo.ToUpper(ch));
+					Add(textInfo.ToLower(ch));
+					break;
+			}
+			return count > startCount;
+		}
+
+		/// <summary>
+		/// 将指定字符范围及其相应的大/小写字母添加到当前集合中。
+		/// </summary>
+		/// <param name="start">要添加到当前集合的字符范围起始（包含）。</param>
+		/// <param name="end">要添加到当前集合的字符范围结束（包含）。</param>
+		/// <param name="culture">大小写转换使用的区域信息。</param>
+		/// <returns>如果该字符范围内的<b>任何</b>大/小写字符已添加到集合内，则为 <c>true</c>；
+		/// 如果该字符范围已全部在集合内，则为 <c>false</c>。</returns>
+		/// <exception cref="ArgumentOutOfRangeException">字符范围的起始大于结束。</exception>
+		public bool AddIgnoreCase(char start, char end, CultureInfo? culture = null)
+		{
+			if (start > end)
+			{
+				throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
+			}
+			if (culture == null)
+			{
+				culture = CultureInfo.InvariantCulture;
+			}
+			int startCount = count;
+			Add(start, end);
+			CaseConverter.GetLowercaseConverter(culture).ConvertRange(start, end, this);
+			CaseConverter.GetUppercaseConverter(culture).ConvertRange(start, end, this);
+			return count > startCount;
 		}
 
 		/// <summary>

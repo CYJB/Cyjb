@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Cyjb.Collections;
 using Cyjb.Conversions;
 
@@ -23,7 +23,7 @@ namespace Cyjb
 		{
 			if (ch == '\\')
 			{
-				return "\\\\";
+				return @"\\";
 			}
 			else if (ch >= ' ' && ch <= '~')
 			{
@@ -31,14 +31,14 @@ namespace Cyjb
 			}
 			return ch switch
 			{
-				'\0' => "\\0",
-				'\a' => "\\a",
-				'\b' => "\\b",
-				'\f' => "\\f",
-				'\n' => "\\n",
-				'\r' => "\\r",
-				'\t' => "\\t",
-				'\v' => "\\v",
+				'\0' => @"\0",
+				'\a' => @"\a",
+				'\b' => @"\b",
+				'\f' => @"\f",
+				'\n' => @"\n",
+				'\r' => @"\r",
+				'\t' => @"\t",
+				'\v' => @"\v",
 				_ => $"\\u{((uint)ch).ToString(16).PadLeft(4, '0')}",
 			};
 		}

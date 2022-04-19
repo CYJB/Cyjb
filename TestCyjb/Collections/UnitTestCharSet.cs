@@ -21,7 +21,7 @@ namespace TestCyjb.Collections
 		public void TestAddRemove()
 		{
 			CharSet set = new();
-			SortedSet<char> expected = new();
+			HashSet<char> expected = new();
 			Assert.AreEqual(0, set.Count);
 			Assert.AreEqual("[]", set.ToString());
 			Assert.IsTrue(expected.SetEquals(set));
@@ -110,6 +110,36 @@ namespace TestCyjb.Collections
 		}
 
 		/// <summary>
+		/// 对 <see cref="CharSet.AddIgnoreCase"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestAddIgnoreCase()
+		{
+			CharSet set = new();
+			HashSet<char> expected = new();
+
+			Assert.IsTrue(set.AddIgnoreCase('a'));
+			expected.AddRange("aA");
+			Assert.IsTrue(expected.SetEquals(set));
+
+			Assert.IsTrue(set.AddIgnoreCase('Z'));
+			expected.AddRange("zZ");
+			Assert.IsTrue(expected.SetEquals(set));
+
+			Assert.IsTrue(set.AddIgnoreCase('0', '3'));
+			expected.AddRange("0123");
+			Assert.IsTrue(expected.SetEquals(set));
+
+			Assert.IsTrue(set.AddIgnoreCase('c', 'f'));
+			expected.AddRange("cdefCDEF");
+			Assert.IsTrue(expected.SetEquals(set));
+
+			Assert.IsTrue(set.AddIgnoreCase('X', 'b'));
+			expected.AddRange(@"XYZ[\]^_`abxyzAB");
+			Assert.IsTrue(expected.SetEquals(set));
+		}
+
+		/// <summary>
 		/// 对 <see cref="CharSet.ReadOnlyClone"/> 方法进行测试。
 		/// </summary>
 		[TestMethod]
@@ -142,7 +172,7 @@ namespace TestCyjb.Collections
 			Assert.IsTrue(set.Remove('\0', char.MaxValue));
 			ReadOnlyCharSet set13 = set.ReadOnlyClone();
 
-			SortedSet<char> expected = new();
+			HashSet<char> expected = new();
 			Assert.AreEqual(0, set1.Count);
 			Assert.AreEqual("[]", set1.ToString());
 			Assert.IsTrue(expected.SetEquals(set));
