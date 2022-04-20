@@ -233,7 +233,7 @@ namespace Cyjb
 		/// <param name="index"><paramref name="str"/> 中的字符位置，并在方法调用之后设置为下一个字符位置，
 		/// 会识别可能的 Unicode 代理项对。</param>
 		/// <returns><paramref name="str"/> 中指定字符的宽度，结果可能是 <c>0</c>、<c>1</c> 或 <c>2</c>。</returns>
-		/// <remarks>此方法基于 Unicode 标准 6.3 版。详情请参见 
+		/// <remarks>此方法基于 Unicode 标准 13.0.0 版。详情请参见 
 		/// <see href="http://www.unicode.org/reports/tr11/">Unicode Standard Annex #11 EAST ASIAN WIDTH</see>。 
 		/// 返回 <c>0</c> 表示控制字符、非间距字符或格式字符，<c>1</c> 表示半角字符，
 		/// <c>2</c> 表示全角字符。</remarks>
