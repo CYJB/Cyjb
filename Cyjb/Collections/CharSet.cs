@@ -261,8 +261,12 @@ namespace Cyjb.Collections
 		/// <returns>当前集合的只读副本。</returns>
 		public ReadOnlyCharSet ReadOnlyClone()
 		{
+			if (count == 0)
+			{
+				return new ReadOnlyCharSet("");
+			}
 			StringBuilder builder = new(ranges.Count * 2 + 1);
-			builder.Append((char)count);
+			builder.Append((char)(count - 1));
 			foreach (var node in ranges)
 			{
 				builder.Append(node.Key);

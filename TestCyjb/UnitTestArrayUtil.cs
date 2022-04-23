@@ -1,18 +1,19 @@
 using System;
 using Cyjb;
 using Cyjb.Collections;
+using Cyjb.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestCyjb
 {
 	/// <summary>
-	/// <see cref="ArrayUtil"/> ÀàµÄµ¥Ôª²âÊÔ¡£
+	/// <see cref="ArrayUtil"/> ç±»çš„å•å…ƒæµ‹è¯•ã€‚
 	/// </summary>
 	[TestClass]
 	public class UnitTestArrayUtil
 	{
 		/// <summary>
-		/// ¶Ô <see cref="ArrayUtil.Add"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="ArrayUtil.Add"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[TestMethod]
 		public void TestAdd()
@@ -25,7 +26,7 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="ArrayUtil.Insert"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="ArrayUtil.Insert"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[TestMethod]
 		public void TestInsert()
@@ -39,7 +40,7 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="ArrayUtil.Concat"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="ArrayUtil.Concat"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[TestMethod]
 		public void TestConcat()
@@ -54,7 +55,7 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="ArrayUtil.Resize"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="ArrayUtil.Resize"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[TestMethod]
 		public void TestResize()
@@ -69,12 +70,12 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="ArrayUtil.Fill"/> ·½·¨µÄÒ»Î¬Êı×é½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="ArrayUtil.Fill"/> æ–¹æ³•çš„ä¸€ç»´æ•°ç»„è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[TestMethod]
 		public void TestFill_1()
 		{
-			// Ò»Î¬Êı×é
+			// ä¸€ç»´æ•°ç»„
 			int[] arr = new int[10];
 			arr.Fill(3);
 			CollectionAssert.AreEqual(new int[] { 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 }, arr);
@@ -94,7 +95,7 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="ArrayUtil.Fill"/> ·½·¨µÄ¶şÎ¬Êı×é½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="ArrayUtil.Fill"/> æ–¹æ³•çš„äºŒç»´æ•°ç»„è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[TestMethod]
 		public void TestFill_2()
@@ -132,12 +133,12 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="ArrayUtil.Fill"/> ·½·¨µÄÈıÎ¬Êı×é½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="ArrayUtil.Fill"/> æ–¹æ³•çš„ä¸‰ç»´æ•°ç»„è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[TestMethod]
 		public void TestFill_3()
 		{
-			// ÈıÎ¬Êı×é
+			// ä¸‰ç»´æ•°ç»„
 			int[,,] arr4 = new int[2, 2, 2];
 			arr4.Fill(3);
 			Assert.AreEqual(3, arr4[0, 0, 0]);
@@ -187,7 +188,7 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="ArrayUtil.Suffle{T}(T[])"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="ArrayUtil.Suffle{T}(T[])"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[TestMethod]
 		public void TestSuffle_1()
@@ -218,7 +219,7 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="ArrayUtil.Suffle{T}(T[,])"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="ArrayUtil.Suffle{T}(T[,])"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[TestMethod]
 		public void TestSuffle_2()
@@ -251,7 +252,7 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="ArrayUtil.Suffle{T}(T[,,])"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="ArrayUtil.Suffle{T}(T[,,])"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[TestMethod]
 		public void TestSuffle_3()

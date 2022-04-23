@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using Cyjb;
 using Cyjb.Reflection;
+using Cyjb.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestCyjb.Reflection

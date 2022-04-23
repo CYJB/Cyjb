@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using Cyjb.Collections;
+using Cyjb.Test.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestCyjb.Collections
@@ -14,6 +15,17 @@ namespace TestCyjb.Collections
 	[TestClass]
 	public class UnitTestCharSet
 	{
+		/// <summary>
+		/// 对 <see cref="CharSet"/> 的 <see cref="ICollection{T}"/> 接口进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestCollection()
+		{
+			CharSet set = new();
+			CollectionTest.Test(set, CollectionTestType.Sorted | CollectionTestType.Unique,
+				"dlgozuqhzlbiuoapzoijkokljtkpuiwoeu2839ythiz7tyb686r329rujweguizlob8ya9yh12huihijkl".ToCharArray());
+		}
+
 		/// <summary>
 		/// 对 <see cref="CharSet"/> 的添加和删除进行测试。
 		/// </summary>
@@ -171,25 +183,25 @@ namespace TestCyjb.Collections
 			ReadOnlyCharSet set12 = set.ReadOnlyClone();
 			Assert.IsTrue(set.Remove('\0', char.MaxValue));
 			ReadOnlyCharSet set13 = set.ReadOnlyClone();
+			Assert.IsTrue(set.Add('\0', char.MaxValue));
+			ReadOnlyCharSet set14 = set.ReadOnlyClone();
 
-			HashSet<char> expected = new();
-			Assert.AreEqual(0, set1.Count);
+			char[] values = "\0abcdefghijklmnopq\uFFFF".ToCharArray();
+
+			SortedSet<char> expected = new();
+			CollectionTest.Test(expected, set1, true, values);
 			Assert.AreEqual("[]", set1.ToString());
-			Assert.IsTrue(expected.SetEquals(set));
 
 			expected.UnionWith("abc");
+			CollectionTest.Test(expected, set2, true, values);
 			Assert.AreEqual("[a-c]", set2.ToString());
-			Assert.AreEqual(expected.Count, set2.Count);
-			Assert.IsTrue(expected.SetEquals(set2));
 
 			expected.UnionWith("e");
+			CollectionTest.Test(expected, set3, true, values);
 			Assert.AreEqual("[a-ce]", set3.ToString());
-			Assert.AreEqual(expected.Count, set3.Count);
-			Assert.IsTrue(expected.SetEquals(set3));
 
+			CollectionTest.Test(expected, set4, true, values);
 			Assert.AreEqual("[a-ce]", set4.ToString());
-			Assert.AreEqual(expected.Count, set4.Count);
-			Assert.IsTrue(expected.SetEquals(set4));
 			Assert.IsTrue(set3.Equals(set4));
 
 			Assert.IsTrue(set4.SetEquals(expected));
@@ -199,34 +211,28 @@ namespace TestCyjb.Collections
 			Assert.IsFalse(set4.IsProperSupersetOf(expected));
 
 			expected.UnionWith("\0");
+			CollectionTest.Test(expected, set5, true, values);
 			Assert.AreEqual("[\0a-ce]", set5.ToString());
-			Assert.AreEqual(expected.Count, set5.Count);
-			Assert.IsTrue(expected.SetEquals(set5));
 
 			expected.UnionWith("dfg");
+			CollectionTest.Test(expected, set6, true, values);
 			Assert.AreEqual("[\0a-g]", set6.ToString());
-			Assert.AreEqual(expected.Count, set6.Count);
-			Assert.IsTrue(expected.SetEquals(set6));
 
 			expected.ExceptWith("def");
+			CollectionTest.Test(expected, set7, true, values);
 			Assert.AreEqual("[\0a-cg]", set7.ToString());
-			Assert.AreEqual(expected.Count, set7.Count);
-			Assert.IsTrue(expected.SetEquals(set7));
 
 			expected.UnionWith("hijkl");
+			CollectionTest.Test(expected, set8, true, values);
 			Assert.AreEqual("[\0a-cg-l]", set8.ToString());
-			Assert.AreEqual(expected.Count, set8.Count);
-			Assert.IsTrue(expected.SetEquals(set8));
 
 			expected.UnionWith("opq");
+			CollectionTest.Test(expected, set9, true, values);
 			Assert.AreEqual("[\0a-cg-lo-q]", set9.ToString());
-			Assert.AreEqual(expected.Count, set9.Count);
-			Assert.IsTrue(expected.SetEquals(set9));
 
 			expected.ExceptWith("klmnop");
+			CollectionTest.Test(expected, set10, true, values);
 			Assert.AreEqual("[\0a-cg-jq]", set10.ToString());
-			Assert.AreEqual(expected.Count, set10.Count);
-			Assert.IsTrue(expected.SetEquals(set10));
 
 			Assert.IsTrue(set10.SetEquals(expected));
 			Assert.IsTrue(set10.IsSubsetOf(expected));
@@ -234,19 +240,19 @@ namespace TestCyjb.Collections
 			Assert.IsFalse(set10.IsProperSubsetOf(expected));
 			Assert.IsFalse(set10.IsProperSupersetOf(expected));
 
+			CollectionTest.Test(expected, set11, true, values);
 			Assert.AreEqual("[\0a-cg-jq]", set11.ToString());
-			Assert.AreEqual(expected.Count, set11.Count);
-			Assert.IsTrue(expected.SetEquals(set11));
 
 			expected.Add(char.MaxValue);
+			CollectionTest.Test(expected, set12, true, values);
 			Assert.AreEqual("[\0a-cg-jq\uFFFF]", set12.ToString());
-			Assert.AreEqual(expected.Count, set12.Count);
-			Assert.IsTrue(expected.SetEquals(set12));
 
 			expected.Clear();
+			CollectionTest.Test(expected, set13, true, values);
 			Assert.AreEqual("[]", set13.ToString());
-			Assert.AreEqual(expected.Count, set13.Count);
-			Assert.IsTrue(expected.SetEquals(set13));
+
+			Assert.AreEqual("[\0-\uFFFF]", set14.ToString());
+			Assert.AreEqual(65536, set14.Count);
 		}
 
 		/// <summary>

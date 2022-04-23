@@ -1,13 +1,12 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Cyjb.Collections.ObjectModel;
+using Cyjb.Test.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestCyjb.Collections.ObjectModel
 {
 	/// <summary>
-	/// <see cref="CollectionBase{T}"/> ¿‡µƒµ•‘™≤‚ ‘°£
+	/// <see cref="CollectionBase{T}"/> Á±ªÁöÑÂçïÂÖÉÊµãËØï„ÄÇ
 	/// </summary>
 	[TestClass]
 	public class UnitTestCollectionBase
@@ -44,37 +43,13 @@ namespace TestCyjb.Collections.ObjectModel
 		}
 
 		/// <summary>
-		/// ∂‘ <see cref="CollectionBase{T}"/> ¿‡Ω¯––≤‚ ‘°£
+		/// ÂØπ <see cref="CollectionBase{T}"/> Á±ªËøõË°åÊµãËØï„ÄÇ
 		/// </summary>
 		[TestMethod]
 		public void TestCollectionBase()
 		{
 			TestCollection collection = new();
-			Assert.AreEqual(0, collection.Count);
-			Assert.IsFalse(collection.Contains(1));
-
-			collection.Add(1);
-			Assert.AreEqual(1, collection.Count);
-			Assert.IsTrue(collection.Contains(1));
-			CollectionAssert.AreEqual(new int[] { 1 }, collection.ToArray());
-
-			collection.Add(2);
-			Assert.AreEqual(2, collection.Count);
-			Assert.IsTrue(collection.Contains(1));
-			Assert.IsTrue(collection.Contains(2));
-			CollectionAssert.AreEqual(new int[] { 1, 2 }, collection.ToArray());
-
-			Assert.IsTrue(collection.Remove(1));
-			Assert.AreEqual(1, collection.Count);
-			Assert.IsFalse(collection.Contains(1));
-			Assert.IsTrue(collection.Contains(2));
-			CollectionAssert.AreEqual(new int[] { 2 }, collection.ToArray());
-
-			collection.Clear();
-			Assert.AreEqual(0, collection.Count);
-			Assert.IsFalse(collection.Contains(1));
-			Assert.IsFalse(collection.Contains(2));
-			CollectionAssert.AreEqual(Array.Empty<int>(), collection.ToArray());
+			CollectionTest.Test(collection, CollectionTestType.Unordered, 0, 1, 2, 3, 4, 5, 6);
 		}
 	}
 }

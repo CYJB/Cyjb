@@ -1,12 +1,10 @@
-﻿using System;
-
-namespace TestCyjb
+namespace Cyjb.Test
 {
 	/// <summary>
 	/// 表示用于测试的提示特性。
 	/// </summary>
 	[AttributeUsage(AttributeTargets.All)]
-	internal class TestHintAttribute : Attribute
+	public class TestHintAttribute : Attribute
 	{
 		/// <summary>
 		/// 提示的内容。

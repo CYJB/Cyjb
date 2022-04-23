@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Diagnostics;
 using System.Text;
 using Cyjb.Collections.ObjectModel;
@@ -13,9 +13,11 @@ namespace Cyjb.Collections
 		ICollection<char>, IReadOnlyCollection<char>, IEnumerable<char>, IEnumerable
 	{
 		/// <summary>
-		/// 字符集合数据，索引 0 表示集合内的字符个数，之后为字符范围列表。
+		/// 字符集合数据。
+		/// 空字符串表示空集合，非空集合的索引 0 表示集合内的字符个数 - 1，之后为字符范围列表。
+		/// 由于 count 为 65536 时会溢出为 0，此时索引 0 使用 count - 1。
 		/// </summary>
-		private readonly string data = "\0";
+		private readonly string data = string.Empty;
 
 		/// <summary>
 		/// 初始化 <see cref="ReadOnlyCharSet"/> 类的新实例。
@@ -47,6 +49,10 @@ namespace Cyjb.Collections
 		{
 			int low = 1;
 			int high = data.Length - 1;
+			if (high < 0)
+			{
+				return -1;
+			}
 			while (low < high)
 			{
 				int mid = (low + high + 1) >> 1;
@@ -362,7 +368,7 @@ namespace Cyjb.Collections
 		/// 获取当前集合包含的元素数。
 		/// </summary>
 		/// <value>当前集合中包含的元素数。</value>
-		public int Count => data[0];
+		public int Count => data.Length == 0 ? 0 : data[0] + 1;
 
 		/// <summary>
 		/// 获取一个值，该值指示当前集合是否为只读。
@@ -483,6 +489,10 @@ namespace Cyjb.Collections
 		/// <returns>当前集合的字符串表示。</returns>
 		public override string ToString()
 		{
+			if (data.Length == 0)
+			{
+				return "[]";
+			}
 			StringBuilder builder = new();
 			builder.Append('[');
 			for (int i = 1; i < data.Length; i += 2)
