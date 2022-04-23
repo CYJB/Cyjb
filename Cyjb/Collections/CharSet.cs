@@ -49,25 +49,30 @@ namespace Cyjb.Collections
 			{
 				throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
 			}
-			Node? node = ranges.FindLE(start);
-			if (node == null || node.Value + 1 < start)
+			Node? node = ranges.Find(start, out int cmp);
+			Node? target = node;
+			if (cmp < 0)
+			{
+				target = node!.Prev;
+			}
+			if (target == null || target.Value + 1 < start)
 			{
 				// 之前的节点不能覆盖或连接 [start, end] 的范围。
 				count += end - start + 1;
-				node = ranges.Add(start, end);
+				target = ranges.Add(start, end, node);
 			}
-			else if (node.Value < end)
+			else if (target.Value < end)
 			{
 				// 存在可以覆盖部分 [start, end] 的范围。
-				count += end - node.Value;
-				node.Value = end;
+				count += end - target.Value;
+				target.Value = end;
 			}
 			else
 			{
 				// 已存在可以覆盖 [start, end] 的范围。
 				return false;
 			}
-			MergeRange(node);
+			MergeRange(target);
 			return true;
 		}
 
@@ -236,6 +241,7 @@ namespace Cyjb.Collections
 					// 保留后面部分字符。
 					count -= end - node.Key + 1;
 					ranges.Remove(node);
+					// 不满足 node.Key <= start，因此不指定 hint。
 					ranges.Add((char)(end + 1), node.Value);
 					break;
 				}

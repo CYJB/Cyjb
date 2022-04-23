@@ -221,7 +221,44 @@ namespace Cyjb.Collections
 		/// <returns>如果在当前集合中找到 <paramref name="key"/>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public bool Contains(TKey key)
 		{
-			return root != null && Find(key).cmp == 0;
+			if (root == null)
+			{
+				return false;
+			}
+			Find(key, out int cmp);
+			return cmp == 0;
+		}
+
+		/// <summary>
+		/// 找到指定键对应的节点。
+		/// </summary>
+		/// <param name="key">要寻找的键。</param>
+		/// <param name="cmp">与节点键的比较结果。</param>
+		/// <returns>如果有指定键对应的节点，则为该节点，否则返回所在的父节点。</returns>
+		public Node? Find(TKey key, out int cmp)
+		{
+			Node? parent = null;
+			Node? node = root;
+			int cc = 0;
+			while (node != null)
+			{
+				parent = node;
+				cc = key.CompareTo(parent.Key);
+				if (cc < 0)
+				{
+					node = node.Left;
+				}
+				else if (cc > 0)
+				{
+					node = node.Right;
+				}
+				else
+				{
+					break;
+				}
+			}
+			cmp = cc;
+			return parent;
 		}
 
 		/// <summary>
@@ -231,12 +268,16 @@ namespace Cyjb.Collections
 		/// <returns>小于等于指定键的节点。</returns>
 		public Node? FindLE(TKey key)
 		{
-			var (node, cmp) = Find(key);
+			if (root == null)
+			{
+				return null;
+			}
+			Node? parent = Find(key, out int cmp);
 			if (cmp < 0)
 			{
-				node = node!.Prev;
+				parent = parent!.Prev;
 			}
-			return node;
+			return parent;
 		}
 
 		/// <summary>
@@ -244,10 +285,21 @@ namespace Cyjb.Collections
 		/// </summary>
 		/// <param name="key">要添加的键。</param>
 		/// <param name="value">要添加的值。</param>
+		/// <param name="hint">小于等于 <paramref name="key"/> 的节点。</param>
 		/// <returns>添加后的节点。</returns>
-		public Node Add(TKey key, TValue value)
+		public Node Add(TKey key, TValue value, Node? hint = null)
 		{
-			var (parent, cmp) = Find(key);
+			Node? parent;
+			int cmp;
+			if (hint == null)
+			{
+				parent = Find(key, out cmp);
+			}
+			else
+			{
+				parent = hint;
+				cmp = key.CompareTo(parent.Key);
+			}
 			if (parent == null)
 			{
 				count++;
@@ -305,10 +357,10 @@ namespace Cyjb.Collections
 		/// 中没有找到 <paramref name="key"/>，该方法也会返回 <c>false</c>。</returns>
 		public bool Remove(TKey key)
 		{
-			var (node, cmp) = Find(key);
-			if (node != null && cmp == 0)
+			Node? parent = Find(key, out int cmp);
+			if (parent != null && cmp == 0)
 			{
-				Remove(node);
+				Remove(parent);
 				return true;
 			}
 			else
@@ -377,35 +429,6 @@ namespace Cyjb.Collections
 		}
 
 		#region AVL 操作
-
-		/// <summary>
-		/// 找到指定键的位置。
-		/// </summary>
-		/// <param name="key">要寻找的键。</param>
-		/// <returns>键的位置父节点和与父节点键的比较结果。</returns>
-		private (Node? parent, int cmp) Find(TKey key)
-		{
-			Node? parent = null, node = root;
-			int cmp = 0;
-			while (node != null)
-			{
-				parent = node;
-				cmp = key.CompareTo(parent.Key);
-				if (cmp == 0)
-				{
-					break;
-				}
-				else if (cmp < 0)
-				{
-					node = node.Left;
-				}
-				else
-				{
-					node = node.Right;
-				}
-			}
-			return (parent, cmp);
-		}
 
 		/// <summary>
 		/// 左旋平衡（RR 和 RL）。
