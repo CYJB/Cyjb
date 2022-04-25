@@ -129,7 +129,7 @@ namespace Cyjb
 		/// <remarks>此方法基于 Unicode 标准 13.0.0 版。详情请参见 
 		/// <see href="http://www.unicode.org/reports/tr11/">Unicode Standard Annex #11 EAST ASIAN WIDTH</see>。</remarks>
 		/// <seealso href="http://www.unicode.org/reports/tr11/">Unicode Standard Annex #11 EAST ASIAN WIDTH</seealso>。
-		private static readonly ReadOnlyCharSet WidthChars = new("\uA521" +
+		private static readonly CharSet WidthChars = CharSet.FromRange(
 			// 1100 ~ 115F Hangul Jamo
 			"\u1100\u115F" +
 			// User interface symbols

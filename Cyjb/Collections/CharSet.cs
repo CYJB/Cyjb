@@ -2,35 +2,60 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using Cyjb.Collections.ObjectModel;
-using Node = Cyjb.Collections.AVLTree<char, char>.Node;
 
 namespace Cyjb.Collections
 {
 	/// <summary>
 	/// 表示字符的有序集合。
 	/// </summary>
+	/// <remarks><see cref="CharSet"/> 类采用类似位示图的树状位压缩数组判断字符是否存在，
+	/// 关于该数据结构的更多解释，请参见我的博文
+	/// <see href="http://www.cnblogs.com/cyjb/archive/p/BitCharSet.html">
+	/// 《基于树状位压缩数组的字符集合》</see>。</remarks>
+	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/BitCharSet.html">
+	/// 《基于树状位压缩数组的字符集合》</seealso>
 	[Serializable, DebuggerDisplay("{ToString()} Count = {Count}")]
 	public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollection<char>
 	{
 		/// <summary>
-		/// 字符集合内的字符范围列表（Key 为 Start，Value 为 End）。
+		/// 字符集合的顶层数组。
 		/// </summary>
-		private readonly AVLTree<char, char> ranges = new();
+		private readonly CharSetItem[] data;
 		/// <summary>
 		/// 集合中字符的个数。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private int count;
+		private int count = 0;
+
+		/// <summary>
+		/// 从指定的范围字符串初始化 <see cref="CharSet"/> 类的新实例。
+		/// </summary>
+		/// <param name="ranges">范围字符串，字符串依次包含了每个字符范围的起止位置。</param>
+		/// <returns><see cref="CharSet"/> 实例。</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="ranges"/> 为 <c>null</c>。</exception>
+		public static CharSet FromRange(string ranges)
+		{
+			CommonExceptions.CheckArgumentNull(ranges);
+			CharSet set = new();
+			for (int i = 1; i < ranges.Length; i += 2)
+			{
+				set.Add(ranges[i - 1], ranges[i]);
+			}
+			return set;
+		}
 
 		/// <summary>
 		/// 初始化 <see cref="CharSet"/> 类的新实例。
 		/// </summary>
-		public CharSet() : base() { }
+		public CharSet() : base()
+		{
+			data = new CharSetItem[CharSetConfig.TopLen].Fill((index) => new CharSetItem(index << CharSetConfig.TopShift));
+		}
 		/// <summary>
 		/// 使用指定的元素初始化 <see cref="CharSet"/> 类的新实例。
 		/// </summary>
 		/// <param name="collection">初始化的字符集合。</param>
-		public CharSet(IEnumerable<char> collection) : base()
+		public CharSet(IEnumerable<char> collection) : this()
 		{
 			UnionWith(collection);
 		}
@@ -49,31 +74,42 @@ namespace Cyjb.Collections
 			{
 				throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
 			}
-			Node? node = ranges.Find(start, out int cmp);
-			Node? target = node;
-			if (cmp < 0)
+			int oldCount = count;
+			CharSetConfig.GetIndex(start, out int startTopIndex, out int startBtmIndex, out ulong startMask);
+			CharSetConfig.GetIndex(end, out int endTopIndex, out int endBtmIndex, out ulong endMask);
+			if (startTopIndex == endTopIndex && startBtmIndex == endBtmIndex)
 			{
-				target = node!.Prev;
-			}
-			if (target == null || target.Value + 1 < start)
-			{
-				// 之前的节点不能覆盖或连接 [start, end] 的范围。
-				count += end - start + 1;
-				target = ranges.Add(start, end, node);
-			}
-			else if (target.Value < end)
-			{
-				// 存在可以覆盖部分 [start, end] 的范围。
-				count += end - target.Value;
-				target.Value = end;
+				// start 和 end 位于同一个底层数组项中，将 start ~ end 之间二进制置 1
+				ulong mask = (endMask - startMask) + endMask;
+				count += data[startTopIndex].Fill(startBtmIndex, mask);
 			}
 			else
 			{
-				// 已存在可以覆盖 [start, end] 的范围。
-				return false;
+				// 将 start ~ max 之间按位置 1。
+				ulong mask = ~startMask + 1UL;
+				count += data[startTopIndex].Fill(startBtmIndex, mask);
+				// 将 0 ~ end 之间按位置 1。
+				mask = (endMask - 1UL) + endMask;
+				count += data[endTopIndex].Fill(endBtmIndex, mask);
 			}
-			MergeRange(target);
-			return true;
+			if (startTopIndex == endTopIndex)
+			{
+				// 将 startBtmIndex ~ endBtmIndex 之间按位置 1。
+				count += data[startTopIndex].FillRange(startBtmIndex + 1, endBtmIndex);
+			}
+			else
+			{
+				// 将 startBtmIndex ~ BtmLen 之间按位置 1。
+				count += data[startTopIndex].FillRange(startBtmIndex + 1, CharSetConfig.BtmLen);
+				// 将 0 ~ endBtmIndex 之间按位置 1。
+				count += data[endTopIndex].FillRange(0, endBtmIndex);
+				// 将 startTopIndex ~ startTopIndex 之间按位置 1。
+				for (int i = startTopIndex + 1; i < endTopIndex; i++)
+				{
+					count += data[i].Fill();
+				}
+			}
+			return count > oldCount;
 		}
 
 		/// <summary>
@@ -150,17 +186,18 @@ namespace Cyjb.Collections
 				culture = CultureInfo.InvariantCulture;
 			}
 			CaseConverter converter = CaseConverter.GetLowercaseConverter(culture);
-			foreach (var node in ranges.ToArray())
+			for (int i = 0; i < CharSetConfig.TopLen; i++)
 			{
-				char start = node.Key;
-				char end = node.Value;
-				if (start == end)
+				foreach (var (start, end) in data[i])
 				{
-					Add(converter.ConvertChar(start));
-				}
-				else
-				{
-					converter.ConvertRange(start, end, this);
+					if (start == end)
+					{
+						Add(converter.ConvertChar(start));
+					}
+					else
+					{
+						converter.ConvertRange(start, end, this);
+					}
 				}
 			}
 		}
@@ -176,17 +213,18 @@ namespace Cyjb.Collections
 				culture = CultureInfo.InvariantCulture;
 			}
 			CaseConverter converter = CaseConverter.GetUppercaseConverter(culture);
-			foreach (var node in ranges.ToArray())
+			for (int i = 0; i < CharSetConfig.TopLen; i++)
 			{
-				char start = node.Key;
-				char end = node.Value;
-				if (start == end)
+				foreach (var (start, end) in data[i])
 				{
-					Add(converter.ConvertChar(start));
-				}
-				else
-				{
-					converter.ConvertRange(start, end, this);
+					if (start == end)
+					{
+						Add(converter.ConvertChar(start));
+					}
+					else
+					{
+						converter.ConvertRange(start, end, this);
+					}
 				}
 			}
 		}
@@ -206,105 +244,216 @@ namespace Cyjb.Collections
 				throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
 			}
 			int oldCount = count;
-			// 从 node 开始向后遍历，移除范围。
-			Node? next;
-			for (Node? node = ranges.FindLE(start) ?? ranges.First; node != null && node.Key <= end; node = next)
+			CharSetConfig.GetIndex(start, out int startTopIndex, out int startBtmIndex, out ulong startMask);
+			CharSetConfig.GetIndex(end, out int endTopIndex, out int endBtmIndex, out ulong endMask);
+			if (startTopIndex == endTopIndex && startBtmIndex == endBtmIndex)
 			{
-				next = node.Next;
-				if (node.Value < start)
+				// start 和 end 位于同一个底层数组项中，将 start ~ end 之间按位置 0
+				ulong mask = (endMask - startMask) + endMask;
+				count += data[startTopIndex].Clear(startBtmIndex, mask);
+			}
+			else
+			{
+				// 将 start ~ max 之间按位置 0。
+				ulong mask = ~startMask + 1UL;
+				count += data[startTopIndex].Clear(startBtmIndex, mask);
+				// 将 0 ~ end 之间按位置 0。
+				mask = (endMask - 1UL) + endMask;
+				count += data[endTopIndex].Clear(endBtmIndex, mask);
+			}
+			if (startTopIndex == endTopIndex)
+			{
+				// 将 startBtmIndex ~ endBtmIndex 之间按位置 0。
+				count += data[startTopIndex].ClearRange(startBtmIndex + 1, endBtmIndex);
+			}
+			else
+			{
+				// 将 startBtmIndex ~ BtmLen 之间二进制置 0。
+				count += data[startTopIndex].ClearRange(startBtmIndex + 1, CharSetConfig.BtmLen);
+				// 将 0 ~ endBtmIndex 之间按位置 0。
+				count += data[endTopIndex].ClearRange(0, endBtmIndex);
+				// 将 startTopIndex ~ startTopIndex 之间按位置 0。
+				for (int i = startTopIndex + 1; i < endTopIndex; i++)
 				{
-					// 未在要移除的范围内。
-					continue;
-				}
-				else if (node.Key < start)
-				{
-					// 保留前面部分字符。
-					char oldEnd = node.Value;
-					count -= node.Value - start + 1;
-					node.Value = (char)(start - 1);
-					if (oldEnd > end)
-					{
-						// 同时需要保留后面部分字符。
-						count += oldEnd - end;
-						ranges.Add((char)(end + 1), oldEnd);
-						break;
-					}
-				}
-				else if (node.Value <= end)
-				{
-					// 全部移除。
-					count -= node.Value - node.Key + 1;
-					ranges.Remove(node);
-				}
-				else
-				{
-					// 保留后面部分字符。
-					count -= end - node.Key + 1;
-					ranges.Remove(node);
-					// 不满足 node.Key <= start，因此不指定 hint。
-					ranges.Add((char)(end + 1), node.Value);
-					break;
+					count += data[i].Clear();
 				}
 			}
 			return count < oldCount;
 		}
 
 		/// <summary>
+		/// 确定当前集合是否包含指定范围内的全部字符。
+		/// </summary>
+		/// <param name="start">要在当前集合中定位的字符起始范围。</param>
+		/// <param name="end">要在当前集合中定位的字符结束范围。</param>
+		/// <returns>如果在当前集合中找到范围内的全部字符，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <exception cref="ArgumentOutOfRangeException">字符范围的起始大于结束。</exception>
+		public bool Contains(char start, char end)
+		{
+			if (start > end)
+			{
+				throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
+			}
+			CharSetConfig.GetIndex(start, out int startTopIndex, out int startBtmIndex, out ulong startMask);
+			CharSetConfig.GetIndex(end, out int endTopIndex, out int endBtmIndex, out ulong endMask);
+			if (startTopIndex == endTopIndex && startBtmIndex == endBtmIndex)
+			{
+				// start 和 end 位于同一个底层数组项中，检查 start ~ end 范围。
+				ulong mask = (endMask - startMask) + endMask;
+				if (!data[startTopIndex].Contains(startBtmIndex, mask))
+				{
+					return false;
+				}
+			}
+			else
+			{
+				// 检查 start ~ max 范围。
+				ulong mask = ~startMask + 1UL;
+				if (!data[startTopIndex].Contains(startBtmIndex, mask))
+				{
+					return false;
+				}
+				// 检查 0 ~ end 范围。
+				mask = (endMask - 1UL) + endMask;
+				if (!data[endTopIndex].Contains(endBtmIndex, mask))
+				{
+					return false;
+				}
+			}
+			if (startTopIndex == endTopIndex)
+			{
+				// 检查 startBtmIndex ~ endBtmIndex 范围。
+				if (!data[startTopIndex].ContainsRange(startBtmIndex + 1, endBtmIndex))
+				{
+					return false;
+				}
+			}
+			else
+			{
+				// 检查 startBtmIndex ~ BtmLen 范围。
+				if (!data[startTopIndex].ContainsRange(startBtmIndex + 1, CharSetConfig.BtmLen))
+				{
+					return false;
+				}
+				// 将 0 ~ endBtmIndex 之间按位置 1。
+				if (!data[endTopIndex].ContainsRange(0, endBtmIndex))
+				{
+					return false;
+				}
+				// 检查 startTopIndex ~ startTopIndex 范围。
+				for (int i = startTopIndex + 1; i < endTopIndex; i++)
+				{
+					if (!data[i].ContainsRange(0, CharSetConfig.BtmLen))
+					{
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+
+		/// <summary>
+		/// 确定当前集合是否包含指定范围内的任意字符。
+		/// </summary>
+		/// <param name="start">要在当前集合中定位的字符起始范围。</param>
+		/// <param name="end">要在当前集合中定位的字符结束范围。</param>
+		/// <returns>如果在当前集合中找到范围内的任意字符，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		/// <exception cref="ArgumentOutOfRangeException">字符范围的起始大于结束。</exception>
+		public bool ContainsAny(char start, char end)
+		{
+			if (start > end)
+			{
+				throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
+			}
+			CharSetConfig.GetIndex(start, out int startTopIndex, out int startBtmIndex, out ulong startMask);
+			CharSetConfig.GetIndex(end, out int endTopIndex, out int endBtmIndex, out ulong endMask);
+			if (startTopIndex == endTopIndex && startBtmIndex == endBtmIndex)
+			{
+				// start 和 end 位于同一个底层数组项中，检查 start ~ end 范围。
+				ulong mask = (endMask - startMask) + endMask;
+				if (data[startTopIndex].Contains(startBtmIndex, mask))
+				{
+					return true;
+				}
+			}
+			else
+			{
+				// 检查 start ~ max 范围。
+				ulong mask = ~startMask + 1UL;
+				if (data[startTopIndex].Contains(startBtmIndex, mask))
+				{
+					return true;
+				}
+				// 检查 0 ~ end 范围。
+				mask = (endMask - 1UL) + endMask;
+				if (data[endTopIndex].Contains(endBtmIndex, mask))
+				{
+					return true;
+				}
+			}
+			if (startTopIndex == endTopIndex)
+			{
+				// 检查 startBtmIndex ~ endBtmIndex 范围。
+				if (data[startTopIndex].ContainsRange(startBtmIndex + 1, endBtmIndex))
+				{
+					return true;
+				}
+			}
+			else
+			{
+				// 检查 startBtmIndex ~ BtmLen 范围。
+				if (data[startTopIndex].ContainsRange(startBtmIndex + 1, CharSetConfig.BtmLen))
+				{
+					return true;
+				}
+				// 将 0 ~ endBtmIndex 之间按位置 1。
+				if (data[endTopIndex].ContainsRange(0, endBtmIndex))
+				{
+					return true;
+				}
+				// 检查 startTopIndex ~ startTopIndex 范围。
+				for (int i = startTopIndex + 1; i < endTopIndex; i++)
+				{
+					if (data[i].ContainsRange(0, CharSetConfig.BtmLen))
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		/// <summary>
 		/// 返回一个循环访问字符范围的枚举器。
 		/// </summary>
 		/// <returns>可用于循环访问字符范围的 <see cref="IEnumerable{Tuple}"/>。</returns>
-		public IEnumerable<(char start, char end)> Ranges()
+		public IEnumerable<ItemRange<char>> Ranges()
 		{
-			foreach (var node in ranges)
+			bool hasRange = false;
+			char start = '\0', end = '\0';
+			for (int i = 0; i < CharSetConfig.TopLen; i++)
 			{
-				yield return (node.Key, node.Value);
-			}
-		}
-
-		/// <summary>
-		/// 返回当前集合的只读副本。
-		/// </summary>
-		/// <returns>当前集合的只读副本。</returns>
-		public ReadOnlyCharSet ReadOnlyClone()
-		{
-			if (count == 0)
-			{
-				return new ReadOnlyCharSet("");
-			}
-			StringBuilder builder = new(ranges.Count * 2 + 1);
-			builder.Append((char)(count - 1));
-			foreach (var node in ranges)
-			{
-				builder.Append(node.Key);
-				builder.Append(node.Value);
-			}
-			return new ReadOnlyCharSet(builder.ToString());
-		}
-
-		#region 字符范围操作
-
-		/// <summary>
-		/// 从指定节点开始合并重叠的字符范围。
-		/// </summary>
-		/// <param name="node">合并的起始节点。</param>
-		private void MergeRange(Node node)
-		{
-			Node? next;
-			while ((next = node.Next) != null)
-			{
-				if (node.Value + 1 < next.Key)
+				foreach (var (curStart, curEnd) in data[i])
 				{
-					// 无法覆盖下一范围。
-					break;
+					if (hasRange)
+					{
+						if (end < curStart - 1)
+						{
+							yield return new ItemRange<char>(start, end);
+							start = curStart;
+						}
+					}
+					else
+					{
+						start = curStart;
+					}
+					end = curEnd;
+					hasRange = true;
 				}
-				ranges.Remove(next);
-				count -= next.Value - next.Key + 1;
-				if (node.Value < next.Value)
-				{
-					count += next.Value - node.Value;
-					node.Value = next.Value;
-					break;
-				}
+			}
+			if (hasRange)
+			{
+				yield return new ItemRange<char>(start, end);
 			}
 		}
 
@@ -314,12 +463,11 @@ namespace Cyjb.Collections
 		/// <param name="other">要与当前集进行比较的集合。</param>
 		/// <returns>如果包含 <paramref name="other"/> 中的所有字符，则返回 
 		/// <c>true</c>，否则返回 <c>false</c>。</returns>
-		internal bool ContainsAllElements(IRangeCollection<char> other)
+		private bool ContainsAllElements(CharSet other)
 		{
-			foreach (var (start, end) in other.Ranges())
+			for (int i = 0; i < CharSetConfig.TopLen; i++)
 			{
-				Node? curNode = ranges.FindLE(start);
-				if (curNode == null || curNode.Value < end)
+				if (!data[i].ContainsAllElements(other.data[i]))
 				{
 					return false;
 				}
@@ -327,7 +475,23 @@ namespace Cyjb.Collections
 			return true;
 		}
 
-		#endregion // 字符范围操作
+		/// <summary>
+		/// 确定当前集合是否包含指定的字符范围中的所有字符。
+		/// </summary>
+		/// <param name="other">要与当前集进行比较的字符范围。</param>
+		/// <returns>如果包含 <paramref name="other"/> 中的所有字符，则返回 
+		/// <c>true</c>，否则返回 <c>false</c>。</returns>
+		private bool ContainsAllElements(IRangeCollection<char> other)
+		{
+			foreach (var (start, end) in other.Ranges())
+			{
+				if (!Contains(start, end))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
 
 		#region ISet<char> 成员
 
@@ -338,7 +502,17 @@ namespace Cyjb.Collections
 		/// <returns>如果该字符已添加到集内，则为 <c>true</c>；如果该字符已在集内，则为 <c>false</c>。</returns>
 		public override bool Add(char ch)
 		{
-			return Add(ch, ch);
+			CharSetConfig.GetIndex(ch, out int topIndex, out int btmIndex, out ulong mask);
+			int modified = data[topIndex].Fill(btmIndex, mask);
+			if (modified == 0)
+			{
+				return false;
+			}
+			else
+			{
+				count += modified;
+				return true;
+			}
 		}
 
 		/// <summary>
@@ -358,7 +532,15 @@ namespace Cyjb.Collections
 				Clear();
 				return;
 			}
-			if (other is IRangeCollection<char> otherRange)
+			if (other is CharSet otherSet)
+			{
+				// CharSet 可以批量操作。
+				for (int i = 0; i < CharSetConfig.TopLen; i++)
+				{
+					count += data[i].ExceptWith(otherSet.data[i]);
+				}
+			}
+			else if (other is IRangeCollection<char> otherRange)
 			{
 				foreach (var (start, end) in otherRange.Ranges())
 				{
@@ -381,7 +563,15 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void IntersectWith(IEnumerable<char> other)
 		{
-			if (other is IRangeCollection<char> otherRange)
+			if (other is CharSet otherSet)
+			{
+				// CharSet 可以批量操作。
+				for (int i = 0; i < CharSetConfig.TopLen; i++)
+				{
+					count += data[i].IntersectWith(otherSet.data[i]);
+				}
+			}
+			else if (other is IRangeCollection<char> otherRange)
 			{
 				// 移除不在 otherRange 里的字符范围。
 				char begin = '\0';
@@ -422,10 +612,6 @@ namespace Cyjb.Collections
 			{
 				return count < otherSet.Count && otherSet.ContainsAllElements(this);
 			}
-			else if (other is ReadOnlyCharSet otherSSet)
-			{
-				return count < otherSSet.Count && otherSSet.ContainsAllElements(this);
-			}
 			else
 			{
 				var (sameCount, unfoundCount) = CountElements(other, false);
@@ -447,7 +633,11 @@ namespace Cyjb.Collections
 			{
 				return false;
 			}
-			if (other is IRangeCollection<char> otherRange)
+			if (other is CharSet otherSet)
+			{
+				return count > otherSet.Count && ContainsAllElements(otherSet);
+			}
+			else if (other is IRangeCollection<char> otherRange)
 			{
 				return count > otherRange.Count && ContainsAllElements(otherRange);
 			}
@@ -476,10 +666,6 @@ namespace Cyjb.Collections
 			{
 				return count <= otherSet.Count && otherSet.ContainsAllElements(this);
 			}
-			else if (other is ReadOnlyCharSet otherRSet)
-			{
-				return count <= otherRSet.Count && otherRSet.ContainsAllElements(this);
-			}
 			else
 			{
 				var (sameCount, unfoundCount) = CountElements(other, false);
@@ -501,7 +687,11 @@ namespace Cyjb.Collections
 			{
 				return !other.Any();
 			}
-			if (other is IRangeCollection<char> otherRange)
+			if (other is CharSet otherSet)
+			{
+				return count >= otherSet.Count && ContainsAllElements(otherSet);
+			}
+			else if (other is IRangeCollection<char> otherRange)
 			{
 				return count >= otherRange.Count && ContainsAllElements(otherRange);
 			}
@@ -525,12 +715,22 @@ namespace Cyjb.Collections
 			{
 				return false;
 			}
-			if (other is IRangeCollection<char> otherRange)
+			if (other is CharSet otherSet)
+			{
+				for (int i = 0; i < CharSetConfig.TopLen; i++)
+				{
+					if (data[i].Overlaps(otherSet.data[i]))
+					{
+						return true;
+					}
+				}
+				return false;
+			}
+			else if (other is IRangeCollection<char> otherRange)
 			{
 				foreach (var (start, end) in otherRange.Ranges())
 				{
-					Node? curNode = ranges.FindLE(start);
-					if (curNode != null && curNode.Value >= start)
+					if (ContainsAny(start, end))
 					{
 						return true;
 					}
@@ -557,7 +757,11 @@ namespace Cyjb.Collections
 			{
 				return !other.Any();
 			}
-			if (other is IRangeCollection<char> otherRange)
+			if (other is CharSet otherSet)
+			{
+				return count == otherSet.Count && ContainsAllElements(otherSet);
+			}
+			else if (other is IRangeCollection<char> otherRange)
 			{
 				return count == otherRange.Count && ContainsAllElements(otherRange);
 			}
@@ -575,16 +779,29 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void SymmetricExceptWith(IEnumerable<char> other)
 		{
-			if (other is IRangeCollection<char>)
+			CommonExceptions.CheckArgumentNull(other);
+			if (count == 0)
 			{
-				CharSet newSet = new(other);
-				newSet.ExceptWith(this);
-				ExceptWith(other);
-				UnionWith(newSet);
+				UnionWith(other);
+			}
+			else if (ReferenceEquals(this, other))
+			{
+				Clear();
+			}
+			else if (other is CharSet otherSet)
+			{
+				for (int i = 0; i < CharSetConfig.TopLen; i++)
+				{
+					count += data[i].SymmetricExceptWith(otherSet.data[i]);
+				}
 			}
 			else
 			{
-				base.SymmetricExceptWith(other);
+				CharSet newSet = new(other);
+				for (int i = 0; i < CharSetConfig.TopLen; i++)
+				{
+					count += data[i].SymmetricExceptWith(newSet.data[i]);
+				}
 			}
 		}
 
@@ -600,9 +817,16 @@ namespace Cyjb.Collections
 			{
 				return;
 			}
-			if (other is IRangeCollection<char> otherRange)
+			if (other is CharSet otherSet)
 			{
-				// CharSet 可以范围操作。
+				// CharSet 可以批量操作。
+				for (int i = 0; i < CharSetConfig.TopLen; i++)
+				{
+					count += data[i].UnionWith(otherSet.data[i]);
+				}
+			}
+			else if (other is IRangeCollection<char> otherRange)
+			{
 				foreach (var (start, end) in otherRange.Ranges())
 				{
 					Add(start, end);
@@ -612,7 +836,7 @@ namespace Cyjb.Collections
 			{
 				foreach (char ch in other)
 				{
-					Add(ch, ch);
+					Add(ch);
 				}
 			}
 		}
@@ -633,7 +857,10 @@ namespace Cyjb.Collections
 		public override void Clear()
 		{
 			count = 0;
-			ranges.Clear();
+			for (int i = 0; i < CharSetConfig.TopLen; i++)
+			{
+				data[i].Clear();
+			}
 		}
 
 		/// <summary>
@@ -643,8 +870,8 @@ namespace Cyjb.Collections
 		/// <returns>如果在当前集合中找到 <paramref name="ch"/>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public override bool Contains(char ch)
 		{
-			Node? node = ranges.FindLE(ch);
-			return node != null && node.Value >= ch;
+			CharSetConfig.GetIndex(ch, out int topIndex, out int btmIndex, out ulong mask);
+			return data[topIndex].Contains(btmIndex, mask);
 		}
 
 		/// <summary>
@@ -655,7 +882,17 @@ namespace Cyjb.Collections
 		/// 如果在原始当前集合中没有找到 <paramref name="ch"/>，该方法也会返回 <c>false</c>。</returns>
 		public override bool Remove(char ch)
 		{
-			return Remove(ch, ch);
+			CharSetConfig.GetIndex(ch, out int topIndex, out int btmIndex, out ulong mask);
+			int modified = data[topIndex].Clear(btmIndex, mask);
+			if (modified == 0)
+			{
+				return false;
+			}
+			else
+			{
+				count += modified;
+				return false;
+			}
 		}
 
 		#endregion // ICollection<char> 成员
@@ -668,15 +905,17 @@ namespace Cyjb.Collections
 		/// <returns>可用于循环访问集合的 <see cref="IEnumerator{Char}"/>。</returns>
 		public override IEnumerator<char> GetEnumerator()
 		{
-			foreach (var node in ranges)
+			for (int i = 0; i < CharSetConfig.TopLen; i++)
 			{
-				char end = node.Value;
-				// 避免 end 正好是 char.MaxValue 时导致死循环。
-				for (char ch = node.Key; ch < end; ch++)
+				foreach (var (start, end) in data[i])
 				{
-					yield return ch;
+					// 避免 end 正好是 char.MaxValue 时导致死循环。
+					for (char ch = start; ch < end; ch++)
+					{
+						yield return ch;
+					}
+					yield return end;
 				}
-				yield return end;
 			}
 		}
 
@@ -727,10 +966,9 @@ namespace Cyjb.Collections
 		public override int GetHashCode()
 		{
 			HashCode hashCode = new();
-			foreach (Node node in ranges)
+			for (int i = 0; i < CharSetConfig.TopLen; i++)
 			{
-				hashCode.Add(node.Key);
-				hashCode.Add(node.Value);
+				hashCode.Add(data[i]);
 			}
 			return hashCode.GetHashCode();
 		}
@@ -745,16 +983,16 @@ namespace Cyjb.Collections
 		{
 			StringBuilder builder = new();
 			builder.Append('[');
-			foreach (var node in ranges)
+			foreach (var (start, end) in Ranges())
 			{
-				builder.Append(node.Key);
-				if (node.Key + 1 < node.Value)
+				builder.Append(start);
+				if (start < end)
 				{
-					builder.Append('-');
-				}
-				if (node.Key != node.Value)
-				{
-					builder.Append(node.Value);
+					if (start + 1 < end)
+					{
+						builder.Append('-');
+					}
+					builder.Append(end);
 				}
 			}
 			builder.Append(']');

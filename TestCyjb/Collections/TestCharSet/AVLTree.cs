@@ -1,14 +1,15 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace Cyjb.Collections
+namespace TestCyjb.Collections.TestCharSet
 {
 	/// <summary>
 	/// AVL 树。
 	/// </summary>
 	[Serializable, DebuggerDisplay("Count = {Count}")]
-	[DebuggerTypeProxy(typeof(EnumerableDebugView<>))]
 	internal class AVLTree<TKey, TValue> : IEnumerable<AVLTree<TKey, TValue>.Node>
 		where TKey : notnull, IComparable<TKey>
 	{

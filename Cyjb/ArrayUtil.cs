@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace Cyjb
 {
@@ -11,6 +11,7 @@ namespace Cyjb
 		/// <see cref="Array.Empty{T}"/> 方法。
 		/// </summary>
 		private static readonly MethodInfo ArrayEmptyMethod = typeof(Array).GetMethod("Empty")!;
+
 		/// <summary>
 		/// 返回指定类型的空数组。
 		/// </summary>
@@ -20,6 +21,53 @@ namespace Cyjb
 		{
 			CommonExceptions.CheckArgumentNull(type);
 			return (Array)ArrayEmptyMethod.MakeGenericMethod(type).Invoke(null, Array.Empty<object>())!;
+		}
+
+		/// <summary>
+		/// 返回当前数组是否与指定数组包含同样内容。
+		/// </summary>
+		/// <typeparam name="T">数组的元素类型。</typeparam>
+		/// <param name="array">要比较的当前数组。</param>
+		/// <param name="other">要比较的另一数组。</param>
+		/// <returns>数组内容是否一致。</returns>
+		public static bool ContentEquals<T>(this T[]? array, T[]? other)
+		{
+			if (ReferenceEquals(array, other))
+			{
+				return true;
+			}
+			if (array == null || other == null || array.Length != other.Length)
+			{
+				return false;
+			}
+			IEqualityComparer<T> comparer = EqualityComparer<T>.Default;
+			for (int i = 0; i < array.Length; i++)
+			{
+				if (!comparer.Equals(array[i], other[i]))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+		/// <summary>
+		/// 返回当前数组内容的哈希值。
+		/// </summary>
+		/// <typeparam name="T">数组的元素类型。</typeparam>
+		/// <param name="array">要获取哈希值的数组。</param>
+		/// <returns>数组内容的哈希值。</returns>
+		public static int GetContentHashCode<T>(this T[]? array)
+		{
+			HashCode hashCode = new();
+			if (array != null)
+			{
+				for (int i = 0; i < array.Length; i++)
+				{
+					hashCode.Add(array[i]);
+				}
+			}
+			return hashCode.ToHashCode();
 		}
 
 		#region 填充一维数组

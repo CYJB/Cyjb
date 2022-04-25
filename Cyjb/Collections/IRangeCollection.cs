@@ -1,7 +1,8 @@
-﻿namespace Cyjb.Collections
+namespace Cyjb.Collections
 {
+
 	/// <summary>
-	/// 表示使用范围表示的集合。
+	/// 表示可以使用范围表示的集合。
 	/// </summary>
 	/// <typeparam name="T">集合中元素的类型。</typeparam>
 	public interface IRangeCollection<T> : IEnumerable<T>
@@ -17,6 +18,6 @@
 		/// 返回一个循环访问元素范围的枚举器。
 		/// </summary>
 		/// <returns>可用于循环访问元素范围的 <see cref="IEnumerable{Tuple}"/>。</returns>
-		IEnumerable<(T start, T end)> Ranges();
+		IEnumerable<ItemRange<T>> Ranges();
 	}
 }

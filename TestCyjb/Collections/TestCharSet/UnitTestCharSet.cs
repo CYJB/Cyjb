@@ -13,7 +13,7 @@ namespace TestCyjb.Collections
 	/// <see cref="CharSet"/> 类的单元测试。
 	/// </summary>
 	[TestClass]
-	public class UnitTestCharSet
+	public partial class UnitTestCharSet
 	{
 		/// <summary>
 		/// 对 <see cref="CharSet"/> 的 <see cref="ICollection{T}"/> 接口进行测试。
@@ -152,209 +152,6 @@ namespace TestCyjb.Collections
 		}
 
 		/// <summary>
-		/// 对 <see cref="CharSet.ReadOnlyClone"/> 方法进行测试。
-		/// </summary>
-		[TestMethod]
-		public void TestReadOnlyClone()
-		{
-			CharSet set = new();
-			ReadOnlyCharSet set1 = set.ReadOnlyClone();
-			Assert.IsTrue(set.Add('a', 'c'));
-			ReadOnlyCharSet set2 = set.ReadOnlyClone();
-			Assert.IsTrue(set.Add('e'));
-			ReadOnlyCharSet set3 = set.ReadOnlyClone();
-			Assert.IsFalse(set.Add('b', 'c'));
-			ReadOnlyCharSet set4 = set.ReadOnlyClone();
-			Assert.IsTrue(set.Add('\0'));
-			ReadOnlyCharSet set5 = set.ReadOnlyClone();
-			Assert.IsTrue(set.Add('d', 'g'));
-			ReadOnlyCharSet set6 = set.ReadOnlyClone();
-			Assert.IsTrue(set.Remove('d', 'f'));
-			ReadOnlyCharSet set7 = set.ReadOnlyClone();
-			Assert.IsTrue(set.Add('h', 'l'));
-			ReadOnlyCharSet set8 = set.ReadOnlyClone();
-			Assert.IsTrue(set.Add('o', 'q'));
-			ReadOnlyCharSet set9 = set.ReadOnlyClone();
-			Assert.IsTrue(set.Remove('k', 'p'));
-			ReadOnlyCharSet set10 = set.ReadOnlyClone();
-			Assert.IsFalse(set.Remove('d', 'f'));
-			ReadOnlyCharSet set11 = set.ReadOnlyClone();
-			Assert.IsTrue(set.Add(char.MaxValue));
-			ReadOnlyCharSet set12 = set.ReadOnlyClone();
-			Assert.IsTrue(set.Remove('\0', char.MaxValue));
-			ReadOnlyCharSet set13 = set.ReadOnlyClone();
-			Assert.IsTrue(set.Add('\0', char.MaxValue));
-			ReadOnlyCharSet set14 = set.ReadOnlyClone();
-
-			char[] values = "\0abcdefghijklmnopq\uFFFF".ToCharArray();
-
-			SortedSet<char> expected = new();
-			CollectionTest.Test(expected, set1, true, values);
-			Assert.AreEqual("[]", set1.ToString());
-
-			expected.UnionWith("abc");
-			CollectionTest.Test(expected, set2, true, values);
-			Assert.AreEqual("[a-c]", set2.ToString());
-
-			expected.UnionWith("e");
-			CollectionTest.Test(expected, set3, true, values);
-			Assert.AreEqual("[a-ce]", set3.ToString());
-
-			CollectionTest.Test(expected, set4, true, values);
-			Assert.AreEqual("[a-ce]", set4.ToString());
-			Assert.IsTrue(set3.Equals(set4));
-
-			Assert.IsTrue(set4.SetEquals(expected));
-			Assert.IsTrue(set4.IsSubsetOf(expected));
-			Assert.IsTrue(set4.IsSupersetOf(expected));
-			Assert.IsFalse(set4.IsProperSubsetOf(expected));
-			Assert.IsFalse(set4.IsProperSupersetOf(expected));
-
-			expected.UnionWith("\0");
-			CollectionTest.Test(expected, set5, true, values);
-			Assert.AreEqual("[\0a-ce]", set5.ToString());
-
-			expected.UnionWith("dfg");
-			CollectionTest.Test(expected, set6, true, values);
-			Assert.AreEqual("[\0a-g]", set6.ToString());
-
-			expected.ExceptWith("def");
-			CollectionTest.Test(expected, set7, true, values);
-			Assert.AreEqual("[\0a-cg]", set7.ToString());
-
-			expected.UnionWith("hijkl");
-			CollectionTest.Test(expected, set8, true, values);
-			Assert.AreEqual("[\0a-cg-l]", set8.ToString());
-
-			expected.UnionWith("opq");
-			CollectionTest.Test(expected, set9, true, values);
-			Assert.AreEqual("[\0a-cg-lo-q]", set9.ToString());
-
-			expected.ExceptWith("klmnop");
-			CollectionTest.Test(expected, set10, true, values);
-			Assert.AreEqual("[\0a-cg-jq]", set10.ToString());
-
-			Assert.IsTrue(set10.SetEquals(expected));
-			Assert.IsTrue(set10.IsSubsetOf(expected));
-			Assert.IsTrue(set10.IsSupersetOf(expected));
-			Assert.IsFalse(set10.IsProperSubsetOf(expected));
-			Assert.IsFalse(set10.IsProperSupersetOf(expected));
-
-			CollectionTest.Test(expected, set11, true, values);
-			Assert.AreEqual("[\0a-cg-jq]", set11.ToString());
-
-			expected.Add(char.MaxValue);
-			CollectionTest.Test(expected, set12, true, values);
-			Assert.AreEqual("[\0a-cg-jq\uFFFF]", set12.ToString());
-
-			expected.Clear();
-			CollectionTest.Test(expected, set13, true, values);
-			Assert.AreEqual("[]", set13.ToString());
-
-			Assert.AreEqual("[\0-\uFFFF]", set14.ToString());
-			Assert.AreEqual(65536, set14.Count);
-		}
-
-		/// <summary>
-		/// 对 <see cref="CharSet.ExceptWith"/> 方法进行测试。
-		/// </summary>
-		[DataTestMethod]
-		[DataRow("", "", "[]", 0)]
-		[DataRow("", "abc", "[]", 0)]
-		[DataRow("abc", "", "[a-c]", 3)]
-		[DataRow("abc", "a", "[bc]", 2)]
-		[DataRow("abc", "ac", "[b]", 1)]
-		[DataRow("abc", "abc", "[]", 0)]
-		[DataRow("acdgkz04", "befhijsxy29", "[04acdgkz]", 8)]
-		[DataRow("cdh2esjzb0f9kiaxyg4", "befhijsxy29", "[04acdgkz]", 8)]
-		public void TestExceptWith(string initial, string other, string expected, int expectedCount)
-		{
-			CharSet set = new(initial);
-			set.ExceptWith(other);
-			Assert.AreEqual(expected, set.ToString());
-			Assert.AreEqual(expectedCount, set.Count);
-
-			set = new(initial);
-			set.ExceptWith(new CharSet(other));
-			Assert.AreEqual(expected, set.ToString());
-			Assert.AreEqual(expectedCount, set.Count);
-		}
-
-		/// <summary>
-		/// 对 <see cref="CharSet.IntersectWith"/> 方法进行测试。
-		/// </summary>
-		[DataTestMethod]
-		[DataRow("", "", "[]", 0)]
-		[DataRow("", "abc", "[]", 0)]
-		[DataRow("abc", "", "[]", 0)]
-		[DataRow("abc", "a", "[a]", 1)]
-		[DataRow("abc", "ac", "[ac]", 2)]
-		[DataRow("abc", "abc", "[a-c]", 3)]
-		[DataRow("acdgkz04", "befhijsxy29", "[]", 0)]
-		[DataRow("cdh2esjzb0f9kiaxyg4", "befhijsxy29", "[29befh-jsxy]", 11)]
-		[DataRow("abcdefghjkz", "bcdghijklmnxyz", "[b-dghjkz]", 8)]
-		public void TestIntersectWith(string initial, string other, string expected, int expectedCount)
-		{
-			CharSet set = new(initial);
-			set.IntersectWith(other);
-			Assert.AreEqual(expected, set.ToString());
-			Assert.AreEqual(expectedCount, set.Count);
-
-			set = new(initial);
-			set.IntersectWith(new CharSet(other));
-			Assert.AreEqual(expected, set.ToString());
-			Assert.AreEqual(expectedCount, set.Count);
-		}
-
-		/// <summary>
-		/// 对 <see cref="CharSet.IsProperSubsetOf"/> 方法进行测试。
-		/// </summary>
-		[DataTestMethod]
-		[DataRow("", "", false)]
-		[DataRow("", "abc", true)]
-		[DataRow("abc", "", false)]
-		[DataRow("abc", "a", false)]
-		[DataRow("abc", "ac", false)]
-		[DataRow("abc", "abc", false)]
-		[DataRow("a", "abc", true)]
-		[DataRow("ac", "abc", true)]
-		[DataRow("acdgkz04", "befhijsxy29", false)]
-		[DataRow("cdh2esjzb0f9kiaxyg4", "befhijsxy29", false)]
-		[DataRow("befhijsxy29", "cdh2esjzb0f9kiaxyg4", true)]
-		public void TestIsProperSubsetOf(string initial, string other, bool expected)
-		{
-			CharSet set = new(initial);
-			Assert.AreEqual(expected, set.IsProperSubsetOf(other));
-			Assert.AreEqual(expected, set.IsProperSubsetOf(new CharSet(other)));
-			Assert.AreEqual(expected, set.ReadOnlyClone().IsProperSubsetOf(other));
-			Assert.AreEqual(expected, set.ReadOnlyClone().IsProperSubsetOf(new CharSet(other).ReadOnlyClone()));
-		}
-
-		/// <summary>
-		/// 对 <see cref="CharSet.IsProperSupersetOf"/> 方法进行测试。
-		/// </summary>
-		[DataTestMethod]
-		[DataRow("", "", false)]
-		[DataRow("", "abc", false)]
-		[DataRow("abc", "", true)]
-		[DataRow("abc", "a", true)]
-		[DataRow("abc", "ac", true)]
-		[DataRow("abc", "abc", false)]
-		[DataRow("a", "abc", false)]
-		[DataRow("ac", "abc", false)]
-		[DataRow("acdgkz04", "befhijsxy29", false)]
-		[DataRow("cdh2esjzb0f9kiaxyg4", "befhijsxy29", true)]
-		[DataRow("befhijsxy29", "cdh2esjzb0f9kiaxyg4", false)]
-		public void TestIsProperSupersetOf(string initial, string other, bool expected)
-		{
-			CharSet set = new(initial);
-			Assert.AreEqual(expected, set.IsProperSupersetOf(other));
-			Assert.AreEqual(expected, set.IsProperSupersetOf(new CharSet(other)));
-			Assert.AreEqual(expected, set.ReadOnlyClone().IsProperSupersetOf(other));
-			Assert.AreEqual(expected, set.ReadOnlyClone().IsProperSupersetOf(new CharSet(other).ReadOnlyClone()));
-		}
-
-		/// <summary>
 		/// 对 <see cref="CharSet.IsSubsetOf"/> 方法进行测试。
 		/// </summary>
 		[DataTestMethod]
@@ -374,8 +171,6 @@ namespace TestCyjb.Collections
 			CharSet set = new(initial);
 			Assert.AreEqual(expected, set.IsSubsetOf(other));
 			Assert.AreEqual(expected, set.IsSubsetOf(new CharSet(other)));
-			Assert.AreEqual(expected, set.ReadOnlyClone().IsSubsetOf(other));
-			Assert.AreEqual(expected, set.ReadOnlyClone().IsSubsetOf(new CharSet(other).ReadOnlyClone()));
 		}
 
 		/// <summary>
@@ -398,8 +193,6 @@ namespace TestCyjb.Collections
 			CharSet set = new(initial);
 			Assert.AreEqual(expected, set.IsSupersetOf(other));
 			Assert.AreEqual(expected, set.IsSupersetOf(new CharSet(other)));
-			Assert.AreEqual(expected, set.ReadOnlyClone().IsSupersetOf(other));
-			Assert.AreEqual(expected, set.ReadOnlyClone().IsSupersetOf(new CharSet(other).ReadOnlyClone()));
 		}
 
 		/// <summary>
@@ -422,8 +215,6 @@ namespace TestCyjb.Collections
 			CharSet set = new(initial);
 			Assert.AreEqual(expected, set.Overlaps(other));
 			Assert.AreEqual(expected, set.Overlaps(new CharSet(other)));
-			Assert.AreEqual(expected, set.ReadOnlyClone().Overlaps(other));
-			Assert.AreEqual(expected, set.ReadOnlyClone().Overlaps(new CharSet(other).ReadOnlyClone()));
 		}
 
 		/// <summary>
@@ -447,8 +238,6 @@ namespace TestCyjb.Collections
 			CharSet set = new(initial);
 			Assert.AreEqual(expected, set.SetEquals(other));
 			Assert.AreEqual(expected, set.SetEquals(new CharSet(other)));
-			Assert.AreEqual(expected, set.ReadOnlyClone().SetEquals(other));
-			Assert.AreEqual(expected, set.ReadOnlyClone().SetEquals(new CharSet(other).ReadOnlyClone()));
 		}
 
 		/// <summary>
@@ -500,11 +289,6 @@ namespace TestCyjb.Collections
 
 			set = new(initial);
 			set.UnionWith(new CharSet(other));
-			Assert.AreEqual(expected, set.ToString());
-			Assert.AreEqual(expectedCount, set.Count);
-
-			set = new(initial);
-			set.UnionWith(new CharSet(other).ReadOnlyClone());
 			Assert.AreEqual(expected, set.ToString());
 			Assert.AreEqual(expectedCount, set.Count);
 		}
@@ -647,195 +431,6 @@ namespace TestCyjb.Collections
 				generateMappingWatch.ElapsedMilliseconds,
 				charSetWatch.ElapsedMilliseconds,
 				hashSetWatch.ElapsedMilliseconds);
-		}
-
-		/// <summary>
-		/// 对 <see cref="CharSet"/> 的添加性能进行测试。
-		/// </summary>
-		[TestMethod]
-		public void TestPerformance()
-		{
-			List<char> charList = new();
-			List<(char start, char end)> smallRangeList = new();
-			List<(char start, char end)> largeRangeList = new();
-			int loopCount = 100;
-			for (int i = 0; i < 10000; i++)
-			{
-				charList.Add((char)Random.Shared.Next(0, char.MaxValue + 1));
-			}
-			for (int i = 0; i < 1000; i++)
-			{
-				int min = Random.Shared.Next(0, char.MaxValue + 1);
-				int max = min + Random.Shared.Next(0, 10);
-				if (max > char.MaxValue)
-				{
-					max = char.MaxValue;
-				}
-				smallRangeList.Add(((char)min, (char)max));
-
-				max = min + Random.Shared.Next(0, 100);
-				if (max > char.MaxValue)
-				{
-					max = char.MaxValue;
-				}
-				largeRangeList.Add(((char)min, (char)max));
-			}
-
-			Stopwatch hashSetCharWatch = new();
-			hashSetCharWatch.Start();
-			for (int i = 0; i < loopCount; i++)
-			{
-				HashSet<char> hashSet = new();
-				for (int j = 0; j < charList.Count; j++)
-				{
-					hashSet.Add(charList[j]);
-				}
-			}
-			hashSetCharWatch.Stop();
-
-			Stopwatch hashSetSmallRangeWatch = new();
-			hashSetSmallRangeWatch.Start();
-			for (int i = 0; i < loopCount; i++)
-			{
-				HashSet<char> hashSet = new();
-				for (int j = 0; j < smallRangeList.Count; j++)
-				{
-					var (start, end) = smallRangeList[j];
-					for (int k = start; k <= end; k++)
-					{
-						hashSet.Add((char)k);
-					}
-				}
-			}
-			hashSetSmallRangeWatch.Stop();
-
-			Stopwatch hashSetLargeRangeWatch = new();
-			hashSetLargeRangeWatch.Start();
-			for (int i = 0; i < loopCount; i++)
-			{
-				HashSet<char> hashSet = new();
-				for (int j = 0; j < largeRangeList.Count; j++)
-				{
-					var (start, end) = largeRangeList[j];
-					for (int k = start; k <= end; k++)
-					{
-						hashSet.Add((char)k);
-					}
-				}
-			}
-			hashSetLargeRangeWatch.Stop();
-
-			Stopwatch sortedSetCharWatch = new();
-			sortedSetCharWatch.Start();
-			for (int i = 0; i < loopCount; i++)
-			{
-				SortedSet<char> sortedSet = new();
-				for (int j = 0; j < charList.Count; j++)
-				{
-					sortedSet.Add(charList[j]);
-				}
-			}
-			sortedSetCharWatch.Stop();
-
-			Stopwatch sortedSetSmallRangeWatch = new();
-			sortedSetSmallRangeWatch.Start();
-			for (int i = 0; i < loopCount; i++)
-			{
-				SortedSet<char> sortedSet = new();
-				for (int j = 0; j < largeRangeList.Count; j++)
-				{
-					var (start, end) = smallRangeList[j];
-					for (int k = start; k <= end; k++)
-					{
-						sortedSet.Add((char)k);
-					}
-				}
-			}
-			sortedSetSmallRangeWatch.Stop();
-
-			Stopwatch sortedSetLargeRangeWatch = new();
-			sortedSetLargeRangeWatch.Start();
-			for (int i = 0; i < loopCount; i++)
-			{
-				SortedSet<char> sortedSet = new();
-				for (int j = 0; j < smallRangeList.Count; j++)
-				{
-					var (start, end) = largeRangeList[j];
-					for (int k = start; k <= end; k++)
-					{
-						sortedSet.Add((char)k);
-					}
-				}
-			}
-			sortedSetLargeRangeWatch.Stop();
-
-			Stopwatch charSetCharWatch = new();
-			charSetCharWatch.Start();
-			for (int i = 0; i < loopCount; i++)
-			{
-				CharSet charSet = new();
-				for (int j = 0; j < charList.Count; j++)
-				{
-					charSet.Add(charList[j]);
-				}
-			}
-			charSetCharWatch.Stop();
-
-			Stopwatch charSetSmallRangeWatch = new();
-			charSetSmallRangeWatch.Start();
-			for (int i = 0; i < loopCount; i++)
-			{
-				CharSet charSet = new();
-				for (int j = 0; j < smallRangeList.Count; j++)
-				{
-					var (start, end) = smallRangeList[j];
-					for (int k = start; k <= end; k++)
-					{
-						charSet.Add((char)k);
-					}
-				}
-			}
-			charSetSmallRangeWatch.Stop();
-
-			Stopwatch charSetLargeRangeWatch = new();
-			charSetLargeRangeWatch.Start();
-			for (int i = 0; i < loopCount; i++)
-			{
-				CharSet charSet = new();
-				for (int j = 0; j < largeRangeList.Count; j++)
-				{
-					var (start, end) = largeRangeList[j];
-					for (int k = start; k <= end; k++)
-					{
-						charSet.Add((char)k);
-					}
-				}
-			}
-			charSetLargeRangeWatch.Stop();
-
-			Console.WriteLine(@"CharPerformance
-Char:
-  CharSet {0}
-  HashSet {1}
-  SortedSet {2}
-SmallRange:
-  CharSet {3}
-  HashSet {4}
-  SortedSet {5}
-LargeRange:
-  CharSet {6}
-  HashSet {7}
-  SortedSet {8}
-",
-				 charSetCharWatch.ElapsedMilliseconds,
-				 hashSetCharWatch.ElapsedMilliseconds,
-				 sortedSetCharWatch.ElapsedMilliseconds,
-				 charSetSmallRangeWatch.ElapsedMilliseconds,
-				 hashSetSmallRangeWatch.ElapsedMilliseconds,
-				 sortedSetSmallRangeWatch.ElapsedMilliseconds,
-				 charSetLargeRangeWatch.ElapsedMilliseconds,
-				 hashSetLargeRangeWatch.ElapsedMilliseconds,
-				 sortedSetLargeRangeWatch.ElapsedMilliseconds);
 		}
 	}
 }
