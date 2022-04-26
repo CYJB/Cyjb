@@ -58,7 +58,7 @@ namespace TestCyjb.Collections
 			foreach (var (name, wrapper) in sets)
 			{
 				List<Performance.Result> result = new();
-				result.Add(Performance.Measure("", loopCount, () =>
+				result.Add(Performance.Measure("", loopCount * 20, () =>
 				{
 					ISet<char> set = wrapper.CreateInstance();
 					foreach (var (isAdd, ch) in charOperation)
@@ -73,7 +73,7 @@ namespace TestCyjb.Collections
 						}
 					}
 				}));
-				result.Add(Performance.Measure("", loopCount, () =>
+				result.Add(Performance.Measure("", loopCount * 5, () =>
 				{
 					ISet<char> set = wrapper.CreateInstance();
 					foreach (var (isAdd, start, end) in smallRangeOperation)
@@ -105,7 +105,7 @@ namespace TestCyjb.Collections
 				}));
 				ISet<char> set = wrapper.CreateInstance();
 				set.UnionWith(list1);
-				result.Add(Performance.Measure("", 100, () =>
+				result.Add(Performance.Measure("", loopCount * 2, () =>
 				{
 					for (int i = 0; i <= char.MaxValue; i++)
 					{
@@ -114,7 +114,7 @@ namespace TestCyjb.Collections
 				}));
 				List<ISet<char>> set1 = new();
 				List<ISet<char>> set2 = new();
-				for (int i = 0; i < 100 * 4; i++)
+				for (int i = 0; i < loopCount * 8; i++)
 				{
 					ISet<char> tmp = wrapper.CreateInstance();
 					tmp.UnionWith(list1);
@@ -125,7 +125,7 @@ namespace TestCyjb.Collections
 					set2.Add(tmp);
 				}
 				int index = 0;
-				result.Add(Performance.Measure("", 100, () =>
+				result.Add(Performance.Measure("", loopCount * 2, () =>
 				{
 					set1[index].UnionWith(set2[index]);
 					index++;
