@@ -82,6 +82,7 @@ namespace Cyjb.Collections
 				// start 和 end 位于同一个底层数组项中，将 start ~ end 之间二进制置 1
 				ulong mask = (endMask - startMask) + endMask;
 				count += data[startTopIndex].Fill(startBtmIndex, mask);
+				return count > oldCount;
 			}
 			else
 			{
@@ -251,6 +252,7 @@ namespace Cyjb.Collections
 				// start 和 end 位于同一个底层数组项中，将 start ~ end 之间按位置 0
 				ulong mask = (endMask - startMask) + endMask;
 				count += data[startTopIndex].Clear(startBtmIndex, mask);
+				return count < oldCount;
 			}
 			else
 			{
@@ -300,10 +302,7 @@ namespace Cyjb.Collections
 			{
 				// start 和 end 位于同一个底层数组项中，检查 start ~ end 范围。
 				ulong mask = (endMask - startMask) + endMask;
-				if (!data[startTopIndex].Contains(startBtmIndex, mask))
-				{
-					return false;
-				}
+				return data[startTopIndex].Contains(startBtmIndex, mask);
 			}
 			else
 			{
@@ -371,22 +370,19 @@ namespace Cyjb.Collections
 			{
 				// start 和 end 位于同一个底层数组项中，检查 start ~ end 范围。
 				ulong mask = (endMask - startMask) + endMask;
-				if (data[startTopIndex].Contains(startBtmIndex, mask))
-				{
-					return true;
-				}
+				return data[startTopIndex].ContainsAny(startBtmIndex, mask);
 			}
 			else
 			{
 				// 检查 start ~ max 范围。
 				ulong mask = ~startMask + 1UL;
-				if (data[startTopIndex].Contains(startBtmIndex, mask))
+				if (data[startTopIndex].ContainsAny(startBtmIndex, mask))
 				{
 					return true;
 				}
 				// 检查 0 ~ end 范围。
 				mask = (endMask - 1UL) + endMask;
-				if (data[endTopIndex].Contains(endBtmIndex, mask))
+				if (data[endTopIndex].ContainsAny(endBtmIndex, mask))
 				{
 					return true;
 				}
@@ -394,7 +390,7 @@ namespace Cyjb.Collections
 			if (startTopIndex == endTopIndex)
 			{
 				// 检查 startBtmIndex ~ endBtmIndex 范围。
-				if (data[startTopIndex].ContainsRange(startBtmIndex + 1, endBtmIndex))
+				if (data[startTopIndex].ContainsAnyRange(startBtmIndex + 1, endBtmIndex))
 				{
 					return true;
 				}
@@ -402,19 +398,19 @@ namespace Cyjb.Collections
 			else
 			{
 				// 检查 startBtmIndex ~ BtmLen 范围。
-				if (data[startTopIndex].ContainsRange(startBtmIndex + 1, CharSetConfig.BtmLen))
+				if (data[startTopIndex].ContainsAnyRange(startBtmIndex + 1, CharSetConfig.BtmLen))
 				{
 					return true;
 				}
 				// 将 0 ~ endBtmIndex 之间按位置 1。
-				if (data[endTopIndex].ContainsRange(0, endBtmIndex))
+				if (data[endTopIndex].ContainsAnyRange(0, endBtmIndex))
 				{
 					return true;
 				}
 				// 检查 startTopIndex ~ startTopIndex 范围。
 				for (int i = startTopIndex + 1; i < endTopIndex; i++)
 				{
-					if (data[i].ContainsRange(0, CharSetConfig.BtmLen))
+					if (data[i].ContainsAnyRange(0, CharSetConfig.BtmLen))
 					{
 						return true;
 					}

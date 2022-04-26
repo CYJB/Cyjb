@@ -25,5 +25,18 @@ namespace Cyjb
 		{
 			return random.NextDouble() > probability;
 		}
+
+		/// <summary>
+		/// 随机返回数组的某一项。
+		/// </summary>
+		/// <param name="random">随机数发生器。</param>
+		/// <param name="items">随机选择的数组。</param>
+		/// <returns>数组的随机项。</returns>
+		/// <exception cref="ArgumentException"><paramref name="items"/> 是空数组。</exception>
+		public static T Choose<T>(this Random random, params T[] items)
+		{
+			CommonExceptions.CheckCollectionEmpty(items);
+			return items[random.Next(items.Length)];
+		}
 	}
 }

@@ -13,6 +13,30 @@ namespace TestCyjb
 	public class UnitTestArrayUtil
 	{
 		/// <summary>
+		/// 对 <see cref="ArrayUtil.ContentEquals"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestContentEquals()
+		{
+			int[] arr1 = new int[] { 1, 2, 3 };
+			int[] arr2 = new int[] { 1, 2, 3 };
+			Assert.IsFalse(arr1 == arr2);
+			Assert.IsTrue(arr1.ContentEquals(arr2));
+		}
+
+		/// <summary>
+		/// 对 <see cref="ArrayUtil.GetContentHashCode"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestGetContentHashCode()
+		{
+			int[] arr1 = new int[] { 1, 2, 3 };
+			int[] arr2 = new int[] { 1, 2, 3 };
+			Assert.AreNotEqual(arr1.GetHashCode(), arr2.GetHashCode());
+			Assert.AreEqual(arr1.GetContentHashCode(), arr2.GetContentHashCode());
+		}
+
+		/// <summary>
 		/// 对 <see cref="ArrayUtil.Add"/> 方法进行测试。
 		/// </summary>
 		[TestMethod]

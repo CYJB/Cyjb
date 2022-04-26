@@ -36,7 +36,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 每个底层数组包含的字符个数。
 		/// </summary>
-		public const int BtmCount = BtmLen * (1 << ItemBitLength);
+		public const int BtmCount = BtmLen << ItemBitLength;
 		/// <summary>
 		/// 底层数组索引的位移。
 		/// </summary>

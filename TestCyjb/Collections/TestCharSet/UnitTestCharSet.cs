@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using Cyjb;
 using Cyjb.Collections;
 using Cyjb.Test.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,6 +17,43 @@ namespace TestCyjb.Collections
 	public partial class UnitTestCharSet
 	{
 		/// <summary>
+		/// 用于测试的字符范围。
+		/// </summary>
+		private readonly static string[] TestRanges = new string[]
+		{
+			// \u0000-\u080。
+			new string (0.To(0x80).Select(i => (char)i).ToArray()),
+			// \u0000-\u083。
+			new string(0.To(0x83).Select(i => (char)i).ToArray()),
+			// \u0000-\u0400。
+			new string(0.To(0x400).Select(i => (char)i).ToArray()),
+			// \u0000-\u0423。
+			new string(0.To(0x423).Select(i => (char)i).ToArray()),
+			// \u0000-\u0C00。
+			new string(0.To(0xC00).Select(i => (char)i).ToArray()),
+			// \u0000-\u0CF7。
+			new string(0.To(0xCF7).Select(i => (char)i).ToArray()),
+			// \u00F3-\u0100。
+			new string(0xF3.To(0x100).Select(i => (char)i).ToArray()),
+			// \u00F3-\u0200。
+			new string(0xF3.To(0x200).Select(i => (char)i).ToArray()),
+			// \u00F3-\u0249。
+			new string(0xF3.To(0x249).Select(i => (char)i).ToArray()),
+			// \u00F3-\u1660。
+			new string(0xF3.To(0x1660).Select(i => (char)i).ToArray()),
+			// \u04A2-\u04B0。
+			new string(0x4A2.To(0x4B0).Select(i => (char)i).ToArray()),
+			// \u04A2-\u04C0。
+			new string(0x4A2.To(0x4C0).Select(i => (char)i).ToArray()),
+			// \u04A2-\u0800。
+			new string(0x4A2.To(0x800).Select(i => (char)i).ToArray()),
+			// \u04A2-\u1812。
+			new string(0x4A2.To(0x1812).Select(i => (char)i).ToArray()),
+			// \u04A2-\uDA5E。
+			new string(0x4A2.To(0xDA5E).Select(i => (char)i).ToArray()),
+		 };
+
+		/// <summary>
 		/// 对 <see cref="CharSet"/> 的 <see cref="ICollection{T}"/> 接口进行测试。
 		/// </summary>
 		[TestMethod]
@@ -23,7 +61,7 @@ namespace TestCyjb.Collections
 		{
 			CharSet set = new();
 			CollectionTest.Test(set, CollectionTestType.Sorted | CollectionTestType.Unique,
-				"dlgozuqhzlbiuoapzoijkokljtkpuiwoeu2839ythiz7tyb686r329rujweguizlob8ya9yh12huihijkl".ToCharArray());
+				"dlgozuqhzlbiuoapzoijkokljtkpuiwoeu2839ythiz7tyb6中文测试86r329rujweguizlob8ya9yh12huihijkl".ToCharArray());
 		}
 
 		/// <summary>
@@ -114,7 +152,25 @@ namespace TestCyjb.Collections
 			Assert.AreEqual(expected.Count, set.Count);
 			Assert.IsTrue(expected.SetEquals(set));
 
-			Assert.IsTrue(set.Remove('\0', char.MaxValue));
+			// 随机添加或删除范围
+			for (int i = 0; i < 200; i++)
+			{
+				string range = Random.Shared.Choose(TestRanges);
+				if (Random.Shared.NextBoolean())
+				{
+					set.Add(range[0], range[^1]);
+					expected.AddRange(range);
+				}
+				else
+				{
+					set.Remove(range[0], range[^1]);
+					expected.ExceptWith(range);
+				}
+				Assert.AreEqual(expected.Count, set.Count);
+				Assert.IsTrue(expected.SetEquals(set));
+			}
+
+			set.Remove('\0', char.MaxValue);
 			expected.Clear();
 			Assert.AreEqual("[]", set.ToString());
 			Assert.AreEqual(expected.Count, set.Count);
@@ -149,6 +205,78 @@ namespace TestCyjb.Collections
 			Assert.IsTrue(set.AddIgnoreCase('X', 'b'));
 			expected.AddRange(@"XYZ[\]^_`abxyzAB");
 			Assert.IsTrue(expected.SetEquals(set));
+		}
+
+		/// <summary>
+		/// 对 <see cref="CharSet"/> 的集合方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestISetMethod()
+		{
+			for (int i = 0; i < TestRanges.Length; i++)
+			{
+				for (int j = 0; j < TestRanges.Length; j++)
+				{
+					string first = TestRanges[i];
+					string second = TestRanges[j];
+					CharSet set = new(first);
+					HashSet<char> expected = new(first);
+
+					Assert.AreEqual(expected.IsSubsetOf(second), set.IsSubsetOf(second));
+					Assert.AreEqual(expected.IsSubsetOf(second), set.IsSubsetOf(new CharSet(second)));
+
+					Assert.AreEqual(expected.IsProperSubsetOf(second), set.IsProperSubsetOf(second));
+					Assert.AreEqual(expected.IsProperSubsetOf(second), set.IsProperSubsetOf(new CharSet(second)));
+
+					Assert.AreEqual(expected.IsSupersetOf(second), set.IsSupersetOf(second));
+					Assert.AreEqual(expected.IsSupersetOf(second), set.IsSupersetOf(new CharSet(second)));
+
+					Assert.AreEqual(expected.IsProperSupersetOf(second), set.IsProperSupersetOf(second));
+					Assert.AreEqual(expected.IsProperSupersetOf(second), set.IsProperSupersetOf(new CharSet(second)));
+
+					Assert.AreEqual(expected.Overlaps(second), set.Overlaps(second));
+					Assert.AreEqual(expected.Overlaps(second), set.Overlaps(new CharSet(second)));
+
+					Assert.AreEqual(expected.SetEquals(second), set.SetEquals(second));
+					Assert.AreEqual(expected.SetEquals(second), set.SetEquals(new CharSet(second)));
+
+					set = new CharSet(first);
+					set.ExceptWith(second);
+					expected = new HashSet<char>(first);
+					expected.ExceptWith(second);
+					Assert.IsTrue(expected.SetEquals(set));
+					set = new CharSet(first);
+					set.ExceptWith(new CharSet(second));
+					Assert.IsTrue(expected.SetEquals(set));
+
+					set = new CharSet(first);
+					set.ExceptWith(second);
+					expected = new HashSet<char>(first);
+					expected.ExceptWith(second);
+					Assert.IsTrue(expected.SetEquals(set));
+					set = new CharSet(first);
+					set.ExceptWith(new CharSet(second));
+					Assert.IsTrue(expected.SetEquals(set));
+
+					set = new CharSet(first);
+					set.SymmetricExceptWith(second);
+					expected = new HashSet<char>(first);
+					expected.SymmetricExceptWith(second);
+					Assert.IsTrue(expected.SetEquals(set));
+					set = new CharSet(first);
+					set.SymmetricExceptWith(new CharSet(second));
+					Assert.IsTrue(expected.SetEquals(set));
+
+					set = new CharSet(first);
+					set.UnionWith(second);
+					expected = new HashSet<char>(first);
+					expected.UnionWith(second);
+					Assert.IsTrue(expected.SetEquals(set));
+					set = new CharSet(first);
+					set.UnionWith(new CharSet(second));
+					Assert.IsTrue(expected.SetEquals(set));
+				}
+			}
 		}
 
 		/// <summary>

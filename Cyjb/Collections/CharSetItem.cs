@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace Cyjb.Collections
 {
@@ -45,9 +46,17 @@ namespace Cyjb.Collections
 		}
 
 		/// <summary>
-		/// 获取当前项中包含的字符个数。
+		/// 获取当前项是否为空。
 		/// </summary>
-		public int Count => count;
+		[MemberNotNullWhen(false, "data")]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private bool IsEmpty() => count == 0;
+
+		/// <summary>
+		/// 获取当前项是否已填满。
+		/// </summary>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private bool IsFullFilled() => count == CharSetConfig.BtmCount;
 
 		/// <summary>
 		/// 返回指定的索引是否包含指定的值。
@@ -57,15 +66,15 @@ namespace Cyjb.Collections
 		/// <returns>如果包含指定的值，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public bool Contains(int index, ulong mask)
 		{
-			if (data == null)
+			if (IsEmpty())
 			{
 				return false;
 			}
-			if (data.Length == 0)
+			else if (IsFullFilled())
 			{
 				return true;
 			}
-			return (data[index] & mask) != 0U;
+			return (data[index] & mask) == mask;
 		}
 
 		/// <summary>
@@ -76,17 +85,13 @@ namespace Cyjb.Collections
 		/// <returns>如果指定的范围全部为 <c>1</c>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public bool ContainsRange(int startIndex, int endIndex)
 		{
-			if (startIndex >= endIndex)
+			if (startIndex >= endIndex || IsFullFilled())
 			{
 				return true;
 			}
-			if (data == null)
+			if (IsEmpty())
 			{
 				return false;
-			}
-			if (data.Length == 0)
-			{
-				return true;
 			}
 			for (int i = startIndex; i < endIndex; i++)
 			{
@@ -96,6 +101,51 @@ namespace Cyjb.Collections
 				}
 			}
 			return true;
+		}
+
+		/// <summary>
+		/// 返回指定的索引是否包含指定的值。
+		/// </summary>
+		/// <param name="index">要检查的索引。</param>
+		/// <param name="mask">要检查的值。</param>
+		/// <returns>如果包含指定的值，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		public bool ContainsAny(int index, ulong mask)
+		{
+			if (IsEmpty())
+			{
+				return false;
+			}
+			else if (IsFullFilled())
+			{
+				return true;
+			}
+			return (data[index] & mask) != 0UL;
+		}
+
+		/// <summary>
+		/// 返回指定的索引是否不全部为 0。
+		/// </summary>
+		/// <param name="startIndex">要检查的起始索引（含）。</param>
+		/// <param name="endIndex">要检查的结束索引（不含）。</param>
+		/// <returns>如果指定的范围不全部为 <c>0</c>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		public bool ContainsAnyRange(int startIndex, int endIndex)
+		{
+			if (startIndex >= endIndex || IsFullFilled())
+			{
+				return true;
+			}
+			if (IsEmpty())
+			{
+				return false;
+			}
+			for (int i = startIndex; i < endIndex; i++)
+			{
+				if (data[i] != 0UL)
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
 		#region 按位操作
@@ -108,18 +158,17 @@ namespace Cyjb.Collections
 		/// <returns>受影响的字符个数。</returns>
 		public int Fill(int index, ulong mask)
 		{
-			EnsureData();
-			if (data.Length == 0)
+			if (IsFullFilled())
 			{
-				// 已经全部是 1，不需要再处理。
 				return 0;
 			}
+			EnsureData();
 			ulong value = data[index];
 			int modifiedCount = mask.CountBits() - (value & mask).CountBits();
 			value |= mask;
 			data[index] = value;
 			count += modifiedCount;
-			if (count == CharSetConfig.BtmCount)
+			if (IsFullFilled())
 			{
 				OptimizeFullFilled();
 			}
@@ -132,15 +181,14 @@ namespace Cyjb.Collections
 		/// <returns>受影响的字符个数。</returns>
 		public int Fill()
 		{
-			if (data == null)
+			if (IsEmpty())
 			{
 				data = Array.Empty<ulong>();
 				count = CharSetConfig.BtmCount;
 				return count;
 			}
-			else if (data.Length == 0)
+			else if (IsFullFilled())
 			{
-				// 已经全部是 1，不需要再处理。
 				return 0;
 			}
 			int modifiedCount = CharSetConfig.BtmCount - count;
@@ -157,7 +205,7 @@ namespace Cyjb.Collections
 		/// <returns>受影响的字符个数。</returns>
 		public int FillRange(int startIndex, int endIndex)
 		{
-			if (startIndex >= endIndex)
+			if (startIndex >= endIndex || IsFullFilled())
 			{
 				return 0;
 			}
@@ -166,11 +214,6 @@ namespace Cyjb.Collections
 				return Fill();
 			}
 			EnsureData();
-			if (data.Length == 0)
-			{
-				// 已经全部是 1，不需要再处理。
-				return 0;
-			}
 			int modifiedCount = 0;
 			for (int i = startIndex; i < endIndex; i++)
 			{
@@ -178,7 +221,7 @@ namespace Cyjb.Collections
 				data[i] = ulong.MaxValue;
 			}
 			count += modifiedCount;
-			if (count == CharSetConfig.BtmCount)
+			if (IsFullFilled())
 			{
 				OptimizeFullFilled();
 			}
@@ -193,9 +236,8 @@ namespace Cyjb.Collections
 		/// <returns>受影响的字符个数。</returns>
 		public int Clear(int index, ulong mask)
 		{
-			if (data == null)
+			if (IsEmpty())
 			{
-				// 已经全部是 0，不需要再处理。
 				return 0;
 			}
 			ExpandData();
@@ -204,7 +246,7 @@ namespace Cyjb.Collections
 			value &= ~mask;
 			data[index] = value;
 			count += modifiedCount;
-			if (count == 0)
+			if (IsEmpty())
 			{
 				OptimizeCleared();
 			}
@@ -217,9 +259,8 @@ namespace Cyjb.Collections
 		/// <returns>受影响的字符个数。</returns>
 		public int Clear()
 		{
-			if (data == null)
+			if (IsEmpty())
 			{
-				// 已经全部是 0，不需要再处理。
 				return 0;
 			}
 			int modifiedCount = -count;
@@ -236,13 +277,8 @@ namespace Cyjb.Collections
 		/// <returns>受影响的字符个数。</returns>
 		public int ClearRange(int startIndex, int endIndex)
 		{
-			if (startIndex >= endIndex)
+			if (startIndex >= endIndex || IsEmpty())
 			{
-				return 0;
-			}
-			if (data == null)
-			{
-				// 已经全部是 0，不需要再处理。
 				return 0;
 			}
 			if (startIndex == 0 && endIndex == CharSetConfig.BtmLen)
@@ -257,7 +293,7 @@ namespace Cyjb.Collections
 				data[i] = 0;
 			}
 			count += modifiedCount;
-			if (count == 0)
+			if (IsEmpty())
 			{
 				OptimizeCleared();
 			}
@@ -276,24 +312,19 @@ namespace Cyjb.Collections
 		/// <c>true</c>，否则返回 <c>false</c>。</returns>
 		public bool ContainsAllElements(CharSetItem other)
 		{
-			ulong[]? otherData = other.data;
-			if (otherData == null)
-			{
-				return true;
-			}
 			if (count < other.count)
 			{
 				return false;
 			}
-			// 已经全部是 1，一定能够包含。
-			if (data!.Length == 0)
+			if (other.IsEmpty() || IsFullFilled())
 			{
 				return true;
 			}
+			ulong[] otherData = other.data;
 			for (int i = 0; i < CharSetConfig.BtmLen; i++)
 			{
-				ulong value = data![i];
-				ulong otherValue = otherData![i];
+				ulong value = data[i];
+				ulong otherValue = otherData[i];
 				if ((value | otherValue) != value)
 				{
 					return false;
@@ -309,19 +340,18 @@ namespace Cyjb.Collections
 		/// <returns>受影响的字符个数。</returns>
 		public int ExceptWith(CharSetItem other)
 		{
-			ulong[]? otherData = other.data;
-			// 已经全部是 0，不需要再处理。
-			if (data == null || otherData == null)
+			if (IsEmpty() || other.IsEmpty())
 			{
 				return 0;
 			}
-			if (otherData.Length == 0)
+			if (other.IsFullFilled())
 			{
 				// 全部排除。
 				return Clear();
 			}
 			ExpandData();
 			int modifiedCount = 0;
+			ulong[] otherData = other.data;
 			for (int i = 0; i < CharSetConfig.BtmLen; i++)
 			{
 				ulong value = data[i];
@@ -348,21 +378,17 @@ namespace Cyjb.Collections
 		/// <returns>受影响的字符个数。</returns>
 		public int IntersectWith(CharSetItem other)
 		{
-			if (data == null)
+			if (IsEmpty() || other.IsFullFilled())
 			{
 				return 0;
 			}
-			ulong[]? otherData = other.data;
-			if (otherData == null)
+			if (other.IsEmpty())
 			{
 				// 全部排除。
 				return Clear();
 			}
-			else if (otherData.Length == 0)
-			{
-				return 0;
-			}
 			ExpandData();
+			ulong[] otherData = other.data;
 			int modifiedCount = 0;
 			for (int i = 0; i < CharSetConfig.BtmLen; i++)
 			{
@@ -391,20 +417,18 @@ namespace Cyjb.Collections
 		/// 至少共享一个通用元素，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public bool Overlaps(CharSetItem other)
 		{
-			ulong[]? otherData = other.data;
-			// 已经全部是 0，不需要再处理。
-			if (data == null || otherData == null)
+			if (IsEmpty() || other.IsEmpty())
 			{
 				return false;
 			}
-			// 已经全部是 1，不需要再处理。
-			if (data.Length == 0 || otherData.Length == 0)
+			if (IsFullFilled() || other.IsFullFilled())
 			{
 				return true;
 			}
+			ulong[] otherData = other.data;
 			for (int i = 0; i < CharSetConfig.BtmLen; i++)
 			{
-				if ((data[i] & otherData[i]) > 0U)
+				if ((data[i] & otherData[i]) > 0UL)
 				{
 					return true;
 				}
@@ -418,25 +442,25 @@ namespace Cyjb.Collections
 		/// <param name="other">要与当前项进行比较的项。</param>
 		public int SymmetricExceptWith(CharSetItem other)
 		{
-			ulong[]? otherData = other.data;
-			if (otherData == null)
+			if (other.IsEmpty())
 			{
 				return 0;
 			}
-			else if (otherData.Length == 0)
+			if (IsFullFilled())
 			{
-				return Clear();
+				return ExceptWith(other);
 			}
-			else if (data == null)
+			ulong[] otherData = other.data;
+			if (IsEmpty())
 			{
 				// 复制数据。
 				count = other.count;
 				CopyData(otherData);
 				return other.count;
 			}
-			else if (data.Length == 0)
+			if (otherData.Length == 0)
 			{
-				return ExceptWith(other);
+				otherData = FullFilledData;
 			}
 			int modifiedCount = 0;
 			for (int i = 0; i < CharSetConfig.BtmLen; i++)
@@ -464,48 +488,41 @@ namespace Cyjb.Collections
 		/// <returns>受影响的字符个数。</returns>
 		public int UnionWith(CharSetItem other)
 		{
-			ulong[]? otherData = other.data;
-			if (otherData == null)
+			if (IsFullFilled() || other.IsEmpty())
 			{
 				return 0;
 			}
-			if (data == null)
+			if (other.IsFullFilled())
+			{
+				count = CharSetConfig.BtmCount - count;
+				OptimizeFullFilled();
+				return count;
+			}
+			ulong[] otherData = other.data;
+			if (IsEmpty())
 			{
 				count = other.count;
 				CopyData(otherData);
 				return other.count;
 			}
-			else if (data.Length == 0)
-			{
-				// 已经全部为 1，不需要再处理。
-				return 0;
-			}
+
 			int modifiedCount = 0;
-			if (otherData.Length == 0)
+			for (int i = 0; i < CharSetConfig.BtmLen; i++)
 			{
-				modifiedCount = CharSetConfig.BtmCount - count;
-				count = modifiedCount;
-				OptimizeFullFilled();
+				// 新增的字符。
+				ulong value = data[i];
+				ulong mask = (~value) & otherData[i];
+				if (mask > 0)
+				{
+					modifiedCount += mask.CountBits();
+					value |= mask;
+					data[i] = value;
+				}
 			}
-			else
+			count += modifiedCount;
+			if (IsFullFilled())
 			{
-				for (int i = 0; i < CharSetConfig.BtmLen; i++)
-				{
-					// 新增的字符。
-					ulong value = data[i];
-					ulong mask = (~value) & otherData[i];
-					if (mask > 0)
-					{
-						modifiedCount += mask.CountBits();
-						value |= mask;
-						data[i] = value;
-					}
-				}
-				count += modifiedCount;
-				if (count == CharSetConfig.BtmCount)
-				{
-					OptimizeFullFilled();
-				}
+				OptimizeFullFilled();
 			}
 			return modifiedCount;
 		}
@@ -515,9 +532,10 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 确保 data 不为空数组（表示全部为 <c>1</c>）。
 		/// </summary>
+		[MemberNotNull("data")]
 		private void ExpandData()
 		{
-			if (data != null && data.Length == 0)
+			if (data!.Length == 0)
 			{
 				data = ArrayPool<ulong>.Shared.Rent(CharSetConfig.BtmLen);
 				// 从 ArrayPool 获取的数组需要自行清零。
@@ -562,7 +580,10 @@ namespace Cyjb.Collections
 		/// </summary>
 		private void OptimizeFullFilled()
 		{
-			ArrayPool<ulong>.Shared.Return(data!);
+			if (data != null)
+			{
+				ArrayPool<ulong>.Shared.Return(data);
+			}
 			data = Array.Empty<ulong>();
 		}
 
@@ -714,7 +735,7 @@ namespace Cyjb.Collections
 			HashCode hashCode = new();
 			hashCode.Add(highBits);
 			hashCode.Add(count);
-			if (data != null)
+			if (!IsEmpty())
 			{
 				for (int i = 0; i < CharSetConfig.BtmLen; i++)
 				{
