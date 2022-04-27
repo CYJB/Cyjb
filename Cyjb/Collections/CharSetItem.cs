@@ -9,7 +9,7 @@ namespace Cyjb.Collections
 	/// <summary>
 	/// 表示字符集合中的底层数组项。
 	/// </summary>
-	internal sealed class CharSetItem : IEnumerable<ItemRange<char>>, IEquatable<CharSetItem>
+	internal sealed class CharSetItem : IEnumerable<ValueRange<char>>, IEquatable<CharSetItem>
 	{
 		/// <summary>
 		/// 全部为 <c>1</c> 的数组，用于简化访问。
@@ -606,7 +606,7 @@ namespace Cyjb.Collections
 		/// 返回一个循环访问集合的枚举器。
 		/// </summary>
 		/// <returns>可用于循环访问集合的 <see cref="IEnumerator{Char}"/>。</returns>
-		public IEnumerator<ItemRange<char>> GetEnumerator()
+		public IEnumerator<ValueRange<char>> GetEnumerator()
 		{
 			if (data == null)
 			{
@@ -614,7 +614,7 @@ namespace Cyjb.Collections
 			}
 			if (data.Length == 0)
 			{
-				yield return new ItemRange<char>((char)highBits, (char)(highBits | CharSetConfig.BtmMask));
+				yield return new ValueRange<char>((char)highBits, (char)(highBits | CharSetConfig.BtmMask));
 				yield break;
 			}
 			char start = '\0', end = '\0';
@@ -631,7 +631,7 @@ namespace Cyjb.Collections
 					{
 						if (end < ch - 1)
 						{
-							yield return new ItemRange<char>(start, end);
+							yield return new ValueRange<char>(start, end);
 							start = ch;
 						}
 					}
@@ -662,7 +662,7 @@ namespace Cyjb.Collections
 						{
 							if (end < ch - 1)
 							{
-								yield return new ItemRange<char>(start, end);
+								yield return new ValueRange<char>(start, end);
 								start = ch;
 							}
 						}
@@ -677,7 +677,7 @@ namespace Cyjb.Collections
 			}
 			if (hasRange)
 			{
-				yield return new ItemRange<char>(start, end);
+				yield return new ValueRange<char>(start, end);
 			}
 		}
 

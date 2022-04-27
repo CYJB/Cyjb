@@ -180,11 +180,11 @@ namespace TestCyjb.Collections.TestCharSet
 		/// 返回一个循环访问字符范围的枚举器。
 		/// </summary>
 		/// <returns>可用于循环访问字符范围的 <see cref="IEnumerable{Tuple}"/>。</returns>
-		public IEnumerable<ItemRange<char>> Ranges()
+		public IEnumerable<ValueRange<char>> Ranges()
 		{
 			foreach (var node in ranges)
 			{
-				yield return new ItemRange<char>(node.Key, node.Value);
+				yield return new ValueRange<char>(node.Key, node.Value);
 			}
 		}
 

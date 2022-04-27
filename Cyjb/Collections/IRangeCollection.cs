@@ -18,6 +18,6 @@ namespace Cyjb.Collections
 		/// 返回一个循环访问元素范围的枚举器。
 		/// </summary>
 		/// <returns>可用于循环访问元素范围的 <see cref="IEnumerable{Tuple}"/>。</returns>
-		IEnumerable<ItemRange<T>> Ranges();
+		IEnumerable<ValueRange<T>> Ranges();
 	}
 }

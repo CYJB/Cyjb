@@ -423,7 +423,7 @@ namespace Cyjb.Collections
 		/// 返回一个循环访问字符范围的枚举器。
 		/// </summary>
 		/// <returns>可用于循环访问字符范围的 <see cref="IEnumerable{Tuple}"/>。</returns>
-		public IEnumerable<ItemRange<char>> Ranges()
+		public IEnumerable<ValueRange<char>> Ranges()
 		{
 			bool hasRange = false;
 			char start = '\0', end = '\0';
@@ -435,7 +435,7 @@ namespace Cyjb.Collections
 					{
 						if (end < curStart - 1)
 						{
-							yield return new ItemRange<char>(start, end);
+							yield return new ValueRange<char>(start, end);
 							start = curStart;
 						}
 					}
@@ -449,7 +449,7 @@ namespace Cyjb.Collections
 			}
 			if (hasRange)
 			{
-				yield return new ItemRange<char>(start, end);
+				yield return new ValueRange<char>(start, end);
 			}
 		}
 
