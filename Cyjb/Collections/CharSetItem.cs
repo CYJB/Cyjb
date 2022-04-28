@@ -12,6 +12,13 @@ namespace Cyjb.Collections
 	internal sealed class CharSetItem : IEnumerable<ValueRange<char>>, IEquatable<CharSetItem>
 	{
 		/// <summary>
+		/// 全部为 <c>0</c> 的数组，用于简化访问。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private static readonly ulong[] EmptyData = new ulong[CharSetConfig.BtmLen] {
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		};
+		/// <summary>
 		/// 全部为 <c>1</c> 的数组，用于简化访问。
 		/// </summary>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -27,9 +34,10 @@ namespace Cyjb.Collections
 		/// </summary>
 		private readonly int highBits;
 		/// <summary>
-		/// 字符集合的底层数组项,使用 <c>null</c> 表示全为 <c>0</c>，使用 <c>[]</c> 表示全为 <c>1</c>。
+		/// 字符集合的底层数组项,使用 <see cref="EmptyData"/> 表示全为 <c>0</c>，
+		/// 使用 <see cref="FullFilledData"/> 表示全为 <c>1</c>。
 		/// </summary>
-		private ulong[]? data;
+		private ulong[] data = EmptyData;
 		/// <summary>
 		/// 集合中字符的个数。
 		/// </summary>
@@ -48,7 +56,6 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 获取当前项是否为空。
 		/// </summary>
-		[MemberNotNullWhen(false, "data")]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private bool IsEmpty() => count == 0;
 
@@ -66,14 +73,6 @@ namespace Cyjb.Collections
 		/// <returns>如果包含指定的值，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public bool Contains(int index, ulong mask)
 		{
-			if (IsEmpty())
-			{
-				return false;
-			}
-			else if (IsFullFilled())
-			{
-				return true;
-			}
 			return (data[index] & mask) == mask;
 		}
 
@@ -111,14 +110,6 @@ namespace Cyjb.Collections
 		/// <returns>如果包含指定的值，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public bool ContainsAny(int index, ulong mask)
 		{
-			if (IsEmpty())
-			{
-				return false;
-			}
-			else if (IsFullFilled())
-			{
-				return true;
-			}
 			return (data[index] & mask) != 0UL;
 		}
 
@@ -183,7 +174,7 @@ namespace Cyjb.Collections
 		{
 			if (IsEmpty())
 			{
-				data = Array.Empty<ulong>();
+				data = FullFilledData;
 				count = CharSetConfig.BtmCount;
 				return count;
 			}
@@ -458,10 +449,6 @@ namespace Cyjb.Collections
 				CopyData(otherData);
 				return other.count;
 			}
-			if (otherData.Length == 0)
-			{
-				otherData = FullFilledData;
-			}
 			int modifiedCount = 0;
 			for (int i = 0; i < CharSetConfig.BtmLen; i++)
 			{
@@ -530,29 +517,27 @@ namespace Cyjb.Collections
 		#endregion // 集合操作
 
 		/// <summary>
-		/// 确保 data 不为空数组（表示全部为 <c>1</c>）。
+		/// 确保 data 不为 <see cref="FullFilledData"/>。
 		/// </summary>
-		[MemberNotNull("data")]
 		private void ExpandData()
 		{
-			if (data!.Length == 0)
+			if (data == FullFilledData)
 			{
 				data = ArrayPool<ulong>.Shared.Rent(CharSetConfig.BtmLen);
-				// 从 ArrayPool 获取的数组需要自行清零。
+				// 从 ArrayPool 获取的数组需要自行初始化。
 				data.Fill(ulong.MaxValue, 0, CharSetConfig.BtmLen);
 			}
 		}
 
 		/// <summary>
-		/// 确保 data 不为 <c>null</c>。
+		/// 确保 data 不为 <see cref="EmptyData"/>。
 		/// </summary>
-		[MemberNotNull("data")]
 		private void EnsureData()
 		{
-			if (data == null)
+			if (data == EmptyData)
 			{
 				data = ArrayPool<ulong>.Shared.Rent(CharSetConfig.BtmLen);
-				// 从 ArrayPool 获取的数组需要自行清零。
+				// 从 ArrayPool 获取的数组需要自行初始化。
 				data.Fill(0UL, 0, CharSetConfig.BtmLen);
 			}
 		}
@@ -564,9 +549,9 @@ namespace Cyjb.Collections
 		private void CopyData(ulong[] other)
 		{
 			// 可以直接复制数据。
-			if (other.Length == 0)
+			if (other == FullFilledData)
 			{
-				data = Array.Empty<ulong>();
+				data = FullFilledData;
 			}
 			else
 			{
@@ -580,11 +565,11 @@ namespace Cyjb.Collections
 		/// </summary>
 		private void OptimizeFullFilled()
 		{
-			if (data != null)
+			if (data != EmptyData)
 			{
 				ArrayPool<ulong>.Shared.Return(data);
 			}
-			data = Array.Empty<ulong>();
+			data = FullFilledData;
 		}
 
 		/// <summary>
@@ -592,12 +577,11 @@ namespace Cyjb.Collections
 		/// </summary>
 		private void OptimizeCleared()
 		{
-			// 调用方确保 data 不为 null。
-			if (data!.Length > 0)
+			if (data != EmptyData && data != FullFilledData)
 			{
 				ArrayPool<ulong>.Shared.Return(data!);
 			}
-			data = null;
+			data = EmptyData;
 		}
 
 		#region IEnumerable<ItemRange<char>> 成员
@@ -608,22 +592,21 @@ namespace Cyjb.Collections
 		/// <returns>可用于循环访问集合的 <see cref="IEnumerator{Char}"/>。</returns>
 		public IEnumerator<ValueRange<char>> GetEnumerator()
 		{
-			if (data == null)
+			if (count == 0)
 			{
 				yield break;
 			}
-			if (data.Length == 0)
+			if (count == CharSetConfig.BtmCount)
 			{
 				yield return new ValueRange<char>((char)highBits, (char)(highBits | CharSetConfig.BtmMask));
 				yield break;
 			}
 			char start = '\0', end = '\0';
 			bool hasRange = false;
-			ulong[] items = data.Length == 0 ? FullFilledData : data;
 			for (int i = 0; i < CharSetConfig.BtmLen; i++)
 			{
 				int midBits = highBits | (i << CharSetConfig.BtmShift);
-				ulong value = items[i];
+				ulong value = data[i];
 				if (value == ulong.MaxValue)
 				{
 					char ch = (char)midBits;
