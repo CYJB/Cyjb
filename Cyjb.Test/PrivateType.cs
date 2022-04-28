@@ -1,16 +1,14 @@
-﻿using System;
 using System.Globalization;
 using System.Reflection;
-using Cyjb;
 using Cyjb.Reflection;
 
-namespace TestCyjb
+namespace Cyjb.Test
 {
 	/// <summary>
 	/// 表示私有类的类型，该私有类提供对私有静态实现的访问。
 	/// </summary>
 	/// <remarks>MSTest 并未在 .NET 下提供 PrivateType，这里提供一个单独的实现。</remarks>
-	internal class PrivateType
+	public class PrivateType
 	{
 		/// <summary>
 		/// 绑定标志位。
