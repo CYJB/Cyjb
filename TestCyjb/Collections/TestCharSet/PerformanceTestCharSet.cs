@@ -24,7 +24,7 @@ namespace TestCyjb.Collections
 			List<(bool isAdd, char ch)> charOperation = new();
 			List<(bool isAdd, char start, char end)> smallRangeOperation = new();
 			List<(bool isAdd, char start, char end)> largeRangeOperation = new();
-			int loopCount = 200;
+			int loopCount = 50;
 			for (int i = 0; i < 5000; i++)
 			{
 				int value = random.Next(char.MaxValue);

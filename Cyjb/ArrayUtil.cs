@@ -109,7 +109,7 @@ namespace Cyjb
 		public static T[] Fill<T>(this T[] array, T value, int startIndex, int count)
 		{
 			CommonExceptions.CheckArgumentNull(array);
-			Array.Fill<T>(array, value, startIndex, count);
+			Array.Fill(array, value, startIndex, count);
 			return array;
 		}
 

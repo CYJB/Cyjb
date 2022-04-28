@@ -499,7 +499,7 @@ namespace Cyjb.Collections
 		public override bool Add(char ch)
 		{
 			CharSetConfig.GetIndex(ch, out int topIndex, out int btmIndex, out ulong mask);
-			int modified = data[topIndex].Fill(btmIndex, mask);
+			int modified = data[topIndex].FillSingle(btmIndex, mask);
 			if (modified == 0)
 			{
 				return false;
@@ -879,7 +879,7 @@ namespace Cyjb.Collections
 		public override bool Remove(char ch)
 		{
 			CharSetConfig.GetIndex(ch, out int topIndex, out int btmIndex, out ulong mask);
-			int modified = data[topIndex].Clear(btmIndex, mask);
+			int modified = data[topIndex].ClearSingle(btmIndex, mask);
 			if (modified == 0)
 			{
 				return false;

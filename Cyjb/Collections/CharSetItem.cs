@@ -142,6 +142,30 @@ namespace Cyjb.Collections
 		#region 按位操作
 
 		/// <summary>
+		/// 将指定索引的指定单个比特位填充为 <c>1</c>。
+		/// </summary>
+		/// <param name="index">要填充的索引。</param>
+		/// <param name="mask">要填充的位置。</param>
+		/// <returns>受影响的字符个数。</returns>
+		public int FillSingle(int index, ulong mask)
+		{
+			ulong value = data[index];
+			if ((value & mask) > 0UL)
+			{
+				return 0;
+			}
+			EnsureData();
+			value |= mask;
+			data[index] = value;
+			count++;
+			if (IsFullFilled())
+			{
+				OptimizeFullFilled();
+			}
+			return 1;
+		}
+
+		/// <summary>
 		/// 将指定索引的指定位置填充为 <c>1</c>。
 		/// </summary>
 		/// <param name="index">要填充的索引。</param>
@@ -153,9 +177,13 @@ namespace Cyjb.Collections
 			{
 				return 0;
 			}
-			EnsureData();
 			ulong value = data[index];
 			int modifiedCount = mask.CountBits() - (value & mask).CountBits();
+			if (modifiedCount == 0)
+			{
+				return 0;
+			}
+			EnsureData();
 			value |= mask;
 			data[index] = value;
 			count += modifiedCount;
@@ -172,13 +200,7 @@ namespace Cyjb.Collections
 		/// <returns>受影响的字符个数。</returns>
 		public int Fill()
 		{
-			if (IsEmpty())
-			{
-				data = FullFilledData;
-				count = CharSetConfig.BtmCount;
-				return count;
-			}
-			else if (IsFullFilled())
+			if (IsFullFilled())
 			{
 				return 0;
 			}
@@ -220,6 +242,30 @@ namespace Cyjb.Collections
 		}
 
 		/// <summary>
+		/// 将指定索引的指定单个位填充为 <c>0</c>。
+		/// </summary>
+		/// <param name="index">要填充的索引。</param>
+		/// <param name="mask">要填充的位置。</param>
+		/// <returns>受影响的字符个数。</returns>
+		public int ClearSingle(int index, ulong mask)
+		{
+			ulong value = data[index];
+			if ((value & mask) == 0UL)
+			{
+				return 0;
+			}
+			ExpandData();
+			value &= ~mask;
+			data[index] = value;
+			count -= 1;
+			if (IsEmpty())
+			{
+				OptimizeCleared();
+			}
+			return -1;
+		}
+
+		/// <summary>
 		/// 将指定索引的指定位置填充为 <c>0</c>。
 		/// </summary>
 		/// <param name="index">要填充的索引。</param>
@@ -231,9 +277,13 @@ namespace Cyjb.Collections
 			{
 				return 0;
 			}
-			ExpandData();
 			ulong value = data[index];
 			int modifiedCount = -(value & mask).CountBits();
+			if (modifiedCount == 0)
+			{
+				return 0;
+			}
+			ExpandData();
 			value &= ~mask;
 			data[index] = value;
 			count += modifiedCount;
@@ -525,7 +575,7 @@ namespace Cyjb.Collections
 			{
 				data = ArrayPool<ulong>.Shared.Rent(CharSetConfig.BtmLen);
 				// 从 ArrayPool 获取的数组需要自行初始化。
-				data.Fill(ulong.MaxValue, 0, CharSetConfig.BtmLen);
+				Array.Fill(data, ulong.MaxValue, 0, CharSetConfig.BtmLen);
 			}
 		}
 
@@ -538,7 +588,7 @@ namespace Cyjb.Collections
 			{
 				data = ArrayPool<ulong>.Shared.Rent(CharSetConfig.BtmLen);
 				// 从 ArrayPool 获取的数组需要自行初始化。
-				data.Fill(0UL, 0, CharSetConfig.BtmLen);
+				Array.Fill(data, 0UL, 0, CharSetConfig.BtmLen);
 			}
 		}
 
