@@ -4,6 +4,15 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	<SignAssembly>True</SignAssembly>
+	<AssemblyOriginatorKeyFile>../CYJB_Code_Key.snk</AssemblyOriginatorKeyFile>
+	<PackageProjectUrl>https://github.com/CYJB/Cyjb</PackageProjectUrl>
+	<Description>提供单元测试的功能扩展</Description>
+	<Copyright>﻿Copyright (c) 2022, CYJB</Copyright>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+	<NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +21,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cyjb\Cyjb.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<None Include="..\.editorconfig" Link=".editorconfig" />
+	<None Include="README.md" Pack="True" PackagePath="" />
+	<None Include="LICENSE.txt" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>

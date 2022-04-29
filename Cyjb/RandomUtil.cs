@@ -29,6 +29,7 @@ namespace Cyjb
 		/// <summary>
 		/// 随机返回数组的某一项。
 		/// </summary>
+		/// <typeparam name="T">数组的元素类型。</typeparam>
 		/// <param name="random">随机数发生器。</param>
 		/// <param name="items">随机选择的数组。</param>
 		/// <returns>数组的随机项。</returns>
