@@ -180,7 +180,7 @@ namespace Cyjb.Collections
 		/// 将当前集合内大写字母对应的小写字母添加到集合中。
 		/// </summary>
 		/// <param name="culture">大小写转换使用的区域信息。</param>
-		public void AddLowercase(CultureInfo culture)
+		public void AddLowercase(CultureInfo? culture = null)
 		{
 			if (culture == null)
 			{
@@ -207,7 +207,7 @@ namespace Cyjb.Collections
 		/// 将当前集合内小写字母对应的大写字母添加到集合中。
 		/// </summary>
 		/// <param name="culture">大小写转换使用的区域信息。</param>
-		public void AddUppercase(CultureInfo culture)
+		public void AddUppercase(CultureInfo? culture = null)
 		{
 			if (culture == null)
 			{
