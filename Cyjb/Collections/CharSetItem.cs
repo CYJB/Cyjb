@@ -345,7 +345,7 @@ namespace Cyjb.Collections
 		/// 反转当前集合，使集合内容变为之前未包含的字符。
 		/// </summary>
 		/// <returns>受影响的字符个数。</returns>
-		public int Reverse()
+		public int Negated()
 		{
 			if (IsEmpty())
 			{

@@ -286,11 +286,11 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 反转当前集合，使集合内容变为之前未包含的字符。
 		/// </summary>
-		public void Reverse()
+		public void Negated()
 		{
 			for (int i = 0; i < CharSetConfig.TopLen; i++)
 			{
-				count += data[i].Reverse();
+				count += data[i].Negated();
 			}
 		}
 

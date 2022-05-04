@@ -422,35 +422,35 @@ namespace TestCyjb.Collections
 		}
 
 		/// <summary>
-		/// 对 <see cref="CharSet.Reverse"/> 方法进行测试。
+		/// 对 <see cref="CharSet.Negated"/> 方法进行测试。
 		/// </summary>
 		[TestMethod]
-		public void TestReverse()
+		public void TestNegated()
 		{
 			CharSet set = new();
-			set.Reverse();
-			HashSet<char> expected = Reverse(new HashSet<char>());
+			set.Negated();
+			HashSet<char> expected = Negated(new HashSet<char>());
 			Assert.AreEqual(expected.Count, set.Count);
 			Assert.IsTrue(expected.SetEquals(set));
 
-			set.Reverse();
-			expected = Reverse(expected);
+			set.Negated();
+			expected = Negated(expected);
 			Assert.AreEqual(expected.Count, set.Count);
 			Assert.IsTrue(expected.SetEquals(set));
 
 			set = new("acdefghiz");
-			set.Reverse();
-			expected = Reverse(new HashSet<char>("acdefghiz"));
+			set.Negated();
+			expected = Negated(new HashSet<char>("acdefghiz"));
 			Assert.AreEqual(expected.Count, set.Count);
 			Assert.IsTrue(expected.SetEquals(set));
 
-			set.Reverse();
-			expected = Reverse(expected);
+			set.Negated();
+			expected = Negated(expected);
 			Assert.AreEqual(expected.Count, set.Count);
 			Assert.IsTrue(expected.SetEquals(set));
 		}
 
-		private HashSet<char> Reverse(HashSet<char> set)
+		private HashSet<char> Negated(HashSet<char> set)
 		{
 			HashSet<char> result = new();
 			for (int i = 0; i <= char.MaxValue; i++)
