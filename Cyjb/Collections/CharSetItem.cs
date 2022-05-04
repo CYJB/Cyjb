@@ -341,6 +341,36 @@ namespace Cyjb.Collections
 			return modifiedCount;
 		}
 
+		/// <summary>
+		/// 反转当前集合，使集合内容变为之前未包含的字符。
+		/// </summary>
+		/// <returns>受影响的字符个数。</returns>
+		public int Reverse()
+		{
+			if (IsEmpty())
+			{
+				data = FullFilledData;
+				count = CharSetConfig.BtmCount;
+				return count;
+			}
+			else if (IsFullFilled())
+			{
+				data = EmptyData;
+				count = 0;
+				return -CharSetConfig.BtmCount;
+			}
+			else
+			{
+				for (int i = 0; i < CharSetConfig.BtmLen; i++)
+				{
+					data[i] = ~data[i];
+				}
+				int oldCount = count;
+				count = CharSetConfig.BtmCount - count;
+				return count - oldCount;
+			}
+		}
+
 		#endregion // 按位操作
 
 		#region 集合操作

@@ -284,6 +284,17 @@ namespace Cyjb.Collections
 		}
 
 		/// <summary>
+		/// 反转当前集合，使集合内容变为之前未包含的字符。
+		/// </summary>
+		public void Reverse()
+		{
+			for (int i = 0; i < CharSetConfig.TopLen; i++)
+			{
+				count += data[i].Reverse();
+			}
+		}
+
+		/// <summary>
 		/// 确定当前集合是否包含指定范围内的全部字符。
 		/// </summary>
 		/// <param name="start">要在当前集合中定位的字符起始范围。</param>

@@ -422,6 +422,46 @@ namespace TestCyjb.Collections
 		}
 
 		/// <summary>
+		/// 对 <see cref="CharSet.Reverse"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestReverse()
+		{
+			CharSet set = new();
+			set.Reverse();
+			HashSet<char> expected = Reverse(new HashSet<char>());
+			Assert.AreEqual(expected.Count, set.Count);
+			Assert.IsTrue(expected.SetEquals(set));
+
+			set.Reverse();
+			expected = Reverse(expected);
+			Assert.AreEqual(expected.Count, set.Count);
+			Assert.IsTrue(expected.SetEquals(set));
+
+			set = new("acdefghiz");
+			set.Reverse();
+			expected = Reverse(new HashSet<char>("acdefghiz"));
+			Assert.AreEqual(expected.Count, set.Count);
+			Assert.IsTrue(expected.SetEquals(set));
+
+			set.Reverse();
+			expected = Reverse(expected);
+			Assert.AreEqual(expected.Count, set.Count);
+			Assert.IsTrue(expected.SetEquals(set));
+		}
+
+		private HashSet<char> Reverse(HashSet<char> set)
+		{
+			HashSet<char> result = new();
+			for (int i = 0; i <= char.MaxValue; i++)
+			{
+				result.Add((char)i);
+			}
+			result.ExceptWith(set);
+			return result;
+		}
+
+		/// <summary>
 		/// 对 <see cref="CharSet.AddLowercase"/> 方法进行测试。
 		/// </summary>
 		[TestMethod]
