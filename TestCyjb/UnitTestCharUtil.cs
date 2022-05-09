@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using Cyjb;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -135,21 +136,80 @@ namespace TestCyjb
 			Assert.AreEqual(2, '\uFFE0'.Width());
 			Assert.AreEqual(2, '\uFFE6'.Width());
 			Assert.AreEqual(1, '\uFFE7'.Width());
-			// 0x20000 ~ 0x2FFFD
-			string target = char.ConvertFromUtf32(0x1FFFF) + char.ConvertFromUtf32(0x20000) +
-				char.ConvertFromUtf32(0x2FFFD) + char.ConvertFromUtf32(0x2FFFE);
+			StringBuilder text = new("\uFFDF\uFFE0\uFFE6\uFFE7");
+			text.AppendUTF32Char(0x10000)
+				.AppendUTF32Char(0x16FDF)
+				.AppendUTF32Char(0x16FE0)
+				.AppendUTF32Char(0x16FE1)
+				.AppendUTF32Char(0x1B2FE)
+				.AppendUTF32Char(0x1B2FF)
+				.AppendUTF32Char(0x1B300)
+				.AppendUTF32Char(0x1F5A3)
+				.AppendUTF32Char(0x1F5A4)
+				.AppendUTF32Char(0x1F5A5)
+				.AppendUTF32Char(0x1FAFE)
+				.AppendUTF32Char(0x1FAFF)
+				.AppendUTF32Char(0x1FB00)
+				.AppendUTF32Char(0x1FFFF)
+				.AppendUTF32Char(0x20000)
+				.AppendUTF32Char(0x2FFFD)
+				.AppendUTF32Char(0x2FFFE)
+				.AppendUTF32Char(0x2FFFF)
+				.AppendUTF32Char(0x30000)
+				.AppendUTF32Char(0x3FFFD)
+				.AppendUTF32Char(0x3FFFE)
+				;
+			string target = text.ToString();
 			int index = 0;
+			// 0xFFDF
 			Assert.AreEqual(1, CharUtil.Width(target, ref index));
+			// 0xFFE0
 			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0xFFE6
 			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0xFFE7"
 			Assert.AreEqual(1, CharUtil.Width(target, ref index));
-			// 0x30000 ~ 0x3FFFD
-			target = char.ConvertFromUtf32(0x2FFFF) + char.ConvertFromUtf32(0x30000) +
-				char.ConvertFromUtf32(0x3FFFD) + char.ConvertFromUtf32(0x3FFFE);
-			index = 0;
+			// 0x10000
 			Assert.AreEqual(1, CharUtil.Width(target, ref index));
+			// 0x16FDF
+			Assert.AreEqual(1, CharUtil.Width(target, ref index));
+			// 0x16FE0
 			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0x16FE1
 			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0x1B2FE
+			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0x1B2FF
+			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0x1B300
+			Assert.AreEqual(1, CharUtil.Width(target, ref index));
+			// 0x1F5A3
+			Assert.AreEqual(1, CharUtil.Width(target, ref index));
+			// 0x1F5A4
+			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0x1F5A5
+			Assert.AreEqual(1, CharUtil.Width(target, ref index));
+			// 0x1FAFE
+			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0x1FAFF
+			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0x1FB00
+			Assert.AreEqual(1, CharUtil.Width(target, ref index));
+			// 0x1FFFF
+			Assert.AreEqual(1, CharUtil.Width(target, ref index));
+			// 0x20000
+			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0x2FFFD
+			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0x2FFFE
+			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0x2FFFF
+			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0x30000
+			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0x3FFFD
+			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0x3FFFE
 			Assert.AreEqual(1, CharUtil.Width(target, ref index));
 		}
 
@@ -169,6 +229,16 @@ namespace TestCyjb
 				Assert.AreEqual(halfWidth[i], fullWidth[i].ToHalfWidth());
 				Assert.AreEqual(fullWidth[i], halfWidth[i].ToFullWidth());
 			}
+		}
+	}
+	static class StringBuilderTestUtil
+	{
+		/// <summary>
+		/// 附加指定的 UTF-32 字符。
+		/// </summary>
+		public static StringBuilder AppendUTF32Char(this StringBuilder text, int ch)
+		{
+			return text.Append(char.ConvertFromUtf32(ch));
 		}
 	}
 }

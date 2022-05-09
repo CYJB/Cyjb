@@ -126,7 +126,7 @@ namespace Cyjb
 		/// <summary>
 		/// 宽字符范围。
 		/// </summary>
-		/// <remarks>此方法基于 Unicode 标准 13.0.0 版。详情请参见 
+		/// <remarks>此字段基于 Unicode 标准 13.0.0 版。详情请参见 
 		/// <see href="http://www.unicode.org/reports/tr11/">Unicode Standard Annex #11 EAST ASIAN WIDTH</see>。</remarks>
 		/// <seealso href="http://www.unicode.org/reports/tr11/">Unicode Standard Annex #11 EAST ASIAN WIDTH</seealso>。
 		private static readonly CharSet WidthChars = CharSet.FromRange(
@@ -205,6 +205,90 @@ namespace Cyjb
 			"\uFFE0\uFFE6");
 
 		/// <summary>
+		/// UTF-32 的宽字符范围。
+		/// </summary>
+		/// <remarks>此字段基于 Unicode 标准 13.0.0 版。详情请参见 
+		/// <see href="http://www.unicode.org/reports/tr11/">Unicode Standard Annex #11 EAST ASIAN WIDTH</see>。</remarks>
+		/// <seealso href="http://www.unicode.org/reports/tr11/">Unicode Standard Annex #11 EAST ASIAN WIDTH</seealso>。
+		private static readonly int[] WidthUTF32Chars = new[] {
+			// 16FE0 ~ 16FFF Ideographic Symbols and Punctuation
+			// 17000 ~ 18AFF Tangut & Components
+			// 18B00 ~ 18CFF Khitan Small Script
+			// 18D00 ~ 18D08 Tangut Supplement
+			// 1B000 ~ 1B12F Kana Supplement & Extended-A
+			// 1B130 ~ 1B16F Small Kana Extension
+			// 1B170 ~ 1B2FF Nushu
+			0x16FE0, 0x1B2FF,
+			// 1F004 MAHJONG TILE RED DRAGON
+			0x1F004, 0x1F004,
+			// 1F0CF PLAYING CARD BLACK JOKER
+			0x1F0CF, 0x1F0CF,
+			// 1F18E NEGATIVE SQUARED AB
+			0x1F18E, 0x1F18E,
+			// 1F191 ~ 1F19A SQUARED CL..SQUARED VS
+			0x1F191, 0x1F19A,
+			// 1F200 ~ 1F2FF Enclosed Ideographic Supplement
+			// 1F300 ~ 1F320 CYCLONE..SHOOTING STAR
+			0x1F200, 0x1F320,
+			// 1F32D ~ 1F335 HOT DOG..CACTUS
+			0x1F32D, 0x1F335,
+			// 1F337 ~ 1F37C TULIP..BABY BOTTLE
+			0x1F337, 0x1F37C,
+			// 1F37E ~ 1F393 BOTTLE WITH POPPING CORK..GRADUATION CAP
+			0x1F37E, 0x1F393,
+			// 1F3A0 ~ 1F3CA CAROUSEL HORSE..SWIMMER
+			0x1F3A0, 0x1F3CA,
+			// 1F3CF ~ 1F3D3 CRICKET BAT AND BALL..TABLE TENNIS PADDLE AND BALL
+			0x1F3CF, 0x1F3D3,
+			// 1F3E0 ~ 1F3F0 HOUSE BUILDING..EUROPEAN CASTLE
+			0x1F3E0, 0x1F3F0,
+			// 1F3F4 WAVING BLACK FLAG
+			0x1F3F4, 0x1F3F4,
+			// 1F3F8 ~ 1F43E BADMINTON RACQUET AND SHUTTLECOCK..AMPHORA
+			0x1F3F8, 0x1F43E,
+			// 1F440 EYES
+			0x1F440, 0x1F440,
+			// 1F442 ~ 1F4FC EAR..VIDEOCASSETTE
+			0x1F442, 0x1F4FC,
+			// 1F4FF ~ 1F53D PRAYER BEADS..DOWN-POINTING SMALL RED TRIANGLE
+			0x1F4FF, 0x1F53D,
+			// 1F54B ~ 1F54E KAABA..MENORAH WITH NINE BRANCHES
+			0x1F54B, 0x1F54E,
+			// 1F550 ~ 1F567 CLOCK FACE ONE OCLOCK..CLOCK FACE TWELVE-THIRTY
+			0x1F550, 0x1F567,
+			// 1F57A MAN DANCING
+			0x1F57A, 0x1F57A,
+			// 1F595 ~ 1F596 REVERSED HAND WITH MIDDLE FINGER EXTENDED..RAISED HAND WITH PART BETWEEN MIDDLE AND RING FINGERS
+			0x1F595, 0x1F596,
+			// 1F5A4 BLACK HEART
+			0x1F5A4, 0x1F5A4,
+			// 1F5FB ~ 1F64F MOUNT FUJI..MOYAI
+			0x1F5FB, 0x1F64F,
+			// 1F680 ~ 1F6C5 ROCKET..LEFT LUGGAGE
+			0x1F680, 0x1F6C5,
+			// 1F6CC SLEEPING ACCOMMODATION
+			0x1F6CC, 0x1F6CC,
+			// 1F6D0 ~ 1F6D2 PLACE OF WORSHIP..SHOPPING TROLLEY
+			0x1F6D0, 0x1F6D2,
+			// 1F6D5 ~ 1F6D7 HINDU TEMPLE..ELEVATOR
+			0x1F6D5, 0x1F6D7,
+			// 1F6EB ~ 1F6EC AIRPLANE DEPARTURE..AIRPLANE ARRIVING
+			0x1F6EB, 0x1F6EC,
+			// 1F6F4 ~ 1F6FC SCOOTER..ROLLER SKATE
+			0x1F6F4, 0x1F6FC,
+			// 1F7E0 ~ 1F7EB LARGE ORANGE CIRCLE..LARGE BROWN SQUARE
+			0x1F7E0, 0x1F7EB,
+			// 1F90C ~ 1F93A PINCHED FINGERS..FENCER
+			0x1F90C, 0x1F93A,
+			// 1F93C ~ 1F945 WRESTLERS..GOAL NET
+			0x1F93C, 0x1F945,
+			// 1F947 ~ 1F9FF FIRST PLACE MEDAL..DISGUISED FACE
+			0x1F947, 0x1F9FF,
+			// 1FA70 ~ 1FAFF Symbols and Pictographs Extended-A
+			0x1FA70, 0x1FAFF,
+		};
+
+		/// <summary>
 		/// 返回指定字符的宽度。
 		/// </summary>
 		/// <param name="ch">要获取宽度的字符。</param>
@@ -256,23 +340,25 @@ namespace Cyjb
 				int ch = char.ConvertToUtf32(str, index);
 				index += 2;
 				// 其它宽字符范围
-				// Plane 2: U+20000..U+2FFFD
-				if (ch >= 0x20000 && ch <= 0x2FFFD)
+				if (ch < 0x20000)
 				{
-					return 2;
+					int idx = Array.BinarySearch(WidthUTF32Chars, ch);
+					if (idx >= 0 || (~idx & 1) == 1)
+					{
+						return 2;
+					}
 				}
-				// Plane 3: U+30000..U+3FFFD
-				if (ch >= 0x30000 && ch <= 0x3FFFD)
+				else if (ch <= 0x3FFFD)
 				{
+					// Plane 2: U+20000..U+2FFFD
+					// Plane 3: U+30000..U+3FFFD
 					return 2;
 				}
 				return 1;
 			}
 			else
 			{
-				char ch = str[index];
-				index++;
-				return Width(ch);
+				return Width(str[index++]);
 			}
 		}
 
