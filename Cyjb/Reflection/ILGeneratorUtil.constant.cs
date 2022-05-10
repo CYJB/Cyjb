@@ -62,7 +62,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		public static void EmitConstant(this ILGenerator il, bool value)
 		{
-			CommonExceptions.CheckArgumentNull(il);
+			ArgumentNullException.ThrowIfNull(il);
 			il.Emit(value ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
 		}
 
@@ -159,7 +159,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		public static void EmitConstant(this ILGenerator il, long value)
 		{
-			CommonExceptions.CheckArgumentNull(il);
+			ArgumentNullException.ThrowIfNull(il);
 			il.Emit(OpCodes.Ldc_I8, value);
 		}
 
@@ -172,7 +172,7 @@ namespace Cyjb.Reflection
 		[CLSCompliant(false)]
 		public static void EmitConstant(this ILGenerator il, ulong value)
 		{
-			CommonExceptions.CheckArgumentNull(il);
+			ArgumentNullException.ThrowIfNull(il);
 			il.Emit(OpCodes.Ldc_I8, (long)value);
 		}
 
@@ -184,7 +184,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		public static void EmitConstant(this ILGenerator il, float value)
 		{
-			CommonExceptions.CheckArgumentNull(il);
+			ArgumentNullException.ThrowIfNull(il);
 			il.Emit(OpCodes.Ldc_R4, value);
 		}
 
@@ -196,7 +196,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		public static void EmitConstant(this ILGenerator il, double value)
 		{
-			CommonExceptions.CheckArgumentNull(il);
+			ArgumentNullException.ThrowIfNull(il);
 			il.Emit(OpCodes.Ldc_R8, value);
 		}
 
@@ -208,7 +208,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		public static void EmitConstant(this ILGenerator il, decimal value)
 		{
-			CommonExceptions.CheckArgumentNull(il);
+			ArgumentNullException.ThrowIfNull(il);
 			if (decimal.Truncate(value) == value)
 			{
 				if (int.MinValue <= value && value <= int.MaxValue)
@@ -243,7 +243,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		public static void EmitConstant(this ILGenerator il, string value)
 		{
-			CommonExceptions.CheckArgumentNull(il);
+			ArgumentNullException.ThrowIfNull(il);
 			if (value == null)
 			{
 				il.Emit(OpCodes.Ldnull);
@@ -265,7 +265,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		public static bool EmitConstant(this ILGenerator il, object? value)
 		{
-			CommonExceptions.CheckArgumentNull(il);
+			ArgumentNullException.ThrowIfNull(il);
 			if (value == null)
 			{
 				il.Emit(OpCodes.Ldnull);
@@ -445,7 +445,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		public static void EmitInt(this ILGenerator il, int value)
 		{
-			CommonExceptions.CheckArgumentNull(il);
+			ArgumentNullException.ThrowIfNull(il);
 			OpCode code;
 			switch (value)
 			{
@@ -507,8 +507,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
 		public static void EmitEmptyArray(this ILGenerator il, Type type)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(type);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(type);
 			il.EmitCall(ArrayEmptyMethod.MakeGenericMethod(type));
 		}
 	}

@@ -138,7 +138,7 @@ namespace TestCyjb.Collections.TestCharSet
 		public OldBitCharSet(IEnumerable<char> collection)
 			: this(false, null)
 		{
-			CommonExceptions.CheckArgumentNull(collection, "collection");
+			ArgumentNullException.ThrowIfNull(collection, "collection");
 			Contract.EndContractBlock();
 			this.UnionWith(collection);
 		}
@@ -152,7 +152,7 @@ namespace TestCyjb.Collections.TestCharSet
 		public OldBitCharSet(IEnumerable<char> collection, bool ignoreCase)
 			: this(ignoreCase, null)
 		{
-			CommonExceptions.CheckArgumentNull(collection, "collection");
+			ArgumentNullException.ThrowIfNull(collection, "collection");
 			Contract.EndContractBlock();
 			this.UnionWith(collection);
 		}
@@ -168,7 +168,7 @@ namespace TestCyjb.Collections.TestCharSet
 		public OldBitCharSet(IEnumerable<char> collection, bool ignoreCase, CultureInfo culture)
 			: this(ignoreCase, culture)
 		{
-			CommonExceptions.CheckArgumentNull(collection, "collection");
+			ArgumentNullException.ThrowIfNull(collection, "collection");
 			Contract.EndContractBlock();
 			this.UnionWith(collection);
 		}
@@ -182,7 +182,7 @@ namespace TestCyjb.Collections.TestCharSet
 		/// <exception cref="ArgumentNullException"><paramref name="info"/> 参数为 <c>null</c>。</exception>
 		private OldBitCharSet(SerializationInfo info, StreamingContext context)
 		{
-			CommonExceptions.CheckArgumentNull(info, "info");
+			ArgumentNullException.ThrowIfNull(info, "info");
 			Contract.EndContractBlock();
 			this.data = (uint[][])info.GetValue("Data", typeof(uint[][]));
 			this.count = info.GetInt32("Count");
@@ -479,7 +479,7 @@ namespace TestCyjb.Collections.TestCharSet
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void ExceptWith(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
+			ArgumentNullException.ThrowIfNull(other, "other");
 			Contract.EndContractBlock();
 			if (this.count <= 0)
 			{
@@ -549,7 +549,7 @@ namespace TestCyjb.Collections.TestCharSet
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void IntersectWith(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
+			ArgumentNullException.ThrowIfNull(other, "other");
 			Contract.EndContractBlock();
 			if (this.count <= 0 || ReferenceEquals(this, other))
 			{
@@ -618,7 +618,7 @@ namespace TestCyjb.Collections.TestCharSet
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsProperSubsetOf(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
+			ArgumentNullException.ThrowIfNull(other, "other");
 			Contract.EndContractBlock();
 			ICollection<char> col = other as ICollection<char>;
 			if (this.count == 0)
@@ -649,7 +649,7 @@ namespace TestCyjb.Collections.TestCharSet
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsProperSupersetOf(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
+			ArgumentNullException.ThrowIfNull(other, "other");
 			Contract.EndContractBlock();
 			if (this.count == 0)
 			{
@@ -680,7 +680,7 @@ namespace TestCyjb.Collections.TestCharSet
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsSubsetOf(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
+			ArgumentNullException.ThrowIfNull(other, "other");
 			Contract.EndContractBlock();
 			if (this.count == 0)
 			{
@@ -706,7 +706,7 @@ namespace TestCyjb.Collections.TestCharSet
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsSupersetOf(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
+			ArgumentNullException.ThrowIfNull(other, "other");
 			Contract.EndContractBlock();
 			ICollection<char> col = other as ICollection<char>;
 			if (col != null)
@@ -738,7 +738,7 @@ namespace TestCyjb.Collections.TestCharSet
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool Overlaps(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
+			ArgumentNullException.ThrowIfNull(other, "other");
 			Contract.EndContractBlock();
 			if (this.count <= 0)
 			{
@@ -794,7 +794,7 @@ namespace TestCyjb.Collections.TestCharSet
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool SetEquals(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
+			ArgumentNullException.ThrowIfNull(other, "other");
 			Contract.EndContractBlock();
 			OldBitCharSet otherSet = other as OldBitCharSet;
 			if (otherSet != null &&
@@ -826,7 +826,7 @@ namespace TestCyjb.Collections.TestCharSet
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void SymmetricExceptWith(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
+			ArgumentNullException.ThrowIfNull(other, "other");
 			Contract.EndContractBlock();
 			if (this.count == 0)
 			{
@@ -901,7 +901,7 @@ namespace TestCyjb.Collections.TestCharSet
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void UnionWith(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other, "other");
+			ArgumentNullException.ThrowIfNull(other, "other");
 			Contract.EndContractBlock();
 			if (ReferenceEquals(this, other))
 			{
@@ -1089,7 +1089,7 @@ namespace TestCyjb.Collections.TestCharSet
 		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
 		void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			CommonExceptions.CheckArgumentNull(info, "info");
+			ArgumentNullException.ThrowIfNull(info, "info");
 			Contract.EndContractBlock();
 			info.AddValue("Data", this.data);
 			info.AddValue("Count", this.count);

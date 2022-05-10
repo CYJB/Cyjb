@@ -72,7 +72,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
 		public static Type GetNonNullableType(this Type type)
 		{
-			CommonExceptions.CheckArgumentNull(type);
+			ArgumentNullException.ThrowIfNull(type);
 			return Nullable.GetUnderlyingType(type) ?? type;
 		}
 
@@ -129,8 +129,8 @@ namespace Cyjb
 		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</seealso>
 		public static bool IsImplicitFrom(this Type type, Type fromType)
 		{
-			CommonExceptions.CheckArgumentNull(type);
-			CommonExceptions.CheckArgumentNull(fromType);
+			ArgumentNullException.ThrowIfNull(type);
+			ArgumentNullException.ThrowIfNull(fromType);
 			Conversion? conversion = ConversionFactory.GetConversion(fromType, type);
 			return conversion != null && conversion.ConversionType.IsImplicit();
 		}
@@ -159,8 +159,8 @@ namespace Cyjb
 		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</seealso>
 		public static bool IsExplicitFrom(this Type type, Type fromType)
 		{
-			CommonExceptions.CheckArgumentNull(type);
-			CommonExceptions.CheckArgumentNull(fromType);
+			ArgumentNullException.ThrowIfNull(type);
+			ArgumentNullException.ThrowIfNull(fromType);
 			return ConversionFactory.GetConversion(fromType, type) != null;
 		}
 
@@ -192,8 +192,8 @@ namespace Cyjb
 		/// 《C# 判断类型间能否隐式或强制类型转换，以及开放泛型类型转换》</seealso>
 		public static bool IsConvertFrom(this Type type, Type fromType, bool isExplicit = false)
 		{
-			CommonExceptions.CheckArgumentNull(type);
-			CommonExceptions.CheckArgumentNull(fromType);
+			ArgumentNullException.ThrowIfNull(type);
+			ArgumentNullException.ThrowIfNull(fromType);
 			Conversion? conversion = ConversionFactory.GetConversion(fromType, type);
 			return conversion != null && (isExplicit || conversion.ConversionType.IsImplicit());
 		}
@@ -207,7 +207,7 @@ namespace Cyjb
 		/// <remarks>若 A 类型可以隐式类型转换（指预定义的类型转换）为 B 类型，那么就称 A 被 B 包含，而 B 包含 A。</remarks>
 		public static Type? GetEncompassingType(IEnumerable<Type> types)
 		{
-			CommonExceptions.CheckArgumentNull(types);
+			ArgumentNullException.ThrowIfNull(types);
 			List<Type> candidates = new();
 			foreach (Type? type in types)
 			{
@@ -268,7 +268,7 @@ namespace Cyjb
 		/// <remarks>若 A 类型可以隐式类型转换（指预定义的类型转换）为 B 类型，那么就称 A 被 B 包含，而 B 包含 A。</remarks>
 		public static Type? GetEncompassedType(IEnumerable<Type> types)
 		{
-			CommonExceptions.CheckArgumentNull(types);
+			ArgumentNullException.ThrowIfNull(types);
 			List<Type> candidates = new();
 			foreach (Type? type in types)
 			{
@@ -345,8 +345,8 @@ namespace Cyjb
 		/// </example>
 		public static Type? CloseDefinitionFrom(this Type definition, Type type)
 		{
-			CommonExceptions.CheckArgumentNull(definition);
-			CommonExceptions.CheckArgumentNull(type);
+			ArgumentNullException.ThrowIfNull(definition);
+			ArgumentNullException.ThrowIfNull(type);
 			if (!definition.IsGenericTypeDefinition)
 			{
 				return null;
@@ -411,8 +411,8 @@ namespace Cyjb
 		/// </example>
 		public static Type? UniqueCloseDefinitionFrom(this Type definition, Type type)
 		{
-			CommonExceptions.CheckArgumentNull(definition);
-			CommonExceptions.CheckArgumentNull(type);
+			ArgumentNullException.ThrowIfNull(definition);
+			ArgumentNullException.ThrowIfNull(type);
 			if (!definition.IsGenericTypeDefinition)
 			{
 				return null;

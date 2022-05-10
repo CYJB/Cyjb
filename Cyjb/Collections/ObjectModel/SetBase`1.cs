@@ -72,7 +72,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual void ExceptWith(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			foreach (T item in other)
 			{
 				Remove(item);
@@ -86,7 +86,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual void IntersectWith(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			ISet<T> set = other as ISet<T> ?? new HashSet<T>(other);
 			List<T> removeList = new();
 			foreach (T item in this)
@@ -111,7 +111,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool IsProperSubsetOf(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (Count == 0)
 			{
 				return other.Any();
@@ -129,7 +129,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool IsProperSupersetOf(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (Count == 0)
 			{
 				return false;
@@ -147,7 +147,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool IsSubsetOf(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (Count == 0)
 			{
 				return true;
@@ -165,7 +165,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool IsSupersetOf(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (Count == 0)
 			{
 				return !other.Any();
@@ -182,7 +182,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool Overlaps(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (Count == 0)
 			{
 				return false;
@@ -199,7 +199,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool SetEquals(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (Count == 0)
 			{
 				return !other.Any();
@@ -215,7 +215,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual void SymmetricExceptWith(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (Count == 0)
 			{
 				UnionWith(other);
@@ -249,7 +249,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual void UnionWith(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			foreach (T item in other)
 			{
 				Add(item);

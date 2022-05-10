@@ -28,8 +28,8 @@ namespace Cyjb.Test
 		/// <param name="typeName">类型的完全限定名。</param>
 		public PrivateType(string assemblyName, string typeName)
 		{
-			CommonExceptions.CheckArgumentNull(assemblyName);
-			CommonExceptions.CheckArgumentNull(typeName);
+			ArgumentNullException.ThrowIfNull(assemblyName);
+			ArgumentNullException.ThrowIfNull(typeName);
 			type = Assembly.Load(assemblyName).GetType(typeName, true)!;
 		}
 
@@ -66,7 +66,7 @@ namespace Cyjb.Test
 		/// <returns>指定索引的数组元素。</returns>
 		public object? GetStaticArrayElement(string name, params int[] indices)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			Array? arr = (Array?)InvokeStatic(name, BindingFlags.GetField | BindingFlags.GetProperty, null, CultureInfo.InvariantCulture);
 			return arr?.GetValue(indices);
 		}
@@ -79,7 +79,7 @@ namespace Cyjb.Test
 		/// <param name="indices">要设置的索引。</param>
 		public void SetStaticArrayElement(string name, object? value, params int[] indices)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			Array? arr = (Array?)InvokeStatic(name, BindingFlags.GetField | BindingFlags.GetProperty, null, CultureInfo.InvariantCulture);
 			if (arr != null)
 			{
@@ -94,7 +94,7 @@ namespace Cyjb.Test
 		/// <returns>静态字段的值。</returns>
 		public object? GetStaticField(string name)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			return InvokeStatic(name, BindingFlags.GetField, null, CultureInfo.InvariantCulture);
 		}
 
@@ -105,7 +105,7 @@ namespace Cyjb.Test
 		/// <param name="value">要设置的静态字段的值。</param>
 		public void SetStaticField(string name, object? value)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			InvokeStatic(name, BindingFlags.SetField, new[] { value }, CultureInfo.InvariantCulture);
 		}
 
@@ -116,7 +116,7 @@ namespace Cyjb.Test
 		/// <returns>静态字段或属性的值。</returns>
 		public object? GetStaticFieldOrProperty(string name)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			return InvokeStatic(name, BindingFlags.GetField | BindingFlags.GetProperty, null, CultureInfo.InvariantCulture);
 		}
 
@@ -127,7 +127,7 @@ namespace Cyjb.Test
 		/// <param name="value">要设置的静态字段或属性的值。</param>
 		public void SetStaticFieldOrProperty(string name, object value)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			InvokeStatic(name, BindingFlags.SetField | BindingFlags.SetProperty, new[] { value }, CultureInfo.InvariantCulture);
 		}
 
@@ -138,7 +138,7 @@ namespace Cyjb.Test
 		/// <returns>静态属性的值。</returns>
 		public object? GetStaticProperty(string name)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			return InvokeStatic(name, BindingFlags.GetProperty, null, CultureInfo.InvariantCulture);
 		}
 
@@ -149,7 +149,7 @@ namespace Cyjb.Test
 		/// <param name="value">要设置的静态属性的值。</param>
 		public void SetStaticProperty(string name, object value)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			InvokeStatic(name, BindingFlags.SetProperty, new[] { value }, CultureInfo.InvariantCulture);
 		}
 
@@ -163,7 +163,7 @@ namespace Cyjb.Test
 		/// <returns>调用结果。</returns>
 		private object? InvokeStatic(string name, BindingFlags bindingFlags, object?[]? args, CultureInfo? culture)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			try
 			{
 				return type.InvokeMember(name, bindingFlags | BindFlags, PowerBinder.Default, null, args, culture);

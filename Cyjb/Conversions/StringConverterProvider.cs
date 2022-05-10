@@ -106,7 +106,7 @@ namespace Cyjb.Conversions
 		/// <exception cref="ArgumentNullException"><paramref name="value"/> 为 <c>null</c>。</exception>
 		private static TOutput ConvertToEnum<TOutput>(string? value)
 		{
-			CommonExceptions.CheckArgumentNull(value);
+			ArgumentNullException.ThrowIfNull(value);
 			return (TOutput)Enum.Parse(typeof(TOutput), value);
 		}
 	}

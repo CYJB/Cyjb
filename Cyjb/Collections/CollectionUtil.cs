@@ -1,4 +1,4 @@
-﻿namespace Cyjb.Collections
+namespace Cyjb.Collections
 {
 	/// <summary>
 	/// 提供对 <see cref="ICollection{T}"/> 的扩展方法。
@@ -15,8 +15,8 @@
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(collection);
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(collection);
+			ArgumentNullException.ThrowIfNull(other);
 			foreach (T item in other)
 			{
 				collection.Add(item);

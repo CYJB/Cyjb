@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Diagnostics;
 using Cyjb.Collections.ObjectModel;
 
@@ -84,7 +84,7 @@ namespace Cyjb.Collections
 		[CLSCompliant(false)]
 		public BitList(IEnumerable<uint> collection) : this()
 		{
-			CommonExceptions.CheckArgumentNull(collection);
+			ArgumentNullException.ThrowIfNull(collection);
 			AddRange(collection);
 		}
 
@@ -95,7 +95,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public BitList(IEnumerable<int> collection) : this()
 		{
-			CommonExceptions.CheckArgumentNull(collection);
+			ArgumentNullException.ThrowIfNull(collection);
 			AddRange(collection);
 		}
 
@@ -106,7 +106,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public BitList(IEnumerable<byte> collection) : this()
 		{
-			CommonExceptions.CheckArgumentNull(collection);
+			ArgumentNullException.ThrowIfNull(collection);
 			AddRange(collection);
 		}
 
@@ -117,7 +117,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public BitList(IEnumerable<bool> collection) : this()
 		{
-			CommonExceptions.CheckArgumentNull(collection);
+			ArgumentNullException.ThrowIfNull(collection);
 			AddRange(collection);
 		}
 
@@ -208,7 +208,7 @@ namespace Cyjb.Collections
 		[CLSCompliant(false)]
 		public BitList AddRange(IEnumerable<uint> collection)
 		{
-			CommonExceptions.CheckArgumentNull(collection);
+			ArgumentNullException.ThrowIfNull(collection);
 			var (list, length) = ConvertToUIntList(collection);
 			return InsertRange(count, length, list);
 		}
@@ -222,7 +222,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public BitList AddRange(IEnumerable<int> collection)
 		{
-			CommonExceptions.CheckArgumentNull(collection);
+			ArgumentNullException.ThrowIfNull(collection);
 			var (list, length) = ConvertToUIntList(collection);
 			return InsertRange(count, length, list);
 		}
@@ -236,7 +236,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public BitList AddRange(IEnumerable<byte> collection)
 		{
-			CommonExceptions.CheckArgumentNull(collection);
+			ArgumentNullException.ThrowIfNull(collection);
 			var (list, length) = ConvertToUIntList(collection);
 			return InsertRange(count, length, list);
 		}
@@ -249,7 +249,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="collection"/> 为 <c>null</c>。</exception>
 		public BitList AddRange(IEnumerable<bool> collection)
 		{
-			CommonExceptions.CheckArgumentNull(collection);
+			ArgumentNullException.ThrowIfNull(collection);
 			var (list, length) = ConvertToUIntList(collection);
 			return InsertRange(count, length, list);
 		}
@@ -389,7 +389,7 @@ namespace Cyjb.Collections
 		/// </overloads>
 		public BitList InsertRange(int index, IEnumerable<int> collection)
 		{
-			CommonExceptions.CheckArgumentNull(collection);
+			ArgumentNullException.ThrowIfNull(collection);
 			if (index < 0 || index > count)
 			{
 				throw CommonExceptions.ArgumentIndexOutOfRange(index);
@@ -411,7 +411,7 @@ namespace Cyjb.Collections
 		[CLSCompliant(false)]
 		public BitList InsertRange(int index, IEnumerable<uint> collection)
 		{
-			CommonExceptions.CheckArgumentNull(collection);
+			ArgumentNullException.ThrowIfNull(collection);
 			if (index < 0 || index > count)
 			{
 				throw CommonExceptions.ArgumentIndexOutOfRange(index);
@@ -432,7 +432,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 大于 <see cref="Count"/>。</exception>
 		public BitList InsertRange(int index, IEnumerable<byte> collection)
 		{
-			CommonExceptions.CheckArgumentNull(collection);
+			ArgumentNullException.ThrowIfNull(collection);
 			if (index < 0 || index > count)
 			{
 				throw CommonExceptions.ArgumentIndexOutOfRange(index);
@@ -452,7 +452,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 大于 <see cref="Count"/>。</exception>
 		public BitList InsertRange(int index, IEnumerable<bool> collection)
 		{
-			CommonExceptions.CheckArgumentNull(collection);
+			ArgumentNullException.ThrowIfNull(collection);
 			if (index < 0 || index > count)
 			{
 				throw CommonExceptions.ArgumentIndexOutOfRange(index);
@@ -744,7 +744,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="list"/> 为 <c>null</c>。</exception>
 		public BitList And(BitList list)
 		{
-			CommonExceptions.CheckArgumentNull(list);
+			ArgumentNullException.ThrowIfNull(list);
 			int cnt = count >> IndexShift;
 			for (int i = 0; i < cnt; i++)
 			{
@@ -764,7 +764,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="list"/> 为 <c>null</c>。</exception>
 		public BitList Or(BitList list)
 		{
-			CommonExceptions.CheckArgumentNull(list);
+			ArgumentNullException.ThrowIfNull(list);
 			int cnt = count >> IndexShift;
 			for (int i = 0; i < cnt; i++)
 			{
@@ -784,7 +784,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="list"/> 为 <c>null</c>。</exception>
 		public BitList Xor(BitList list)
 		{
-			CommonExceptions.CheckArgumentNull(list);
+			ArgumentNullException.ThrowIfNull(list);
 			int cnt = count >> IndexShift;
 			for (int i = 0; i < cnt; i++)
 			{

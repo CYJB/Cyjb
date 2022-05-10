@@ -21,8 +21,8 @@
 		/// </overloads>
 		public static Predicate<T> And<T>(this Predicate<T> predicate, Predicate<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(predicate);
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(predicate);
+			ArgumentNullException.ThrowIfNull(other);
 			return obj => predicate(obj) && other(obj);
 		}
 
@@ -37,8 +37,8 @@
 		/// <exception cref="ArgumentNullException"><paramref name="others"/> 为 <c>null</c>。</exception>
 		public static Predicate<T> And<T>(this Predicate<T> predicate, params Predicate<T>[] others)
 		{
-			CommonExceptions.CheckArgumentNull(predicate);
-			CommonExceptions.CheckArgumentNull(others);
+			ArgumentNullException.ThrowIfNull(predicate);
+			ArgumentNullException.ThrowIfNull(others);
 			return obj =>
 			{
 				if (!predicate(obj))
@@ -72,8 +72,8 @@
 		/// </overloads>
 		public static Predicate<T> Or<T>(this Predicate<T> predicate, Predicate<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(predicate);
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(predicate);
+			ArgumentNullException.ThrowIfNull(other);
 			return obj => predicate(obj) || other(obj);
 		}
 
@@ -88,8 +88,8 @@
 		/// <exception cref="ArgumentNullException"><paramref name="others"/> 为 <c>null</c>。</exception>
 		public static Predicate<T> Or<T>(this Predicate<T> predicate, params Predicate<T>[] others)
 		{
-			CommonExceptions.CheckArgumentNull(predicate);
-			CommonExceptions.CheckArgumentNull(others);
+			ArgumentNullException.ThrowIfNull(predicate);
+			ArgumentNullException.ThrowIfNull(others);
 			return obj =>
 			{
 				if (predicate(obj))
@@ -116,7 +116,7 @@
 		/// <exception cref="ArgumentNullException"><paramref name="predicate"/> 为 <c>null</c>。</exception>
 		public static Predicate<T> Not<T>(this Predicate<T> predicate)
 		{
-			CommonExceptions.CheckArgumentNull(predicate);
+			ArgumentNullException.ThrowIfNull(predicate);
 			return obj => !predicate(obj);
 		}
 

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -40,8 +40,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
 		public static LocalBuilder GetLocal(this ILGenerator il, Type type)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(type);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(type);
 			return il.GetManager().GetLocal(type);
 		}
 
@@ -54,8 +54,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="local"/> 为 <c>null</c>。</exception>
 		public static void FreeLocal(this ILGenerator il, LocalBuilder local)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(local);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(local);
 			il.GetManager().FreeLocal(local);
 		}
 
@@ -68,7 +68,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		public static int GetClosure(this ILGenerator il, object value)
 		{
-			CommonExceptions.CheckArgumentNull(il);
+			ArgumentNullException.ThrowIfNull(il);
 			return il.GetManager().GetClosure(value);
 		}
 
@@ -80,7 +80,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="il"/> 为 <c>null</c>。</exception>
 		public static object? GetClosure(this ILGenerator il)
 		{
-			CommonExceptions.CheckArgumentNull(il);
+			ArgumentNullException.ThrowIfNull(il);
 			return il.GetManager().GetClosure();
 		}
 
@@ -102,9 +102,9 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentException"><paramref name="outputType"/> 包含泛型参数。</exception>
 		public static void EmitConversion(this ILGenerator il, Type inputType, Type outputType, bool isChecked)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(inputType);
-			CommonExceptions.CheckArgumentNull(outputType);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(inputType);
+			ArgumentNullException.ThrowIfNull(outputType);
 			if (inputType.ContainsGenericParameters)
 			{
 				throw ReflectionExceptions.TypeContainsGenericParameters(inputType);
@@ -140,9 +140,9 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentException"><paramref name="outputType"/> 包含泛型参数。</exception>
 		public static Converter? GetConversion(this ILGenerator il, Type inputType, Type outputType)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(inputType);
-			CommonExceptions.CheckArgumentNull(outputType);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(inputType);
+			ArgumentNullException.ThrowIfNull(outputType);
 			if (inputType.ContainsGenericParameters)
 			{
 				throw ReflectionExceptions.TypeContainsGenericParameters(inputType);
@@ -173,8 +173,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		public static void Emit(this ILGenerator il, OpCode opCode, MethodBase method)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(method);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(method);
 			if (method.MemberType == MemberTypes.Constructor)
 			{
 				il.Emit(opCode, (ConstructorInfo)method);
@@ -199,8 +199,8 @@ namespace Cyjb.Reflection
 		/// </overloads>
 		public static void EmitCall(this ILGenerator il, MethodInfo method)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(method);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(method);
 			il.EmitCallInternal(method, false, Type.EmptyTypes);
 		}
 
@@ -214,8 +214,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		public static void EmitCall(this ILGenerator il, MethodInfo method, bool tailCall)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(method);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(method);
 			il.EmitCallInternal(method, tailCall, Type.EmptyTypes);
 		}
 
@@ -230,8 +230,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		public static void EmitCall(this ILGenerator il, MethodInfo method, params Type[] parameterTypes)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(method);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(method);
 			il.EmitCallInternal(method, false, parameterTypes);
 		}
 
@@ -248,8 +248,8 @@ namespace Cyjb.Reflection
 		public static void EmitCall(this ILGenerator il, MethodInfo method, bool tailCall,
 			params Type[] parameterTypes)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(method);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(method);
 			il.EmitCallInternal(method, tailCall, parameterTypes);
 		}
 
@@ -290,8 +290,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		public static void EmitCall(this ILGenerator il, Type instanceType, MethodInfo method)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(method);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(method);
 			il.EmitCallInternal(instanceType, method, false, Type.EmptyTypes);
 		}
 
@@ -307,8 +307,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		public static void EmitCall(this ILGenerator il, Type instanceType, MethodInfo method, bool tailCall)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(method);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(method);
 			il.EmitCallInternal(instanceType, method, tailCall, Type.EmptyTypes);
 		}
 
@@ -326,8 +326,8 @@ namespace Cyjb.Reflection
 		public static void EmitCall(this ILGenerator il, Type instanceType, MethodInfo method,
 			params Type[]? parameterTypes)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(method);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(method);
 			il.EmitCallInternal(instanceType, method, false, parameterTypes);
 		}
 
@@ -346,8 +346,8 @@ namespace Cyjb.Reflection
 		public static void EmitCall(this ILGenerator il, Type instanceType, MethodInfo method, bool tailCall,
 			params Type[]? parameterTypes)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(method);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(method);
 			il.EmitCallInternal(instanceType, method, tailCall, parameterTypes);
 		}
 
@@ -469,8 +469,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentException"><paramref name="valueType"/> 包含泛型参数。</exception>
 		public static void EmitGetAddress(this ILGenerator il, Type valueType)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(valueType);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(valueType);
 			LocalBuilder locFrom = il.DeclareLocal(valueType);
 			il.Emit(OpCodes.Stloc, locFrom);
 			il.Emit(OpCodes.Ldloca, locFrom);
@@ -486,8 +486,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentException"><paramref name="type"/> 包含泛型参数。</exception>
 		public static void EmitNew(this ILGenerator il, Type type)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(type);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(type);
 			if (type.ContainsGenericParameters)
 			{
 				throw ReflectionExceptions.TypeContainsGenericParameters(type);

@@ -65,10 +65,10 @@ namespace Cyjb
 		public static Delegate? PowerDelegate(this Type type, string name, Type delegateType,
 			BindingFlags flags = BindingFlags.Default)
 		{
-			CommonExceptions.CheckArgumentNull(delegateType);
+			ArgumentNullException.ThrowIfNull(delegateType);
 			CommonExceptions.CheckDelegateType(delegateType);
-			CommonExceptions.CheckArgumentNull(type);
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(type);
+			ArgumentNullException.ThrowIfNull(name);
 			if (type.ContainsGenericParameters)
 			{
 				throw ReflectionExceptions.UnboundGenParam(nameof(type));
@@ -94,8 +94,8 @@ namespace Cyjb
 			BindingFlags flags = BindingFlags.Default)
 			where TDelegate : Delegate
 		{
-			CommonExceptions.CheckArgumentNull(type);
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(type);
+			ArgumentNullException.ThrowIfNull(name);
 			if (type.ContainsGenericParameters)
 			{
 				throw ReflectionExceptions.UnboundGenParam(nameof(type));
@@ -124,10 +124,10 @@ namespace Cyjb
 		public static Delegate? PowerDelegate(this Type type, string name, Type delegateType, object? firstArgument,
 			BindingFlags flags = BindingFlags.Default)
 		{
-			CommonExceptions.CheckArgumentNull(delegateType);
+			ArgumentNullException.ThrowIfNull(delegateType);
 			CommonExceptions.CheckDelegateType(delegateType);
-			CommonExceptions.CheckArgumentNull(type);
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(type);
+			ArgumentNullException.ThrowIfNull(name);
 			if (type.ContainsGenericParameters)
 			{
 				throw ReflectionExceptions.UnboundGenParam(nameof(type));
@@ -155,8 +155,8 @@ namespace Cyjb
 			BindingFlags flags = BindingFlags.Default)
 			where TDelegate : Delegate
 		{
-			CommonExceptions.CheckArgumentNull(type);
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(type);
+			ArgumentNullException.ThrowIfNull(name);
 			if (type.ContainsGenericParameters)
 			{
 				throw ReflectionExceptions.UnboundGenParam(nameof(type));

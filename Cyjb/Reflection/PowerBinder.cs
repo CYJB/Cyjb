@@ -374,7 +374,7 @@ namespace Cyjb.Reflection
 			ParameterModifier[]? modifiers)
 		{
 			CommonExceptions.CheckArrayElemenetNull(match);
-			CommonExceptions.CheckArgumentNull(types);
+			ArgumentNullException.ThrowIfNull(types);
 			MethodArgumentsOption options = MethodArgumentsOption.None;
 			if (isExplicit)
 			{
@@ -751,7 +751,7 @@ namespace Cyjb.Reflection
 			ParameterModifier[]? modifiers, CultureInfo? culture, string[]? names, out object? state)
 		{
 			CommonExceptions.CheckArrayElemenetNull(match);
-			CommonExceptions.CheckArgumentNull(args);
+			ArgumentNullException.ThrowIfNull(args);
 			if (names != null && names.Length > args.Length)
 			{
 				throw ReflectionExceptions.NamedParamTooBig(nameof(names));
@@ -960,7 +960,7 @@ namespace Cyjb.Reflection
 		public override PropertyInfo? SelectProperty(BindingFlags bindingAttr, PropertyInfo[] match,
 			Type? returnType, Type[]? indexes, ParameterModifier[]? modifiers)
 		{
-			CommonExceptions.CheckArgumentNull(match);
+			ArgumentNullException.ThrowIfNull(match);
 			// 按返回值筛选。
 			int length = match.Length;
 			if (returnType != null)

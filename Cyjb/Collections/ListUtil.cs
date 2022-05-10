@@ -19,8 +19,8 @@
 		/// <paramref name="list"/> 中的有效索引。</exception>
 		public static void InsertRange<T>(this IList<T> list, int index, IEnumerable<T> collection)
 		{
-			CommonExceptions.CheckArgumentNull(list);
-			CommonExceptions.CheckArgumentNull(collection);
+			ArgumentNullException.ThrowIfNull(list);
+			ArgumentNullException.ThrowIfNull(collection);
 			if (index < 0 || index > list.Count)
 			{
 				throw CommonExceptions.ArgumentIndexOutOfRange(index);
@@ -41,7 +41,7 @@
 		/// <exception cref="ArgumentNullException"><paramref name="list"/> 为 <c>null</c>。</exception>
 		public static IList<T> Suffle<T>(this IList<T> list)
 		{
-			CommonExceptions.CheckArgumentNull(list);
+			ArgumentNullException.ThrowIfNull(list);
 			for (int i = list.Count - 1; i > 0; i--)
 			{
 				int j = Random.Shared.Next(i + 1);
@@ -71,7 +71,7 @@
 		/// </overloads>
 		public static IList<T> Reverse<T>(this IList<T> list)
 		{
-			CommonExceptions.CheckArgumentNull(list);
+			ArgumentNullException.ThrowIfNull(list);
 			ReverseInterval(list, 0, list.Count);
 			return list;
 		}
@@ -91,7 +91,7 @@
 		/// 加 <paramref name="count"/> 之和大于列表的长度。</exception>
 		public static IList<T> Reverse<T>(this IList<T> list, int index, int count)
 		{
-			CommonExceptions.CheckArgumentNull(list);
+			ArgumentNullException.ThrowIfNull(list);
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative(index);
@@ -144,7 +144,7 @@
 		/// 且 <typeparamref name="T"/> 类型没有实现 <see cref="IComparable{T}"/> 泛型接口。</exception>
 		public static int BinarySearch<T>(this IList<T> list, T value, IComparer<T>? comparer = null)
 		{
-			CommonExceptions.CheckArgumentNull(list);
+			ArgumentNullException.ThrowIfNull(list);
 			return BinarySearchInternal(list, 0, list.Count, value, comparer);
 		}
 
@@ -172,7 +172,7 @@
 		/// 且 <typeparamref name="T"/> 类型没有实现 <see cref="IComparable{T}"/> 泛型接口。</exception>
 		public static int BinarySearch<T>(this IList<T> list, int index, int length, T value, IComparer<T>? comparer = null)
 		{
-			CommonExceptions.CheckArgumentNull(list);
+			ArgumentNullException.ThrowIfNull(list);
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative(index);
@@ -259,8 +259,8 @@
 		public static int BinarySearch<TSource, TResult>(this IList<TSource> list, TResult value,
 			Func<TSource, TResult> selector, IComparer<TResult>? comparer = null)
 		{
-			CommonExceptions.CheckArgumentNull(list);
-			CommonExceptions.CheckArgumentNull(selector);
+			ArgumentNullException.ThrowIfNull(list);
+			ArgumentNullException.ThrowIfNull(selector);
 			return BinarySearchInternal(list, 0, list.Count, value, selector, comparer);
 		}
 
@@ -292,8 +292,8 @@
 		public static int BinarySearch<TSource, TResult>(this IList<TSource> list, int index, int length,
 			TResult value, Func<TSource, TResult> selector, IComparer<TResult>? comparer = null)
 		{
-			CommonExceptions.CheckArgumentNull(list);
-			CommonExceptions.CheckArgumentNull(selector);
+			ArgumentNullException.ThrowIfNull(list);
+			ArgumentNullException.ThrowIfNull(selector);
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative(index);

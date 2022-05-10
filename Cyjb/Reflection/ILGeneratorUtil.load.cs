@@ -27,7 +27,7 @@ namespace Cyjb.Reflection
 		/// </overloads>
 		public static void EmitLoadArg(this ILGenerator il, int index)
 		{
-			CommonExceptions.CheckArgumentNull(il);
+			ArgumentNullException.ThrowIfNull(il);
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative(index);
@@ -68,7 +68,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c>。</exception>
 		public static void EmitLoadArgAddress(this ILGenerator il, int index)
 		{
-			CommonExceptions.CheckArgumentNull(il);
+			ArgumentNullException.ThrowIfNull(il);
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative(index);
@@ -97,13 +97,13 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="targetType"/> 为 <c>null</c>。</exception>
 		public static void EmitLoadArg(this ILGenerator il, int index, Type paramType, Type targetType)
 		{
-			CommonExceptions.CheckArgumentNull(il);
+			ArgumentNullException.ThrowIfNull(il);
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative(index);
 			}
-			CommonExceptions.CheckArgumentNull(paramType);
-			CommonExceptions.CheckArgumentNull(targetType);
+			ArgumentNullException.ThrowIfNull(paramType);
+			ArgumentNullException.ThrowIfNull(targetType);
 			EmitLoadArg(il, index, paramType, targetType, true);
 		}
 
@@ -124,13 +124,13 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentException"><paramref name="targetType"/> 包含泛型参数。</exception>
 		public static void EmitLoadArg(this ILGenerator il, int index, Type paramType, Type targetType, bool isChecked)
 		{
-			CommonExceptions.CheckArgumentNull(il);
+			ArgumentNullException.ThrowIfNull(il);
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative(index);
 			}
-			CommonExceptions.CheckArgumentNull(paramType);
-			CommonExceptions.CheckArgumentNull(targetType);
+			ArgumentNullException.ThrowIfNull(paramType);
+			ArgumentNullException.ThrowIfNull(targetType);
 			if (paramType.ContainsGenericParameters)
 			{
 				throw ReflectionExceptions.TypeContainsGenericParameters(paramType);
@@ -173,8 +173,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="field"/> 为 <c>null</c>。</exception>
 		public static void EmitLoadField(this ILGenerator il, FieldInfo field)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(field);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(field);
 			il.Emit(field.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, field);
 		}
 
@@ -187,8 +187,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="field"/> 为 <c>null</c>。</exception>
 		public static void EmitLoadFieldAddress(this ILGenerator il, FieldInfo field)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(field);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(field);
 			il.Emit(field.IsStatic ? OpCodes.Ldsflda : OpCodes.Ldflda, field);
 		}
 
@@ -201,8 +201,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="field"/> 为 <c>null</c>。</exception>
 		public static void EmitStoreField(this ILGenerator il, FieldInfo field)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(field);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(field);
 			il.Emit(field.IsStatic ? OpCodes.Stsfld : OpCodes.Stfld, field);
 		}
 
@@ -219,8 +219,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="elementType"/> 为 <c>null</c>。</exception>
 		public static void EmitLoadElement(this ILGenerator il, Type elementType)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(elementType);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(elementType);
 			if (!elementType.IsValueType)
 			{
 				il.Emit(OpCodes.Ldelem_Ref);
@@ -279,8 +279,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="elementType"/> 为 <c>null</c>。</exception>
 		public static void EmitStoreElement(this ILGenerator il, Type elementType)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(elementType);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(elementType);
 			if (!elementType.IsValueType)
 			{
 				il.Emit(OpCodes.Stelem_Ref);
@@ -333,8 +333,8 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="type"/> 为 <c>null</c>。</exception>
 		public static void EmitLoadIndirect(this ILGenerator il, Type type)
 		{
-			CommonExceptions.CheckArgumentNull(il);
-			CommonExceptions.CheckArgumentNull(type);
+			ArgumentNullException.ThrowIfNull(il);
+			ArgumentNullException.ThrowIfNull(type);
 			switch (Type.GetTypeCode(type))
 			{
 				case TypeCode.Boolean:

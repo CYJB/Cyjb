@@ -50,7 +50,7 @@ namespace Cyjb.Test
 		/// <param name="args">构造函数的参数。</param>
 		public PrivateObject(Type type, params object?[] args)
 		{
-			CommonExceptions.CheckArgumentNull(type);
+			ArgumentNullException.ThrowIfNull(type);
 			ConstructFrom(Activator.CreateInstance(type, ConstructorFlags, PowerBinder.Default, args, null)!);
 		}
 
@@ -71,7 +71,7 @@ namespace Cyjb.Test
 		[MemberNotNull("type")]
 		private void ConstructFrom(object obj)
 		{
-			CommonExceptions.CheckArgumentNull(obj);
+			ArgumentNullException.ThrowIfNull(obj);
 			target = obj;
 			type = obj.GetType();
 		}
@@ -121,7 +121,7 @@ namespace Cyjb.Test
 		/// <returns>方法的返回值。</returns>
 		public object? Invoke(string name, params object?[] args)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			return Invoke(name, BindingFlags.InvokeMethod, args, CultureInfo.InvariantCulture);
 		}
 
@@ -133,7 +133,7 @@ namespace Cyjb.Test
 		/// <returns>指定索引的数组元素。</returns>
 		public object? GetArrayElement(string name, params int[] indices)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			Array? arr = (Array?)Invoke(name, BindingFlags.GetField | BindingFlags.GetProperty, null, CultureInfo.InvariantCulture);
 			return arr?.GetValue(indices);
 		}
@@ -146,7 +146,7 @@ namespace Cyjb.Test
 		/// <param name="indices">要设置的索引。</param>
 		public void SetArrayElement(string name, object? value, params int[] indices)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			Array? arr = (Array?)Invoke(name, BindingFlags.GetField | BindingFlags.GetProperty, null, CultureInfo.InvariantCulture);
 			if (arr != null)
 			{
@@ -161,7 +161,7 @@ namespace Cyjb.Test
 		/// <returns>字段的值。</returns>
 		public object? GetField(string name)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			return Invoke(name, BindingFlags.GetField, null, CultureInfo.InvariantCulture);
 		}
 
@@ -172,7 +172,7 @@ namespace Cyjb.Test
 		/// <param name="value">要设置的字段的值。</param>
 		public void SetField(string name, object? value)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			Invoke(name, BindingFlags.SetField, new[] { value }, CultureInfo.InvariantCulture);
 		}
 
@@ -183,7 +183,7 @@ namespace Cyjb.Test
 		/// <returns>字段或属性的值。</returns>
 		public object? GetFieldOrProperty(string name)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			return Invoke(name, BindingFlags.GetField | BindingFlags.GetProperty, null, CultureInfo.InvariantCulture);
 		}
 
@@ -194,7 +194,7 @@ namespace Cyjb.Test
 		/// <param name="value">要设置的字段或属性的值。</param>
 		public void SetFieldOrProperty(string name, object value)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			Invoke(name, BindingFlags.SetField | BindingFlags.SetProperty, new[] { value }, CultureInfo.InvariantCulture);
 		}
 
@@ -205,7 +205,7 @@ namespace Cyjb.Test
 		/// <returns>属性的值。</returns>
 		public object? GetProperty(string name)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			return Invoke(name, BindingFlags.GetProperty, null, CultureInfo.InvariantCulture);
 		}
 
@@ -216,7 +216,7 @@ namespace Cyjb.Test
 		/// <param name="value">要设置的属性的值。</param>
 		public void SetProperty(string name, object value)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			Invoke(name, BindingFlags.SetProperty, new[] { value }, CultureInfo.InvariantCulture);
 		}
 
@@ -230,7 +230,7 @@ namespace Cyjb.Test
 		/// <returns>调用结果。</returns>
 		private object? Invoke(string name, BindingFlags bindingFlags, object?[]? args, CultureInfo? culture)
 		{
-			CommonExceptions.CheckArgumentNull(name);
+			ArgumentNullException.ThrowIfNull(name);
 			try
 			{
 				return type.InvokeMember(name, bindingFlags | BindFlags, PowerBinder.Default, target, args, culture);

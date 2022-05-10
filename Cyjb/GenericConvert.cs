@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection.Emit;
 using Cyjb.Cache;
@@ -29,8 +29,8 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="outputType"/> 为 <c>null</c>。</exception>
 		public static Type GetConverterType(Type inputType, Type outputType)
 		{
-			CommonExceptions.CheckArgumentNull(inputType);
-			CommonExceptions.CheckArgumentNull(outputType);
+			ArgumentNullException.ThrowIfNull(inputType);
+			ArgumentNullException.ThrowIfNull(outputType);
 			return typeof(Converter<,>).MakeGenericType(inputType, outputType);
 		}
 
@@ -256,8 +256,8 @@ namespace Cyjb
 		/// <exception cref="ArgumentException"><paramref name="outputType"/> 包含泛型参数。</exception>
 		public static ObjectConverter? GetConverter(Type inputType, Type outputType)
 		{
-			CommonExceptions.CheckArgumentNull(inputType);
-			CommonExceptions.CheckArgumentNull(outputType);
+			ArgumentNullException.ThrowIfNull(inputType);
+			ArgumentNullException.ThrowIfNull(outputType);
 			if (inputType.ContainsGenericParameters)
 			{
 				throw ReflectionExceptions.TypeContainsGenericParameters(inputType);
@@ -286,8 +286,8 @@ namespace Cyjb
 		/// <exception cref="ArgumentException"><paramref name="outputType"/> 包含泛型参数。</exception>
 		public static bool CanChangeType(Type inputType, Type outputType)
 		{
-			CommonExceptions.CheckArgumentNull(inputType);
-			CommonExceptions.CheckArgumentNull(outputType);
+			ArgumentNullException.ThrowIfNull(inputType);
+			ArgumentNullException.ThrowIfNull(outputType);
 			if (inputType.ContainsGenericParameters)
 			{
 				throw ReflectionExceptions.TypeContainsGenericParameters(inputType);
@@ -316,7 +316,7 @@ namespace Cyjb
 		/// <see cref="IConverterProvider"/> 提供的类型转换方法。</remarks>
 		public static void AddConverter<TInput, TOutput>(Converter<TInput, TOutput> converter)
 		{
-			CommonExceptions.CheckArgumentNull(converter);
+			ArgumentNullException.ThrowIfNull(converter);
 			ConverterProvider provider = new(converter, typeof(TInput), typeof(TOutput));
 			providers.AddOrUpdate(provider.OriginType, provider, (type, old) => ConverterProvider.Combine(old, provider));
 		}
@@ -333,8 +333,8 @@ namespace Cyjb
 		/// 方法提供的类型转换方法优先级更高，且后设置的优先级更高。</remarks>
 		public static void AddConverterProvider(IConverterProvider provider)
 		{
-			CommonExceptions.CheckArgumentNull(provider);
-			CommonExceptions.CheckArgumentNull(provider.OriginType);
+			ArgumentNullException.ThrowIfNull(provider);
+			ArgumentNullException.ThrowIfNull(provider.OriginType);
 			providers.AddOrUpdate(provider.OriginType, provider, (type, old) => ConverterProvider.Combine(old, provider));
 		}
 
@@ -380,7 +380,7 @@ namespace Cyjb
 		/// <exception cref="InvalidCastException">不支持此转换。</exception>
 		public static object? ChangeType(object? value, Type outputType)
 		{
-			CommonExceptions.CheckArgumentNull(outputType);
+			ArgumentNullException.ThrowIfNull(outputType);
 			if (value == null)
 			{
 				if (outputType.IsValueType)

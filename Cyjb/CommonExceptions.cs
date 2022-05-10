@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Diagnostics.CodeAnalysis;
+using System.Collections;
 using System.Runtime.CompilerServices;
 
 namespace Cyjb
@@ -9,24 +8,6 @@ namespace Cyjb
 	/// </summary>
 	public static class CommonExceptions
 	{
-
-		#region 参数异常
-
-		/// <summary>
-		/// 检查指定参数的值，如果为 <c>null</c> 则抛出相应异常。
-		/// </summary>
-		/// <typeparam name="T">要检查的参数类型。</typeparam>
-		/// <param name="value">要检查是否为 <c>null</c> 的参数值。</param>
-		/// <param name="paramName">被检查的参数名。</param>
-		public static void CheckArgumentNull<T>([NotNull] T? value, [CallerArgumentExpression("value")] string? paramName = null)
-		{
-			if (value == null)
-			{
-				throw new ArgumentNullException(paramName);
-			}
-		}
-
-		#endregion // 参数异常
 
 		#region 数值异常
 
@@ -266,7 +247,7 @@ namespace Cyjb
 		public static void CheckSimplyArray(Array array,
 			[CallerArgumentExpression("array")] string? paramName = null)
 		{
-			CheckArgumentNull(array, paramName);
+			ArgumentNullException.ThrowIfNull(array, paramName);
 			if (array.Rank != 1)
 			{
 				throw MultidimensionalArrayNotSupported(paramName);
@@ -350,7 +331,7 @@ namespace Cyjb
 		public static void CheckArrayElemenetNull<T>(T[] array,
 			[CallerArgumentExpression("array")] string? paramName = null)
 		{
-			CheckArgumentNull(array, paramName);
+			ArgumentNullException.ThrowIfNull(array, paramName);
 			if (array.Length == 0)
 			{
 				throw new ArgumentException(Resources.CollectionEmpty, paramName);

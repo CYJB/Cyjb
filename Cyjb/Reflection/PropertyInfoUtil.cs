@@ -15,7 +15,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="property"/> 为 <c>null</c>。</exception>
 		public static Type[] GetIndexParameterTypes(this PropertyInfo property)
 		{
-			CommonExceptions.CheckArgumentNull(property);
+			ArgumentNullException.ThrowIfNull(property);
 			ParameterInfo[] paramInfos = property.GetIndexParameters();
 			if (paramInfos.Length == 0)
 			{
@@ -47,7 +47,7 @@ namespace Cyjb.Reflection
 		/// <seealso cref="MethodInfo.GetBaseDefinition"/>
 		public static PropertyInfo GetBaseDefinition(this PropertyInfo property)
 		{
-			CommonExceptions.CheckArgumentNull(property);
+			ArgumentNullException.ThrowIfNull(property);
 			MethodInfo? method = property.GetGetMethod(true) ?? property.GetSetMethod(true);
 			if (method == null)
 			{

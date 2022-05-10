@@ -15,7 +15,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		public static Type[] GetParameterTypesWithReturn(this MethodInfo method)
 		{
-			CommonExceptions.CheckArgumentNull(method);
+			ArgumentNullException.ThrowIfNull(method);
 			ParameterInfo[] parameters = method.GetParametersNoCopy();
 			if (parameters.Length == 0)
 			{
@@ -55,8 +55,8 @@ namespace Cyjb.Reflection
 		/// </overloads>
 		public static MethodInfo MakeGenericMethodFromArgumentTypes(this MethodInfo method, params Type[] types)
 		{
-			CommonExceptions.CheckArgumentNull(method);
-			CommonExceptions.CheckArgumentNull(types);
+			ArgumentNullException.ThrowIfNull(method);
+			ArgumentNullException.ThrowIfNull(types);
 			if (!method.IsGenericMethodDefinition)
 			{
 				throw ReflectionExceptions.NeedGenericMethodDefinition(nameof(method));
@@ -88,8 +88,8 @@ namespace Cyjb.Reflection
 		public static MethodInfo MakeGenericMethodFromArgumentTypes(this MethodInfo method, Type[] types,
 			MethodArgumentsOption options)
 		{
-			CommonExceptions.CheckArgumentNull(method);
-			CommonExceptions.CheckArgumentNull(types);
+			ArgumentNullException.ThrowIfNull(method);
+			ArgumentNullException.ThrowIfNull(types);
 			if (!method.IsGenericMethodDefinition)
 			{
 				throw ReflectionExceptions.NeedGenericMethodDefinition(nameof(method));
@@ -119,8 +119,8 @@ namespace Cyjb.Reflection
 		/// </overloads>
 		public static Type[]? GenericArgumentsInferences(this MethodBase method, params Type[] types)
 		{
-			CommonExceptions.CheckArgumentNull(method);
-			CommonExceptions.CheckArgumentNull(types);
+			ArgumentNullException.ThrowIfNull(method);
+			ArgumentNullException.ThrowIfNull(types);
 			if (method.IsGenericMethodDefinition)
 			{
 				MethodArgumentsOption options = MethodArgumentsOption.OptionalParamBinding;
@@ -146,8 +146,8 @@ namespace Cyjb.Reflection
 		public static Type[]? GenericArgumentsInferences(this MethodBase method, Type[] types,
 			MethodArgumentsOption options)
 		{
-			CommonExceptions.CheckArgumentNull(method);
-			CommonExceptions.CheckArgumentNull(types);
+			ArgumentNullException.ThrowIfNull(method);
+			ArgumentNullException.ThrowIfNull(types);
 			if (method.IsGenericMethodDefinition)
 			{
 				return MethodArgumentsInfo.GetInfo(method, types, options)?.GetGenericArguments(null, options);

@@ -32,7 +32,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		public static ParameterInfo[] GetParametersNoCopy(this MethodBase method)
 		{
-			CommonExceptions.CheckArgumentNull(method);
+			ArgumentNullException.ThrowIfNull(method);
 			return getParametersNoCopy(method);
 		}
 
@@ -44,7 +44,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="ArgumentNullException"><paramref name="method"/> 为 <c>null</c>。</exception>
 		public static Type[] GetParameterTypes(this MethodBase method)
 		{
-			CommonExceptions.CheckArgumentNull(method);
+			ArgumentNullException.ThrowIfNull(method);
 			ParameterInfo[] parameters = method.GetParametersNoCopy();
 			if (parameters.Length == 0)
 			{

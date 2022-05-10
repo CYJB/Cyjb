@@ -35,7 +35,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="ranges"/> 为 <c>null</c>。</exception>
 		public static CharSet FromRange(string ranges)
 		{
-			CommonExceptions.CheckArgumentNull(ranges);
+			ArgumentNullException.ThrowIfNull(ranges);
 			CharSet set = new();
 			for (int i = 1; i < ranges.Length; i += 2)
 			{
@@ -529,7 +529,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void ExceptWith(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (count <= 0)
 			{
 				return;
@@ -610,7 +610,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsProperSubsetOf(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (count == 0)
 			{
 				return other.Any();
@@ -635,7 +635,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsProperSupersetOf(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (count == 0)
 			{
 				return false;
@@ -664,7 +664,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsSubsetOf(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (count == 0)
 			{
 				return true;
@@ -689,7 +689,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool IsSupersetOf(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (count == 0)
 			{
 				return !other.Any();
@@ -717,7 +717,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool Overlaps(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (count == 0)
 			{
 				return false;
@@ -759,7 +759,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override bool SetEquals(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (count == 0)
 			{
 				return !other.Any();
@@ -786,7 +786,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void SymmetricExceptWith(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (count == 0)
 			{
 				UnionWith(other);
@@ -819,7 +819,7 @@ namespace Cyjb.Collections
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public override void UnionWith(IEnumerable<char> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (ReferenceEquals(this, other))
 			{
 				return;

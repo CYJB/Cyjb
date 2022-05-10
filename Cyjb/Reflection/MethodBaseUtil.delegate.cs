@@ -28,7 +28,7 @@ namespace Cyjb.Reflection
 		/// </overloads>
 		public static Delegate? PowerDelegate(this MethodBase method, Type delegateType)
 		{
-			CommonExceptions.CheckArgumentNull(delegateType);
+			ArgumentNullException.ThrowIfNull(delegateType);
 			CommonExceptions.CheckDelegateType(delegateType);
 			ReflectionExceptions.CheckUnboundGenParam(method);
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)
@@ -80,7 +80,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="method"/>。</exception>
 		public static Delegate? PowerDelegate(this MethodBase method, Type delegateType, object? firstArgument)
 		{
-			CommonExceptions.CheckArgumentNull(delegateType);
+			ArgumentNullException.ThrowIfNull(delegateType);
 			CommonExceptions.CheckDelegateType(delegateType);
 			ReflectionExceptions.CheckUnboundGenParam(method);
 			if (method.ContainsGenericParameters && !method.IsGenericMethodDefinition)

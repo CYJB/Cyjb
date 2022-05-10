@@ -88,7 +88,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool IsProperSubsetOf(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (Count == 0)
 			{
 				return other.Any();
@@ -106,7 +106,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool IsProperSupersetOf(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (Count == 0)
 			{
 				return false;
@@ -124,7 +124,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool IsSubsetOf(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (Count == 0)
 			{
 				return true;
@@ -142,7 +142,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool IsSupersetOf(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (Count == 0)
 			{
 				return !other.Any();
@@ -159,7 +159,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool Overlaps(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (Count == 0)
 			{
 				return false;
@@ -176,7 +176,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 		public virtual bool SetEquals(IEnumerable<T> other)
 		{
-			CommonExceptions.CheckArgumentNull(other);
+			ArgumentNullException.ThrowIfNull(other);
 			if (Count == 0)
 			{
 				return !other.Any();

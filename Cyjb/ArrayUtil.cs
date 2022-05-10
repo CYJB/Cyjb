@@ -19,7 +19,7 @@ namespace Cyjb
 		/// <returns>指定类型的空数组。</returns>
 		public static Array Empty(Type type)
 		{
-			CommonExceptions.CheckArgumentNull(type);
+			ArgumentNullException.ThrowIfNull(type);
 			return (Array)ArrayEmptyMethod.MakeGenericMethod(type).Invoke(null, Array.Empty<object>())!;
 		}
 
@@ -87,7 +87,7 @@ namespace Cyjb
 		/// </overloads>
 		public static T[] Fill<T>(this T[] array, T value)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			Array.Fill(array, value);
 			return array;
 		}
@@ -108,7 +108,7 @@ namespace Cyjb
 		/// 加 <paramref name="count"/> 之和大于数组的长度。</exception>
 		public static T[] Fill<T>(this T[] array, T value, int startIndex, int count)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			Array.Fill(array, value, startIndex, count);
 			return array;
 		}
@@ -123,7 +123,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为<c>null</c>。</exception>
 		public static T[] Fill<T>(this T[] array, Func<int, T> value)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			return FillInternal(array, value, 0, array.Length);
 		}
 
@@ -143,7 +143,7 @@ namespace Cyjb
 		/// 或 <paramref name="count"/> 小于零。</exception>
 		public static T[] Fill<T>(this T[] array, Func<int, T> value, int startIndex, int count)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			if (startIndex < 0 || startIndex > array.Length)
 			{
 				throw CommonExceptions.ArgumentIndexOutOfRange(startIndex);
@@ -191,7 +191,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为<c>null</c>。</exception>
 		public static T[,] Fill<T>(this T[,] array, T value)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			int len1 = array.GetLength(0);
 			int len2 = array.GetLength(1);
 			for (int i = 0; i < len1; i++)
@@ -214,7 +214,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为<c>null</c>。</exception>
 		public static T[][] Fill<T>(this T[][] array, T value)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			for (int i = 0; i < array.Length; i++)
 			{
 				T[] arr = array[i];
@@ -236,7 +236,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为<c>null</c>。</exception>
 		public static T[,] Fill<T>(this T[,] array, Func<int, int, T> value)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			int len1 = array.GetLength(0);
 			int len2 = array.GetLength(1);
 			for (int i = 0; i < len1; i++)
@@ -259,7 +259,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为<c>null</c>。</exception>
 		public static T[][] Fill<T>(this T[][] array, Func<int, int, T> value)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			for (int i = 0; i < array.Length; i++)
 			{
 				T[] arr = array[i];
@@ -285,7 +285,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为<c>null</c>。</exception>
 		public static T[,,] Fill<T>(this T[,,] array, T value)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			int len1 = array.GetLength(0);
 			int len2 = array.GetLength(1);
 			int len3 = array.GetLength(2);
@@ -312,7 +312,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为<c>null</c>。</exception>
 		public static T[][][] Fill<T>(this T[][][] array, T value)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			for (int i = 0; i < array.Length; i++)
 			{
 				T[][] arr1 = array[i];
@@ -338,13 +338,13 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为<c>null</c>。</exception>
 		public static T[,,] Fill<T>(this T[,,] array, Func<int, int, int, T> value)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			int len1 = array.GetLength(0);
 			int len2 = array.GetLength(1);
 			int len3 = array.GetLength(2);
 			for (int i = 0; i < len1; i++)
 			{
-				CommonExceptions.CheckArgumentNull(array);
+				ArgumentNullException.ThrowIfNull(array);
 				for (int j = 0; j < len2; j++)
 				{
 					for (int k = 0; k < len3; k++)
@@ -366,7 +366,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为<c>null</c>。</exception>
 		public static T[][][] Fill<T>(this T[][][] array, Func<int, int, int, T> value)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			for (int i = 0; i < array.Length; i++)
 			{
 				T[][] arr1 = array[i];
@@ -396,7 +396,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为<c>null</c>。</exception>
 		public static T[] Add<T>(this T[] array, params T[] items)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			if (items.Length == 0)
 			{
 				return array;
@@ -420,7 +420,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于 <c>0</c> 或大于数组的长度。</exception>
 		public static T[] Insert<T>(this T[] array, int index, params T[] items)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			if (index < 0)
 			{
 				throw CommonExceptions.ArgumentNegative(index);
@@ -454,7 +454,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为<c>null</c>。</exception>
 		public static T[] Concat<T>(this T[] array, params T[][] others)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			if (others.Length == 0)
 			{
 				return array;
@@ -493,7 +493,7 @@ namespace Cyjb
 		/// </overloads>
 		public static T[] Resize<T>(this T[] array, int newSize)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			if (newSize == array.Length)
 			{
 				return array;
@@ -515,7 +515,7 @@ namespace Cyjb
 		/// <exception cref="ArgumentNullException"><paramref name="array"/> 为<c>null</c>。</exception>
 		public static T[] Resize<T>(this T[] array, int newSize, T value)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			if (newSize == array.Length)
 			{
 				return array;
@@ -566,7 +566,7 @@ namespace Cyjb
 		/// </overloads>
 		public static T[] Suffle<T>(this T[] array)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			for (int i = array.Length - 1; i > 0; i--)
 			{
 				int j = Random.Shared.Next(i + 1);
@@ -607,7 +607,7 @@ namespace Cyjb
 		/// </remarks>
 		public static T[,] Suffle<T>(this T[,] array)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			int w = array.GetLength(1);
 			int idx = array.Length;
 			for (int i = array.GetLength(0) - 1; i >= 0; i--)
@@ -656,7 +656,7 @@ namespace Cyjb
 		/// </remarks>
 		public static T[,,] Suffle<T>(this T[,,] array)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			int h = array.GetLength(1);
 			int w = array.GetLength(2);
 			int idx = array.Length;
@@ -701,7 +701,7 @@ namespace Cyjb
 		/// </overloads>
 		public static T[] Reverse<T>(this T[] array)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			Array.Reverse(array);
 			return array;
 		}
@@ -721,7 +721,7 @@ namespace Cyjb
 		/// 加 <paramref name="length"/> 之和大于数组的长度。</exception>
 		public static T[] Reverse<T>(this T[] array, int index, int length)
 		{
-			CommonExceptions.CheckArgumentNull(array);
+			ArgumentNullException.ThrowIfNull(array);
 			Array.Reverse(array, index, length);
 			return array;
 		}

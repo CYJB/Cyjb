@@ -28,7 +28,7 @@ namespace Cyjb.Reflection
 		/// </overloads>
 		public static Delegate? PowerDelegate(this PropertyInfo property, Type delegateType)
 		{
-			CommonExceptions.CheckArgumentNull(delegateType);
+			ArgumentNullException.ThrowIfNull(delegateType);
 			CommonExceptions.CheckDelegateType(delegateType);
 			ReflectionExceptions.CheckUnboundGenParam(property);
 			return property.PowerDelegate(delegateType, false, null);
@@ -74,7 +74,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="property"/>。</exception>
 		public static Delegate? PowerDelegate(this PropertyInfo property, Type delegateType, object? firstArgument)
 		{
-			CommonExceptions.CheckArgumentNull(delegateType);
+			ArgumentNullException.ThrowIfNull(delegateType);
 			CommonExceptions.CheckDelegateType(delegateType);
 			ReflectionExceptions.CheckUnboundGenParam(property);
 			return property.PowerDelegate(delegateType, true, firstArgument);

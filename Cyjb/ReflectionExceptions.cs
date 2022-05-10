@@ -253,7 +253,7 @@ namespace Cyjb
 		internal static void CheckUnboundGenParam(MemberInfo member,
 			[CallerArgumentExpression("member")] string? paramName = null)
 		{
-			CommonExceptions.CheckArgumentNull(member, paramName);
+			ArgumentNullException.ThrowIfNull(member, paramName);
 			Type? declaringType = member.DeclaringType;
 			if (declaringType != null && declaringType.ContainsGenericParameters)
 			{

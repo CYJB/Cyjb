@@ -1,4 +1,4 @@
-﻿namespace Cyjb.Collections
+namespace Cyjb.Collections
 {
 	/// <summary>
 	/// 提供对 <see cref="IEnumerable{T}"/> 接口的扩展方法。
@@ -15,7 +15,7 @@
 		/// <exception cref="ArgumentNullException"><paramref name="source"/> 为 <c>null</c>。</exception>
 		public static bool IsDistinct<TSource>(this IEnumerable<TSource> source, IEqualityComparer<TSource>? comparer = null)
 		{
-			CommonExceptions.CheckArgumentNull(source);
+			ArgumentNullException.ThrowIfNull(source);
 			HashSet<TSource> set = new(comparer);
 			return source.All(set.Add);
 		}

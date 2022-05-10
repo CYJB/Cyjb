@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Reflection.Emit;
 using Cyjb.Conversions;
 
@@ -30,7 +30,7 @@ namespace Cyjb.Reflection
 		/// </overloads>
 		public static Delegate? PowerDelegate(this FieldInfo field, Type delegateType)
 		{
-			CommonExceptions.CheckArgumentNull(delegateType);
+			ArgumentNullException.ThrowIfNull(delegateType);
 			CommonExceptions.CheckDelegateType(delegateType);
 			ReflectionExceptions.CheckUnboundGenParam(field);
 			return field.PowerDelegate(delegateType, false, null);
@@ -76,7 +76,7 @@ namespace Cyjb.Reflection
 		/// <exception cref="MethodAccessException">调用方无权访问 <paramref name="field"/>。</exception>
 		public static Delegate? PowerDelegate(this FieldInfo field, Type delegateType, object? firstArgument)
 		{
-			CommonExceptions.CheckArgumentNull(delegateType);
+			ArgumentNullException.ThrowIfNull(delegateType);
 			CommonExceptions.CheckDelegateType(delegateType);
 			ReflectionExceptions.CheckUnboundGenParam(field);
 			return field.PowerDelegate(delegateType, true, firstArgument);
