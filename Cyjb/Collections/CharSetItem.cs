@@ -768,7 +768,7 @@ namespace Cyjb.Collections
 		/// <returns>如果当前对象等于 <paramref name="other"/>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public bool Equals(CharSetItem? other)
 		{
-			if (other == null)
+			if (other is null)
 			{
 				return false;
 			}

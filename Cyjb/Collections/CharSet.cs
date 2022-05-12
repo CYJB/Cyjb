@@ -938,7 +938,7 @@ namespace Cyjb.Collections
 		/// <exception cref="NotImplementedException"></exception>
 		public bool Equals(CharSet? other)
 		{
-			if (other == null)
+			if (other is null)
 			{
 				return false;
 			}
@@ -952,11 +952,7 @@ namespace Cyjb.Collections
 		/// <returns>如果指定的对象等于当前对象，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 		public override bool Equals(object? obj)
 		{
-			if (obj == null)
-			{
-				return false;
-			}
-			else if (obj is CharSet set)
+			if (obj is CharSet set)
 			{
 				return Equals(set);
 			}
