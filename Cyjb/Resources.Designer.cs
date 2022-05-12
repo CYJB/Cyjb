@@ -662,5 +662,23 @@ namespace Cyjb {
                 return ResourceManager.GetString("UniqueValue_Unique", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 UnorderedHashCode is a mutable struct and should not be compared with other UnorderedHashCode. 的本地化字符串。
+        /// </summary>
+        internal static string UnorderedHashCode_EqualityNotSupported {
+            get {
+                return ResourceManager.GetString("UnorderedHashCode_EqualityNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 UnorderedHashCode is a mutable struct and should not be compared with other UnorderedHashCode.Use ToHashCode to retrieve the computed hash code. 的本地化字符串。
+        /// </summary>
+        internal static string UnorderedHashCode_HashCodeNotSupported {
+            get {
+                return ResourceManager.GetString("UnorderedHashCode_HashCodeNotSupported", resourceCulture);
+            }
+        }
     }
 }

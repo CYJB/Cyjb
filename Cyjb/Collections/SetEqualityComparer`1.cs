@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Cyjb.Collections
 {
@@ -21,7 +21,7 @@ namespace Cyjb.Collections
 		{
 			get
 			{
-				if (defaultValue == null)
+				if (defaultValue is null)
 				{
 					Interlocked.CompareExchange(ref defaultValue, new SetEqualityComparer<T>(), null);
 				}
@@ -31,7 +31,7 @@ namespace Cyjb.Collections
 		/// <summary>
 		/// 初始化 <see cref="SetEqualityComparer{T}"/> 类的新实例。
 		/// </summary>
-		public SetEqualityComparer() { }
+		private SetEqualityComparer() { }
 
 		#region EqualityComparer<ISet<T>> 成员
 
@@ -48,22 +48,23 @@ namespace Cyjb.Collections
 		/// </overloads>
 		public override bool Equals(ISet<T>? x, ISet<T>? y)
 		{
-			if (x == null)
+			if (ReferenceEquals(x, y))
 			{
-				return y == null;
+				return true;
 			}
-			else if (y == null)
+			if (x is null)
+			{
+				return y is null;
+			}
+			if (y is null)
 			{
 				return false;
 			}
-			else
-			{
-				return x == y || x.SetEquals(y);
-			}
+			return x.SetEquals(y);
 		}
 
 		/// <summary>
-		/// 返回指定对象的哈希代码。
+		/// 返回指定对象的哈希代码，使用 MurmurHash3 的无序版本。
 		/// </summary>
 		/// <param name="obj">将为其返回哈希代码。</param>
 		/// <returns>指定对象的哈希代码。</returns>
@@ -75,16 +76,12 @@ namespace Cyjb.Collections
 		/// </overloads>
 		public override int GetHashCode(ISet<T> obj)
 		{
-			// 使用与位置无关的弱哈希。
-			int hashCode = obj.Count;
-			foreach (T item in obj)
+			UnorderedHashCode hashCode = new();
+			foreach (T value in obj)
 			{
-				if (item != null)
-				{
-					hashCode ^= item.GetHashCode();
-				}
+				hashCode.Add(value);
 			}
-			return hashCode;
+			return hashCode.ToHashCode();
 		}
 
 		#endregion // EqualityComparer<ISet<T>> 成员

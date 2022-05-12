@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Cyjb.Collections
 {
@@ -21,7 +21,7 @@ namespace Cyjb.Collections
 		{
 			get
 			{
-				if (defaultValue == null)
+				if (defaultValue is null)
 				{
 					Interlocked.CompareExchange(ref defaultValue, new ListEqualityComparer<T>(), null);
 				}
@@ -41,7 +41,7 @@ namespace Cyjb.Collections
 		/// 初始化 <see cref="ListEqualityComparer{T}"/> 类的新实例。
 		/// </summary>
 		/// </overloads>
-		public ListEqualityComparer()
+		private ListEqualityComparer()
 		{
 			comparer = EqualityComparer<T>.Default;
 		}
@@ -69,17 +69,17 @@ namespace Cyjb.Collections
 		/// </overloads>
 		public override bool Equals(IList<T>? x, IList<T>? y)
 		{
-			if (x == null)
-			{
-				return y == null;
-			}
-			else if (y == null)
-			{
-				return false;
-			}
-			else if (x == y)
+			if (ReferenceEquals(x, y))
 			{
 				return true;
+			}
+			if (x is null)
+			{
+				return y is null;
+			}
+			if (y is null)
+			{
+				return false;
 			}
 			int cnt = x.Count;
 			if (cnt != y.Count)
@@ -104,9 +104,9 @@ namespace Cyjb.Collections
 		public override int GetHashCode(IList<T> list)
 		{
 			HashCode hashCode = new();
-			for (int i = 0; i < list.Count; i++)
+			foreach (T item in list)
 			{
-				hashCode.Add(list[i]);
+				hashCode.Add(item);
 			}
 			return hashCode.ToHashCode();
 		}

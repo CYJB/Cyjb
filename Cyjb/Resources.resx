@@ -385,4 +385,12 @@
     <value>[Unique {0}]</value>
     <comment>唯一的文本。</comment>
   </data>
+  <data name="UnorderedHashCode_EqualityNotSupported" xml:space="preserve">
+    <value>UnorderedHashCode is a mutable struct and should not be compared with other UnorderedHashCode.</value>
+    <comment>UnorderedHashCode 不支持相等比较。</comment>
+  </data>
+  <data name="UnorderedHashCode_HashCodeNotSupported" xml:space="preserve">
+    <value>UnorderedHashCode is a mutable struct and should not be compared with other UnorderedHashCode.Use ToHashCode to retrieve the computed hash code.</value>
+    <comment>UnorderedHashCode 不支持 HashCode。</comment>
+  </data>
 </root>
