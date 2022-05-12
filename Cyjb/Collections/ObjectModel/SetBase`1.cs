@@ -20,27 +20,7 @@ namespace Cyjb.Collections.ObjectModel
 		protected virtual (int sameCount, int unfoundCount) CountElements(IEnumerable<T> other,
 			bool returnIfUnfound)
 		{
-			int sameCount = 0, unfoundCount = 0;
-			HashSet<T> uniqueSet = new();
-			foreach (T item in other)
-			{
-				if (Contains(item))
-				{
-					if (uniqueSet.Add(item))
-					{
-						sameCount++;
-					}
-				}
-				else
-				{
-					unfoundCount++;
-					if (returnIfUnfound)
-					{
-						break;
-					}
-				}
-			}
-			return (sameCount, unfoundCount);
+			return CollectionHelper.CountElements(this, other, returnIfUnfound);
 		}
 
 		#region CollectionBase<T> 成员

@@ -1,10 +1,43 @@
-﻿namespace Cyjb.Collections.ObjectModel
+namespace Cyjb.Collections.ObjectModel
 {
 	/// <summary>
 	/// 提供集合的辅助类。
 	/// </summary>
 	internal static class CollectionHelper
 	{
+		/// <summary>
+		/// 确定当前集与指定集合相比，相同的和未包含的元素数目。
+		/// </summary>
+		/// <param name="set">当前集。</param>
+		/// <param name="other">要与当前集进行比较的集合。</param>
+		/// <param name="returnIfUnfound">是否遇到未包含的元素就返回。</param>
+		/// <returns>当前集合中相同元素和为包含的元素数目。</returns>
+		public static (int sameCount, int unfoundCount) CountElements<T>(ISet<T> set, IEnumerable<T> other,
+			bool returnIfUnfound)
+		{
+			int sameCount = 0, unfoundCount = 0;
+			HashSet<T> uniqueSet = new();
+			foreach (T item in other)
+			{
+				if (set.Contains(item))
+				{
+					if (uniqueSet.Add(item))
+					{
+						sameCount++;
+					}
+				}
+				else
+				{
+					unfoundCount++;
+					if (returnIfUnfound)
+					{
+						break;
+					}
+				}
+			}
+			return (sameCount, unfoundCount);
+		}
+
 		/// <summary>
 		/// 从特定的 <see cref="Array"/> 索引处开始，将指定集合的元素复制到一个 <see cref="Array"/> 中。
 		/// </summary>
