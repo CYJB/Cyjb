@@ -5,13 +5,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace TestCyjb
 {
 	/// <summary>
-	/// <see cref="UInt32Util"/> ÀàµÄµ¥Ôª²âÊÔ¡£
+	/// <see cref="UInt32Util"/> ç±»çš„å•å…ƒæµ‹è¯•ã€‚
 	/// </summary>
 	[TestClass]
 	public class UnitTestUInt32Util
 	{
 		/// <summary>
-		/// ¶Ô <see cref="UInt32Util.IsPowerOf2(uint)"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="UInt32Util.IsPowerOf2(uint)"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[DataTestMethod]
 		[DataRow(0, false)]
@@ -55,7 +55,7 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="UInt32Util.CountBits(uint)"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="UInt32Util.CountBits(uint)"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[DataTestMethod]
 		[DataRow(0, 0)]
@@ -97,7 +97,7 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="UInt32Util.Parity(uint)"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="UInt32Util.Parity(uint)"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[DataTestMethod]
 		[DataRow(0, 0)]
@@ -139,7 +139,7 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="UInt32Util.ReverseBits(uint)"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="UInt32Util.ReverseBits(uint)"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[DataTestMethod]
 		[DataRow(0, 0)]
@@ -182,7 +182,7 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="UInt32Util.LogBase2(uint)"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="UInt32Util.LogBase2(uint)"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[DataTestMethod]
 		[DataRow(0, 0)]
@@ -222,7 +222,7 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="UInt32Util.LogBase10(uint)"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="UInt32Util.LogBase10(uint)"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[DataTestMethod]
 		[DataRow(0, 0)]
@@ -246,7 +246,7 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="UInt32Util.CountTrailingZeroBits(uint)"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="UInt32Util.CountTrailingZeroBits(uint)"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[DataTestMethod]
 		[DataRow(0, 32)]
@@ -295,7 +295,7 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="UInt32Util.CountTrailingBits(uint)"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="UInt32Util.CountTrailingBits(uint)"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[DataTestMethod]
 		[DataRow(0, 0)]
@@ -352,10 +352,10 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="UInt32Util.CeilingPowerOf2(uint)"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="UInt32Util.CeilingPowerOf2(uint)"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[DataTestMethod]
-		[DataRow(0, 1)]
+		[DataRow(0, 0)]
 		[DataRow(1, 1)]
 		[DataRow(2, 2)]
 		[DataRow(3, 4)]
@@ -395,13 +395,13 @@ namespace TestCyjb
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="UInt32Util.NextBitPermutation(uint)"/> ·½·¨½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="UInt32Util.NextBitPermutation(uint)"/> æ–¹æ³•è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[DataTestMethod]
 		[DataRow(new uint[] { 0, 0 })]
 		[DataRow(new uint[] { 4294967295, 4294967295 })]
-		[DataRow(new uint[] { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 
-			262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 
+		[DataRow(new uint[] { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072,
+			262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456,
 			536870912, 1073741824, 2147483648, 1 })]
 		[DataRow(new uint[] { 2145386494, 2145910783, 2146172927, 2146303999, 2146369535, 2146402303, 2146418687, 2146426879 })]
 		[DataRow(new uint[] { 2146435069, 2146435070, 2146959358 })]
