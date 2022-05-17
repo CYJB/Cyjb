@@ -15,6 +15,7 @@
 		<NeutralLanguage>en</NeutralLanguage>
 		<Version>$(VersionPrefix)</Version>
 		<VersionPrefix>1.0.3</VersionPrefix>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
