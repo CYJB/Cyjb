@@ -88,15 +88,6 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 Ambiguous user-defined converter found when convert &apos;{0}&apos; to &apos;{1}&apos;. 的本地化字符串。
-        /// </summary>
-        internal static string AmbiguousUserDefinedConverter {
-            get {
-                return ResourceManager.GetString("AmbiguousUserDefinedConverter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 &apos;{0}&apos; cannot be greater than &apos;{1}&apos;. 的本地化字符串。
         /// </summary>
         internal static string ArgumentMinMaxValue {
@@ -196,60 +187,6 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 Cannot bind to open constructed method. 的本地化字符串。
-        /// </summary>
-        internal static string BindOpenConstructedMethod {
-            get {
-                return ResourceManager.GetString("BindOpenConstructedMethod", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Cannot bind to the target field because its type is not compatible with that of the delegate type. 的本地化字符串。
-        /// </summary>
-        internal static string BindTargetField {
-            get {
-                return ResourceManager.GetString("BindTargetField", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Cannot bind to the target method because its signature is not compatible with that of the delegate type. 的本地化字符串。
-        /// </summary>
-        internal static string BindTargetMethod {
-            get {
-                return ResourceManager.GetString("BindTargetMethod", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Cannot bind to the target property because its signature is not compatible with that of the delegate type. 的本地化字符串。
-        /// </summary>
-        internal static string BindTargetProperty {
-            get {
-                return ResourceManager.GetString("BindTargetProperty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Cannot bind to the target property because no get accessor exists. 的本地化字符串。
-        /// </summary>
-        internal static string BindTargetPropertyNoGet {
-            get {
-                return ResourceManager.GetString("BindTargetPropertyNoGet", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Cannot bind to the target property because no set accessor exists. 的本地化字符串。
-        /// </summary>
-        internal static string BindTargetPropertyNoSet {
-            get {
-                return ResourceManager.GetString("BindTargetPropertyNoSet", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 null cannot be converted to a value type. 的本地化字符串。
         /// </summary>
         internal static string CannotCastNullToValueType {
@@ -300,15 +237,6 @@ namespace Cyjb {
         internal static string CollectionItemNull {
             get {
                 return ResourceManager.GetString("CollectionItemNull", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Delegate type &apos;{0}&apos; not compatible with &apos;{1}&apos;. 的本地化字符串。
-        /// </summary>
-        internal static string DelegateIncompatible {
-            get {
-                return ResourceManager.GetString("DelegateIncompatible", resourceCulture);
             }
         }
         
@@ -556,42 +484,6 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 Property &apos;{0}&apos; has no get accessor exists. 的本地化字符串。
-        /// </summary>
-        internal static string PropertyNoGetter {
-            get {
-                return ResourceManager.GetString("PropertyNoGetter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Property &apos;{0}&apos; has no set accessor exists. 的本地化字符串。
-        /// </summary>
-        internal static string PropertyNoSetter {
-            get {
-                return ResourceManager.GetString("PropertyNoSetter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Public property or field named &apos;{0}&apos; not exists. 的本地化字符串。
-        /// </summary>
-        internal static string PropertyOrFieldNotFound {
-            get {
-                return ResourceManager.GetString("PropertyOrFieldNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Property or field named &apos;{0}&apos; not exists. 的本地化字符串。
-        /// </summary>
-        internal static string PropertyOrFieldNotFound_NonPublic {
-            get {
-                return ResourceManager.GetString("PropertyOrFieldNotFound_NonPublic", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Cannot read from a closed &apos;{0}&apos;. 的本地化字符串。
         /// </summary>
         internal static string StreamClosed {
@@ -606,15 +498,6 @@ namespace Cyjb {
         internal static string TypeContainsGenericParameters {
             get {
                 return ResourceManager.GetString("TypeContainsGenericParameters", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Type member &apos;{0}&apos; not exists. 的本地化字符串。
-        /// </summary>
-        internal static string TypeMemberNotFound {
-            get {
-                return ResourceManager.GetString("TypeMemberNotFound", resourceCulture);
             }
         }
         

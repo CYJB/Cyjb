@@ -129,10 +129,6 @@
     <value>找到多个有指定名称且与指定绑定约束匹配的属性。</value>
     <comment>找到多个有指定名称且与指定绑定约束匹配的属性。</comment>
   </data>
-  <data name="AmbiguousUserDefinedConverter" xml:space="preserve">
-    <value>将“{0}”转换为“{1}”时，存在不明确的用户定义转换。</value>
-    <comment>找到多个用户自定义的类型转换。</comment>
-  </data>
   <data name="ArgumentMinMaxValue" xml:space="preserve">
     <value>“{0}”不能大于“{1}”。</value>
     <comment>参数上下界不能颠倒。</comment>
@@ -177,30 +173,6 @@
     <value>目标数组的长度不足，请检查数组索引和长度。</value>
     <comment>目标数组太小。</comment>
   </data>
-  <data name="BindOpenConstructedMethod" xml:space="preserve">
-    <value>不能绑定到开放构造方法。</value>
-    <comment>不能绑定到开放构造方法。</comment>
-  </data>
-  <data name="BindTargetField" xml:space="preserve">
-    <value>无法绑定到目标字段，因其类型与委托类型的签名不兼容。</value>
-    <comment>绑定到目标字段时出错。</comment>
-  </data>
-  <data name="BindTargetMethod" xml:space="preserve">
-    <value>无法绑定到目标方法，因其签名与委托类型的签名不兼容。</value>
-    <comment>绑定到目标方法时出错。</comment>
-  </data>
-  <data name="BindTargetProperty" xml:space="preserve">
-    <value>无法绑定到目标属性，因其签名与委托类型的签名不兼容。</value>
-    <comment>绑定到目标属性时出错。</comment>
-  </data>
-  <data name="BindTargetPropertyNoGet" xml:space="preserve">
-    <value>无法绑定到目标属性，因其不存在 get 访问器。</value>
-    <comment>绑定到目标属性时出错。</comment>
-  </data>
-  <data name="BindTargetPropertyNoSet" xml:space="preserve">
-    <value>无法绑定到目标属性，因其不存在 set 访问器。</value>
-    <comment>绑定到目标属性时出错。</comment>
-  </data>
   <data name="CannotCastNullToValueType" xml:space="preserve">
     <value>null 不能转换为值类型。</value>
     <comment>null 不能转换为值类型。</comment>
@@ -224,10 +196,6 @@
   <data name="CollectionItemNull" xml:space="preserve">
     <value>“{0}”中存在 null 元素。</value>
     <comment>集合中存在 null 元素。</comment>
-  </data>
-  <data name="DelegateIncompatible" xml:space="preserve">
-    <value>委托类型“{0}”与“{1}”不兼容。</value>
-    <comment>委托的类型不兼容。</comment>
   </data>
   <data name="DuplicateName" xml:space="preserve">
     <value>具有相同名称的参数已经存在。</value>
@@ -337,22 +305,6 @@
     <value>值对于 UInt64 太大或太小。</value>
     <comment>值对于 UInt64 太大或太小。</comment>
   </data>
-  <data name="PropertyNoGetter" xml:space="preserve">
-    <value>属性“{0}”不存在 get 访问器。</value>
-    <comment>属性不存在 get 访问器。</comment>
-  </data>
-  <data name="PropertyNoSetter" xml:space="preserve">
-    <value>属性“{0}”不存在 set 访问器。</value>
-    <comment>属性不存在 set 访问器。</comment>
-  </data>
-  <data name="PropertyOrFieldNotFound" xml:space="preserve">
-    <value>找不到名为“{0}”的公共属性或字段。</value>
-    <comment>找不到公共属性或字段。</comment>
-  </data>
-  <data name="PropertyOrFieldNotFound_NonPublic" xml:space="preserve">
-    <value>找不到名为“{0}”的属性或字段。</value>
-    <comment>找不到属性或字段。</comment>
-  </data>
   <data name="StreamClosed" xml:space="preserve">
     <value>不能从关闭的“{0}”中读取。</value>
     <comment>流已关闭。</comment>
@@ -360,10 +312,6 @@
   <data name="TypeContainsGenericParameters" xml:space="preserve">
     <value>类型“{0}”包含泛型参数。</value>
     <comment>类型包含泛型参数。</comment>
-  </data>
-  <data name="TypeMemberNotFound" xml:space="preserve">
-    <value>找不到类型成员“{0}”。</value>
-    <comment>找不到类型成员。</comment>
   </data>
   <data name="TypeMissingDefaultConstructor" xml:space="preserve">
     <value>类型“{0}”没有默认构造函数。</value>

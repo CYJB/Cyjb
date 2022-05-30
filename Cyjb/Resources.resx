@@ -129,10 +129,6 @@
     <value>More than one property is found with the specified name and matching the specified binding constraints.</value>
     <comment>找到多个有指定名称且与指定绑定约束匹配的属性。</comment>
   </data>
-  <data name="AmbiguousUserDefinedConverter" xml:space="preserve">
-    <value>Ambiguous user-defined converter found when convert '{0}' to '{1}'.</value>
-    <comment>找到多个用户自定义的类型转换。</comment>
-  </data>
   <data name="ArgumentMinMaxValue" xml:space="preserve">
     <value>'{0}' cannot be greater than '{1}'.</value>
     <comment>参数上下界不能颠倒。</comment>
@@ -177,30 +173,6 @@
     <value>Destination array is not long enough, check array index and length.</value>
     <comment>目标数组太小。</comment>
   </data>
-  <data name="BindOpenConstructedMethod" xml:space="preserve">
-    <value>Cannot bind to open constructed method.</value>
-    <comment>不能绑定到开放构造方法。</comment>
-  </data>
-  <data name="BindTargetField" xml:space="preserve">
-    <value>Cannot bind to the target field because its type is not compatible with that of the delegate type.</value>
-    <comment>绑定到目标字段时出错。</comment>
-  </data>
-  <data name="BindTargetMethod" xml:space="preserve">
-    <value>Cannot bind to the target method because its signature is not compatible with that of the delegate type.</value>
-    <comment>绑定到目标方法时出错。</comment>
-  </data>
-  <data name="BindTargetProperty" xml:space="preserve">
-    <value>Cannot bind to the target property because its signature is not compatible with that of the delegate type.</value>
-    <comment>绑定到目标属性时出错。</comment>
-  </data>
-  <data name="BindTargetPropertyNoGet" xml:space="preserve">
-    <value>Cannot bind to the target property because no get accessor exists.</value>
-    <comment>绑定到目标属性时出错。</comment>
-  </data>
-  <data name="BindTargetPropertyNoSet" xml:space="preserve">
-    <value>Cannot bind to the target property because no set accessor exists.</value>
-    <comment>绑定到目标属性时出错。</comment>
-  </data>
   <data name="CannotCastNullToValueType" xml:space="preserve">
     <value>null cannot be converted to a value type.</value>
     <comment>null 不能转换为值类型。</comment>
@@ -224,10 +196,6 @@
   <data name="CollectionItemNull" xml:space="preserve">
     <value>An element of '{0}' was null.</value>
     <comment>集合中存在 null 元素。</comment>
-  </data>
-  <data name="DelegateIncompatible" xml:space="preserve">
-    <value>Delegate type '{0}' not compatible with '{1}'.</value>
-    <comment>委托的类型不兼容。</comment>
   </data>
   <data name="DuplicateName" xml:space="preserve">
     <value>A parameter with the same name has already existed.</value>
@@ -337,22 +305,6 @@
     <value>Value was either too large or too small for a UInt64.</value>
     <comment>值对于 UInt64 太大或太小。</comment>
   </data>
-  <data name="PropertyNoGetter" xml:space="preserve">
-    <value>Property '{0}' has no get accessor exists.</value>
-    <comment>属性不存在 get 访问器。</comment>
-  </data>
-  <data name="PropertyNoSetter" xml:space="preserve">
-    <value>Property '{0}' has no set accessor exists.</value>
-    <comment>属性不存在 set 访问器。</comment>
-  </data>
-  <data name="PropertyOrFieldNotFound" xml:space="preserve">
-    <value>Public property or field named '{0}' not exists.</value>
-    <comment>找不到公共属性或字段。</comment>
-  </data>
-  <data name="PropertyOrFieldNotFound_NonPublic" xml:space="preserve">
-    <value>Property or field named '{0}' not exists.</value>
-    <comment>找不到属性或字段。</comment>
-  </data>
   <data name="StreamClosed" xml:space="preserve">
     <value>Cannot read from a closed '{0}'.</value>
     <comment>流已关闭。</comment>
@@ -360,10 +312,6 @@
   <data name="TypeContainsGenericParameters" xml:space="preserve">
     <value>Type '{0}' contains generic parameters.</value>
     <comment>类型包含泛型参数。</comment>
-  </data>
-  <data name="TypeMemberNotFound" xml:space="preserve">
-    <value>Type member '{0}' not exists.</value>
-    <comment>找不到类型成员。</comment>
   </data>
   <data name="TypeMissingDefaultConstructor" xml:space="preserve">
     <value>Type '{0}' does not have a default constructor.</value>
