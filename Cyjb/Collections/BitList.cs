@@ -172,9 +172,10 @@ namespace Cyjb.Collections
 		/// 将当前列表调整为指定的新大小。
 		/// </summary>
 		/// <param name="newCount">要调整到的大小。</param>
+		/// <param name="defaultValue">扩展列表大小时的默认值。</param>
 		/// <returns>调整后的当前列表。</returns>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="newCount"/> 小于零。</exception>
-		public BitList Resize(int newCount)
+		public BitList Resize(int newCount, bool defaultValue = false)
 		{
 			if (newCount < 0)
 			{
@@ -186,7 +187,7 @@ namespace Cyjb.Collections
 			}
 			else if (newCount > count)
 			{
-				AddRange(newCount - count, false);
+				AddRange(newCount - count, defaultValue);
 			}
 			return this;
 		}
@@ -522,6 +523,7 @@ namespace Cyjb.Collections
 		{
 			int sourceIdx = (count - 1) >> IndexShift;
 			int cnt = ((sourceIdx + 1) << IndexShift) + length;
+			EnsureCapacity(cnt);
 			int lowSize = cnt & IndexMask;
 			if (lowSize == 0)
 			{
@@ -818,13 +820,17 @@ namespace Cyjb.Collections
 		/// <returns>当前 <see cref="BitList"/> 对象。</returns>
 		public BitList LeftShift(int offset)
 		{
-			if (count <= 0)
+			if (count <= 0 || offset == 0)
 			{
 				return this;
 			}
 			int b = count.LogBase2();
 			offset &= (1 << (b + 1)) - 1;
 			LeftShift(0, offset);
+			if (offset > count)
+			{
+				offset = count;
+			}
 			Fill(0, offset, false);
 			return this;
 		}

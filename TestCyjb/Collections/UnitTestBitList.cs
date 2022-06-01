@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cyjb;
@@ -174,6 +174,29 @@ namespace TestCyjb.Collections
 
 			list.RightShift(17);
 			Assert.AreEqual(new BitList(new uint[] { 0xABC33D0, 0x6000 }).Resize(45), list);
+		}
+
+		/// <summary>
+		/// 对 <see cref="BitList.LeftShift"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestLeftShift()
+		{
+			BitList list = new(2, true);
+			list.LeftShift(0);
+			Assert.AreEqual(new(new bool[] { true, true }), list);
+
+			list = new(2, true);
+			list.LeftShift(1);
+			Assert.AreEqual(new(new bool[] { false, true }), list);
+
+			list = new(2, true);
+			list.LeftShift(2);
+			Assert.AreEqual(new(new bool[] { false, false }), list);
+
+			list = new(2, true);
+			list.LeftShift(3);
+			Assert.AreEqual(new(new bool[] { false, false }), list);
 		}
 	}
 }
