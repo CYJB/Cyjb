@@ -9,15 +9,6 @@ namespace Cyjb;
 internal static class ReflectionExceptions
 {
 	/// <summary>
-	/// 返回代码不应到达这里的异常。
-	/// </summary>
-	/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
-	internal static InvalidOperationException Unreachable()
-	{
-		return new InvalidOperationException("Code supposed to be unreachable.");
-	}
-
-	/// <summary>
 	/// 返回找到多个与绑定约束匹配的字段的异常。
 	/// </summary>
 	/// <returns><see cref="AmbiguousMatchException"/> 对象。</returns>

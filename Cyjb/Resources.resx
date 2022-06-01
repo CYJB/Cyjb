@@ -158,10 +158,6 @@
     <comment>索引超出范围。</comment>
   </data>
   <data name="ArgumentWrongType" xml:space="preserve">
-    <value>The parameter value is not a valid type.</value>
-    <comment>参数值不是有效类型。</comment>
-  </data>
-  <data name="ArgumentWrongType_Specific" xml:space="preserve">
     <value>The parameter value '{0}' is not of type '{1}'.</value>
     <comment>参数值不是有效类型。</comment>
   </data>
@@ -210,10 +206,6 @@
     <comment>无效的基。</comment>
   </data>
   <data name="InvalidCast" xml:space="preserve">
-    <value>Specified cast is not valid.</value>
-    <comment>一种类型不能转换为另一种类型。</comment>
-  </data>
-  <data name="InvalidCast_FromTo" xml:space="preserve">
     <value>Invalid cast from '{0}' to '{1}'.</value>
     <comment>一种类型不能转换为另一种类型。</comment>
   </data>
@@ -238,10 +230,6 @@
     <comment>多维数组不被支持。</comment>
   </data>
   <data name="MustBeDelegate" xml:space="preserve">
-    <value>Type must derive from Delegate.</value>
-    <comment>类型必须从委托派生。</comment>
-  </data>
-  <data name="MustBeDelegate_Type" xml:space="preserve">
     <value>Type '{0}' must derive from Delegate.</value>
     <comment>类型必须从委托派生。</comment>
   </data>
@@ -340,5 +328,9 @@
   <data name="UnorderedHashCode_HashCodeNotSupported" xml:space="preserve">
     <value>UnorderedHashCode is a mutable struct and should not be compared with other UnorderedHashCode.Use ToHashCode to retrieve the computed hash code.</value>
     <comment>UnorderedHashCode 不支持 HashCode。</comment>
+  </data>
+  <data name="Unreachable" xml:space="preserve">
+    <value>Code supposed to be unreachable.</value>
+    <comment>代码不应到达这里的异常。</comment>
   </data>
 </root>

@@ -151,20 +151,11 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 The parameter value is not a valid type. 的本地化字符串。
+        ///   查找类似 The parameter value &apos;{0}&apos; is not of type &apos;{1}&apos;. 的本地化字符串。
         /// </summary>
         internal static string ArgumentWrongType {
             get {
                 return ResourceManager.GetString("ArgumentWrongType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 The parameter value &apos;{0}&apos; is not of type &apos;{1}&apos;. 的本地化字符串。
-        /// </summary>
-        internal static string ArgumentWrongType_Specific {
-            get {
-                return ResourceManager.GetString("ArgumentWrongType_Specific", resourceCulture);
             }
         }
         
@@ -268,20 +259,11 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 Specified cast is not valid. 的本地化字符串。
+        ///   查找类似 Invalid cast from &apos;{0}&apos; to &apos;{1}&apos;. 的本地化字符串。
         /// </summary>
         internal static string InvalidCast {
             get {
                 return ResourceManager.GetString("InvalidCast", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Invalid cast from &apos;{0}&apos; to &apos;{1}&apos;. 的本地化字符串。
-        /// </summary>
-        internal static string InvalidCast_FromTo {
-            get {
-                return ResourceManager.GetString("InvalidCast_FromTo", resourceCulture);
             }
         }
         
@@ -331,20 +313,11 @@ namespace Cyjb {
         }
         
         /// <summary>
-        ///   查找类似 Type must derive from Delegate. 的本地化字符串。
+        ///   查找类似 Type &apos;{0}&apos; must derive from Delegate. 的本地化字符串。
         /// </summary>
         internal static string MustBeDelegate {
             get {
                 return ResourceManager.GetString("MustBeDelegate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Type &apos;{0}&apos; must derive from Delegate. 的本地化字符串。
-        /// </summary>
-        internal static string MustBeDelegate_Type {
-            get {
-                return ResourceManager.GetString("MustBeDelegate_Type", resourceCulture);
             }
         }
         
@@ -561,6 +534,15 @@ namespace Cyjb {
         internal static string UnorderedHashCode_HashCodeNotSupported {
             get {
                 return ResourceManager.GetString("UnorderedHashCode_HashCodeNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Code supposed to be unreachable. 的本地化字符串。
+        /// </summary>
+        internal static string Unreachable {
+            get {
+                return ResourceManager.GetString("Unreachable", resourceCulture);
             }
         }
     }

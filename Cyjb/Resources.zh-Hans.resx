@@ -158,10 +158,6 @@
     <comment>索引超出范围。</comment>
   </data>
   <data name="ArgumentWrongType" xml:space="preserve">
-    <value>参数的值不是有效的类型。</value>
-    <comment>参数值不是有效类型。</comment>
-  </data>
-  <data name="ArgumentWrongType_Specific" xml:space="preserve">
     <value>参数的值“{0}”不是“{1}”类型。</value>
     <comment>参数值不是有效类型。</comment>
   </data>
@@ -210,10 +206,6 @@
     <comment>无效的基。</comment>
   </data>
   <data name="InvalidCast" xml:space="preserve">
-    <value>指定的转换无效。</value>
-    <comment>一种类型不能转换为另一种类型。</comment>
-  </data>
-  <data name="InvalidCast_FromTo" xml:space="preserve">
     <value>从“{0}”到“{1}”的类型转换无效。</value>
     <comment>一种类型不能转换为另一种类型。</comment>
   </data>
@@ -238,10 +230,6 @@
     <comment>多维数组不被支持。</comment>
   </data>
   <data name="MustBeDelegate" xml:space="preserve">
-    <value>提供的类型必须从委托派生。</value>
-    <comment>类型必须从委托派生。</comment>
-  </data>
-  <data name="MustBeDelegate_Type" xml:space="preserve">
     <value>提供的类型“{0}”必须从委托派生。</value>
     <comment>类型必须从委托派生。</comment>
   </data>
@@ -340,5 +328,9 @@
   <data name="UnorderedHashCode_HashCodeNotSupported" xml:space="preserve">
     <value>UnorderedHashCode 是一个可变的结构体，不应与其它  UnorderedHashCode 比较。使用 ToHashCode 来获取计算的哈希代码。</value>
     <comment>UnorderedHashCode 不支持 HashCode。</comment>
+  </data>
+  <data name="Unreachable" xml:space="preserve">
+    <value>不应被执行到的代码。</value>
+    <comment>代码不应到达这里的异常。</comment>
   </data>
 </root>
