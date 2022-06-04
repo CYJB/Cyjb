@@ -12,6 +12,20 @@ namespace TestCyjb
 	public class UnitTestCharUtil
 	{
 		/// <summary>
+		/// 对 <see cref="CharUtil.IsAnyLineSeparator"/> 方法进行测试。
+		/// </summary>
+		[DataTestMethod]
+		public void TestIsAnyLineSeparator()
+		{
+			for (int i = 0; i <= char.MaxValue; i++)
+			{
+				char ch = (char)i;
+				bool expected = ch is '\n' or '\r' or '\u0085' or '\u2028' or '\u2029';
+				Assert.AreEqual(expected, ch.IsAnyLineSeparator());
+			}
+		}
+
+		/// <summary>
 		/// 对 <see cref="CharUtil.UnicodeEscape"/> 方法进行测试。
 		/// </summary>
 		[DataTestMethod]

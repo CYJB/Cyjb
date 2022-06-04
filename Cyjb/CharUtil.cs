@@ -10,6 +10,32 @@ namespace Cyjb
 	public static class CharUtil
 	{
 		/// <summary>
+		/// 返回当前字符是否是行分隔符，包含 <c>'\n'</c>, <c>'\r'</c>, <c>'\u0085'</c>,
+		/// <c>'\u2028'</c> 和 <c>'\u2029'</c>。
+		/// </summary>
+		/// <param name="ch">要检查的字符。</param>
+		/// <returns>当前字符是否是行分隔符。</returns>
+		public static bool IsAnyLineSeparator(this char ch)
+		{
+			if (ch > '\r')
+			{
+				if (ch < '\u0085')
+				{
+					return false;
+				}
+				else if (ch > '\u2029')
+				{
+					return false;
+				}
+				return ch is '\u0085' or '\u2028' or '\u2029';
+			}
+			else
+			{
+				return ch is '\n' or '\r';
+			}
+		}
+
+		/// <summary>
 		/// 返回当前字符的 Unicode 转义字符串。
 		/// </summary>
 		/// <param name="ch">要获取转义字符串的字符。</param>

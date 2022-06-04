@@ -6,49 +6,49 @@ namespace Cyjb.Text;
 public struct LinePosition : IComparable<LinePosition>, IEquatable<LinePosition>
 {
 	/// <summary>
-	/// 行号。
+	/// 行号，从 <c>1</c> 开始。
 	/// </summary>
 	private readonly int line;
 	/// <summary>
-	/// 行内的字符位置。
+	/// 行内的字符位置，从 <c>0</c> 开始。
 	/// </summary>
 	private readonly int character;
 	/// <summary>
-	/// 列号。
+	/// 列号，从 <c>1</c> 开始。
 	/// </summary>
 	private readonly int column;
 
 	/// <summary>
 	/// 使用的行号的字符位置初始化。
 	/// </summary>
-	/// <param name="line">行号。</param>
-	/// <param name="character">行内的字符位置。</param>
+	/// <param name="line">行号，从 <c>1</c> 开始。</param>
+	/// <param name="character">行内的字符位置，从 <c>0</c> 开始。</param>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="line"/> 小于 <c>0</c>。</exception>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="character"/> 小于 <c>0</c>。</exception>
-	public LinePosition(int line, int character) : this(line, character, character) { }
+	public LinePosition(int line, int character) : this(line, character, character + 1) { }
 
 	/// <summary>
 	/// 使用的行号、字符位置和列号初始化。
 	/// </summary>
-	/// <param name="line">行号。</param>
-	/// <param name="character">行内的字符位置。</param>
-	/// <param name="column">行号。</param>
+	/// <param name="line">行号，从 <c>1</c> 开始。</param>
+	/// <param name="character">行内的字符位置，从 <c>0</c> 开始。</param>
+	/// <param name="column">列号，从 <c>1</c> 开始。</param>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="line"/> 小于 <c>0</c>。</exception>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="character"/> 小于 <c>0</c>。</exception>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="column"/> 小于 <c>0</c>。</exception>
 	public LinePosition(int line, int character, int column)
 	{
-		if (line < 0)
+		if (line < 1)
 		{
-			throw CommonExceptions.ArgumentNegative(line);
+			throw CommonExceptions.ArgumentMustBePositive(line);
 		}
 		if (character < 0)
 		{
 			throw CommonExceptions.ArgumentNegative(character);
 		}
-		if (column < 0)
+		if (column < 1)
 		{
-			throw CommonExceptions.ArgumentNegative(column);
+			throw CommonExceptions.ArgumentMustBePositive(column);
 		}
 		this.line = line;
 		this.character = character;
@@ -56,17 +56,17 @@ public struct LinePosition : IComparable<LinePosition>, IEquatable<LinePosition>
 	}
 
 	/// <summary>
-	/// 行号。
+	/// 行号，从 <c>1</c> 开始。
 	/// </summary>
 	public int Line => line;
 	/// <summary>
-	/// 列号。
-	/// </summary>
-	public int Column => column;
-	/// <summary>
-	/// 行内的字符位置，不参与比较。
+	/// 行内的字符位置，从 <c>0</c> 开始。
 	/// </summary>
 	public int Character => character;
+	/// <summary>
+	/// 列号，从 <c>1</c> 开始。
+	/// </summary>
+	public int Column => column;
 
 	#region IComparable<LinePosition> 成员
 
@@ -140,7 +140,7 @@ public struct LinePosition : IComparable<LinePosition>, IEquatable<LinePosition>
 	/// <returns>如果当前对象等于 <paramref name="other"/>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 	public bool Equals(LinePosition other)
 	{
-		return line == other.line && character == other.character;
+		return line == other.line && character == other.character && column == other.column;
 	}
 
 	/// <summary>
@@ -163,7 +163,7 @@ public struct LinePosition : IComparable<LinePosition>, IEquatable<LinePosition>
 	/// <returns>当前对象的哈希值。</returns>
 	public override int GetHashCode()
 	{
-		return HashCode.Combine(line, character);
+		return HashCode.Combine(line, character, column);
 	}
 
 	/// <summary>
@@ -196,6 +196,6 @@ public struct LinePosition : IComparable<LinePosition>, IEquatable<LinePosition>
 	/// <returns>当前对象的字符串表示形式。</returns>
 	public override string ToString()
 	{
-		return line + "," + character;
+		return line + "," + column;
 	}
 }
