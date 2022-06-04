@@ -19,7 +19,7 @@ public class UnitTestLinePosition
 		LinePosition pos = new(10, 20);
 		Assert.AreEqual(10, pos.Line);
 		Assert.AreEqual(20, pos.Character);
-		Assert.AreEqual(20, pos.Column);
+		Assert.AreEqual(21, pos.Column);
 
 		pos = new(10, 20, 24);
 		Assert.AreEqual(10, pos.Line);
