@@ -90,7 +90,7 @@ internal static class ReflectionExceptions
 	/// <returns><see cref="InvalidOperationException"/> 对象。</returns>
 	internal static InvalidOperationException NeedGenericMethodDefinition(string paramName)
 	{
-		return new InvalidOperationException(ResourcesUtil.Format(Resources.NeedGenericMethodDefinition, paramName));
+		return new InvalidOperationException(Resources.NeedGenericMethodDefinition(paramName));
 	}
 
 	/// <summary>
@@ -100,7 +100,7 @@ internal static class ReflectionExceptions
 	/// <returns><see cref="ArgumentException"/> 对象。</returns>
 	internal static ArgumentException TypeContainsGenericParameters(Type type)
 	{
-		return new ArgumentException(ResourcesUtil.Format(Resources.TypeContainsGenericParameters, type));
+		return new ArgumentException(Resources.TypeContainsGenericParameters(type));
 	}
 
 	/// <summary>
@@ -110,7 +110,7 @@ internal static class ReflectionExceptions
 	/// <returns><see cref="ArgumentException"/> 对象。</returns>
 	internal static ArgumentException TypeMissingDefaultConstructor(Type type)
 	{
-		return new ArgumentException(ResourcesUtil.Format(Resources.TypeMissingDefaultConstructor, type));
+		return new ArgumentException(Resources.TypeMissingDefaultConstructor(type));
 	}
 
 	/// <summary>

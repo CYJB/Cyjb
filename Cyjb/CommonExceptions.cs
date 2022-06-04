@@ -20,7 +20,7 @@ public static class CommonExceptions
 	public static ArgumentOutOfRangeException ArgumentMustBePositive(object actualValue,
 		[CallerArgumentExpression("actualValue")] string? paramName = null)
 	{
-		return new ArgumentOutOfRangeException(paramName, actualValue, ResourcesUtil.Format(Resources.ArgumentMustBePositive, paramName));
+		return new ArgumentOutOfRangeException(paramName, actualValue, Resources.ArgumentMustBePositive(paramName));
 	}
 
 	/// <summary>
@@ -32,7 +32,7 @@ public static class CommonExceptions
 	public static ArgumentOutOfRangeException ArgumentNegative(object actualValue,
 		[CallerArgumentExpression("actualValue")] string? paramName = null)
 	{
-		return new ArgumentOutOfRangeException(paramName, actualValue, ResourcesUtil.Format(Resources.ArgumentNegative, paramName));
+		return new ArgumentOutOfRangeException(paramName, actualValue, Resources.ArgumentNegative(paramName));
 	}
 
 	/// <summary>
@@ -44,7 +44,7 @@ public static class CommonExceptions
 	public static ArgumentOutOfRangeException ArgumentIndexOutOfRange(object actualValue,
 		[CallerArgumentExpression("actualValue")] string? paramName = null)
 	{
-		return new ArgumentOutOfRangeException(paramName, actualValue, Resources.ArgumentOutOfRange_Index);
+		return new ArgumentOutOfRangeException(paramName, actualValue, Resources.ArgumentOutOfRangeIndex);
 	}
 
 	/// <summary>
@@ -56,7 +56,7 @@ public static class CommonExceptions
 	public static ArgumentOutOfRangeException ArgumentCountOutOfRange(object actualValue,
 		[CallerArgumentExpression("actualValue")] string? paramName = null)
 	{
-		return new ArgumentOutOfRangeException(paramName, actualValue, Resources.ArgumentOutOfRange_Count);
+		return new ArgumentOutOfRangeException(paramName, actualValue, Resources.ArgumentOutOfRangeCount);
 	}
 
 	/// <summary>
@@ -73,7 +73,7 @@ public static class CommonExceptions
 	public static ArgumentOutOfRangeException ArgumentOutOfRange(object actualValue,
 		[CallerArgumentExpression("actualValue")] string? paramName = null)
 	{
-		return new ArgumentOutOfRangeException(paramName, actualValue, ResourcesUtil.Format(Resources.ArgumentOutOfRange, paramName));
+		return new ArgumentOutOfRangeException(paramName, actualValue, Resources.ArgumentOutOfRange(paramName));
 	}
 
 	/// <summary>
@@ -88,7 +88,7 @@ public static class CommonExceptions
 		[CallerArgumentExpression("actualValue")] string? paramName = null)
 	{
 		return new ArgumentOutOfRangeException(paramName, actualValue,
-			 ResourcesUtil.Format(Resources.ArgumentOutOfRange_Between, paramName, begin, end));
+			Resources.ArgumentOutOfRangeBetween(paramName, begin, end));
 	}
 
 	/// <summary>
@@ -99,7 +99,7 @@ public static class CommonExceptions
 	/// <returns><see cref="ArgumentOutOfRangeException"/> 对象。</returns>
 	public static ArgumentOutOfRangeException ArgumentMinMaxValue(string minParamName, string maxParamName)
 	{
-		return new ArgumentOutOfRangeException(minParamName, ResourcesUtil.Format(Resources.ArgumentMinMaxValue, minParamName, maxParamName));
+		return new ArgumentOutOfRangeException(minParamName, Resources.ArgumentMinMaxValue(minParamName, maxParamName));
 	}
 
 	/// <summary>
@@ -209,7 +209,7 @@ public static class CommonExceptions
 	/// <returns><see cref="ObjectDisposedException"/> 对象。</returns>
 	public static ObjectDisposedException StreamClosed(string streamName)
 	{
-		return new ObjectDisposedException(streamName, ResourcesUtil.Format(Resources.StreamClosed, streamName));
+		return new ObjectDisposedException(streamName, Resources.StreamClosed(streamName));
 	}
 
 	#endregion // 对象状态异常
@@ -308,7 +308,7 @@ public static class CommonExceptions
 	{
 		if (collection == null || collection.Count == 0)
 		{
-			throw new ArgumentException(ResourcesUtil.Format(Resources.CollectionEmpty, paramName), paramName);
+			throw new ArgumentException(Resources.CollectionEmpty(paramName), paramName);
 		}
 	}
 
@@ -326,7 +326,7 @@ public static class CommonExceptions
 		}
 		else
 		{
-			message = ResourcesUtil.Format(Resources.MultidimensionalArrayNotSupported_Param, paramName);
+			message = Resources.MultidimensionalArrayNotSupportedParam(paramName);
 		}
 		return new RankException(message);
 	}
@@ -343,11 +343,11 @@ public static class CommonExceptions
 		ArgumentNullException.ThrowIfNull(array, paramName);
 		if (array.Length == 0)
 		{
-			throw new ArgumentException(Resources.CollectionEmpty, paramName);
+			throw new ArgumentException(Resources.CollectionEmpty(paramName), paramName);
 		}
 		if (Array.IndexOf(array, null) >= 0)
 		{
-			throw new ArgumentException(ResourcesUtil.Format(Resources.CollectionItemNull, paramName), paramName);
+			throw new ArgumentException(Resources.CollectionItemNull(paramName), paramName);
 		}
 	}
 
@@ -365,8 +365,7 @@ public static class CommonExceptions
 	public static ArgumentException ArgumentWrongType(object? actualValue, Type targetType,
 		[CallerArgumentExpression("actualValue")] string? paramName = null)
 	{
-		string message = ResourcesUtil.Format(Resources.ArgumentWrongType, actualValue, targetType);
-		return new ArgumentException(message, paramName);
+		return new ArgumentException(Resources.ArgumentWrongType(actualValue, targetType), paramName);
 	}
 
 	/// <summary>
@@ -379,7 +378,7 @@ public static class CommonExceptions
 	/// <exception cref="ArgumentNullException"><paramref name="toType"/> 为 <c>null</c>。</exception>
 	public static InvalidCastException InvalidCast(Type fromType, Type toType)
 	{
-		return new InvalidCastException(ResourcesUtil.Format(Resources.InvalidCast, fromType, toType));
+		return new InvalidCastException(Resources.InvalidCast(fromType, toType));
 	}
 
 	/// <summary>
@@ -423,7 +422,7 @@ public static class CommonExceptions
 	/// <returns><see cref="ArgumentException"/> 对象。</returns>
 	public static ArgumentException MustBeDelegate(Type type, [CallerArgumentExpression("type")] string? paramName = null)
 	{
-		return new ArgumentException(ResourcesUtil.Format(Resources.MustBeDelegate, type), paramName);
+		return new ArgumentException(Resources.MustBeDelegate(type), paramName);
 	}
 
 	/// <summary>
@@ -462,7 +461,7 @@ public static class CommonExceptions
 	/// <returns><see cref="ArgumentException"/> 对象。</returns>
 	public static ArgumentException MustBeEnum(Type type, [CallerArgumentExpression("type")] string? paramName = null)
 	{
-		return new ArgumentException(ResourcesUtil.Format(Resources.MustBeEnum_Type, type), paramName);
+		return new ArgumentException(Resources.MustBeEnumType(type), paramName);
 	}
 
 	/// <summary>
@@ -474,7 +473,7 @@ public static class CommonExceptions
 	{
 		if (!type.IsEnum)
 		{
-			throw new ArgumentException(ResourcesUtil.Format(Resources.MustBeEnum_Type, type), paramName);
+			throw new ArgumentException(Resources.MustBeEnumType(type), paramName);
 		}
 	}
 
