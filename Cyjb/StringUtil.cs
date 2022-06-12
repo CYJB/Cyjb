@@ -287,7 +287,7 @@ public static class StringUtil
 	/// <param name="value">要测试的字符串。</param>
 	/// <returns>如果 <paramref name="value"/> 参数是 <c>null</c> 或者 <see cref="string.Empty"/>，
 	/// 则为 <c>true</c>；否则为 <c>false</c>。</returns>
-	public static bool IsNullOrEmpty(this string? value)
+	public static bool IsNullOrEmpty([NotNullWhen(false)] this string? value)
 	{
 		return string.IsNullOrEmpty(value);
 	}
@@ -298,7 +298,7 @@ public static class StringUtil
 	/// <param name="value">要测试的字符串。</param>
 	/// <returns>如果 <paramref name="value"/> 参数是 <c>null</c>、<see cref="string.Empty"/> 
 	/// 或者仅由空白字符组成，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-	public static bool IsNullOrWhiteSpace(this string? value)
+	public static bool IsNullOrWhiteSpace([NotNullWhen(false)] this string? value)
 	{
 		return string.IsNullOrWhiteSpace(value);
 	}
