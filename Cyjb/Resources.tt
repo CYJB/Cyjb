@@ -1,8 +1,8 @@
 <#
-/*
-为同名的 .resx 文件生成强类型代码。
-与 ResXFileCodeGenerator 相比，提供了字符串格式化能力。
-*/
+/**
+ * 为同名的 .resx 文件生成强类型代码。
+ * 与 ResXFileCodeGenerator 相比，提供了字符串格式化能力。
+ */
 #>
 <#@ template language="C#" hostspecific="true" #>
 <#@ assembly name="System.Core" #>
@@ -13,7 +13,6 @@
 <#@ import namespace="System" #>
 <#@ import namespace="System.IO" #>
 <#@ import namespace="System.Xml" #>
-<#@ import namespace="System.Text" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text.RegularExpressions" #>
@@ -101,12 +100,12 @@ internal partial class <#= resxClassName #>
 	/// <summary>
 	/// 获取此类使用的缓存的 <see cref="ResourceManager"/> 实例。
 	/// </summary>
-	[ComponentModel.EditorBrowsableAttribute(ComponentModel.EditorBrowsableState.Advanced)]
+	[ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Advanced)]
 	internal static ResourceManager ResourceManager
 	{
 		get
 		{
-			if (object.ReferenceEquals(resourceManager, null))
+			if (resourceManager is null)
 			{
 				resourceManager = new ResourceManager("<#= resxNamespace #>.<#= resxClassName #>", typeof(<#= resxClassName #>).Assembly);
 			}
@@ -117,7 +116,7 @@ internal partial class <#= resxClassName #>
 	/// <summary>
 	/// 获取或设置资源使用的区域信息。
 	/// </summary>
-	[ComponentModel.EditorBrowsableAttribute(ComponentModel.EditorBrowsableState.Advanced)]
+	[ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Advanced)]
 	internal static CultureInfo? Culture
 	{
 		get
@@ -179,8 +178,9 @@ internal partial class <#= resxClassName #>
 			{
 				Write(", ");
 			}
-			Write("arg");
+			Write("Format(arg");
 			Write(i.ToString());
+			Write(")");
 		}
 	#>);
 	}
@@ -201,7 +201,7 @@ internal partial class <#= resxClassName #>
 	/// 将指定对象格式化为字符串。
 	/// </summary>
 	/// <param name="value">要格式化的对象。</param>
-	private static object? Format(object? value)
+	private static object Format(object? value)
 	{
 		if (value == null)
 		{

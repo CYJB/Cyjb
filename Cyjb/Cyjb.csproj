@@ -14,7 +14,7 @@
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<NeutralLanguage>en</NeutralLanguage>
 		<Version>$(VersionPrefix)</Version>
-		<VersionPrefix>1.0.4</VersionPrefix>
+		<VersionPrefix>1.0.6</VersionPrefix>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<TransformOnBuild>true</TransformOnBuild>
 	</PropertyGroup>

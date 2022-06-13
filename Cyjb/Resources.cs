@@ -33,12 +33,12 @@ internal partial class Resources
 	/// <summary>
 	/// 获取此类使用的缓存的 <see cref="ResourceManager"/> 实例。
 	/// </summary>
-	[ComponentModel.EditorBrowsableAttribute(ComponentModel.EditorBrowsableState.Advanced)]
+	[ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Advanced)]
 	internal static ResourceManager ResourceManager
 	{
 		get
 		{
-			if (object.ReferenceEquals(resourceManager, null))
+			if (resourceManager is null)
 			{
 				resourceManager = new ResourceManager("Cyjb.Resources", typeof(Resources).Assembly);
 			}
@@ -49,7 +49,7 @@ internal partial class Resources
 	/// <summary>
 	/// 获取或设置资源使用的区域信息。
 	/// </summary>
-	[ComponentModel.EditorBrowsableAttribute(ComponentModel.EditorBrowsableState.Advanced)]
+	[ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Advanced)]
 	internal static CultureInfo? Culture
 	{
 		get
@@ -82,7 +82,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string ArgumentMinMaxValue(object? arg0, object? arg1)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("ArgumentMinMaxValue", resourceCulture)!, arg0, arg1);
+		return string.Format(resourceCulture, ResourceManager.GetString("ArgumentMinMaxValue", resourceCulture)!, Format(arg0), Format(arg1));
 	}
 	
 	/// <summary>
@@ -90,7 +90,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string ArgumentMustBePositive(object? arg0)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("ArgumentMustBePositive", resourceCulture)!, arg0);
+		return string.Format(resourceCulture, ResourceManager.GetString("ArgumentMustBePositive", resourceCulture)!, Format(arg0));
 	}
 	
 	/// <summary>
@@ -98,7 +98,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string ArgumentNegative(object? arg0)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("ArgumentNegative", resourceCulture)!, arg0);
+		return string.Format(resourceCulture, ResourceManager.GetString("ArgumentNegative", resourceCulture)!, Format(arg0));
 	}
 	
 	/// <summary>
@@ -106,7 +106,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string ArgumentOutOfRange(object? arg0)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("ArgumentOutOfRange", resourceCulture)!, arg0);
+		return string.Format(resourceCulture, ResourceManager.GetString("ArgumentOutOfRange", resourceCulture)!, Format(arg0));
 	}
 	
 	/// <summary>
@@ -114,7 +114,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string ArgumentOutOfRangeBetween(object? arg0, object? arg1, object? arg2)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("ArgumentOutOfRange_Between", resourceCulture)!, arg0, arg1, arg2);
+		return string.Format(resourceCulture, ResourceManager.GetString("ArgumentOutOfRange_Between", resourceCulture)!, Format(arg0), Format(arg1), Format(arg2));
 	}
 	
 	/// <summary>
@@ -132,7 +132,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string ArgumentWrongType(object? arg0, object? arg1)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("ArgumentWrongType", resourceCulture)!, arg0, arg1);
+		return string.Format(resourceCulture, ResourceManager.GetString("ArgumentWrongType", resourceCulture)!, Format(arg0), Format(arg1));
 	}
 	
 	/// <summary>
@@ -165,7 +165,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string CollectionEmpty(object? arg0)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("CollectionEmpty", resourceCulture)!, arg0);
+		return string.Format(resourceCulture, ResourceManager.GetString("CollectionEmpty", resourceCulture)!, Format(arg0));
 	}
 	
 	/// <summary>
@@ -178,7 +178,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string CollectionItemNull(object? arg0)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("CollectionItemNull", resourceCulture)!, arg0);
+		return string.Format(resourceCulture, ResourceManager.GetString("CollectionItemNull", resourceCulture)!, Format(arg0));
 	}
 	
 	/// <summary>
@@ -201,7 +201,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string InvalidCast(object? arg0, object? arg1)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("InvalidCast", resourceCulture)!, arg0, arg1);
+		return string.Format(resourceCulture, ResourceManager.GetString("InvalidCast", resourceCulture)!, Format(arg0), Format(arg1));
 	}
 	
 	/// <summary>
@@ -229,7 +229,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string MultidimensionalArrayNotSupportedParam(object? arg0)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("MultidimensionalArrayNotSupported_Param", resourceCulture)!, arg0);
+		return string.Format(resourceCulture, ResourceManager.GetString("MultidimensionalArrayNotSupported_Param", resourceCulture)!, Format(arg0));
 	}
 	
 	/// <summary>
@@ -237,7 +237,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string MustBeDelegate(object? arg0)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("MustBeDelegate", resourceCulture)!, arg0);
+		return string.Format(resourceCulture, ResourceManager.GetString("MustBeDelegate", resourceCulture)!, Format(arg0));
 	}
 	
 	/// <summary>
@@ -250,7 +250,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string MustBeEnumType(object? arg0)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("MustBeEnum_Type", resourceCulture)!, arg0);
+		return string.Format(resourceCulture, ResourceManager.GetString("MustBeEnum_Type", resourceCulture)!, Format(arg0));
 	}
 	
 	/// <summary>
@@ -268,7 +268,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string NeedGenericMethodDefinition(object? arg0)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("NeedGenericMethodDefinition", resourceCulture)!, arg0);
+		return string.Format(resourceCulture, ResourceManager.GetString("NeedGenericMethodDefinition", resourceCulture)!, Format(arg0));
 	}
 	
 	/// <summary>
@@ -326,7 +326,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string StreamClosed(object? arg0)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("StreamClosed", resourceCulture)!, arg0);
+		return string.Format(resourceCulture, ResourceManager.GetString("StreamClosed", resourceCulture)!, Format(arg0));
 	}
 	
 	/// <summary>
@@ -334,7 +334,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string TypeContainsGenericParameters(object? arg0)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("TypeContainsGenericParameters", resourceCulture)!, arg0);
+		return string.Format(resourceCulture, ResourceManager.GetString("TypeContainsGenericParameters", resourceCulture)!, Format(arg0));
 	}
 	
 	/// <summary>
@@ -342,7 +342,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string TypeMissingDefaultConstructor(object? arg0)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("TypeMissingDefaultConstructor", resourceCulture)!, arg0);
+		return string.Format(resourceCulture, ResourceManager.GetString("TypeMissingDefaultConstructor", resourceCulture)!, Format(arg0));
 	}
 	
 	/// <summary>
@@ -365,7 +365,7 @@ internal partial class Resources
 	/// </summary>
 	internal static string UniqueValueUnique(object? arg0)
 	{
-		return string.Format(resourceCulture, ResourceManager.GetString("UniqueValue_Unique", resourceCulture)!, arg0);
+		return string.Format(resourceCulture, ResourceManager.GetString("UniqueValue_Unique", resourceCulture)!, Format(arg0));
 	}
 	
 	/// <summary>
@@ -387,7 +387,7 @@ internal partial class Resources
 	/// 将指定对象格式化为字符串。
 	/// </summary>
 	/// <param name="value">要格式化的对象。</param>
-	private static object? Format(object? value)
+	private static object Format(object? value)
 	{
 		if (value == null)
 		{
