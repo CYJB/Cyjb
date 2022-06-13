@@ -87,7 +87,7 @@ public static class CollectionAssertUtil
 			{
 				if (!comparer.Equals(expectedEnum.Current, actualEnum.Current))
 				{
-					resultInfo = ResourcesUtil.Format(Resources.ElementsAtIndexDontMatch, index);
+					resultInfo = Resources.ElementsAtIndexDontMatch(index);
 					return false;
 				}
 				index++;
@@ -95,7 +95,7 @@ public static class CollectionAssertUtil
 			resultInfo = Resources.BothCollectionsSameElements;
 			return true;
 		}
-		resultInfo = ResourcesUtil.Format(Resources.BothCollectionsSameReference, string.Empty);
+		resultInfo = Resources.BothCollectionsSameReference;
 		return true;
 	}
 
@@ -178,8 +178,7 @@ public static class CollectionAssertUtil
 			Dictionary<T, int> actualCounts = GetElementCounts(actual, comparer, out int acutalNulLCount);
 			if (acutalNulLCount != expectedNullCount)
 			{
-				resultInfo = ResourcesUtil.Format(Resources.CollectionsHasMismatchedElements,
-					expectedNullCount, "null", acutalNulLCount);
+				resultInfo = Resources.CollectionsHasMismatchedElements(expectedNullCount, "null", acutalNulLCount);
 				return false;
 			}
 			foreach (T key in expectedCounts.Keys)
@@ -188,15 +187,14 @@ public static class CollectionAssertUtil
 				actualCounts.TryGetValue(key, out int actualCount);
 				if (expectedCount != actualCount)
 				{
-					resultInfo = ResourcesUtil.Format(Resources.CollectionsHasMismatchedElements,
-						expectedCount, key, actualCount);
+					resultInfo = Resources.CollectionsHasMismatchedElements(expectedCount, key, actualCount);
 					return false;
 				}
 			}
 			resultInfo = Resources.BothCollectionsSameElements;
 			return true;
 		}
-		resultInfo = ResourcesUtil.Format(Resources.BothCollectionsSameReference, string.Empty);
+		resultInfo = Resources.BothCollectionsSameReference;
 		return true;
 	}
 
