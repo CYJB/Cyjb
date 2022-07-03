@@ -16,8 +16,9 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
 <#
-	EnvDTE.DTE dte = (Host as IServiceProvider)?.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+	EnvDTE.DTE dte = ((IServiceProvider)Host).GetCOMService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
 	if (dte == null)
 	{
 		Error("当前 ResX 模板只能在 Visual Studio 环境下执行");
@@ -76,9 +77,7 @@
 
 namespace <#= resxNamespace #>;
 
-using CompilerServices = global::System.Runtime.CompilerServices;
 using ComponentModel = global::System.ComponentModel;
-using Diagnostics = global::System.Diagnostics;
 using ResourceManager = global::System.Resources.ResourceManager;
 using CultureInfo = global::System.Globalization.CultureInfo;
 
@@ -88,8 +87,8 @@ using CultureInfo = global::System.Globalization.CultureInfo;
 /// <remarks>此类是由 T4 文本模板通过 Visual Studio 的工具自动生成的。
 /// 若要添加或移除成员，请编辑 .ResX 文件，然后重新运行 T4 模板。
 /// </remarks>
-[Diagnostics.DebuggerNonUserCodeAttribute()]
-[CompilerServices.CompilerGeneratedAttribute()]
+[global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+[global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
 internal partial class <#= resxClassName #>
 {
 	#nullable enable

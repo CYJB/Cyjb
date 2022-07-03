@@ -101,37 +101,37 @@ namespace TestCyjb.Collections
 
 			Assert.IsTrue(set.Add('\0'));
 			expected.UnionWith("\0");
-			Assert.AreEqual("[\0a-ce]", set.ToString());
+			Assert.AreEqual(@"[\0a-ce]", set.ToString());
 			Assert.AreEqual(expected.Count, set.Count);
 			Assert.IsTrue(expected.SetEquals(set));
 
 			Assert.IsTrue(set.Add('d', 'g'));
 			expected.UnionWith("dfg");
-			Assert.AreEqual("[\0a-g]", set.ToString());
+			Assert.AreEqual(@"[\0a-g]", set.ToString());
 			Assert.AreEqual(expected.Count, set.Count);
 			Assert.IsTrue(expected.SetEquals(set));
 
 			Assert.IsTrue(set.Remove('d', 'f'));
 			expected.ExceptWith("def");
-			Assert.AreEqual("[\0a-cg]", set.ToString());
+			Assert.AreEqual(@"[\0a-cg]", set.ToString());
 			Assert.AreEqual(expected.Count, set.Count);
 			Assert.IsTrue(expected.SetEquals(set));
 
 			Assert.IsTrue(set.Add('h', 'l'));
 			expected.UnionWith("hijkl");
-			Assert.AreEqual("[\0a-cg-l]", set.ToString());
+			Assert.AreEqual(@"[\0a-cg-l]", set.ToString());
 			Assert.AreEqual(expected.Count, set.Count);
 			Assert.IsTrue(expected.SetEquals(set));
 
 			Assert.IsTrue(set.Add('o', 'q'));
 			expected.UnionWith("opq");
-			Assert.AreEqual("[\0a-cg-lo-q]", set.ToString());
+			Assert.AreEqual(@"[\0a-cg-lo-q]", set.ToString());
 			Assert.AreEqual(expected.Count, set.Count);
 			Assert.IsTrue(expected.SetEquals(set));
 
 			Assert.IsTrue(set.Remove('k', 'p'));
 			expected.ExceptWith("klmnop");
-			Assert.AreEqual("[\0a-cg-jq]", set.ToString());
+			Assert.AreEqual(@"[\0a-cg-jq]", set.ToString());
 			Assert.AreEqual(expected.Count, set.Count);
 			Assert.IsTrue(expected.SetEquals(set));
 
@@ -142,13 +142,13 @@ namespace TestCyjb.Collections
 			Assert.IsFalse(set.IsProperSupersetOf(expected));
 
 			Assert.IsFalse(set.Remove('d', 'f'));
-			Assert.AreEqual("[\0a-cg-jq]", set.ToString());
+			Assert.AreEqual(@"[\0a-cg-jq]", set.ToString());
 			Assert.AreEqual(expected.Count, set.Count);
 			Assert.IsTrue(expected.SetEquals(set));
 
 			Assert.IsTrue(set.Add(char.MaxValue));
 			expected.Add(char.MaxValue);
-			Assert.AreEqual("[\0a-cg-jq\uFFFF]", set.ToString());
+			Assert.AreEqual(@"[\0a-cg-jq\uFFFF]", set.ToString());
 			Assert.AreEqual(expected.Count, set.Count);
 			Assert.IsTrue(expected.SetEquals(set));
 

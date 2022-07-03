@@ -17,6 +17,7 @@
 		<VersionPrefix>1.0.6</VersionPrefix>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<TransformOnBuild>true</TransformOnBuild>
+		<Authors>CYJB</Authors>
 	</PropertyGroup>
 
 	<ItemGroup>
