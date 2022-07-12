@@ -293,15 +293,15 @@ public class UnitTestByteUtil
 	/// 对 <see cref="ByteUtil.NextBitPermutation(byte)"/> 方法进行测试。
 	/// </summary>
 	[DataTestMethod]
-	[DataRow(new byte[] { 0, 0 })]
-	[DataRow(new byte[] { 255, 255 })]
-	[DataRow(new byte[] { 1, 2, 4, 8, 16, 32, 64, 128, 1 })]
-	[DataRow(new byte[] { 40, 48, 65, 66, 68, 72, 80, 96, 129, 130, 132, 136, 144, 160, 192, 3, 5, 6, 9, 10, 12, 17, 18, 20, 24, 33, 34, 36, 40 })]
-	public void TestNextBitPermutation(byte[] values)
+	[DataRow(0, 0)]
+	[DataRow(255, 255)]
+	[DataRow(1, 2, 4, 8, 16, 32, 64, 128, 1)]
+	[DataRow(40, 48, 65, 66, 68, 72, 80, 96, 129, 130, 132, 136, 144, 160, 192, 3, 5, 6, 9, 10, 12, 17, 18, 20, 24, 33, 34, 36, 40)]
+	public void TestNextBitPermutation(params int[] values)
 	{
 		for (int i = 1; i < values.Length; i++)
 		{
-			Assert.AreEqual(values[i], ByteUtil.NextBitPermutation(values[i - 1]), "NextBitPermutation of {0}", values[i - 1]);
+			Assert.AreEqual((byte)values[i], ByteUtil.NextBitPermutation((byte)values[i - 1]), "NextBitPermutation of {0}", (byte)values[i - 1]);
 		}
 	}
 }

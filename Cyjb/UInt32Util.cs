@@ -6,8 +6,8 @@ namespace Cyjb;
 /// 提供对 <see cref="uint"/>  的扩展方法。
 /// </summary>
 /// <remarks>位运算的算法来自于 
-/// <see href="http://graphics.stanford.edu/~seander/bithacks.html">Bit Twiddling Hacks</see>。</remarks>
-/// <seealso href="http://graphics.stanford.edu/~seander/bithacks.html">Bit Twiddling Hacks</seealso>
+/// <see href="https://graphics.stanford.edu/~seander/bithacks.html">Bit Twiddling Hacks</see>。</remarks>
+/// <seealso href="https://graphics.stanford.edu/~seander/bithacks.html">Bit Twiddling Hacks</seealso>
 public static class UInt32Util
 {
 
@@ -272,9 +272,15 @@ public static class UInt32Util
 	[CLSCompliant(false)]
 	public static uint NextBitPermutation(this uint value)
 	{
+		if (value == 0)
+		{
+			return 0;
+		}
 		uint t = value | (value - 1U);
+		uint r = ((~t & (uint)(-(int)~t)) - 1U);
+		int shift = BitOperations.TrailingZeroCount(value);
 		// 这里分两次右移，这样在 >> 32 时可以正确得到结果 0。
-		uint r = ((~t & (uint)(-(int)~t)) - 1U) >> value.CountTrailingZeroBits() >> 1;
+		r = r >> shift >> 1;
 		if (t < uint.MaxValue)
 		{
 			t = r | (t + 1U);

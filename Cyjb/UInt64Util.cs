@@ -164,9 +164,13 @@ public static class UInt64Util
 	[CLSCompliant(false)]
 	public static ulong NextBitPermutation(this ulong value)
 	{
+		if (value == 0)
+		{
+			return 0;
+		}
 		ulong t = value | (value - 1UL);
 		// 这里分两次右移，这样在 >> 64 时可以正确得到结果 0。
-		ulong r = ((~t & (ulong)(-(long)~t)) - 1UL) >> value.CountTrailingZeroBits() >> 1;
+		ulong r = ((~t & (ulong)(-(long)~t)) - 1UL) >> BitOperations.TrailingZeroCount(value) >> 1;
 		if (t < ulong.MaxValue)
 		{
 			t = r | (t + 1UL);

@@ -126,8 +126,12 @@ public static class ByteUtil
 	/// </para></remarks>
 	public static byte NextBitPermutation(this byte value)
 	{
-		int t = value | (value - 1);
-		int r = ((~t & -~t) - 1) >> (value.CountTrailingZeroBits() + 1);
+		if (value == 0)
+		{
+			return 0;
+		}
+		int t = (value | (value - 1)) & 0xFF;
+		int r = ((~t & -~t) - 1) >> (CountTrailingZeroBits(value) + 1);
 		if (t < 255)
 		{
 			t = r | (t + 1);
