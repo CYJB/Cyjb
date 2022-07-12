@@ -39,13 +39,14 @@ namespace Cyjb
 		/// 返回当前字符的 Unicode 转义字符串。
 		/// </summary>
 		/// <param name="ch">要获取转义字符串的字符。</param>
+		/// <param name="escapeVisibleUnicode">是否转义可见的 Unicode 字符，默认为 <c>true</c>。</param>
 		/// <returns>字符的转义字符串，如果无需转义则返回原始字符。</returns>
 		/// <remarks>
 		/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），会返回原始字符。</para>
 		/// <para>对于某些特殊字符（\0, \, \a, \b, \f, \n, \r, \t, \v）以及自定义的字符，会返回其转义形式。</para>
 		/// <para>对于其它字符，会返回其十六进制转义形式（\u0000）。</para>
 		/// </remarks>
-		public static string UnicodeEscape(this char ch)
+		public static string UnicodeEscape(this char ch, bool escapeVisibleUnicode = true)
 		{
 			if (ch == '\\')
 			{
@@ -65,8 +66,34 @@ namespace Cyjb
 				'\r' => @"\r",
 				'\t' => @"\t",
 				'\v' => @"\v",
-				_ => $"\\u{((uint)ch).ToString(16).PadLeft(4, '0')}",
+				_ => escapeVisibleUnicode || !IsVisibleUnicode(ch) ? $"\\u{((uint)ch).ToString(16).PadLeft(4, '0')}" : ch.ToString(),
 			};
+		}
+
+		/// <summary>
+		/// 返回指定的字符是否是可见的 Unicode 字符。
+		/// </summary>
+		/// <param name="ch">要检查的字符。</param>
+		/// <returns>如果指定字符是可见的 Unicode 字符，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+		private static bool IsVisibleUnicode(char ch)
+		{
+			UnicodeCategory category = char.GetUnicodeCategory(ch);
+			switch (category)
+			{
+				case UnicodeCategory.Control:
+				case UnicodeCategory.SpaceSeparator:
+				case UnicodeCategory.Format:
+				case UnicodeCategory.NonSpacingMark:
+				case UnicodeCategory.OtherNotAssigned:
+				case UnicodeCategory.EnclosingMark:
+				case UnicodeCategory.SpacingCombiningMark:
+				case UnicodeCategory.LineSeparator:
+				case UnicodeCategory.ParagraphSeparator:
+				case UnicodeCategory.Surrogate:
+					return false;
+				default:
+					return true;
+			}
 		}
 
 		/// <summary>

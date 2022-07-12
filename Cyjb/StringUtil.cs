@@ -17,6 +17,7 @@ public static class StringUtil
 	/// 返回当前字符串的 Unicode 转义字符串。
 	/// </summary>
 	/// <param name="str">要进行转义的字符串。</param>
+	/// <param name="escapeVisibleUnicode">是否转义可见的 Unicode 字符，默认为 <c>true</c>。</param>
 	/// <returns>转义后的字符串。</returns>
 	/// <remarks>
 	/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），不会发生改变。</para>
@@ -24,7 +25,7 @@ public static class StringUtil
 	/// <para>对于其它字符，会替换为其十六进制转义形式（\u0000）。</para>
 	/// </remarks>
 	[return: NotNullIfNotNull("str")]
-	public static string? UnicodeEscape(this string? str)
+	public static string? UnicodeEscape(this string? str, bool escapeVisibleUnicode = true)
 	{
 		if (string.IsNullOrEmpty(str))
 		{
@@ -33,7 +34,7 @@ public static class StringUtil
 		StringBuilder builder = new(str.Length * 2);
 		for (int i = 0; i < str.Length; i++)
 		{
-			builder.Append(str[i].UnicodeEscape());
+			builder.Append(str[i].UnicodeEscape(escapeVisibleUnicode));
 		}
 		return builder.ToString();
 	}

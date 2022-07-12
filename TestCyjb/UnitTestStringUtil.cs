@@ -1,4 +1,4 @@
-﻿using Cyjb;
+using Cyjb;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestCyjb
@@ -13,22 +13,35 @@ namespace TestCyjb
 		/// 对 <see cref="StringUtil.UnicodeEscape"/> 方法进行测试。
 		/// </summary>
 		[DataTestMethod]
-		[DataRow(null, null)]
-		[DataRow("", "")]
-		[DataRow("English or 中文 or \u0061\u0308 or \uD834\uDD60", @"English or \u4E2D\u6587 or a\u0308 or \uD834\uDD60")]
-		[DataRow("English or 中文 or \u0061\u0308 or \U0001D160", @"English or \u4E2D\u6587 or a\u0308 or \uD834\uDD60")]
-		[DataRow("\x25 \u0061\u0308 or \uD834\uDD60\\", @"% a\u0308 or \uD834\uDD60\\")]
-		[DataRow("\\", @"\\")]
-		[DataRow("\\\\", @"\\\\")]
-		[DataRow("\\\x1", @"\\\u0001")]
-		[DataRow("\\\\\\", @"\\\\\\")]
-		[DataRow("\\\\\x1", @"\\\\\u0001")]
-		[DataRow("\\ab", @"\\ab")]
-		[DataRow("\\a\\b\u23556", @"\\a\\b\u23556")]
-		[DataRow("\\a\\b\\U23556", @"\\a\\b\\U23556")]
-		public void TestUnicodeEscape(string? str, string? expected)
+		[DataRow(null, true, null)]
+		[DataRow("", true, "")]
+		[DataRow("English or 中文 or \u0061\u0308 or \uD834\uDD60", true, @"English or \u4E2D\u6587 or a\u0308 or \uD834\uDD60")]
+		[DataRow("English or 中文 or \u0061\u0308 or \U0001D160", true, @"English or \u4E2D\u6587 or a\u0308 or \uD834\uDD60")]
+		[DataRow("\x25 \u0061\u0308 or \uD834\uDD60\\", true, @"% a\u0308 or \uD834\uDD60\\")]
+		[DataRow("\\", true, @"\\")]
+		[DataRow("\\\\", true, @"\\\\")]
+		[DataRow("\\\x1", true, @"\\\u0001")]
+		[DataRow("\\\\\\", true, @"\\\\\\")]
+		[DataRow("\\\\\x1", true, @"\\\\\u0001")]
+		[DataRow("\\ab", true, @"\\ab")]
+		[DataRow("\\a\\b\u23556", true, @"\\a\\b\u23556")]
+		[DataRow("\\a\\b\\U23556", true, @"\\a\\b\\U23556")]
+		[DataRow(null, false, null)]
+		[DataRow("", false, "")]
+		[DataRow("English or 中文 or \u0061\u0308 or \uD834\uDD60", false, @"English or 中文 or a\u0308 or \uD834\uDD60")]
+		[DataRow("English or 中文 or \u0061\u0308 or \U0001D160", false, @"English or 中文 or a\u0308 or \uD834\uDD60")]
+		[DataRow("\x25 \u0061\u0308 or \uD834\uDD60\\", false, @"% a\u0308 or \uD834\uDD60\\")]
+		[DataRow("\\", false, @"\\")]
+		[DataRow("\\\\", false, @"\\\\")]
+		[DataRow("\\\x1", false, @"\\\u0001")]
+		[DataRow("\\\\\\", false, @"\\\\\\")]
+		[DataRow("\\\\\x1", false, @"\\\\\u0001")]
+		[DataRow("\\ab", false, @"\\ab")]
+		[DataRow("\\a\\b\u23556", false, @"\\a\\b⍕6")]
+		[DataRow("\\a\\b\\U23556", false, @"\\a\\b\\U23556")]
+		public void TestUnicodeEscape(string? str, bool escapeVisibleUnicode, string? expected)
 		{
-			Assert.AreEqual(expected, str.UnicodeEscape());
+			Assert.AreEqual(expected, str.UnicodeEscape(escapeVisibleUnicode));
 		}
 
 		/// <summary>

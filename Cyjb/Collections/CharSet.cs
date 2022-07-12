@@ -988,14 +988,14 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 		builder.Append('[');
 		foreach (var (start, end) in Ranges())
 		{
-			builder.Append(start.UnicodeEscape());
+			builder.Append(start.UnicodeEscape(false));
 			if (start < end)
 			{
 				if (start + 1 < end)
 				{
 					builder.Append('-');
 				}
-				builder.Append(end.UnicodeEscape());
+				builder.Append(end.UnicodeEscape(false));
 			}
 		}
 		builder.Append(']');

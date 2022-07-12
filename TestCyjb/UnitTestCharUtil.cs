@@ -29,22 +29,35 @@ namespace TestCyjb
 		/// 对 <see cref="CharUtil.UnicodeEscape"/> 方法进行测试。
 		/// </summary>
 		[DataTestMethod]
-		[DataRow('a', @"a")]
-		[DataRow('z', @"z")]
-		[DataRow('\0', @"\0")]
-		[DataRow('\\', @"\\")]
-		[DataRow('\a', @"\a")]
-		[DataRow('\b', @"\b")]
-		[DataRow('\f', @"\f")]
-		[DataRow('\n', @"\n")]
-		[DataRow('\r', @"\r")]
-		[DataRow('\t', @"\t")]
-		[DataRow('\v', @"\v")]
-		[DataRow('中', @"\u4E2D")]
-		[DataRow('\x1', @"\u0001")]
-		public void TestUnicodeEscape(char ch, string expected)
+		[DataRow('a', true, @"a")]
+		[DataRow('z', true, @"z")]
+		[DataRow('\0', true, @"\0")]
+		[DataRow('\\', true, @"\\")]
+		[DataRow('\a', true, @"\a")]
+		[DataRow('\b', true, @"\b")]
+		[DataRow('\f', true, @"\f")]
+		[DataRow('\n', true, @"\n")]
+		[DataRow('\r', true, @"\r")]
+		[DataRow('\t', true, @"\t")]
+		[DataRow('\v', true, @"\v")]
+		[DataRow('中', true, @"\u4E2D")]
+		[DataRow('\x1', true, @"\u0001")]
+		[DataRow('a', false, @"a")]
+		[DataRow('z', false, @"z")]
+		[DataRow('\0', false, @"\0")]
+		[DataRow('\\', false, @"\\")]
+		[DataRow('\a', false, @"\a")]
+		[DataRow('\b', false, @"\b")]
+		[DataRow('\f', false, @"\f")]
+		[DataRow('\n', false, @"\n")]
+		[DataRow('\r', false, @"\r")]
+		[DataRow('\t', false, @"\t")]
+		[DataRow('\v', false, @"\v")]
+		[DataRow('中', false, @"中")]
+		[DataRow('\x1', false, @"\u0001")]
+		public void TestUnicodeEscape(char ch, bool escapeVisibleUnicode, string expected)
 		{
-			Assert.AreEqual(expected, ch.UnicodeEscape());
+			Assert.AreEqual(expected, ch.UnicodeEscape(escapeVisibleUnicode));
 		}
 
 		/// <summary>
