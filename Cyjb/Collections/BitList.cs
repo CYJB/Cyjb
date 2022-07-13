@@ -735,6 +735,97 @@ namespace Cyjb.Collections
 			return (value & GetMask(end)) == 0U;
 		}
 
+		/// <summary>
+		/// 返回首个可以匹配指定模式的索引。
+		/// </summary>
+		/// <param name="pattern">要寻找的模式。</param>
+		/// <param name="startIndex">搜索的起始索引。</param>
+		/// <returns>首个可以匹配指定模式的索引，如果不存在则为 <c>-1</c>。</returns>
+		public int IndexOf(BitList pattern, int startIndex = 0)
+		{
+			// 使用扩展的 BNDM 算法。
+			int cnt = pattern.Count;
+			BitList trueTable = pattern;
+			BitList falseTable = new BitList(pattern).Not();
+			BitList match = new(cnt, true);
+			int end = Count - cnt;
+			while (startIndex <= end)
+			{
+				int i = cnt;
+				int last = cnt;
+				match.FillAll(true);
+				while (!match.AllFalse())
+				{
+					if (this[startIndex + i - 1])
+					{
+						match.And(trueTable);
+					}
+					else
+					{
+						match.And(falseTable);
+					}
+					i--;
+					if (match[0])
+					{
+						if (i > 0)
+						{
+							last = i;
+						}
+						else
+						{
+							return startIndex;
+						}
+					}
+					match.RightShift(1);
+				}
+				startIndex += last;
+			}
+			return -1;
+		}
+
+		/// <summary>
+		/// 寻找可以放入指定模式的最小空当索引，允许使用超出当前列表范围的空当。
+		/// </summary>
+		/// <param name="pattern">要寻找的模式。</param>
+		/// <param name="startIndex">搜索的起始索引。</param>
+		/// <returns>最小空当索引。</returns>
+		public int FindSpace(BitList pattern, int startIndex = 0)
+		{
+			// 使用扩展的 BNDM 算法。
+			int cnt = pattern.Count;
+			BitList table = new(pattern);
+			table.Not();
+			BitList match = new(cnt, true);
+			while (true)
+			{
+				int end = Count - startIndex;
+				int i = cnt;
+				int last = cnt;
+				match.FillAll(true);
+				while (!match.AllFalse())
+				{
+					if (i <= end && this[startIndex + i - 1])
+					{
+						match.And(table);
+					}
+					i--;
+					if (match[0])
+					{
+						if (i > 0)
+						{
+							last = i;
+						}
+						else
+						{
+							return startIndex;
+						}
+					}
+					match.RightShift(1);
+				}
+				startIndex += last;
+			}
+		}
+
 		#region 二进制操作
 
 		/// <summary>

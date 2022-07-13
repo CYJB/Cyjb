@@ -198,5 +198,158 @@ namespace TestCyjb.Collections
 			list.LeftShift(3);
 			Assert.AreEqual(new(new bool[] { false, false }), list);
 		}
+
+		//                                                       0     1     2      3      4     5      6     7      8      9      10    11    12     13
+		private static readonly BitList list1 = new(new bool[] { true, true, false, false, true, false, true, false, false, false, true, true, false, true });
+
+		/// <summary>
+		/// 对 <see cref="BitList.IndexOf"/> 方法进行测试。
+		/// </summary>
+		[DataTestMethod]
+		[DataRow(0, true)]
+		[DataRow(2, false)]
+
+		[DataRow(0, true, true)]
+		[DataRow(1, true, false)]
+		[DataRow(3, false, true)]
+		[DataRow(2, false, false)]
+
+		[DataRow(-1, true, true, true)]
+		[DataRow(0, true, true, false)]
+		[DataRow(4, true, false, true)]
+		[DataRow(1, true, false, false)]
+		[DataRow(9, false, true, true)]
+		[DataRow(3, false, true, false)]
+		[DataRow(2, false, false, true)]
+		[DataRow(7, false, false, false)]
+
+		[DataRow(-1, true, true, true, true)]
+		[DataRow(-1, true, true, true, false)]
+		[DataRow(10, true, true, false, true)]
+		[DataRow(0, true, true, false, false)]
+		[DataRow(-1, true, false, true, true)]
+		[DataRow(4, true, false, true, false)]
+		[DataRow(1, true, false, false, true)]
+		[DataRow(6, true, false, false, false)]
+		[DataRow(-1, false, true, true, true)]
+		[DataRow(9, false, true, true, false)]
+		[DataRow(3, false, true, false, true)]
+		[DataRow(5, false, true, false, false)]
+		[DataRow(8, false, false, true, true)]
+		[DataRow(2, false, false, true, false)]
+		[DataRow(7, false, false, false, true)]
+		[DataRow(-1, false, false, false, false)]
+
+		[DataRow(-1, true, true, true, true, true)]
+		[DataRow(-1, true, true, true, true, false)]
+		[DataRow(-1, true, true, true, false, true)]
+		[DataRow(-1, true, true, true, false, false)]
+		[DataRow(-1, true, true, false, true, true)]
+		[DataRow(-1, true, true, false, true, false)]
+		[DataRow(0, true, true, false, false, true)]
+		[DataRow(-1, true, true, false, false, false)]
+		[DataRow(-1, true, false, true, true, true)]
+		[DataRow(-1, true, false, true, true, false)]
+		[DataRow(-1, true, false, true, false, true)]
+		[DataRow(4, true, false, true, false, false)]
+		[DataRow(-1, true, false, false, true, true)]
+		[DataRow(1, true, false, false, true, false)]
+		[DataRow(6, true, false, false, false, true)]
+		[DataRow(-1, true, false, false, false, false)]
+		[DataRow(-1, false, true, true, true, true)]
+		[DataRow(-1, false, true, true, true, false)]
+		[DataRow(9, false, true, true, false, true)]
+		[DataRow(-1, false, true, true, false, false)]
+		[DataRow(-1, false, true, false, true, true)]
+		[DataRow(3, false, true, false, true, false)]
+		[DataRow(-1, false, true, false, false, true)]
+		[DataRow(5, false, true, false, false, false)]
+		[DataRow(-1, false, false, true, true, true)]
+		[DataRow(8, false, false, true, true, false)]
+		[DataRow(2, false, false, true, false, true)]
+		[DataRow(-1, false, false, true, false, false)]
+		[DataRow(7, false, false, false, true, true)]
+		[DataRow(-1, false, false, false, true, false)]
+		[DataRow(-1, false, false, false, false, true)]
+		[DataRow(-1, false, false, false, false, false)]
+		public void TestIndexOf(int expected, params bool[] pattern)
+		{
+			Assert.AreEqual(expected, list1.IndexOf(new BitList(pattern)));
+		}
+
+		/// <summary>
+		/// 对 <see cref="BitList.TestFindSpace"/> 方法进行测试。
+		/// </summary>
+		[DataTestMethod]
+		[DataRow(2, true)]
+		[DataRow(0, false)]
+
+		[DataRow(2, true, true)]
+		[DataRow(2, true, false)]
+		[DataRow(1, false, true)]
+		[DataRow(0, false, false)]
+
+		[DataRow(7, true, true, true)]
+		[DataRow(2, true, true, false)]
+		[DataRow(3, true, false, true)]
+		[DataRow(2, true, false, false)]
+		[DataRow(1, false, true, true)]
+		[DataRow(1, false, true, false)]
+		[DataRow(0, false, false, true)]
+		[DataRow(0, false, false, false)]
+
+		[DataRow(14, true, true, true, true)]
+		[DataRow(7, true, true, true, false)]
+		[DataRow(2, true, true, false, true)]
+		[DataRow(2, true, true, false, false)]
+		[DataRow(5, true, false, true, true)]
+		[DataRow(3, true, false, true, false)]
+		[DataRow(2, true, false, false, true)]
+		[DataRow(2, true, false, false, false)]
+		[DataRow(6, false, true, true, true)]
+		[DataRow(1, false, true, true, false)]
+		[DataRow(2, false, true, false, true)]
+		[DataRow(1, false, true, false, false)]
+		[DataRow(0, false, false, true, true)]
+		[DataRow(0, false, false, true, false)]
+		[DataRow(0, false, false, false, true)]
+		[DataRow(0, false, false, false, false)]
+
+		[DataRow(14, true, true, true, true, true)]
+		[DataRow(14, true, true, true, true, false)]
+		[DataRow(14, true, true, true, false, true)]
+		[DataRow(7, true, true, true, false, false)]
+		[DataRow(14, true, true, false, true, true)]
+		[DataRow(2, true, true, false, true, false)]
+		[DataRow(8, true, true, false, false, true)]
+		[DataRow(2, true, true, false, false, false)]
+		[DataRow(5, true, false, true, true, true)]
+		[DataRow(5, true, false, true, true, false)]
+		[DataRow(3, true, false, true, false, true)]
+		[DataRow(3, true, false, true, false, false)]
+		[DataRow(5, true, false, false, true, true)]
+		[DataRow(2, true, false, false, true, false)]
+		[DataRow(3, true, false, false, false, true)]
+		[DataRow(2, true, false, false, false, false)]
+		[DataRow(13, false, true, true, true, true)]
+		[DataRow(6, false, true, true, true, false)]
+		[DataRow(1, false, true, true, false, true)]
+		[DataRow(1, false, true, true, false, false)]
+		[DataRow(4, false, true, false, true, true)]
+		[DataRow(2, false, true, false, true, false)]
+		[DataRow(1, false, true, false, false, true)]
+		[DataRow(1, false, true, false, false, false)]
+		[DataRow(5, false, false, true, true, true)]
+		[DataRow(0, false, false, true, true, false)]
+		[DataRow(1, false, false, true, false, true)]
+		[DataRow(0, false, false, true, false, false)]
+		[DataRow(4, false, false, false, true, true)]
+		[DataRow(0, false, false, false, true, false)]
+		[DataRow(1, false, false, false, false, true)]
+		[DataRow(0, false, false, false, false, false)]
+		public void TestFindSpace(int expected, params bool[] pattern)
+		{
+			Assert.AreEqual(expected, list1.FindSpace(new BitList(pattern)));
+		}
 	}
 }
