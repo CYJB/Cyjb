@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using Cyjb.Collections.ObjectModel;
+using Cyjb.Globalization;
 
 namespace Cyjb.Collections;
 
@@ -15,6 +16,7 @@ namespace Cyjb.Collections;
 /// <seealso href="http://www.cnblogs.com/cyjb/archive/p/BitCharSet.html">
 /// 《基于树状位压缩数组的字符集合》</seealso>
 [Serializable, DebuggerDisplay("{ToString()} Count = {Count}")]
+[DebuggerTypeProxy(typeof(CharSetDebugView))]
 public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollection<char>
 {
 	/// <summary>
@@ -26,6 +28,11 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// </summary>
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	private int count = 0;
+	/// <summary>
+	/// 集合的字符串表示。
+	/// </summary>
+	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+	private string? text = null;
 
 	/// <summary>
 	/// 从指定的范围字符串初始化 <see cref="CharSet"/> 类的新实例。
@@ -61,6 +68,24 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	}
 
 	/// <summary>
+	/// 将当前集合标记为已改变。
+	/// </summary>
+	private void MarkDirty()
+	{
+		text = null;
+	}
+
+	/// <summary>
+	/// 将当前标记标记为只读，并返回当前集合。
+	/// </summary>
+	/// <returns>当前集合。</returns>
+	public CharSet MarkReadOnly()
+	{
+		SetCollectionReadOnly();
+		return this;
+	}
+
+	/// <summary>
 	/// 将指定字符范围添加到当前集合中。
 	/// </summary>
 	/// <param name="start">要添加到当前集合的字符范围起始（包含）。</param>
@@ -70,6 +95,7 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// <exception cref="ArgumentOutOfRangeException">字符范围的起始大于结束。</exception>
 	public bool Add(char start, char end)
 	{
+		CheckIsReadOnly();
 		if (start > end)
 		{
 			throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
@@ -82,7 +108,15 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 			// start 和 end 位于同一个底层数组项中，将 start ~ end 之间二进制置 1
 			ulong mask = (endMask - startMask) + endMask;
 			count += data[startTopIndex].Fill(startBtmIndex, mask);
-			return count > oldCount;
+			if (count > oldCount)
+			{
+				MarkDirty();
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{
@@ -110,7 +144,15 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 				count += data[i].Fill();
 			}
 		}
-		return count > oldCount;
+		if (count > oldCount)
+		{
+			MarkDirty();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -122,11 +164,12 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// 如果该字符的全部大小写都已在集内，则为 <c>false</c>。</returns>
 	public bool AddIgnoreCase(char ch, CultureInfo? culture = null)
 	{
+		CheckIsReadOnly();
 		if (culture == null)
 		{
 			culture = CultureInfo.InvariantCulture;
 		}
-		int startCount = count;
+		int oldCount = count;
 		Add(ch);
 		TextInfo textInfo = culture.TextInfo;
 		switch (char.GetUnicodeCategory(ch))
@@ -147,7 +190,7 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 				Add(textInfo.ToLower(ch));
 				break;
 		}
-		return count > startCount;
+		return count > oldCount;
 	}
 
 	/// <summary>
@@ -161,6 +204,7 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// <exception cref="ArgumentOutOfRangeException">字符范围的起始大于结束。</exception>
 	public bool AddIgnoreCase(char start, char end, CultureInfo? culture = null)
 	{
+		CheckIsReadOnly();
 		if (start > end)
 		{
 			throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
@@ -169,11 +213,11 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 		{
 			culture = CultureInfo.InvariantCulture;
 		}
-		int startCount = count;
+		int oldCount = count;
 		Add(start, end);
 		CaseConverter.GetLowercaseConverter(culture).ConvertRange(start, end, this);
 		CaseConverter.GetUppercaseConverter(culture).ConvertRange(start, end, this);
-		return count > startCount;
+		return count > oldCount;
 	}
 
 	/// <summary>
@@ -182,6 +226,7 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// <param name="culture">大小写转换使用的区域信息。</param>
 	public void AddLowercase(CultureInfo? culture = null)
 	{
+		CheckIsReadOnly();
 		if (culture == null)
 		{
 			culture = CultureInfo.InvariantCulture;
@@ -209,6 +254,7 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// <param name="culture">大小写转换使用的区域信息。</param>
 	public void AddUppercase(CultureInfo? culture = null)
 	{
+		CheckIsReadOnly();
 		if (culture == null)
 		{
 			culture = CultureInfo.InvariantCulture;
@@ -240,6 +286,7 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// <exception cref="ArgumentOutOfRangeException">字符范围的起始大于结束。</exception>
 	public bool Remove(char start, char end)
 	{
+		CheckIsReadOnly();
 		if (start > end)
 		{
 			throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
@@ -252,7 +299,15 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 			// start 和 end 位于同一个底层数组项中，将 start ~ end 之间按位置 0
 			ulong mask = (endMask - startMask) + endMask;
 			count += data[startTopIndex].Clear(startBtmIndex, mask);
-			return count < oldCount;
+			if (count < oldCount)
+			{
+				MarkDirty();
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{
@@ -280,7 +335,15 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 				count += data[i].Clear();
 			}
 		}
-		return count < oldCount;
+		if (count < oldCount)
+		{
+			MarkDirty();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -288,10 +351,12 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// </summary>
 	public void Negated()
 	{
+		CheckIsReadOnly();
 		for (int i = 0; i < CharSetConfig.TopLen; i++)
 		{
 			count += data[i].Negated();
 		}
+		MarkDirty();
 	}
 
 	/// <summary>
@@ -509,6 +574,7 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// <returns>如果该字符已添加到集内，则为 <c>true</c>；如果该字符已在集内，则为 <c>false</c>。</returns>
 	public override bool Add(char ch)
 	{
+		CheckIsReadOnly();
 		CharSetConfig.GetIndex(ch, out int topIndex, out int btmIndex, out ulong mask);
 		int modified = data[topIndex].FillSingle(btmIndex, mask);
 		if (modified == 0)
@@ -517,6 +583,7 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 		}
 		else
 		{
+			MarkDirty();
 			count += modified;
 			return true;
 		}
@@ -529,6 +596,7 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 	public override void ExceptWith(IEnumerable<char> other)
 	{
+		CheckIsReadOnly();
 		ArgumentNullException.ThrowIfNull(other);
 		if (count <= 0)
 		{
@@ -542,9 +610,14 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 		if (other is CharSet otherSet)
 		{
 			// CharSet 可以批量操作。
+			int oldCount = count;
 			for (int i = 0; i < CharSetConfig.TopLen; i++)
 			{
 				count += data[i].ExceptWith(otherSet.data[i]);
+			}
+			if (count != oldCount)
+			{
+				MarkDirty();
 			}
 		}
 		else if (other is IRangeCollection<char> otherRange)
@@ -570,12 +643,18 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 	public override void IntersectWith(IEnumerable<char> other)
 	{
+		CheckIsReadOnly();
 		if (other is CharSet otherSet)
 		{
 			// CharSet 可以批量操作。
+			int oldCount = count;
 			for (int i = 0; i < CharSetConfig.TopLen; i++)
 			{
 				count += data[i].IntersectWith(otherSet.data[i]);
+			}
+			if (count != oldCount)
+			{
+				MarkDirty();
 			}
 		}
 		else if (other is IRangeCollection<char> otherRange)
@@ -617,6 +696,7 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 		}
 		if (other is CharSet otherSet)
 		{
+			// CharSet 可以批量操作。
 			return count < otherSet.Count && otherSet.ContainsAllElements(this);
 		}
 		else
@@ -786,29 +866,30 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 	public override void SymmetricExceptWith(IEnumerable<char> other)
 	{
+		CheckIsReadOnly();
 		ArgumentNullException.ThrowIfNull(other);
 		if (count == 0)
 		{
 			UnionWith(other);
+			return;
 		}
 		else if (ReferenceEquals(this, other))
 		{
 			Clear();
+			return;
 		}
-		else if (other is CharSet otherSet)
+		if (other is not CharSet otherSet)
 		{
-			for (int i = 0; i < CharSetConfig.TopLen; i++)
-			{
-				count += data[i].SymmetricExceptWith(otherSet.data[i]);
-			}
+			otherSet = new CharSet(other);
 		}
-		else
+		int oldCount = count;
+		for (int i = 0; i < CharSetConfig.TopLen; i++)
 		{
-			CharSet newSet = new(other);
-			for (int i = 0; i < CharSetConfig.TopLen; i++)
-			{
-				count += data[i].SymmetricExceptWith(newSet.data[i]);
-			}
+			count += data[i].SymmetricExceptWith(otherSet.data[i]);
+		}
+		if (count != oldCount)
+		{
+			MarkDirty();
 		}
 	}
 
@@ -819,6 +900,7 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 	public override void UnionWith(IEnumerable<char> other)
 	{
+		CheckIsReadOnly();
 		ArgumentNullException.ThrowIfNull(other);
 		if (ReferenceEquals(this, other))
 		{
@@ -827,9 +909,14 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 		if (other is CharSet otherSet)
 		{
 			// CharSet 可以批量操作。
+			int oldCount = count;
 			for (int i = 0; i < CharSetConfig.TopLen; i++)
 			{
 				count += data[i].UnionWith(otherSet.data[i]);
+			}
+			if (count != oldCount)
+			{
+				MarkDirty();
 			}
 		}
 		else if (other is IRangeCollection<char> otherRange)
@@ -863,11 +950,17 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// </summary>
 	public override void Clear()
 	{
+		CheckIsReadOnly();
+		if (count == 0)
+		{
+			return;
+		}
 		count = 0;
 		for (int i = 0; i < CharSetConfig.TopLen; i++)
 		{
 			data[i].Clear();
 		}
+		MarkDirty();
 	}
 
 	/// <summary>
@@ -889,6 +982,7 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// 如果在原始当前集合中没有找到 <paramref name="ch"/>，该方法也会返回 <c>false</c>。</returns>
 	public override bool Remove(char ch)
 	{
+		CheckIsReadOnly();
 		CharSetConfig.GetIndex(ch, out int topIndex, out int btmIndex, out ulong mask);
 		int modified = data[topIndex].ClearSingle(btmIndex, mask);
 		if (modified == 0)
@@ -898,6 +992,7 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 		else
 		{
 			count += modified;
+			MarkDirty();
 			return false;
 		}
 	}
@@ -984,21 +1079,40 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	/// <returns>当前集合的字符串表示。</returns>
 	public override string ToString()
 	{
-		StringBuilder builder = new();
-		builder.Append('[');
-		foreach (var (start, end) in Ranges())
+		if (text == null)
 		{
-			builder.Append(start.UnicodeEscape(false));
-			if (start < end)
+			StringBuilder builder = new();
+			builder.Append('[');
+			// 允许通过 UnicodeCategory 压缩字符串表示形式。
+			CharSet tempSet = new(this);
+			StringBuilder categories = new();
+			foreach (UnicodeCategory category in Enum.GetValues<UnicodeCategory>())
 			{
-				if (start + 1 < end)
+				IReadOnlySet<char> chars = category.GetChars();
+				if (tempSet.IsSupersetOf(chars))
 				{
-					builder.Append('-');
+					categories.Append(@"\p{");
+					categories.Append(category.GetName());
+					categories.Append('}');
+					tempSet.ExceptWith(chars);
 				}
-				builder.Append(end.UnicodeEscape(false));
 			}
+			foreach (var (start, end) in tempSet.Ranges())
+			{
+				builder.Append(start.UnicodeEscape(false));
+				if (start < end)
+				{
+					if (start + 1 < end)
+					{
+						builder.Append('-');
+					}
+					builder.Append(end.UnicodeEscape(false));
+				}
+			}
+			builder.Append(categories);
+			builder.Append(']');
+			text = builder.ToString();
 		}
-		builder.Append(']');
-		return builder.ToString();
+		return text;
 	}
 }

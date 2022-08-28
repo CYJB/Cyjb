@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Cyjb.Collections
 {
@@ -28,9 +28,7 @@ namespace Cyjb.Collections
 		/// </summary>
 		/// <value>包含了源集合中的所有项的数组。</value>
 		[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-		public T[] Items
-		{
-			get { return source.ToArray(); }
-		}
+		public T[] Items => source.ToArray();
+
 	}
 }

@@ -193,6 +193,10 @@
     <value>“{0}”中存在 null 元素。</value>
     <comment>集合中存在 null 元素。</comment>
   </data>
+  <data name="CollectionReadOnly" xml:space="preserve">
+    <value>集合是只读的。</value>
+    <comment>集合是只读的。</comment>
+  </data>
   <data name="DuplicateName" xml:space="preserve">
     <value>具有相同名称的参数已经存在。</value>
     <comment>参数名相同。</comment>
@@ -216,6 +220,10 @@
   <data name="InvalidThreshold" xml:space="preserve">
     <value>指定的阈值超出范围。</value>
     <comment>阈值超出范围。</comment>
+  </data>
+  <data name="InvalidUnicodeCategoryName" xml:space="preserve">
+    <value>无效的 UnicodeCategory 名称。</value>
+    <comment>无效的 UnicodeCategory 名称。</comment>
   </data>
   <data name="MethodNotSupported" xml:space="preserve">
     <value>不支持指定的方法。</value>

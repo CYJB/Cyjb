@@ -180,6 +180,11 @@ internal partial class Resources
 	}
 	
 	/// <summary>
+	/// 返回类似 <c>Collection is read-only.</c> 的本地化字符串。
+	/// </summary>
+	internal static string CollectionReadOnly => ResourceManager.GetString("CollectionReadOnly", resourceCulture)!;
+	
+	/// <summary>
 	/// 返回类似 <c>A parameter with the same name has already existed.</c> 的本地化字符串。
 	/// </summary>
 	internal static string DuplicateName => ResourceManager.GetString("DuplicateName", resourceCulture)!;
@@ -211,6 +216,11 @@ internal partial class Resources
 	/// 返回类似 <c>The specified threshold is out of range.</c> 的本地化字符串。
 	/// </summary>
 	internal static string InvalidThreshold => ResourceManager.GetString("InvalidThreshold", resourceCulture)!;
+	
+	/// <summary>
+	/// 返回类似 <c>Invalid UnicodeCategory name.</c> 的本地化字符串。
+	/// </summary>
+	internal static string InvalidUnicodeCategoryName => ResourceManager.GetString("InvalidUnicodeCategoryName", resourceCulture)!;
 	
 	/// <summary>
 	/// 返回类似 <c>Specified method is not supported.</c> 的本地化字符串。

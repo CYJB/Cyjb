@@ -4,7 +4,7 @@ namespace Cyjb.Collections.ObjectModel
 	/// 为泛型集合提供基类。
 	/// </summary>
 	/// <typeparam name="T">集合中的元素类型。</typeparam>
-	public abstract class SetBase<T> : CollectionBase<T>, ISet<T>
+	public abstract class SetBase<T> : CollectionBase<T>, ISet<T>, IReadOnlySet<T>
 	{
 		/// <summary>
 		/// 初始化 <see cref="SetBase{T}"/> 类的新实例。

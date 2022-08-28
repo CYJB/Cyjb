@@ -193,6 +193,10 @@
     <value>An element of '{0}' was null.</value>
     <comment>集合中存在 null 元素。</comment>
   </data>
+  <data name="CollectionReadOnly" xml:space="preserve">
+    <value>Collection is read-only.</value>
+    <comment>集合是只读的。</comment>
+  </data>
   <data name="DuplicateName" xml:space="preserve">
     <value>A parameter with the same name has already existed.</value>
     <comment>参数名相同。</comment>
@@ -216,6 +220,10 @@
   <data name="InvalidThreshold" xml:space="preserve">
     <value>The specified threshold is out of range.</value>
     <comment>阈值超出范围。</comment>
+  </data>
+  <data name="InvalidUnicodeCategoryName" xml:space="preserve">
+    <value>Invalid UnicodeCategory name.</value>
+    <comment>无效的 UnicodeCategory 名称。</comment>
   </data>
   <data name="MethodNotSupported" xml:space="preserve">
     <value>Specified method is not supported.</value>

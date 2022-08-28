@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using Cyjb;
 using Cyjb.Collections;
+using Cyjb.Globalization;
 using Cyjb.Test.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -450,7 +451,7 @@ namespace TestCyjb.Collections
 			Assert.IsTrue(expected.SetEquals(set));
 		}
 
-		private HashSet<char> Negated(HashSet<char> set)
+		private static HashSet<char> Negated(HashSet<char> set)
 		{
 			HashSet<char> result = new();
 			for (int i = 0; i <= char.MaxValue; i++)
@@ -459,6 +460,35 @@ namespace TestCyjb.Collections
 			}
 			result.ExceptWith(set);
 			return result;
+		}
+
+		/// <summary>
+		/// 对 <see cref="CharSet.MarkReadOnly"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestMarkReadOnly()
+		{
+			CharSet set = new("abc");
+			set.MarkReadOnly();
+			Assert.IsTrue(set.Contains('b'));
+			Assert.ThrowsException<NotSupportedException>(() => set.Add('a'));
+			Assert.ThrowsException<NotSupportedException>(() => set.Remove('a'));
+			Assert.ThrowsException<NotSupportedException>(() => set.UnionWith("b"));
+		}
+
+		/// <summary>
+		/// 对 <see cref="CharSet.ToString"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestToString()
+		{
+			CharSet set = new();
+			set.UnionWith(UnicodeCategory.UppercaseLetter.GetChars());
+			Assert.AreEqual(@"[\p{Lu}]", set.ToString());
+			set.UnionWith(UnicodeCategory.Control.GetChars());
+			Assert.AreEqual(@"[\p{Lu}\p{Cc}]", set.ToString());
+			set.UnionWith("123");
+			Assert.AreEqual(@"[1-3\p{Lu}\p{Cc}]", set.ToString());
 		}
 
 		/// <summary>

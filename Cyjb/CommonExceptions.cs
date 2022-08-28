@@ -351,6 +351,15 @@ public static class CommonExceptions
 		}
 	}
 
+	/// <summary>
+	/// 返回集合是只读的异常。
+	/// </summary>
+	/// <returns><see cref="NotSupportedException"/> 对象。</returns>
+	public static NotSupportedException CollectionReadOnly()
+	{
+		return new NotSupportedException(Resources.CollectionReadOnly);
+	}
+
 	#endregion // 数组、集合异常
 
 	#region 类型异常
