@@ -9,10 +9,10 @@ namespace Cyjb.Collections
 	/// </summary>
 	/// <remarks>
 	/// <para><see cref="BitList"/> 类采用位示图来保存布尔值，关于该数据结构的更多解释，请参见我的博文
-	/// <see href="http://www.cnblogs.com/cyjb/archive/p/BitList.html">《C# 位压缩列表》</see>。</para>
+	/// <see href="https://www.cnblogs.com/cyjb/archive/p/BitList.html">《C# 位压缩列表》</see>。</para>
 	/// <para>由于位操作的复杂性，<see cref="BitList"/> 类的一些方法效率并不高，实际使用时需要做好相应的测试。</para>
 	/// </remarks>
-	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/BitList.html">《C# 位压缩列表》</seealso>
+	/// <seealso href="https://www.cnblogs.com/cyjb/archive/p/BitList.html">《C# 位压缩列表》</seealso>
 	public sealed class BitList : ListBase<bool>, IEquatable<BitList>, ICollection
 	{
 		/// <summary>
@@ -166,6 +166,65 @@ namespace Cyjb.Collections
 				items = newData;
 				capacity = newLength << IndexShift;
 			}
+		}
+
+		/// <summary>
+		/// 确定 <see cref="BitList"/> 中特定项的索引。
+		/// </summary>
+		/// <param name="item">要在 <see cref="BitList"/> 中定位的对象。</param>
+		/// <param name="startIndex">要定位的起始索引。</param>
+		/// <returns>如果在 <see cref="BitList"/> 中找到 <paramref name="item"/>，
+		/// 则为该项的索引；否则为 <c>-1</c>。</returns>
+		public int IndexOf(bool item, int startIndex)
+		{
+			if (startIndex >= count)
+			{
+				return -1;
+			}
+			int start = startIndex >> IndexShift;
+			int end = count >> IndexShift;
+			int idx = -1;
+			if (item)
+			{
+				uint value = items[start] & ~GetMask(startIndex & IndexMask);
+				if (value > 0U)
+				{
+					idx = (start << IndexShift) + value.CountTrailingZeroBits();
+				}
+				else
+				{
+					for (int i = start + 1; i <= end; i++)
+					{
+						value = items[i];
+						if (value > 0U)
+						{
+							idx = (i << IndexShift) + value.CountTrailingZeroBits();
+							break;
+						}
+					}
+				}
+			}
+			else
+			{
+				uint value = items[start] | GetMask(startIndex & IndexMask);
+				if (value < uint.MaxValue)
+				{
+					idx = (start << IndexShift) + value.CountTrailingBits();
+				}
+				else
+				{
+					for (int i = start + 1; i <= end; i++)
+					{
+						value = items[i];
+						if (value < uint.MaxValue)
+						{
+							idx = (i << IndexShift) + value.CountTrailingBits();
+							break;
+						}
+					}
+				}
+			}
+			return idx > count ? -1 : idx;
 		}
 
 		/// <summary>
@@ -1058,33 +1117,7 @@ namespace Cyjb.Collections
 		/// 则为该项的索引；否则为 <c>-1</c>。</returns>
 		public override int IndexOf(bool item)
 		{
-			int end = count >> IndexShift;
-			int idx = -1;
-			if (item)
-			{
-				for (int i = 0; i <= end; i++)
-				{
-					uint value = items[i];
-					if (value > 0U)
-					{
-						idx = (i << IndexShift) + value.CountTrailingZeroBits();
-						break;
-					}
-				}
-			}
-			else
-			{
-				for (int i = 0; i <= end; i++)
-				{
-					uint value = items[i];
-					if (value < uint.MaxValue)
-					{
-						idx = (i << IndexShift) + value.CountTrailingBits();
-						break;
-					}
-				}
-			}
-			return idx > count ? -1 : idx;
+			return IndexOf(item, 0);
 		}
 
 		#endregion // IList<T> 成员

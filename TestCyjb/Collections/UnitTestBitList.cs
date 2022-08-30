@@ -199,6 +199,21 @@ namespace TestCyjb.Collections
 			Assert.AreEqual(new(new bool[] { false, false }), list);
 		}
 
+		/// <summary>
+		/// 对 <see cref="BitList.IndexOf(bool, int)"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestIndexOf()
+		{
+			BitList bitList = new(new uint[] { 0xE0000009, 0x524447F, 0, 0, uint.MaxValue, 0x1E444FF, 0x1E44410 });
+			List<bool> list = new(bitList);
+			for (int i = 0; i < list.Count; i++)
+			{
+				Assert.AreEqual(list.IndexOf(true, i), bitList.IndexOf(true, i), "indexOf(true, {0})", i);
+				Assert.AreEqual(list.IndexOf(false, i), bitList.IndexOf(false, i), "indexOf(false, {0})", i);
+			}
+		}
+
 		//                                                       0     1     2      3      4     5      6     7      8      9      10    11    12     13
 		private static readonly BitList list1 = new(new bool[] { true, true, false, false, true, false, true, false, false, false, true, true, false, true });
 
@@ -272,7 +287,7 @@ namespace TestCyjb.Collections
 		[DataRow(-1, false, false, false, true, false)]
 		[DataRow(-1, false, false, false, false, true)]
 		[DataRow(-1, false, false, false, false, false)]
-		public void TestIndexOf(int expected, params bool[] pattern)
+		public void TestIndexOfPattern(int expected, params bool[] pattern)
 		{
 			Assert.AreEqual(expected, list1.IndexOf(new BitList(pattern)));
 		}
