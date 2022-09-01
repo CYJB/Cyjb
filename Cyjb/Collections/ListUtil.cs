@@ -1,4 +1,4 @@
-﻿namespace Cyjb.Collections
+namespace Cyjb.Collections
 {
 	/// <summary>
 	/// 提供对 <see cref="IList{T}"/> 的扩展方法。
@@ -34,8 +34,7 @@
 		/// <summary>
 		/// 随机打乱当前列表中元素的顺序。
 		/// </summary>
-		/// <typeparam name="T"><paramref name="list"/> 中的元素的类型。
-		/// </typeparam>
+		/// <typeparam name="T"><paramref name="list"/> 中的元素的类型。</typeparam>
 		/// <param name="list">要随机打乱顺序的列表。</param>
 		/// <returns>已完成随机排序的列表。</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="list"/> 为 <c>null</c>。</exception>
@@ -53,6 +52,88 @@
 				}
 			}
 			return list;
+		}
+
+		/// <summary>
+		/// 将当前列表中的元素变换为下一排列。
+		/// </summary>
+		/// <typeparam name="T"><paramref name="list"/> 中的元素的类型。</typeparam>
+		/// <param name="list">要变换为下一排列的列表。</param>
+		/// <param name="comparer">列表元素的比较器。</param>
+		/// <returns>如果排列存在，则为 <c>true</c>；否则变换为首个排列并返回 <c>false</c>。</returns>
+		public static bool NextPermutation<T>(this IList<T> list, Comparer<T>? comparer = null)
+		{
+			int count = list.Count;
+			if (count <= 1)
+			{
+				return false;
+			}
+			if (comparer == null)
+			{
+				comparer = Comparer<T>.Default;
+			}
+			int cur = count - 1;
+			while (true)
+			{
+				int idx1 = cur;
+				cur--;
+				if (comparer.Compare(list[cur], list[idx1]) < 0)
+				{
+					int idx2 = count - 1;
+					for (; comparer.Compare(list[cur], list[idx2]) >= 0; idx2--) ;
+					T temp = list[cur];
+					list[cur] = list[idx2];
+					list[idx2] = temp;
+					Reverse(list, idx1, count - idx1);
+					return true;
+				}
+				if (cur == 0)
+				{
+					Reverse(list, 0, count);
+					return false;
+				}
+			}
+		}
+
+		/// <summary>
+		/// 将当前列表中的元素变换为上一排列。
+		/// </summary>
+		/// <typeparam name="T"><paramref name="list"/> 中的元素的类型。</typeparam>
+		/// <param name="list">要变换为上一排列的列表。</param>
+		/// <param name="comparer">列表元素的比较器。</param>
+		/// <returns>如果排列存在，则为 <c>true</c>；否则变换为末排列并返回 <c>false</c>。</returns>
+		public static bool PrevPermutation<T>(this IList<T> list, Comparer<T>? comparer = null)
+		{
+			int count = list.Count;
+			if (count <= 1)
+			{
+				return false;
+			}
+			if (comparer == null)
+			{
+				comparer = Comparer<T>.Default;
+			}
+			int cur = count - 1;
+			while (true)
+			{
+				int idx1 = cur;
+				cur--;
+				if (comparer.Compare(list[idx1], list[cur]) < 0)
+				{
+					int idx2 = count - 1;
+					for (; comparer.Compare(list[idx2], list[cur]) >= 0; idx2--) ;
+					T temp = list[cur];
+					list[cur] = list[idx2];
+					list[idx2] = temp;
+					Reverse(list, idx1, count - idx1);
+					return true;
+				}
+				if (cur == 0)
+				{
+					Reverse(list, 0, count);
+					return false;
+				}
+			}
 		}
 
 		#region 翻转
@@ -113,8 +194,7 @@
 		/// <param name="count">要翻转部分的长度。</param>
 		private static void ReverseInterval<T>(this IList<T> list, int index, int count)
 		{
-			int end = index + count - 1;
-			for (; index < end; index++, end--)
+			for (int end = index + count - 1; index < end; index++, end--)
 			{
 				T temp = list[index];
 				list[index] = list[end];

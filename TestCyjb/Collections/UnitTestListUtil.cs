@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cyjb.Collections;
@@ -67,6 +67,86 @@ namespace TestCyjb.Collections
 				}
 				Console.WriteLine();
 			}
+		}
+
+		/// <summary>
+		/// 对 <see cref="ListUtil.NextPermutation"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestNextPermutation()
+		{
+			List<int> list = new();
+			Assert.IsFalse(list.NextPermutation());
+
+			list.Add(1);
+			Assert.IsFalse(list.NextPermutation());
+			CollectionAssert.AreEqual(new int[] { 1 }, list);
+
+			list.Add(2);
+			Assert.IsTrue(list.NextPermutation());
+			CollectionAssert.AreEqual(new int[] { 2, 1 }, list);
+			Assert.IsFalse(list.NextPermutation());
+			CollectionAssert.AreEqual(new int[] { 1, 2 }, list);
+
+			int[] first = Permutations.Permutations3[0];
+			list = new List<int>(first);
+			for (int i = 1; i < Permutations.Permutations3.Length; i++)
+			{
+				Assert.IsTrue(list.NextPermutation());
+				CollectionAssert.AreEqual(Permutations.Permutations3[i], list);
+			}
+			Assert.IsFalse(list.NextPermutation());
+			CollectionAssert.AreEqual(first, list);
+
+			first = Permutations.Permutations6[0];
+			list = new List<int>(first);
+			for (int i = 1; i < Permutations.Permutations6.Length; i++)
+			{
+				Assert.IsTrue(list.NextPermutation());
+				CollectionAssert.AreEqual(Permutations.Permutations6[i], list);
+			}
+			Assert.IsFalse(list.NextPermutation());
+			CollectionAssert.AreEqual(first, list);
+		}
+
+		/// <summary>
+		/// 对 <see cref="ListUtil.PrevPermutation"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestPrevPermutation()
+		{
+			List<int> list = new();
+			Assert.IsFalse(list.PrevPermutation());
+
+			list.Add(1);
+			Assert.IsFalse(list.PrevPermutation());
+			CollectionAssert.AreEqual(new int[] { 1 }, list);
+
+			list.Insert(0, 2);
+			Assert.IsTrue(list.PrevPermutation());
+			CollectionAssert.AreEqual(new int[] { 1, 2 }, list);
+			Assert.IsFalse(list.PrevPermutation());
+			CollectionAssert.AreEqual(new int[] { 2, 1 }, list);
+
+			int[] first = Permutations.Permutations3[^1];
+			list = new List<int>(first);
+			for (int i = Permutations.Permutations3.Length - 2; i >= 0; i--)
+			{
+				Assert.IsTrue(list.PrevPermutation());
+				CollectionAssert.AreEqual(Permutations.Permutations3[i], list);
+			}
+			Assert.IsFalse(list.PrevPermutation());
+			CollectionAssert.AreEqual(first, list);
+
+			first = Permutations.Permutations6[^1];
+			list = new List<int>(first);
+			for (int i = Permutations.Permutations6.Length - 2; i >= 0; i--)
+			{
+				Assert.IsTrue(list.PrevPermutation());
+				CollectionAssert.AreEqual(Permutations.Permutations6[i], list);
+			}
+			Assert.IsFalse(list.PrevPermutation());
+			CollectionAssert.AreEqual(first, list);
 		}
 
 		/// <summary>
