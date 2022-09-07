@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using Cyjb;
 using Cyjb.Collections;
 using Cyjb.Globalization;
+using Cyjb.Test;
 using Cyjb.Test.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -483,12 +485,24 @@ namespace TestCyjb.Collections
 		public void TestToString()
 		{
 			CharSet set = new();
+			set.UnionWith("abc");
+			Assert.AreEqual(@"[a-c]", set.ToString());
 			set.UnionWith(UnicodeCategory.UppercaseLetter.GetChars());
-			Assert.AreEqual(@"[\p{Lu}]", set.ToString());
+			Assert.AreEqual(@"[a-c\p{Lu}]", set.ToString());
+			set.UnionWith(UnicodeCategory.LowercaseLetter.GetChars());
+			Assert.AreEqual(@"[\p{Lu}\p{Ll}]", set.ToString());
 			set.UnionWith(UnicodeCategory.Control.GetChars());
-			Assert.AreEqual(@"[\p{Lu}\p{Cc}]", set.ToString());
+			Assert.AreEqual(@"[\p{Lu}\p{Ll}\p{Cc}]", set.ToString());
 			set.UnionWith("123");
-			Assert.AreEqual(@"[1-3\p{Lu}\p{Cc}]", set.ToString());
+			Assert.AreEqual(@"[1-3\p{Lu}\p{Ll}\p{Cc}]", set.ToString());
+			set.UnionWith(UnicodeCategory.DecimalDigitNumber.GetChars());
+			Assert.AreEqual(@"[\p{Lu}\p{Ll}\p{Nd}\p{Cc}]", set.ToString());
+			set.ExceptWith("abcdefhjk");
+			Assert.AreEqual(@"[\p{Lu}\p{Ll}\p{Nd}\p{Cc}-[a-fhjk]]", set.ToString());
+			set.Add('\0', char.MaxValue);
+			Assert.AreEqual(@"[\0-\uFFFF]", set.ToString());
+			set.Remove('\u03AA', '\u03AD');
+			Assert.AreEqual(@"[\0-Ωή-\uFFFF]", set.ToString());
 		}
 
 		/// <summary>
@@ -629,6 +643,85 @@ namespace TestCyjb.Collections
 				generateMappingWatch.ElapsedMilliseconds,
 				charSetWatch.ElapsedMilliseconds,
 				hashSetWatch.ElapsedMilliseconds);
+		}
+
+		/// <summary>
+		/// 对 <see cref="CharSet.RangeCount"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestRangeCount()
+		{
+			CharSet testSet = new();
+			Assert.AreEqual(0, testSet.RangeCount());
+			testSet.Add('\0', char.MaxValue);
+			Assert.AreEqual(1, testSet.RangeCount());
+
+
+			StringBuilder text = new();
+			for (int i = 0x40; i < 0x80; i++)
+			{
+				text.Append((char)i);
+			}
+			string str40 = text.ToString();
+			List<string> testStrs = new() { "\0", "\x01", "\x02", "\x04", "\x05", "\x3E", "\x3F", str40 };
+			testStrs.Sort();
+
+			int count = testStrs.Count;
+			while (testStrs.NextPermutation())
+			{
+				CharSet set = new();
+				for (int i = 0; i < count; i++)
+				{
+					set.AddRange(testStrs[i]);
+					Assert.AreEqual(set.Ranges().Count(), set.RangeCount(), set.ToString());
+				}
+			}
+
+			testStrs = new List<string>() { "\x3E", "\x3F", str40, "\x80", "\x81", "\x13C", "\x13D" };
+			testStrs.Sort();
+
+			count = testStrs.Count;
+			while (testStrs.NextPermutation())
+			{
+				CharSet set = new();
+				for (int i = 0; i < count; i++)
+				{
+					set.AddRange(testStrs[i]);
+					Assert.AreEqual(set.Ranges().Count(), set.RangeCount(), set.ToString());
+				}
+			}
+		}
+
+		/// <summary>
+		/// 对 <see cref="CharSet.RangeCount"/> 方法性能进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestRangeCountPerformance()
+		{
+			List<CharSet> sets = new();
+			CharSet set = new();
+			for (int i = 0; i < 10000; i++)
+			{
+				char ch = (char)Random.Shared.Next();
+				set.Add(ch);
+				sets.Add(new CharSet(set));
+			}
+
+			int count = sets.Count;
+			Performance.Measure("Ranges().Count()", 2, () =>
+			{
+				for (int i = 0; i < count; i++)
+				{
+					sets[i].Ranges().Count();
+				}
+			}).Print();
+			Performance.Measure("RangeCount()", 2, () =>
+			{
+				for (int i = 0; i < count; i++)
+				{
+					sets[i].RangeCount();
+				}
+			}).Print();
 		}
 	}
 }

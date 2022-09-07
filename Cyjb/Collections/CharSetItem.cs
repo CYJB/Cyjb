@@ -663,6 +663,47 @@ internal sealed class CharSetItem : IEnumerable<ValueRange<char>>, IEquatable<Ch
 		data = EmptyData;
 	}
 
+	/// <summary>
+	/// 计算范围的端点个数。
+	/// </summary>
+	/// <param name="lastBit">前一 bit 的值。</param>
+	/// <returns>范围的端点个数。</returns>
+	public int PointCount(ref ulong lastBit)
+	{
+		int pCount;
+		if (count == 0)
+		{
+			pCount = (int)lastBit;
+			lastBit = 0UL;
+			return pCount;
+		}
+		if (count == CharSetConfig.BtmCount)
+		{
+			pCount = 1 - (int)lastBit;
+			lastBit = 1UL;
+			return pCount;
+		}
+		pCount = 0;
+		for (int i = 0; i < CharSetConfig.BtmLen; i++)
+		{
+			ulong value = data[i];
+			if (value == ulong.MaxValue)
+			{
+				if (lastBit == 0UL)
+				{
+					pCount++;
+					lastBit = 1UL;
+				}
+			}
+			else
+			{
+				pCount += (value ^ (value << 1 | lastBit)).CountBits();
+				lastBit = (value & 0x8000000000000000UL) > 0 ? 1UL : 0UL;
+			}
+		}
+		return pCount;
+	}
+
 	#region IEnumerable<ItemRange<char>> 成员
 
 	/// <summary>

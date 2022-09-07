@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
-using System.Text;
 using Cyjb.Collections.ObjectModel;
-using Cyjb.Globalization;
 
 namespace Cyjb.Collections;
 
@@ -17,7 +15,7 @@ namespace Cyjb.Collections;
 /// 《基于树状位压缩数组的字符集合》</seealso>
 [Serializable, DebuggerDisplay("{ToString()} Count = {Count}")]
 [DebuggerTypeProxy(typeof(CharSetDebugView))]
-public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollection<char>
+public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollection<char>
 {
 	/// <summary>
 	/// 字符集合的顶层数组。
@@ -496,6 +494,22 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 	}
 
 	/// <summary>
+	/// 返回当前字符集合包含的范围个数。
+	/// </summary>
+	/// <returns>当前字符集合包含的范围个数。</returns>
+	/// <remarks>与 <c>CharSet.Ranges().Count()</c> 等价，但效率更高。</remarks>
+	public int RangeCount()
+	{
+		int pointCount = 0;
+		ulong lastBit = 0UL;
+		for (int i = 0; i < CharSetConfig.TopLen; i++)
+		{
+			pointCount += data[i].PointCount(ref lastBit);
+		}
+		return (pointCount + 1) >> 1;
+	}
+
+	/// <summary>
 	/// 返回一个循环访问字符范围的枚举器。
 	/// </summary>
 	/// <returns>可用于循环访问字符范围的 <see cref="IEnumerable{Tuple}"/>。</returns>
@@ -882,15 +896,12 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 		{
 			otherSet = new CharSet(other);
 		}
-		int oldCount = count;
 		for (int i = 0; i < CharSetConfig.TopLen; i++)
 		{
 			count += data[i].SymmetricExceptWith(otherSet.data[i]);
 		}
-		if (count != oldCount)
-		{
-			MarkDirty();
-		}
+		// 这里不对比 count，因为字符可能增删。
+		MarkDirty();
 	}
 
 	/// <summary>
@@ -1073,46 +1084,4 @@ public sealed class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollecti
 
 	#endregion // IEquatable<CharSet> 成员
 
-	/// <summary>
-	/// 返回当前集合的字符串表示。
-	/// </summary>
-	/// <returns>当前集合的字符串表示。</returns>
-	public override string ToString()
-	{
-		if (text == null)
-		{
-			StringBuilder builder = new();
-			builder.Append('[');
-			// 允许通过 UnicodeCategory 压缩字符串表示形式。
-			CharSet tempSet = new(this);
-			StringBuilder categories = new();
-			foreach (UnicodeCategory category in Enum.GetValues<UnicodeCategory>())
-			{
-				IReadOnlySet<char> chars = category.GetChars();
-				if (tempSet.IsSupersetOf(chars))
-				{
-					categories.Append(@"\p{");
-					categories.Append(category.GetName());
-					categories.Append('}');
-					tempSet.ExceptWith(chars);
-				}
-			}
-			foreach (var (start, end) in tempSet.Ranges())
-			{
-				builder.Append(start.UnicodeEscape(false));
-				if (start < end)
-				{
-					if (start + 1 < end)
-					{
-						builder.Append('-');
-					}
-					builder.Append(end.UnicodeEscape(false));
-				}
-			}
-			builder.Append(categories);
-			builder.Append(']');
-			text = builder.ToString();
-		}
-		return text;
-	}
 }
