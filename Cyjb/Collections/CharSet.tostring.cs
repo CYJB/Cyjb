@@ -35,7 +35,7 @@ public sealed partial class CharSet
 	/// <summary>
 	/// Unicode 类别信息。
 	/// </summary>
-	private static Lazy<UnicodeCategoryInfo[]> UnicodeCategoryInfos = new(() =>
+	private static readonly Lazy<UnicodeCategoryInfo[]> UnicodeCategoryInfos = new(() =>
 	{
 		UnicodeCategory[] categories = Enum.GetValues<UnicodeCategory>();
 		UnicodeCategoryInfo[] infos = new UnicodeCategoryInfo[categories.Length + 6];
@@ -100,9 +100,8 @@ public sealed partial class CharSet
 			while (changed)
 			{
 				changed = false;
-				for (int i = 0; i < infos.Count; i++)
+				foreach(UnicodeCategoryInfo info in infos)
 				{
-					UnicodeCategoryInfo info = infos[i];
 					IReadOnlySet<char> catChars = info.Chars;
 					// 允许最多尝试 10% 的排除字符。
 					if (1.1 * chars.Count < catChars.Count)
