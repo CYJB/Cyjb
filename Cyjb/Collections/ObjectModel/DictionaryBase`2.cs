@@ -16,12 +16,12 @@ public abstract class DictionaryBase<TKey, TValue> : IDictionary<TKey, TValue>,
 	where TKey : notnull
 {
 	/// <summary>
-	/// 用于同步集合访问的对象。
+	/// 用于同步字典访问的对象。
 	/// </summary>
 	[NonSerialized, DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	private object? syncRoot;
 	/// <summary>
-	/// 当前集合是否是只读的。
+	/// 当前字典是否是只读的。
 	/// </summary>
 	private bool isReadOnly = false;
 	/// <summary>
@@ -42,9 +42,9 @@ public abstract class DictionaryBase<TKey, TValue> : IDictionary<TKey, TValue>,
 	{ }
 
 	/// <summary>
-	/// 获取一个可用于同步对当前集合的访问的对象。
+	/// 获取一个可用于同步对当前字典的访问的对象。
 	/// </summary>
-	/// <returns>可用于同步对当前集合的访问的对象。</returns>
+	/// <returns>可用于同步对当前字典的访问的对象。</returns>
 	protected virtual object GetSyncRoot()
 	{
 		if (syncRoot == null)
@@ -55,7 +55,7 @@ public abstract class DictionaryBase<TKey, TValue> : IDictionary<TKey, TValue>,
 	}
 
 	/// <summary>
-	/// 将当前集合设置为只读的。
+	/// 将当前字典设置为只读的。
 	/// </summary>
 	protected void SetCollectionReadOnly()
 	{
@@ -63,7 +63,7 @@ public abstract class DictionaryBase<TKey, TValue> : IDictionary<TKey, TValue>,
 	}
 
 	/// <summary>
-	/// 检查当前集合是否是只读的。
+	/// 检查当前字典是否是只读的。
 	/// </summary>
 	protected void CheckIsReadOnly()
 	{
@@ -317,15 +317,15 @@ public abstract class DictionaryBase<TKey, TValue> : IDictionary<TKey, TValue>,
 	#region ICollection<KeyValuePair<TKey, TValue>> 成员
 
 	/// <summary>
-	/// 获取当前集合包含的元素数。
+	/// 获取当前字典包含的元素数。
 	/// </summary>
-	/// <value>当前集合中包含的元素数。</value>
+	/// <value>当前字典中包含的元素数。</value>
 	public abstract int Count { get; }
 
 	/// <summary>
-	/// 获取一个值，该值指示当前集合是否为只读。
+	/// 获取一个值，该值指示当前字典是否为只读。
 	/// </summary>
-	/// <value>如果当前集合是只读的，则为 <c>true</c>；否则为 <c>false</c>。</value>
+	/// <value>如果当前字典是只读的，则为 <c>true</c>；否则为 <c>false</c>。</value>
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => isReadOnly;
 
@@ -341,7 +341,7 @@ public abstract class DictionaryBase<TKey, TValue> : IDictionary<TKey, TValue>,
 	}
 
 	/// <summary>
-	/// 从当前集合中移除所有元素。
+	/// 从当前字典中移除所有元素。
 	/// </summary>
 	public abstract void Clear();
 
@@ -408,31 +408,31 @@ public abstract class DictionaryBase<TKey, TValue> : IDictionary<TKey, TValue>,
 	#region ICollection 成员
 
 	/// <summary>
-	/// 获取一个值，该值指示是否同步对当前集合的访问（线程安全）。
+	/// 获取一个值，该值指示是否同步对当前字典的访问（线程安全）。
 	/// </summary>
-	/// <value>如果对当前集合的访问是同步的（线程安全），则为 <c>true</c>；否则为 <c>false</c>。</value>
+	/// <value>如果对当前字典的访问是同步的（线程安全），则为 <c>true</c>；否则为 <c>false</c>。</value>
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	bool ICollection.IsSynchronized => false;
 
 	/// <summary>
-	/// 获取一个可用于同步对当前集合的访问的对象。
+	/// 获取一个可用于同步对当前字典的访问的对象。
 	/// </summary>
-	/// <value>可用于同步对当前集合的访问的对象。</value>
+	/// <value>可用于同步对当前字典的访问的对象。</value>
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	object ICollection.SyncRoot => GetSyncRoot();
 
 	/// <summary>
-	/// 从特定的 <see cref="Array"/> 索引处开始，将当前集合的元素复制到一个 <see cref="Array"/> 中。
+	/// 从特定的 <see cref="Array"/> 索引处开始，将当前字典的元素复制到一个 <see cref="Array"/> 中。
 	/// </summary>
-	/// <param name="array">从当前集合复制的元素的目标位置的一维 <see cref="Array"/>。
+	/// <param name="array">从当前字典复制的元素的目标位置的一维 <see cref="Array"/>。
 	/// <paramref name="array"/> 必须具有从零开始的索引。</param>
 	/// <param name="index"><paramref name="array"/> 中从零开始的索引，在此处开始复制。</param>
 	/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> 小于零。</exception>
 	/// <exception cref="ArgumentException"><paramref name="array"/> 是多维的。</exception>
-	/// <exception cref="ArgumentException">当前集合中的元素数目大于从 <paramref name="index"/>
+	/// <exception cref="ArgumentException">当前字典中的元素数目大于从 <paramref name="index"/>
 	/// 到目标 <paramref name="array"/> 末尾之间的可用空间。</exception>
-	/// <exception cref="ArgumentException">当前集合的类型无法自动转换为目标 <paramref name="array"/> 的类型。</exception>
+	/// <exception cref="ArgumentException">当前字典的类型无法自动转换为目标 <paramref name="array"/> 的类型。</exception>
 	void ICollection.CopyTo(Array array, int index)
 	{
 		CollectionHelper.CopyTo(this, array, index);
@@ -443,9 +443,9 @@ public abstract class DictionaryBase<TKey, TValue> : IDictionary<TKey, TValue>,
 	#region IEnumerable<T> 成员
 
 	/// <summary>
-	/// 返回一个循环访问集合的枚举器。
+	/// 返回一个循环访问字典的枚举器。
 	/// </summary>
-	/// <returns>可用于循环访问集合的 <see cref="IEnumerator{T}"/> 对象。</returns>
+	/// <returns>可用于循环访问字典的 <see cref="IEnumerator{T}"/> 对象。</returns>
 	public abstract IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator();
 
 	#endregion // IEnumerable<T> 成员
@@ -453,9 +453,9 @@ public abstract class DictionaryBase<TKey, TValue> : IDictionary<TKey, TValue>,
 	#region IEnumerable 成员
 
 	/// <summary>
-	/// 返回一个循环访问集合的枚举器。
+	/// 返回一个循环访问字典的枚举器。
 	/// </summary>
-	/// <returns>可用于循环访问集合的 <see cref="IEnumerator"/> 对象。</returns>
+	/// <returns>可用于循环访问字典的 <see cref="IEnumerator"/> 对象。</returns>
 	IEnumerator IEnumerable.GetEnumerator()
 	{
 		return GetEnumerator();
