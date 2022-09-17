@@ -15,27 +15,22 @@ namespace TestCyjb.Collections.ObjectModel
 		{
 			private readonly List<int> items = new();
 			public override int Count => items.Count;
-
 			public override void Clear()
 			{
 				items.Clear();
 			}
-
 			public override bool Contains(int item)
 			{
 				return items.Contains(item);
 			}
-
 			public override IEnumerator<int> GetEnumerator()
 			{
 				return items.GetEnumerator();
 			}
-
 			public override bool Remove(int item)
 			{
 				return items.Remove(item);
 			}
-
 			protected override void AddItem(int item)
 			{
 				items.Add(item);

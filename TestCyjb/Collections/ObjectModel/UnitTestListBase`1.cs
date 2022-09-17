@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace TestCyjb.Collections.ObjectModel
 {
 	/// <summary>
-	/// <see cref="ListBase{T}"/> ÀàµÄµ¥Ôª²âÊÔ¡£
+	/// <see cref="ListBase{T}"/> ç±»çš„å•å…ƒæµ‹è¯•ã€‚
 	/// </summary>
 	[TestClass]
 	public class UnitTestListBase
@@ -20,22 +20,18 @@ namespace TestCyjb.Collections.ObjectModel
 			{
 				return items.IndexOf(item);
 			}
-
 			protected override void InsertItem(int index, int item)
 			{
 				items.Insert(index, item);
 			}
-
 			protected override void RemoveItem(int index)
 			{
 				items.RemoveAt(index);
 			}
-
 			protected override int GetItemAt(int index)
 			{
 				return items[index];
 			}
-
 			protected override void SetItemAt(int index, int item)
 			{
 				items[index] = item;
@@ -48,11 +44,10 @@ namespace TestCyjb.Collections.ObjectModel
 			{
 				return items.GetEnumerator();
 			}
-
 		}
 
 		/// <summary>
-		/// ¶Ô <see cref="ListBase{T}"/> Àà½øĞĞ²âÊÔ¡£
+		/// å¯¹ <see cref="ListBase{T}"/> ç±»è¿›è¡Œæµ‹è¯•ã€‚
 		/// </summary>
 		[TestMethod]
 		public void TestListBase()

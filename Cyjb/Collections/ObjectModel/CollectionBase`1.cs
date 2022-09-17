@@ -80,8 +80,7 @@ public abstract class CollectionBase<T> : ICollection<T>, IReadOnlyCollection<T>
 	/// <summary>
 	/// 获取一个值，该值指示当前集合是否为只读。
 	/// </summary>
-	/// <value>如果当前集合是只读的，则为 <c>true</c>；
-	/// 否则为 <c>false</c>。</value>
+	/// <value>如果当前集合是只读的，则为 <c>true</c>；否则为 <c>false</c>。</value>
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	bool ICollection<T>.IsReadOnly => isReadOnly;
 
@@ -119,7 +118,7 @@ public abstract class CollectionBase<T> : ICollection<T>, IReadOnlyCollection<T>
 	/// <exception cref="ArgumentException"><see cref="CollectionBase{T}"/> 
 	/// 中的元素数目大于从 <paramref name="arrayIndex"/> 到目标 <paramref name="array"/> 
 	/// 末尾之间的可用空间。</exception>
-	/// <exception cref="ArgumentException">源当前集合
+	/// <exception cref="ArgumentException">当前集合
 	/// 的类型无法自动转换为目标 <paramref name="array"/> 的类型。</exception>
 	public void CopyTo(T[] array, int arrayIndex)
 	{
@@ -131,7 +130,7 @@ public abstract class CollectionBase<T> : ICollection<T>, IReadOnlyCollection<T>
 	/// </summary>
 	/// <param name="item">要从当前集合中移除的对象。</param>
 	/// <returns>如果已从当前集合中成功移除 <paramref name="item"/>，则为 <c>true</c>；否则为 <c>false</c>。
-	/// 如果在原始当前集合中没有找到 <paramref name="item"/>，该方法也会返回 <c>false</c>。</returns>
+	/// 如果在当前集合中没有找到 <paramref name="item"/>，该方法也会返回 <c>false</c>。</returns>
 	public abstract bool Remove(T item);
 
 	#endregion // ICollection<T> 成员
