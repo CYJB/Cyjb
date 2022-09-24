@@ -7,12 +7,12 @@ namespace Cyjb;
 /// </summary>
 /// <typeparam name="T1">第一个可选类型。</typeparam>
 /// <typeparam name="T2">第二个可选类型。</typeparam>
-public sealed class Variant<T1, T2>
+public class Variant<T1, T2>
 {
 	/// <summary>
 	/// 值的索引。
 	/// </summary>
-	private int index;
+	protected int index;
 	/// <summary>
 	/// 第一个类型的值。
 	/// </summary>
@@ -23,6 +23,15 @@ public sealed class Variant<T1, T2>
 	private T2? value2;
 
 	/// <summary>
+	/// 使用指定的值索引初始化 <see cref="Variant{T1, T2}"/> 结构的新实例。
+	/// </summary>
+	/// <param name="index">值的索引。</param>
+	protected Variant(int index)
+	{
+		this.index = index;
+	}
+
+	/// <summary>
 	/// 使用指定的值初始化 <see cref="Variant{T1, T2}"/> 结构的新实例。
 	/// </summary>
 	/// <param name="value">初始化的值。</param>
@@ -30,7 +39,6 @@ public sealed class Variant<T1, T2>
 	{
 		index = 0;
 		value1 = value;
-		value2 = default;
 	}
 
 	/// <summary>
@@ -40,14 +48,13 @@ public sealed class Variant<T1, T2>
 	public Variant(T2 value)
 	{
 		index = 1;
-		value1 = default;
 		value2 = value;
 	}
 
 	/// <summary>
 	/// 获取值的类型。
 	/// </summary>
-	public Type ValueType => index switch
+	public virtual Type ValueType => index switch
 	{
 		0 => typeof(T1),
 		_ => typeof(T2),
@@ -56,7 +63,7 @@ public sealed class Variant<T1, T2>
 	/// <summary>
 	/// 获取或设置当前实例保存的值。
 	/// </summary>
-	public object Value
+	public virtual object Value
 	{
 		get
 		{
@@ -85,9 +92,8 @@ public sealed class Variant<T1, T2>
 	/// <param name="value">要设置的值。</param>
 	public void SetValue(T1 value)
 	{
-		index = 0;
+		ResetValue(0);
 		value1 = value;
-		value2 = default;
 	}
 
 	/// <summary>
@@ -96,8 +102,7 @@ public sealed class Variant<T1, T2>
 	/// <param name="value">要设置的值。</param>
 	public void SetValue(T2 value)
 	{
-		index = 1;
-		value1 = default;
+		ResetValue(1);
 		value2 = value;
 	}
 
@@ -140,6 +145,17 @@ public sealed class Variant<T1, T2>
 	}
 
 	/// <summary>
+	/// 重置所有值。
+	/// </summary>
+	/// <param name="index">要重置到的索引。</param>
+	protected virtual void ResetValue(int index)
+	{
+		this.index = index;
+		value1 = default;
+		value2 = default;
+	}
+
+	/// <summary>
 	/// 允许从 <typeparamref name="T1"/> 隐式转换为 <see cref="Variant{T1, T2}"/>。
 	/// </summary>
 	/// <param name="value">要转换的值。</param>
@@ -154,9 +170,9 @@ public sealed class Variant<T1, T2>
 	/// <param name="value">要转换的值。</param>
 	public static explicit operator T1(Variant<T1, T2> value)
 	{
-		if (value.index == 0)
+		if (value.TryGetValue(out T1? result))
 		{
-			return value.value1!;
+			return result;
 		}
 		throw CommonExceptions.InvalidCast(typeof(T2), typeof(T1));
 	}
@@ -176,9 +192,9 @@ public sealed class Variant<T1, T2>
 	/// <param name="value">要转换的值。</param>
 	public static explicit operator T2(Variant<T1, T2> value)
 	{
-		if (value.index == 1)
+		if (value.TryGetValue(out T2? result))
 		{
-			return value.value2!;
+			return result;
 		}
 		throw CommonExceptions.InvalidCast(typeof(T1), typeof(T2));
 	}
