@@ -6,7 +6,6 @@ namespace Cyjb.Collections.ObjectModel;
 /// 提供 <see cref="IDictionaryEnumerator"/> 的包装。
 /// </summary>
 internal class DictionaryEnumerator<TKey, TValue> : IDictionaryEnumerator
-	where TKey : notnull
 {
 	/// <summary>
 	/// 被包装的迭代器。
@@ -25,12 +24,12 @@ internal class DictionaryEnumerator<TKey, TValue> : IDictionaryEnumerator
 	/// <summary>
 	/// 同时获取当前字典项的键和值。
 	/// </summary>
-	public DictionaryEntry Entry => new(enumerator.Current.Key, enumerator.Current.Value);
+	public DictionaryEntry Entry => new(enumerator.Current.Key!, enumerator.Current.Value);
 
 	/// <summary>
 	/// 获取当前字典项的键。
 	/// </summary>
-	public object Key => enumerator.Current.Key;
+	public object Key => enumerator.Current.Key!;
 
 	/// <summary>
 	/// 获取当前字典项的值。

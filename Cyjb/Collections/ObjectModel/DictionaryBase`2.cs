@@ -13,7 +13,6 @@ namespace Cyjb.Collections.ObjectModel;
 [DebuggerTypeProxy(typeof(DictionaryDebugView<,>))]
 public abstract class DictionaryBase<TKey, TValue> : IDictionary<TKey, TValue>,
 	IReadOnlyDictionary<TKey, TValue>, IDictionary, ICollection<KeyValuePair<TKey, TValue>>
-	where TKey : notnull
 {
 	/// <summary>
 	/// 用于同步字典访问的对象。
