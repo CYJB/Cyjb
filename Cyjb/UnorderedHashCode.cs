@@ -11,6 +11,22 @@ namespace Cyjb;
 [SuppressMessage("Usage", "CA2231:重写值类型的 Equals 方法时应重载相等运算符", Justification = "<挂起>")]
 public struct UnorderedHashCode
 {
+	/// <summary>
+	/// 返回指定集合的无序哈希代码。
+	/// </summary>
+	/// <typeparam name="T">集合的元素类型。</typeparam>
+	/// <param name="collection">要计算无序哈希代码的集合。</param>
+	/// <returns>指定集合的无序哈希代码。</returns>
+	public static int Combine<T>(IEnumerable<T> collection)
+	{
+		UnorderedHashCode hashCode = new();
+		foreach (T item in collection)
+		{
+			hashCode.Add(item);
+		}
+		return hashCode.ToHashCode();
+	}
+
 	private uint count;
 	private int sum;
 	private int xor;
