@@ -38,11 +38,19 @@ public struct TextSpan : IComparable<TextSpan>, IEquatable<TextSpan>
 	/// <summary>
 	/// 范围的起始位置。
 	/// </summary>
-	public int Start => start;
+	public int Start
+	{
+		get => start;
+		init => start = value;
+	}
 	/// <summary>
 	/// 范围的结束位置（不含）。
 	/// </summary>
-	public int End => end;
+	public int End
+	{
+		get => end;
+		init => end = value;
+	}
 	/// <summary>
 	/// 范围的长度。
 	/// </summary>
@@ -51,6 +59,17 @@ public struct TextSpan : IComparable<TextSpan>, IEquatable<TextSpan>
 	/// 范围是否是空的。
 	/// </summary>
 	public bool IsEmpty => start == end;
+
+	/// <summary>
+	/// 解构当前文本范围。
+	/// </summary>
+	/// <param name="start">文本范围的起始位置（包含）。</param>
+	/// <param name="end">文本范围的结束位置（不含）。</param>
+	public void Deconstruct(out int start, out int end)
+	{
+		start = this.start;
+		end = this.end;
+	}
 
 	#region 范围操作
 

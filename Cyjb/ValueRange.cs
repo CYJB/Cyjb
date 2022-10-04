@@ -35,12 +35,20 @@ namespace Cyjb
 		/// <summary>
 		/// 范围的起始值（包含）。
 		/// </summary>
-		public T Start => start;
+		public T Start
+		{
+			get => start;
+			init => start = value;
+		}
 
 		/// <summary>
 		/// 范围的结束值（包含）。
 		/// </summary>
-		public T End => end;
+		public T End
+		{
+			get => end;
+			init => end = value;
+		}
 
 		/// <summary>
 		/// 解构当前范围。

@@ -58,15 +58,27 @@ public struct LinePosition : IComparable<LinePosition>, IEquatable<LinePosition>
 	/// <summary>
 	/// 行号，从 <c>1</c> 开始。
 	/// </summary>
-	public int Line => line;
+	public int Line
+	{
+		get => line;
+		init => line = value;
+	}
 	/// <summary>
 	/// 行内的字符位置，从 <c>0</c> 开始。
 	/// </summary>
-	public int Character => character;
+	public int Character
+	{
+		get => character;
+		init => character = value;
+	}
 	/// <summary>
 	/// 列号，从 <c>1</c> 开始。
 	/// </summary>
-	public int Column => column;
+	public int Column
+	{
+		get => column;
+		init => column = value;
+	}
 
 	#region IComparable<LinePosition> 成员
 
