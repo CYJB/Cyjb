@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Cyjb;
 
@@ -95,6 +96,7 @@ public struct UniqueValue<TValue>
 	/// </summary>
 	/// <value>如果值被设置了，而且是唯一的，则为 <c>true</c>；
 	/// 如果值未被设置，或者不唯一，则为 <c>false</c>。</value>
+	[MemberNotNullWhen(true, nameof(Value))]
 	public bool IsUnique
 	{
 		get { return isUnique == true; }
