@@ -163,6 +163,25 @@ public class ListStack<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	}
 
 	/// <summary>
+	/// 删除堆栈顶部指定个数的元素。
+	/// </summary>
+	/// <param name="size">要删除的元素个数。</param>
+	/// <exception cref="InvalidOperationException"><paramref name="size"/> 不是堆栈的有效个数。</exception>
+	public void Pop(int size)
+	{
+		if (size < 0 || size > count)
+		{
+			throw CommonExceptions.ArgumentOutOfRange(size);
+		}
+		if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+		{
+			Array.Clear(items, count - size, size);
+		}
+		count -= size;
+		version++;
+	}
+
+	/// <summary>
 	/// 返回堆栈顶部的元素，但不将其移除。
 	/// </summary>
 	/// <returns>堆栈顶部的元素。</returns>

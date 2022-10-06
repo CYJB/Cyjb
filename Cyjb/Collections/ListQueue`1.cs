@@ -192,6 +192,39 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	}
 
 	/// <summary>
+	/// 删除队列开始处指定个数的元素。
+	/// </summary>
+	/// <param name="size">要删除的元素个数。</param>
+	/// <exception cref="InvalidOperationException"><paramref name="size"/> 不是堆栈的有效个数。</exception>
+	public void Dequeue(int size)
+	{
+		if (size < 0 || size > count)
+		{
+			throw CommonExceptions.ArgumentOutOfRange(size);
+		}
+		int newHead = head + size;
+		if (newHead < items.Length)
+		{
+			if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+			{
+				Array.Clear(items, head, size);
+			}
+		}
+		else
+		{
+			newHead -= items.Length;
+			if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+			{
+				Array.Clear(items, head, items.Length - head);
+				Array.Clear(items, 0, newHead);
+			}
+		}
+		head = newHead;
+		count -= size;
+		version++;
+	}
+
+	/// <summary>
 	/// 返回队列开始处的元素，但不将其移除。
 	/// </summary>
 	/// <returns>队列开始处的元素。</returns>
