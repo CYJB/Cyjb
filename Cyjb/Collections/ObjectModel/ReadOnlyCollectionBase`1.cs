@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Diagnostics;
 
 namespace Cyjb.Collections.ObjectModel
@@ -17,10 +17,18 @@ namespace Cyjb.Collections.ObjectModel
 		[NonSerialized, DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private object? syncRoot;
 		/// <summary>
+		/// 集合是否为只读的。
+		/// </summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private readonly bool isReadOnly;
+
+		/// <summary>
 		/// 初始化 <see cref="ReadOnlyCollectionBase{T}"/> 类的新实例。
 		/// </summary>
-		protected ReadOnlyCollectionBase()
-		{ }
+		protected ReadOnlyCollectionBase(bool isReadOnly = true)
+		{
+			this.isReadOnly = isReadOnly;
+		}
 
 		/// <summary>
 		/// 获取一个可用于同步对当前集合的访问的对象。
@@ -49,10 +57,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <value>如果当前集合是只读的，则为 <c>true</c>；
 		/// 否则为 <c>false</c>。</value>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		bool ICollection<T>.IsReadOnly
-		{
-			get { return true; }
-		}
+		bool ICollection<T>.IsReadOnly => isReadOnly;
 
 		/// <summary>
 		/// 将指定对象添加到当前集合中。

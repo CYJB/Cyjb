@@ -190,6 +190,26 @@ internal partial class Resources
 	internal static string DuplicateName => ResourceManager.GetString("DuplicateName", resourceCulture)!;
 	
 	/// <summary>
+	/// 返回类似 <c>Stack empty.</c> 的本地化字符串。
+	/// </summary>
+	internal static string EmptyStack => ResourceManager.GetString("EmptyStack", resourceCulture)!;
+	
+	/// <summary>
+	/// 返回类似 <c>Enumeration already finished.</c> 的本地化字符串。
+	/// </summary>
+	internal static string EnumEnded => ResourceManager.GetString("EnumEnded", resourceCulture)!;
+	
+	/// <summary>
+	/// 返回类似 <c>Collection was modified after the enumerator was instantiated.</c> 的本地化字符串。
+	/// </summary>
+	internal static string EnumFailedVersion => ResourceManager.GetString("EnumFailedVersion", resourceCulture)!;
+	
+	/// <summary>
+	/// 返回类似 <c>Enumeration has not started. Call MoveNext.</c> 的本地化字符串。
+	/// </summary>
+	internal static string EnumNotStarted => ResourceManager.GetString("EnumNotStarted", resourceCulture)!;
+	
+	/// <summary>
 	/// 返回类似 <c>Additional non-parsable characters are at the end of the string.</c> 的本地化字符串。
 	/// </summary>
 	internal static string ExtraJunkAtEnd => ResourceManager.GetString("ExtraJunkAtEnd", resourceCulture)!;

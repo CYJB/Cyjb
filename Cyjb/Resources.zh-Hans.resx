@@ -201,6 +201,22 @@
     <value>具有相同名称的参数已经存在。</value>
     <comment>参数名相同。</comment>
   </data>
+  <data name="EmptyStack" xml:space="preserve">
+    <value>堆栈是空的。</value>
+    <comment>堆栈是空的。</comment>
+  </data>
+  <data name="EnumEnded" xml:space="preserve">
+    <value>枚举已经结束。</value>
+    <comment>枚举已结束。</comment>
+  </data>
+  <data name="EnumFailedVersion" xml:space="preserve">
+    <value>在开始枚举后，容器发生了修改。</value>
+    <comment>枚举容器发生了修改。</comment>
+  </data>
+  <data name="EnumNotStarted" xml:space="preserve">
+    <value>枚举尚未开始。请调用 MoveNext 方法。</value>
+    <comment>枚举未开始。</comment>
+  </data>
   <data name="ExtraJunkAtEnd" xml:space="preserve">
     <value>字符串的末尾有其他无法分析的字符。</value>
     <comment>字符串的末尾有其他无法分析的字符。</comment>
