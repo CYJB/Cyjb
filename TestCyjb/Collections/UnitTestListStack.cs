@@ -27,6 +27,7 @@ public class UnitTestListStack
 		Assert.IsTrue(stack.TryPeek(out int value));
 		Assert.AreEqual(1, value);
 		Assert.AreEqual(1, stack[0]);
+		Assert.AreEqual(1, stack[^1]);
 		Assert.ThrowsException<ArgumentOutOfRangeException>(() => stack[1]);
 
 		stack.Push(2);
@@ -36,6 +37,8 @@ public class UnitTestListStack
 		Assert.AreEqual(2, value);
 		Assert.AreEqual(2, stack[0]);
 		Assert.AreEqual(1, stack[1]);
+		Assert.AreEqual(1, stack[^1]);
+		Assert.AreEqual(2, stack[^2]);
 		Assert.ThrowsException<ArgumentOutOfRangeException>(() => stack[2]);
 
 		stack.Push(3);
@@ -43,11 +46,18 @@ public class UnitTestListStack
 		stack.Push(5);
 		CollectionAssert.AreEqual(new int[] { 5, 4, 3, 2, 1 }, stack.ToArray());
 		CollectionAssert.AreEqual(new int[] { 5, 4, 3, 2, 1 }, stack.Select(v => v).ToArray());
+		int[] array = new int[10];
+		stack.CopyTo(array, 2);
+		CollectionAssert.AreEqual(new int[] { 0, 0, 5, 4, 3, 2, 1, 0, 0, 0 }, array);
 
 		IEnumerator<int> enumerator = stack.GetEnumerator();
 		enumerator.MoveNext();
 		stack.Push(6);
 		Assert.ThrowsException<InvalidOperationException>(() => enumerator.MoveNext());
+		Assert.AreEqual(6, stack[0]);
+		Assert.AreEqual(5, stack[1]);
+		Assert.AreEqual(1, stack[^1]);
+		Assert.AreEqual(2, stack[^2]);
 
 		Assert.AreEqual(6, stack.Count);
 		Assert.AreEqual(6, stack.Pop());

@@ -90,13 +90,10 @@ public abstract class CollectionBase<T> : ICollection<T>, IReadOnlyCollection<T>
 	/// <param name="arrayIndex"><paramref name="array"/> 中从零开始的索引，在此处开始复制。</param>
 	/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="arrayIndex"/> 小于零。</exception>
-	/// <exception cref="ArgumentException"><paramref name="array"/> 是多维的。</exception>
 	/// <exception cref="ArgumentException"><see cref="CollectionBase{T}"/> 
 	/// 中的元素数目大于从 <paramref name="arrayIndex"/> 到目标 <paramref name="array"/> 
 	/// 末尾之间的可用空间。</exception>
-	/// <exception cref="ArgumentException">当前集合
-	/// 的类型无法自动转换为目标 <paramref name="array"/> 的类型。</exception>
-	public void CopyTo(T[] array, int arrayIndex)
+	public virtual void CopyTo(T[] array, int arrayIndex)
 	{
 		CollectionHelper.CopyTo(this, array, arrayIndex);
 	}

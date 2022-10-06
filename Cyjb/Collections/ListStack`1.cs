@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -87,6 +86,26 @@ public class ListStack<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 				throw CommonExceptions.ArgumentOutOfRange(offset);
 			}
 			return items[count - offset - 1];
+		}
+	}
+
+	/// <summary>
+	/// 获取堆栈距离栈顶指定偏移处的元素。
+	/// </summary>
+	/// <param name="offset">要获取的元素距离栈顶从零开始的偏移。</param>
+	/// <value>指定偏移处的元素。</value>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> 不是 
+	/// <see cref="ListStack{T}"/> 中的有效偏移。</exception>
+	public T this[Index offset]
+	{
+		get
+		{
+			int index = (offset.IsFromEnd ? offset.Value : count - offset.Value) - 1;
+			if (index < 0 || index >= count)
+			{
+				throw CommonExceptions.ArgumentOutOfRange(offset);
+			}
+			return items[index];
 		}
 	}
 
@@ -268,6 +287,39 @@ public class ListStack<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 			return Array.LastIndexOf(items, item) >= 0;
 		}
 		return false;
+	}
+
+	/// <summary>
+	/// 从特定的 <see cref="Array"/> 索引处开始，将当前集合
+	/// 的元素复制到一个 <see cref="Array"/> 中。
+	/// </summary>
+	/// <param name="array">从当前集合复制的元素的目标位置的一维 
+	/// <see cref="Array"/>。<paramref name="array"/> 必须具有从零开始的索引。</param>
+	/// <param name="arrayIndex"><paramref name="array"/> 中从零开始的索引，在此处开始复制。</param>
+	/// <exception cref="ArgumentNullException"><paramref name="array"/> 为 <c>null</c>。</exception>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="arrayIndex"/> 小于零。</exception>
+	/// <exception cref="ArgumentException"><paramref name="array"/> 是多维的。</exception>
+	/// <exception cref="ArgumentException"><see cref="CollectionBase{T}"/> 
+	/// 中的元素数目大于从 <paramref name="arrayIndex"/> 到目标 <paramref name="array"/> 
+	/// 末尾之间的可用空间。</exception>
+	/// <exception cref="ArgumentException">源当前集合
+	/// 的类型无法自动转换为目标 <paramref name="array"/> 的类型。</exception>
+	public override void CopyTo(T[] array, int arrayIndex)
+	{
+		ArgumentNullException.ThrowIfNull(array);
+		if (arrayIndex < 0)
+		{
+			throw CommonExceptions.ArgumentNegative(arrayIndex);
+		}
+		else if (array.Length - arrayIndex < count)
+		{
+			throw CommonExceptions.ArrayTooSmall(nameof(array));
+		}
+		int idx = arrayIndex + count - 1;
+		for (int i = 0; i < count; i++, idx--)
+		{
+			array[idx] = items[i];
+		}
 	}
 
 	/// <summary>
