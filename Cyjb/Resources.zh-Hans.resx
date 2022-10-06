@@ -201,6 +201,10 @@
     <value>具有相同名称的参数已经存在。</value>
     <comment>参数名相同。</comment>
   </data>
+  <data name="EmptyQueue" xml:space="preserve">
+    <value>队列是空的。</value>
+    <comment>队列是空的。</comment>
+  </data>
   <data name="EmptyStack" xml:space="preserve">
     <value>堆栈是空的。</value>
     <comment>堆栈是空的。</comment>

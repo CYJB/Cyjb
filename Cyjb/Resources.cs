@@ -190,6 +190,11 @@ internal partial class Resources
 	internal static string DuplicateName => ResourceManager.GetString("DuplicateName", resourceCulture)!;
 	
 	/// <summary>
+	/// 返回类似 <c>Queue empty.</c> 的本地化字符串。
+	/// </summary>
+	internal static string EmptyQueue => ResourceManager.GetString("EmptyQueue", resourceCulture)!;
+	
+	/// <summary>
 	/// 返回类似 <c>Stack empty.</c> 的本地化字符串。
 	/// </summary>
 	internal static string EmptyStack => ResourceManager.GetString("EmptyStack", resourceCulture)!;
@@ -427,4 +432,5 @@ internal partial class Resources
 	#nullable restore
 
 }
+
 
