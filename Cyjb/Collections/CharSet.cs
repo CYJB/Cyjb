@@ -7,7 +7,7 @@ namespace Cyjb.Collections;
 /// <summary>
 /// 表示字符的有序集合。
 /// </summary>
-/// <remarks><see cref="CharSet"/> 类采用类似位示图的树状位压缩数组判断字符是否存在，
+/// <remarks><see cref="CharSet"/> 类采用类似位示图的树状位压缩数组存储字符，
 /// 关于该数据结构的更多解释，请参见我的博文
 /// <see href="http://www.cnblogs.com/cyjb/archive/p/BitCharSet.html">
 /// 《基于树状位压缩数组的字符集合》</see>。</remarks>
@@ -15,7 +15,7 @@ namespace Cyjb.Collections;
 /// 《基于树状位压缩数组的字符集合》</seealso>
 [Serializable, DebuggerDisplay("{ToString()} Count = {Count}")]
 [DebuggerTypeProxy(typeof(CharSetDebugView))]
-public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRangeCollection<char>
+public sealed partial class CharSet : SetBase<char>, ICharSet, IEquatable<CharSet>, IRangeCollection<char>
 {
 	/// <summary>
 	/// 字符集合的顶层数组。
@@ -54,7 +54,7 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	/// </summary>
 	public CharSet() : base()
 	{
-		data = new CharSetItem[CharSetConfig.TopLen].Fill((index) => new CharSetItem(index << CharSetConfig.TopShift));
+		data = CharSetConfig.CreateData();
 	}
 	/// <summary>
 	/// 使用指定的元素初始化 <see cref="CharSet"/> 类的新实例。
@@ -66,6 +66,12 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	}
 
 	/// <summary>
+	/// 字符集合的顶层数组。
+	/// </summary>
+	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+	CharSetItem[] ICharSet.Data => data;
+
+	/// <summary>
 	/// 将当前集合标记为已改变。
 	/// </summary>
 	private void MarkDirty()
@@ -74,13 +80,21 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	}
 
 	/// <summary>
-	/// 将当前标记标记为只读，并返回当前集合。
+	/// 返回当前集合的只读包装器。
 	/// </summary>
-	/// <returns>当前集合。</returns>
-	public CharSet MarkReadOnly()
+	/// <returns>当前集合的只读包装器。</returns>
+	public ReadOnlyCharSet AsReadOnly()
 	{
-		SetCollectionReadOnly();
-		return this;
+		return new ReadOnlyCharSet(this);
+	}
+
+	/// <summary>
+	/// 将当前集合转换为只读集合，当前集合的数据不再可用。
+	/// </summary>
+	/// <returns>转换后的只读集合。</returns>
+	internal ReadOnlyCharSet MoveReadOnly()
+	{
+		return new ReadOnlyCharSet(data, count, text);
 	}
 
 	/// <summary>
@@ -93,7 +107,6 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	/// <exception cref="ArgumentOutOfRangeException">字符范围的起始大于结束。</exception>
 	public bool Add(char start, char end)
 	{
-		CheckIsReadOnly();
 		if (start > end)
 		{
 			throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
@@ -162,7 +175,6 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	/// 如果该字符的全部大小写都已在集内，则为 <c>false</c>。</returns>
 	public bool AddIgnoreCase(char ch, CultureInfo? culture = null)
 	{
-		CheckIsReadOnly();
 		if (culture == null)
 		{
 			culture = CultureInfo.InvariantCulture;
@@ -202,7 +214,6 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	/// <exception cref="ArgumentOutOfRangeException">字符范围的起始大于结束。</exception>
 	public bool AddIgnoreCase(char start, char end, CultureInfo? culture = null)
 	{
-		CheckIsReadOnly();
 		if (start > end)
 		{
 			throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
@@ -224,7 +235,6 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	/// <param name="culture">大小写转换使用的区域信息。</param>
 	public void AddLowercase(CultureInfo? culture = null)
 	{
-		CheckIsReadOnly();
 		if (culture == null)
 		{
 			culture = CultureInfo.InvariantCulture;
@@ -252,7 +262,6 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	/// <param name="culture">大小写转换使用的区域信息。</param>
 	public void AddUppercase(CultureInfo? culture = null)
 	{
-		CheckIsReadOnly();
 		if (culture == null)
 		{
 			culture = CultureInfo.InvariantCulture;
@@ -284,7 +293,6 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	/// <exception cref="ArgumentOutOfRangeException">字符范围的起始大于结束。</exception>
 	public bool Remove(char start, char end)
 	{
-		CheckIsReadOnly();
 		if (start > end)
 		{
 			throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
@@ -349,148 +357,11 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	/// </summary>
 	public void Negated()
 	{
-		CheckIsReadOnly();
 		for (int i = 0; i < CharSetConfig.TopLen; i++)
 		{
 			count += data[i].Negated();
 		}
 		MarkDirty();
-	}
-
-	/// <summary>
-	/// 确定当前集合是否包含指定范围内的全部字符。
-	/// </summary>
-	/// <param name="start">要在当前集合中定位的字符起始范围。</param>
-	/// <param name="end">要在当前集合中定位的字符结束范围。</param>
-	/// <returns>如果在当前集合中找到范围内的全部字符，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-	/// <exception cref="ArgumentOutOfRangeException">字符范围的起始大于结束。</exception>
-	public bool Contains(char start, char end)
-	{
-		if (start > end)
-		{
-			throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
-		}
-		CharSetConfig.GetIndex(start, out int startTopIndex, out int startBtmIndex, out ulong startMask);
-		CharSetConfig.GetIndex(end, out int endTopIndex, out int endBtmIndex, out ulong endMask);
-		if (startTopIndex == endTopIndex && startBtmIndex == endBtmIndex)
-		{
-			// start 和 end 位于同一个底层数组项中，检查 start ~ end 范围。
-			ulong mask = (endMask - startMask) + endMask;
-			return data[startTopIndex].Contains(startBtmIndex, mask);
-		}
-		else
-		{
-			// 检查 start ~ max 范围。
-			ulong mask = ~startMask + 1UL;
-			if (!data[startTopIndex].Contains(startBtmIndex, mask))
-			{
-				return false;
-			}
-			// 检查 0 ~ end 范围。
-			mask = (endMask - 1UL) + endMask;
-			if (!data[endTopIndex].Contains(endBtmIndex, mask))
-			{
-				return false;
-			}
-		}
-		if (startTopIndex == endTopIndex)
-		{
-			// 检查 startBtmIndex ~ endBtmIndex 范围。
-			if (!data[startTopIndex].ContainsRange(startBtmIndex + 1, endBtmIndex))
-			{
-				return false;
-			}
-		}
-		else
-		{
-			// 检查 startBtmIndex ~ BtmLen 范围。
-			if (!data[startTopIndex].ContainsRange(startBtmIndex + 1, CharSetConfig.BtmLen))
-			{
-				return false;
-			}
-			// 将 0 ~ endBtmIndex 之间按位置 1。
-			if (!data[endTopIndex].ContainsRange(0, endBtmIndex))
-			{
-				return false;
-			}
-			// 检查 startTopIndex ~ startTopIndex 范围。
-			for (int i = startTopIndex + 1; i < endTopIndex; i++)
-			{
-				if (!data[i].ContainsRange(0, CharSetConfig.BtmLen))
-				{
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	/// <summary>
-	/// 确定当前集合是否包含指定范围内的任意字符。
-	/// </summary>
-	/// <param name="start">要在当前集合中定位的字符起始范围。</param>
-	/// <param name="end">要在当前集合中定位的字符结束范围。</param>
-	/// <returns>如果在当前集合中找到范围内的任意字符，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-	/// <exception cref="ArgumentOutOfRangeException">字符范围的起始大于结束。</exception>
-	public bool ContainsAny(char start, char end)
-	{
-		if (start > end)
-		{
-			throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
-		}
-		CharSetConfig.GetIndex(start, out int startTopIndex, out int startBtmIndex, out ulong startMask);
-		CharSetConfig.GetIndex(end, out int endTopIndex, out int endBtmIndex, out ulong endMask);
-		if (startTopIndex == endTopIndex && startBtmIndex == endBtmIndex)
-		{
-			// start 和 end 位于同一个底层数组项中，检查 start ~ end 范围。
-			ulong mask = (endMask - startMask) + endMask;
-			return data[startTopIndex].ContainsAny(startBtmIndex, mask);
-		}
-		else
-		{
-			// 检查 start ~ max 范围。
-			ulong mask = ~startMask + 1UL;
-			if (data[startTopIndex].ContainsAny(startBtmIndex, mask))
-			{
-				return true;
-			}
-			// 检查 0 ~ end 范围。
-			mask = (endMask - 1UL) + endMask;
-			if (data[endTopIndex].ContainsAny(endBtmIndex, mask))
-			{
-				return true;
-			}
-		}
-		if (startTopIndex == endTopIndex)
-		{
-			// 检查 startBtmIndex ~ endBtmIndex 范围。
-			if (data[startTopIndex].ContainsAnyRange(startBtmIndex + 1, endBtmIndex))
-			{
-				return true;
-			}
-		}
-		else
-		{
-			// 检查 startBtmIndex ~ BtmLen 范围。
-			if (data[startTopIndex].ContainsAnyRange(startBtmIndex + 1, CharSetConfig.BtmLen))
-			{
-				return true;
-			}
-			// 将 0 ~ endBtmIndex 之间按位置 1。
-			if (data[endTopIndex].ContainsAnyRange(0, endBtmIndex))
-			{
-				return true;
-			}
-			// 检查 startTopIndex ~ startTopIndex 范围。
-			for (int i = startTopIndex + 1; i < endTopIndex; i++)
-			{
-				if (data[i].ContainsAnyRange(0, CharSetConfig.BtmLen))
-				{
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	/// <summary>
@@ -500,13 +371,7 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	/// <remarks>与 <c>CharSet.Ranges().Count()</c> 等价，但效率更高。</remarks>
 	public int RangeCount()
 	{
-		int pointCount = 0;
-		ulong lastBit = 0UL;
-		for (int i = 0; i < CharSetConfig.TopLen; i++)
-		{
-			pointCount += data[i].PointCount(ref lastBit);
-		}
-		return (pointCount + 1) >> 1;
+		return CharSetConfig.RangeCount(data);
 	}
 
 	/// <summary>
@@ -515,71 +380,16 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	/// <returns>可用于循环访问字符范围的 <see cref="IEnumerable{Tuple}"/>。</returns>
 	public IEnumerable<ValueRange<char>> Ranges()
 	{
-		bool hasRange = false;
-		char start = '\0', end = '\0';
-		for (int i = 0; i < CharSetConfig.TopLen; i++)
-		{
-			foreach (var (curStart, curEnd) in data[i])
-			{
-				if (hasRange)
-				{
-					if (end < curStart - 1)
-					{
-						yield return new ValueRange<char>(start, end);
-						start = curStart;
-					}
-				}
-				else
-				{
-					start = curStart;
-				}
-				end = curEnd;
-				hasRange = true;
-			}
-		}
-		if (hasRange)
-		{
-			yield return new ValueRange<char>(start, end);
-		}
+		return CharSetConfig.Ranges(data);
 	}
+
+	#region SetBase<char> 成员
 
 	/// <summary>
-	/// 确定当前集合是否包含指定的集合中的所有字符。
+	/// 获取当前集合包含的字符数。
 	/// </summary>
-	/// <param name="other">要与当前集进行比较的集合。</param>
-	/// <returns>如果包含 <paramref name="other"/> 中的所有字符，则返回 
-	/// <c>true</c>，否则返回 <c>false</c>。</returns>
-	private bool ContainsAllElements(CharSet other)
-	{
-		for (int i = 0; i < CharSetConfig.TopLen; i++)
-		{
-			if (!data[i].ContainsAllElements(other.data[i]))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/// <summary>
-	/// 确定当前集合是否包含指定的字符范围中的所有字符。
-	/// </summary>
-	/// <param name="other">要与当前集进行比较的字符范围。</param>
-	/// <returns>如果包含 <paramref name="other"/> 中的所有字符，则返回 
-	/// <c>true</c>，否则返回 <c>false</c>。</returns>
-	private bool ContainsAllElements(IRangeCollection<char> other)
-	{
-		foreach (var (start, end) in other.Ranges())
-		{
-			if (!Contains(start, end))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	#region ISet<char> 成员
+	/// <value>当前集合中包含的字符数。</value>
+	public override int Count => count;
 
 	/// <summary>
 	/// 向当前集内添加字符，并返回一个指示是否已成功添加字符的值。
@@ -588,7 +398,6 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	/// <returns>如果该字符已添加到集内，则为 <c>true</c>；如果该字符已在集内，则为 <c>false</c>。</returns>
 	public override bool Add(char ch)
 	{
-		CheckIsReadOnly();
 		CharSetConfig.GetIndex(ch, out int topIndex, out int btmIndex, out ulong mask);
 		int modified = data[topIndex].FillSingle(btmIndex, mask);
 		if (modified == 0)
@@ -604,13 +413,75 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	}
 
 	/// <summary>
+	/// 确定当前集合是否包含指定字符。
+	/// </summary>
+	/// <param name="ch">要在当前集合中定位的字符。</param>
+	/// <returns>如果在当前集合中找到 <paramref name="ch"/>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+	public override bool Contains(char ch)
+	{
+		CharSetConfig.GetIndex(ch, out int topIndex, out int btmIndex, out ulong mask);
+		return data[topIndex].Contains(btmIndex, mask);
+	}
+
+	/// <summary>
+	/// 从当前集合中移除指定字符。
+	/// </summary>
+	/// <param name="ch">要从当前集合中移除的字符。</param>
+	/// <returns>如果已从当前集合中成功移除 <paramref name="ch"/>，则为 <c>true</c>；否则为 <c>false</c>。
+	/// 如果在原始当前集合中没有找到 <paramref name="ch"/>，该方法也会返回 <c>false</c>。</returns>
+	public override bool Remove(char ch)
+	{
+		CharSetConfig.GetIndex(ch, out int topIndex, out int btmIndex, out ulong mask);
+		int modified = data[topIndex].ClearSingle(btmIndex, mask);
+		if (modified == 0)
+		{
+			return false;
+		}
+		else
+		{
+			count += modified;
+			MarkDirty();
+			return false;
+		}
+	}
+
+	/// <summary>
+	/// 从当前集合中移除所有字符。
+	/// </summary>
+	public override void Clear()
+	{
+		if (count == 0)
+		{
+			return;
+		}
+		count = 0;
+		for (int i = 0; i < CharSetConfig.TopLen; i++)
+		{
+			data[i].Clear();
+		}
+		MarkDirty();
+	}
+
+	/// <summary>
+	/// 返回一个循环访问集合的枚举器。
+	/// </summary>
+	/// <returns>可用于循环访问集合的 <see cref="IEnumerator{T}"/> 对象。</returns>
+	public override IEnumerator<char> GetEnumerator()
+	{
+		return CharSetConfig.GetEnumerator(data);
+	}
+
+	#endregion // SetBase<char> 成员
+
+	#region ISet<char> 成员
+
+	/// <summary>
 	/// 从当前集合内移除指定集合中的所有元素。
 	/// </summary>
 	/// <param name="other">要从集合内移除的项的集合。</param>
 	/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 	public override void ExceptWith(IEnumerable<char> other)
 	{
-		CheckIsReadOnly();
 		ArgumentNullException.ThrowIfNull(other);
 		if (count <= 0)
 		{
@@ -621,13 +492,13 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 			Clear();
 			return;
 		}
-		if (other is CharSet otherSet)
+		if (other is ICharSet otherSet)
 		{
-			// CharSet 可以批量操作。
+			// ICharSet 可以批量操作。
 			int oldCount = count;
 			for (int i = 0; i < CharSetConfig.TopLen; i++)
 			{
-				count += data[i].ExceptWith(otherSet.data[i]);
+				count += data[i].ExceptWith(otherSet.Data[i]);
 			}
 			if (count != oldCount)
 			{
@@ -653,18 +524,17 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	/// <summary>
 	/// 修改当前集合，使当前集合仅包含指定集合中也存在的元素。
 	/// </summary>
-	/// <param name="other">要与当前集合进行比较的集合。</param>
+	/// <param name="other">要与当前集合进行比较的集合。</param>internal 
 	/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 	public override void IntersectWith(IEnumerable<char> other)
 	{
-		CheckIsReadOnly();
-		if (other is CharSet otherSet)
+		if (other is ICharSet otherSet)
 		{
-			// CharSet 可以批量操作。
+			// ICharSet 可以批量操作。
 			int oldCount = count;
 			for (int i = 0; i < CharSetConfig.TopLen; i++)
 			{
-				count += data[i].IntersectWith(otherSet.data[i]);
+				count += data[i].IntersectWith(otherSet.Data[i]);
 			}
 			if (count != oldCount)
 			{
@@ -704,14 +574,14 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	public override bool IsProperSubsetOf(IEnumerable<char> other)
 	{
 		ArgumentNullException.ThrowIfNull(other);
-		if (count == 0)
+		if (other is ICharSet otherSet)
+		{
+			// ICharSet 可以批量操作。
+			return count < otherSet.Count && CharSetConfig.ContainsAllElements(otherSet.Data, data);
+		}
+		else if (count == 0)
 		{
 			return other.Any();
-		}
-		if (other is CharSet otherSet)
-		{
-			// CharSet 可以批量操作。
-			return count < otherSet.Count && otherSet.ContainsAllElements(this);
 		}
 		else
 		{
@@ -734,13 +604,13 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 		{
 			return false;
 		}
-		if (other is CharSet otherSet)
+		if (other is ICharSet otherSet)
 		{
-			return count > otherSet.Count && ContainsAllElements(otherSet);
+			return count > otherSet.Count && CharSetConfig.ContainsAllElements(data, otherSet.Data);
 		}
 		else if (other is IRangeCollection<char> otherRange)
 		{
-			return count > otherRange.Count && ContainsAllElements(otherRange);
+			return count > otherRange.Count && CharSetConfig.ContainsAllElements(data, otherRange);
 		}
 		else
 		{
@@ -763,9 +633,9 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 		{
 			return true;
 		}
-		if (other is CharSet otherSet)
+		if (other is ICharSet otherSet)
 		{
-			return count <= otherSet.Count && otherSet.ContainsAllElements(this);
+			return count <= otherSet.Count && CharSetConfig.ContainsAllElements(otherSet.Data, data);
 		}
 		else
 		{
@@ -784,17 +654,17 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	public override bool IsSupersetOf(IEnumerable<char> other)
 	{
 		ArgumentNullException.ThrowIfNull(other);
-		if (count == 0)
+		if (other is ICharSet otherSet)
 		{
-			return !other.Any();
-		}
-		if (other is CharSet otherSet)
-		{
-			return count >= otherSet.Count && ContainsAllElements(otherSet);
+			return count >= otherSet.Count && CharSetConfig.ContainsAllElements(data, otherSet.Data);
 		}
 		else if (other is IRangeCollection<char> otherRange)
 		{
-			return count >= otherRange.Count && ContainsAllElements(otherRange);
+			return count >= otherRange.Count && CharSetConfig.ContainsAllElements(data, otherRange);
+		}
+		else if (count == 0)
+		{
+			return !other.Any();
 		}
 		else
 		{
@@ -816,11 +686,11 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 		{
 			return false;
 		}
-		if (other is CharSet otherSet)
+		if (other is ICharSet otherSet)
 		{
 			for (int i = 0; i < CharSetConfig.TopLen; i++)
 			{
-				if (data[i].Overlaps(otherSet.data[i]))
+				if (data[i].Overlaps(otherSet.Data[i]))
 				{
 					return true;
 				}
@@ -831,7 +701,7 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 		{
 			foreach (var (start, end) in otherRange.Ranges())
 			{
-				if (ContainsAny(start, end))
+				if (CharSetConfig.ContainsAny(data, start, end))
 				{
 					return true;
 				}
@@ -858,13 +728,13 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 		{
 			return !other.Any();
 		}
-		if (other is CharSet otherSet)
+		if (other is ICharSet otherSet)
 		{
-			return count == otherSet.Count && ContainsAllElements(otherSet);
+			return count == otherSet.Count && CharSetConfig.ContainsAllElements(data, otherSet.Data);
 		}
 		else if (other is IRangeCollection<char> otherRange)
 		{
-			return count == otherRange.Count && ContainsAllElements(otherRange);
+			return count == otherRange.Count && CharSetConfig.ContainsAllElements(data, otherRange);
 		}
 		else
 		{
@@ -880,7 +750,6 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 	public override void SymmetricExceptWith(IEnumerable<char> other)
 	{
-		CheckIsReadOnly();
 		ArgumentNullException.ThrowIfNull(other);
 		if (count == 0)
 		{
@@ -892,13 +761,13 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 			Clear();
 			return;
 		}
-		if (other is not CharSet otherSet)
+		if (other is not ICharSet otherSet)
 		{
 			otherSet = new CharSet(other);
 		}
 		for (int i = 0; i < CharSetConfig.TopLen; i++)
 		{
-			count += data[i].SymmetricExceptWith(otherSet.data[i]);
+			count += data[i].SymmetricExceptWith(otherSet.Data[i]);
 		}
 		// 这里不对比 count，因为字符可能增删。
 		MarkDirty();
@@ -911,19 +780,18 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	/// <exception cref="ArgumentNullException"><paramref name="other"/> 为 <c>null</c>。</exception>
 	public override void UnionWith(IEnumerable<char> other)
 	{
-		CheckIsReadOnly();
 		ArgumentNullException.ThrowIfNull(other);
 		if (ReferenceEquals(this, other))
 		{
 			return;
 		}
-		if (other is CharSet otherSet)
+		if (other is ICharSet otherSet)
 		{
-			// CharSet 可以批量操作。
+			// ICharSet 可以批量操作。
 			int oldCount = count;
 			for (int i = 0; i < CharSetConfig.TopLen; i++)
 			{
-				count += data[i].UnionWith(otherSet.data[i]);
+				count += data[i].UnionWith(otherSet.Data[i]);
 			}
 			if (count != oldCount)
 			{
@@ -948,92 +816,6 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 
 	#endregion // ISet<char> 成员
 
-	#region ICollection<char> 成员
-
-	/// <summary>
-	/// 获取当前集合包含的字符数。
-	/// </summary>
-	/// <value>当前集合中包含的字符数。</value>
-	public override int Count => count;
-
-	/// <summary>
-	/// 从当前集合中移除所有字符。
-	/// </summary>
-	public override void Clear()
-	{
-		CheckIsReadOnly();
-		if (count == 0)
-		{
-			return;
-		}
-		count = 0;
-		for (int i = 0; i < CharSetConfig.TopLen; i++)
-		{
-			data[i].Clear();
-		}
-		MarkDirty();
-	}
-
-	/// <summary>
-	/// 确定当前集合是否包含指定字符。
-	/// </summary>
-	/// <param name="ch">要在当前集合中定位的字符。</param>
-	/// <returns>如果在当前集合中找到 <paramref name="ch"/>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-	public override bool Contains(char ch)
-	{
-		CharSetConfig.GetIndex(ch, out int topIndex, out int btmIndex, out ulong mask);
-		return data[topIndex].Contains(btmIndex, mask);
-	}
-
-	/// <summary>
-	/// 从当前集合中移除指定字符。
-	/// </summary>
-	/// <param name="ch">要从当前集合中移除的字符。</param>
-	/// <returns>如果已从当前集合中成功移除 <paramref name="ch"/>，则为 <c>true</c>；否则为 <c>false</c>。
-	/// 如果在原始当前集合中没有找到 <paramref name="ch"/>，该方法也会返回 <c>false</c>。</returns>
-	public override bool Remove(char ch)
-	{
-		CheckIsReadOnly();
-		CharSetConfig.GetIndex(ch, out int topIndex, out int btmIndex, out ulong mask);
-		int modified = data[topIndex].ClearSingle(btmIndex, mask);
-		if (modified == 0)
-		{
-			return false;
-		}
-		else
-		{
-			count += modified;
-			MarkDirty();
-			return false;
-		}
-	}
-
-	#endregion // ICollection<char> 成员
-
-	#region IEnumerable<char> 成员
-
-	/// <summary>
-	/// 返回一个循环访问集合的枚举器。
-	/// </summary>
-	/// <returns>可用于循环访问集合的 <see cref="IEnumerator{Char}"/>。</returns>
-	public override IEnumerator<char> GetEnumerator()
-	{
-		for (int i = 0; i < CharSetConfig.TopLen; i++)
-		{
-			foreach (var (start, end) in data[i])
-			{
-				// 避免 end 正好是 char.MaxValue 时导致死循环。
-				for (char ch = start; ch < end; ch++)
-				{
-					yield return ch;
-				}
-				yield return end;
-			}
-		}
-	}
-
-	#endregion // IEnumerable<char> 成员
-
 	#region IEquatable<CharSet> 成员
 
 	/// <summary>
@@ -1048,7 +830,7 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 		{
 			return false;
 		}
-		return count == other.Count && ContainsAllElements(other);
+		return count == other.count && CharSetConfig.ContainsAllElements(data, other.data);
 	}
 
 	/// <summary>
@@ -1074,14 +856,21 @@ public sealed partial class CharSet : SetBase<char>, IEquatable<CharSet>, IRange
 	/// <returns>当前对象的哈希代码。</returns>
 	public override int GetHashCode()
 	{
-		HashCode hashCode = new();
-		for (int i = 0; i < CharSetConfig.TopLen; i++)
-		{
-			hashCode.Add(data[i]);
-		}
-		return hashCode.ToHashCode();
+		return CharSetConfig.GetHashCode(data);
 	}
 
 	#endregion // IEquatable<CharSet> 成员
 
+	/// <summary>
+	/// 返回当前集合的字符串表示。
+	/// </summary>
+	/// <returns>当前集合的字符串表示。</returns>
+	public override string ToString()
+	{
+		if (text == null)
+		{
+			text = CharSetConfig.ToString(this);
+		}
+		return text;
+	}
 }

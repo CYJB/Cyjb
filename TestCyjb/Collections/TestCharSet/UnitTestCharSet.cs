@@ -253,12 +253,12 @@ namespace TestCyjb.Collections
 					Assert.IsTrue(expected.SetEquals(set));
 
 					set = new CharSet(first);
-					set.ExceptWith(second);
+					set.IntersectWith(second);
 					expected = new HashSet<char>(first);
-					expected.ExceptWith(second);
+					expected.IntersectWith(second);
 					Assert.IsTrue(expected.SetEquals(set));
 					set = new CharSet(first);
-					set.ExceptWith(new CharSet(second));
+					set.IntersectWith(new CharSet(second));
 					Assert.IsTrue(expected.SetEquals(set));
 
 					set = new CharSet(first);
@@ -462,20 +462,6 @@ namespace TestCyjb.Collections
 			}
 			result.ExceptWith(set);
 			return result;
-		}
-
-		/// <summary>
-		/// 对 <see cref="CharSet.MarkReadOnly"/> 方法进行测试。
-		/// </summary>
-		[TestMethod]
-		public void TestMarkReadOnly()
-		{
-			CharSet set = new("abc");
-			set.MarkReadOnly();
-			Assert.IsTrue(set.Contains('b'));
-			Assert.ThrowsException<NotSupportedException>(() => set.Add('a'));
-			Assert.ThrowsException<NotSupportedException>(() => set.Remove('a'));
-			Assert.ThrowsException<NotSupportedException>(() => set.UnionWith("b"));
 		}
 
 		/// <summary>

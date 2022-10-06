@@ -16,16 +16,11 @@ public abstract class CollectionBase<T> : ICollection<T>, IReadOnlyCollection<T>
 	/// </summary>
 	[NonSerialized, DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	private object? syncRoot;
-	/// <summary>
-	/// 当前集合是否是只读的。
-	/// </summary>
-	private bool isReadOnly = false;
 
 	/// <summary>
 	/// 初始化 <see cref="CollectionBase{T}"/> 类的新实例。
 	/// </summary>
-	protected CollectionBase()
-	{ }
+	protected CollectionBase() { }
 
 	/// <summary>
 	/// 获取一个可用于同步对当前集合的访问的对象。
@@ -38,25 +33,6 @@ public abstract class CollectionBase<T> : ICollection<T>, IReadOnlyCollection<T>
 			Interlocked.CompareExchange(ref syncRoot, new object(), null);
 		}
 		return syncRoot;
-	}
-
-	/// <summary>
-	/// 将当前集合设置为只读的。
-	/// </summary>
-	protected void SetCollectionReadOnly()
-	{
-		isReadOnly = true;
-	}
-
-	/// <summary>
-	/// 检查当前集合是否是只读的。
-	/// </summary>
-	protected void CheckIsReadOnly()
-	{
-		if (isReadOnly)
-		{
-			throw CommonExceptions.CollectionReadOnly();
-		}
 	}
 
 	#region CollectionBase<T> 成员
@@ -82,7 +58,7 @@ public abstract class CollectionBase<T> : ICollection<T>, IReadOnlyCollection<T>
 	/// </summary>
 	/// <value>如果当前集合是只读的，则为 <c>true</c>；否则为 <c>false</c>。</value>
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	bool ICollection<T>.IsReadOnly => isReadOnly;
+	bool ICollection<T>.IsReadOnly => false;
 
 	/// <summary>
 	/// 将指定对象添加到当前集合中。

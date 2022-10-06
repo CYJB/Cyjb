@@ -40,7 +40,6 @@ internal sealed class CharSetItem : IEnumerable<ValueRange<char>>, IEquatable<Ch
 	/// <summary>
 	/// 集合中字符的个数。
 	/// </summary>
-	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	private int count = 0;
 
 	/// <summary>
@@ -560,7 +559,7 @@ internal sealed class CharSetItem : IEnumerable<ValueRange<char>>, IEquatable<Ch
 		}
 		if (other.IsFullFilled())
 		{
-			count = CharSetConfig.BtmCount - count;
+			count = CharSetConfig.BtmCount;
 			OptimizeFullFilled();
 			return count;
 		}

@@ -72,7 +72,7 @@ public static class UnicodeCategoryUtil
 	/// <summary>
 	/// Unicode 类别对应的字符集合。
 	/// </summary>
-	public static readonly Lazy<Dictionary<UnicodeCategory, CharSet>> CharSets = new(() =>
+	public static readonly Lazy<Dictionary<UnicodeCategory, ReadOnlyCharSet>> CharSets = new(() =>
 	{
 		UnicodeCategory[] categories = Enum.GetValues<UnicodeCategory>();
 		Dictionary<UnicodeCategory, CharSet> map = new(categories.Length);
@@ -85,12 +85,10 @@ public static class UnicodeCategoryUtil
 			map[char.GetUnicodeCategory(ch)].Add(ch);
 		}
 		map[char.GetUnicodeCategory(char.MaxValue)].Add(char.MaxValue);
-		// 将集合设置为只读的，避免被误修改。
-		foreach (CharSet chars in map.Values)
+		return new Dictionary<UnicodeCategory, ReadOnlyCharSet>(map.Select(pair =>
 		{
-			chars.MarkReadOnly();
-		}
-		return map;
+			return new KeyValuePair<UnicodeCategory, ReadOnlyCharSet>(pair.Key, pair.Value.MoveReadOnly());
+		}));
 	});
 
 	/// <summary>
@@ -98,7 +96,7 @@ public static class UnicodeCategoryUtil
 	/// </summary>
 	/// <param name="category">当前 UnicodeCategory。</param>
 	/// <returns>当前 UnicodeCategory 包含的全部字符。</returns>
-	public static IReadOnlySet<char> GetChars(this UnicodeCategory category)
+	public static ReadOnlyCharSet GetChars(this UnicodeCategory category)
 	{
 		return CharSets.Value[category];
 	}

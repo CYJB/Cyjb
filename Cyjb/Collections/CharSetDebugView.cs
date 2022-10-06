@@ -11,13 +11,13 @@ internal sealed class CharSetDebugView
 	/// 调试视图的源集合。
 	/// </summary>
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private readonly CharSet source;
+	private readonly ICharSet source;
 
 	/// <summary>
 	/// 使用指定的源集合初始化 <see cref="CharSet"/> 类的实例。
 	/// </summary>
 	/// <param name="sourceCollection">使用调试视图的源集合。</param>
-	public CharSetDebugView(CharSet sourceCollection)
+	public CharSetDebugView(ICharSet sourceCollection)
 	{
 		source = sourceCollection;
 	}
@@ -33,7 +33,7 @@ internal sealed class CharSetDebugView
 		{
 			List<DebugKeyValuePair> result = new();
 			int index = 0;
-			foreach (ValueRange<char> range in source.Ranges())
+			foreach (ValueRange<char> range in CharSetConfig.Ranges(source.Data))
 			{
 				int count = range.End - range.Start;
 				string key = count == 0 ? $"[{index}]" : $"[{index}..{index + count}]";
