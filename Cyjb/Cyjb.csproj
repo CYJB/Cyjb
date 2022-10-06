@@ -24,6 +24,7 @@
 		<None Include="..\.editorconfig" Link=".editorconfig" />
 		<None Include="..\README.md" Pack="True" PackagePath="" />
 		<None Include="LICENSE.txt" Pack="true" PackagePath="" />
+		<Content Include="ResourcesTemplate.t4" />
 	</ItemGroup>
 
 	<ItemGroup>
