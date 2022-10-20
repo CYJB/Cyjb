@@ -121,6 +121,7 @@ public class Variant<T1, T2, T3> : Variant<T1, T2>
 	/// 允许从 <typeparamref name="T1"/> 隐式转换为 <see cref="Variant{T1, T2, T3}"/>。
 	/// </summary>
 	/// <param name="value">要转换的值。</param>
+	/// <returns>转换得到的 <see cref="Variant{T1, T2, T3}"/>。</returns>
 	public static implicit operator Variant<T1, T2, T3>(T1 value)
 	{
 		return new Variant<T1, T2, T3>(value);
@@ -130,6 +131,7 @@ public class Variant<T1, T2, T3> : Variant<T1, T2>
 	/// 允许从 <see cref="Variant{T1, T2, T3}"/> 显式转换为 <typeparamref name="T1"/>。
 	/// </summary>
 	/// <param name="value">要转换的值。</param>
+	/// <returns>转换得到的 <typeparamref name="T1"/>。</returns>
 	public static explicit operator T1(Variant<T1, T2, T3> value)
 	{
 		if (value.TryGetValue(out T1? result))
@@ -143,6 +145,7 @@ public class Variant<T1, T2, T3> : Variant<T1, T2>
 	/// 允许从 <typeparamref name="T2"/> 隐式转换为 <see cref="Variant{T1, T2, T3}"/>。
 	/// </summary>
 	/// <param name="value">要转换的值。</param>
+	/// <returns>转换得到的 <see cref="Variant{T1, T2, T3}"/>。</returns>
 	public static implicit operator Variant<T1, T2, T3>(T2 value)
 	{
 		return new Variant<T1, T2, T3>(value);
@@ -152,6 +155,7 @@ public class Variant<T1, T2, T3> : Variant<T1, T2>
 	/// 允许从 <see cref="Variant{T1, T2, T3}"/> 显式转换为 <typeparamref name="T2"/>。
 	/// </summary>
 	/// <param name="value">要转换的值。</param>
+	/// <returns>转换得到的 <typeparamref name="T2"/>。</returns>
 	public static explicit operator T2(Variant<T1, T2, T3> value)
 	{
 		if (value.TryGetValue(out T2? result))
@@ -165,6 +169,7 @@ public class Variant<T1, T2, T3> : Variant<T1, T2>
 	/// 允许从 <typeparamref name="T3"/> 隐式转换为 <see cref="Variant{T1, T2, T3}"/>。
 	/// </summary>
 	/// <param name="value">要转换的值。</param>
+	/// <returns>转换得到的 <see cref="Variant{T1, T2, T3}"/>。</returns>
 	public static implicit operator Variant<T1, T2, T3>(T3 value)
 	{
 		return new Variant<T1, T2, T3>(value);
@@ -174,6 +179,7 @@ public class Variant<T1, T2, T3> : Variant<T1, T2>
 	/// 允许从 <see cref="Variant{T1, T2, T3}"/> 显式转换为 <typeparamref name="T3"/>。
 	/// </summary>
 	/// <param name="value">要转换的值。</param>
+	/// <returns>转换得到的 <typeparamref name="T3"/>。</returns>
 	public static explicit operator T3(Variant<T1, T2, T3> value)
 	{
 		if (value.TryGetValue(out T3? result))

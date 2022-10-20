@@ -25,6 +25,7 @@ namespace Cyjb.Collections.ObjectModel
 		/// <summary>
 		/// 初始化 <see cref="ReadOnlyCollectionBase{T}"/> 类的新实例。
 		/// </summary>
+		/// <param name="isReadOnly"><c>IsReadOnly</c> 属性返回的值。</param>
 		protected ReadOnlyCollectionBase(bool isReadOnly = true)
 		{
 			this.isReadOnly = isReadOnly;
