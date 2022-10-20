@@ -17,6 +17,28 @@ public static class UnicodeCategoryUtil
 	};
 
 	/// <summary>
+	/// Unicode 类别对应的字符集合。
+	/// </summary>
+	private static readonly Lazy<Dictionary<UnicodeCategory, ReadOnlyCharSet>> charSets = new(() =>
+	{
+		UnicodeCategory[] categories = Enum.GetValues<UnicodeCategory>();
+		Dictionary<UnicodeCategory, CharSet> map = new(categories.Length);
+		foreach (UnicodeCategory category in categories)
+		{
+			map[category] = new CharSet();
+		}
+		for (char ch = '\0'; ch < char.MaxValue; ch++)
+		{
+			map[char.GetUnicodeCategory(ch)].Add(ch);
+		}
+		map[char.GetUnicodeCategory(char.MaxValue)].Add(char.MaxValue);
+		return new Dictionary<UnicodeCategory, ReadOnlyCharSet>(map.Select(pair =>
+		{
+			return new KeyValuePair<UnicodeCategory, ReadOnlyCharSet>(pair.Key, pair.Value.MoveReadOnly());
+		}));
+	});
+
+	/// <summary>
 	/// 返回当前 UnicodeCategory 的名称（Lu、Ll 等）。
 	/// </summary>
 	/// <param name="category">当前 UnicodeCategory。</param>
@@ -70,34 +92,12 @@ public static class UnicodeCategoryUtil
 	}
 
 	/// <summary>
-	/// Unicode 类别对应的字符集合。
-	/// </summary>
-	public static readonly Lazy<Dictionary<UnicodeCategory, ReadOnlyCharSet>> CharSets = new(() =>
-	{
-		UnicodeCategory[] categories = Enum.GetValues<UnicodeCategory>();
-		Dictionary<UnicodeCategory, CharSet> map = new(categories.Length);
-		foreach (UnicodeCategory category in categories)
-		{
-			map[category] = new CharSet();
-		}
-		for (char ch = '\0'; ch < char.MaxValue; ch++)
-		{
-			map[char.GetUnicodeCategory(ch)].Add(ch);
-		}
-		map[char.GetUnicodeCategory(char.MaxValue)].Add(char.MaxValue);
-		return new Dictionary<UnicodeCategory, ReadOnlyCharSet>(map.Select(pair =>
-		{
-			return new KeyValuePair<UnicodeCategory, ReadOnlyCharSet>(pair.Key, pair.Value.MoveReadOnly());
-		}));
-	});
-
-	/// <summary>
 	/// 返回当前 UnicodeCategory 包含的全部字符。
 	/// </summary>
 	/// <param name="category">当前 UnicodeCategory。</param>
 	/// <returns>当前 UnicodeCategory 包含的全部字符。</returns>
 	public static ReadOnlyCharSet GetChars(this UnicodeCategory category)
 	{
-		return CharSets.Value[category];
+		return charSets.Value[category];
 	}
 }
