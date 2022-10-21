@@ -16,7 +16,7 @@ namespace TestCyjb.Collections
 		[TestMethod]
 		public void TestSetEqualityComparer()
 		{
-			IEqualityComparer<ISet<int>> comparer = SetEqualityComparer<int>.Default;
+			IEqualityComparer<IReadOnlySet<int>> comparer = SetEqualityComparer<int>.Default;
 			SortedSet<int> a = new() { 1, 2, 3 };
 			HashSet<int> b = new() { 3, 2, 1 };
 			Assert.IsTrue(comparer.Equals(a, b));
