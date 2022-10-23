@@ -338,21 +338,6 @@ namespace TestCyjb
 
 			Assert.IsNull(typeof(IEnumerable<>).UniqueCloseDefinitionFrom(typeof(TestClass)));
 		}
-
-		/// <summary>
-		/// 对 <see cref="TypeUtil.FullName"/> 方法进行测试。
-		/// </summary>
-		[DataTestMethod]
-		[DataRow("System.Int32", typeof(int))]
-		[DataRow("System.Collections.IEnumerable", typeof(IEnumerable))]
-		[DataRow("System.Collections.Generic.IEnumerable`1", typeof(IEnumerable<>))]
-		[DataRow("System.Collections.Generic.IEnumerable`1[System.Int32]", typeof(IEnumerable<int>))]
-		[DataRow("System.Collections.Generic.Dictionary`2[System.String,System.Nullable`1[System.Int32]]",
-			typeof(Dictionary<string, int?>))]
-		public void TestFullName(string fullName, Type type)
-		{
-			Assert.AreEqual(fullName, type.FullName());
-		}
 	}
 }
 

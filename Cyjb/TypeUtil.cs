@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Text;
+using System.Reflection;
 using Cyjb.Conversions;
 
 namespace Cyjb
@@ -489,36 +488,6 @@ namespace Cyjb
 					type = type.BaseType;
 				}
 			}
-		}
-
-		/// <summary>
-		/// 获取 <see cref="Type"/> 的完全限定名，包括 <see cref="Type"/> 的命名空间，但不包括程序集。
-		/// </summary>
-		/// <param name="type">要获取完全限定名的类型。</param>
-		/// <returns>获取 <see cref="Type"/> 的完全限定名，包括 <see cref="Type"/> 的命名空间，但不包括程序集；
-		/// 如果当前实例表示泛型类型参数、数组类型、指针类型或基于类型参数的 byref 类型，
-		/// 或表示不属于泛型类型定义但包含无法解析的类型参数的泛型类型，则返回 <c>null</c>。</returns>
-		/// <remarks>与 <see cref="Type.FullName"/> 不同，即使如果当前 <see cref="Type"/> 表示泛型类型，
-		/// <see cref="FullName"/> 返回的字符串中的类型实参也不会包含程序集、版本等信息。</remarks>
-		public static string FullName(this Type type)
-		{
-			if (!type.IsGenericType || type.ContainsGenericParameters)
-			{
-				return type.FullName!;
-			}
-			StringBuilder text = new(type.GetGenericTypeDefinition().FullName);
-			text.Append('[');
-			Type[] args = type.GetGenericArguments();
-			for (int i = 0; i < args.Length; i++)
-			{
-				if (i > 0)
-				{
-					text.Append(',');
-				}
-				text.Append(args[i].FullName());
-			}
-			text.Append(']');
-			return text.ToString();
 		}
 	}
 }
