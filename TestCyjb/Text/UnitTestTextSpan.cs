@@ -317,4 +317,18 @@ public class UnitTestTextSpan
 			Assert.IsFalse(left != right);
 		}
 	}
+
+	/// <summary>
+	/// 对 <see cref="TextSpan.Combine"/> 方法进行测试。
+	/// </summary>
+	[TestMethod]
+	public void TestCombine()
+	{
+		Assert.AreEqual(new TextSpan(), TextSpan.Combine());
+		Assert.AreEqual(new TextSpan(1, 2), TextSpan.Combine(new TextSpan(1, 2)));
+		Assert.AreEqual(new TextSpan(1, 20), TextSpan.Combine(new TextSpan(1, 2), new TextSpan(10, 20)));
+		Assert.AreEqual(new TextSpan(1, 40), TextSpan.Combine(new TextSpan(40, 40), new TextSpan(1, 2)));
+		Assert.AreEqual(new TextSpan(1, 200), TextSpan.Combine(
+			new TextSpan(40, 40), new TextSpan(1, 2), new TextSpan(100, 200)));
+	}
 }

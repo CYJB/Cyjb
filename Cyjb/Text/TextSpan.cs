@@ -3,8 +3,39 @@ namespace Cyjb.Text;
 /// <summary>
 /// 表示文本的范围。
 /// </summary>
-public struct TextSpan : IComparable<TextSpan>, IEquatable<TextSpan>
+public readonly struct TextSpan : IComparable<TextSpan>, IEquatable<TextSpan>
 {
+	/// <summary>
+	/// 将多个文本范围的组合，返回恰好可以包含它们的文本范围。
+	/// </summary>
+	/// <param name="spans">要组合的文本范围。</param>
+	/// <returns>恰好可以包含 <paramref name="spans"/> 的文本范围。</returns>
+	public static TextSpan Combine(params TextSpan[] spans)
+	{
+		if (spans.Length == 0)
+		{
+			return new TextSpan();
+		}
+		else if (spans.Length == 1)
+		{
+			return spans[0];
+		}
+		var (start, end) = spans[0];
+		for (int i = 1; i < spans.Length; i++)
+		{
+			var (curStart, curEnd) = spans[i];
+			if (curStart < start)
+			{
+				start = curStart;
+			}
+			if (curEnd > end)
+			{
+				end = curEnd;
+			}
+		}
+		return new TextSpan(start, end);
+	}
+
 	/// <summary>
 	/// 范围的起始位置。
 	/// </summary>
