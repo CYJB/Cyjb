@@ -6,7 +6,18 @@ namespace Cyjb.Text;
 public readonly struct TextSpan : IComparable<TextSpan>, IEquatable<TextSpan>
 {
 	/// <summary>
-	/// 将多个文本范围的组合，返回恰好可以包含它们的文本范围。
+	/// 返回恰好可以包含指定两个文本范围的最小范围。
+	/// </summary>
+	/// <param name="first">要组合的第一个文本范围。</param>
+	/// <param name="second">要组合的第二个文本范围。</param>
+	/// <returns>恰好可以包含 <paramref name="first"/> 和 <paramref name="second"/> 的文本范围。</returns>
+	public static TextSpan Combine(TextSpan first, TextSpan second)
+	{
+		return new TextSpan(Math.Min(first.start, second.start), Math.Max(first.end, second.end));
+	}
+
+	/// <summary>
+	/// 返回恰好可以包含指定多个文本范围的最小范围。
 	/// </summary>
 	/// <param name="spans">要组合的文本范围。</param>
 	/// <returns>恰好可以包含 <paramref name="spans"/> 的文本范围。</returns>
