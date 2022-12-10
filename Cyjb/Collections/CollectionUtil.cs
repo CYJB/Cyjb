@@ -6,6 +6,16 @@ namespace Cyjb.Collections;
 public static class CollectionUtil
 {
 	/// <summary>
+	/// 返回一个空的只读集合。
+	/// </summary>
+	/// <typeparam name="T">集合中元素的类型。</typeparam>
+	/// <returns>空的只读集合。</returns>
+	public static IReadOnlyCollection<T> Empty<T>()
+	{
+		return EmptyList<T>.Instance;
+	}
+
+	/// <summary>
 	/// 将指定集合的元素添加到当前集合中。
 	/// </summary>
 	/// <typeparam name="T">集合中元素的类型。</typeparam>

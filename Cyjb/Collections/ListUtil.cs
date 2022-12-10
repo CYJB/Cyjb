@@ -5,6 +5,15 @@ namespace Cyjb.Collections;
 /// </summary>
 public static class ListUtil
 {
+	/// <summary>
+	/// 返回一个空的只读列表。
+	/// </summary>
+	/// <typeparam name="T">列表中元素的类型。</typeparam>
+	/// <returns>空的只读列表。</returns>
+	public static IReadOnlyList<T> Empty<T>()
+	{
+		return EmptyList<T>.Instance;
+	}
 
 	/// <summary>
 	/// 将指定集合的元素插入到当前列表的指定索引处。
