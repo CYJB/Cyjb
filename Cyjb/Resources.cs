@@ -355,6 +355,11 @@ internal partial class Resources
 	internal static string OverflowUInt64 => ResourceManager.GetString("OverflowUInt64", resourceCulture)!;
 	
 	/// <summary>
+	/// 返回类似 <c>Range index can not from end.</c> 的本地化字符串。
+	/// </summary>
+	internal static string RangeIndexFromEnd => ResourceManager.GetString("RangeIndexFromEnd", resourceCulture)!;
+	
+	/// <summary>
 	/// 返回类似 <c>Cannot read from a closed '{0}'.</c> 的本地化字符串。
 	/// </summary>
 	internal static string StreamClosed(object? arg0)

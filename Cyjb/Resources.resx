@@ -321,6 +321,10 @@
     <value>Value was either too large or too small for a UInt64.</value>
     <comment>值对于 UInt64 太大或太小。</comment>
   </data>
+  <data name="RangeIndexFromEnd" xml:space="preserve">
+    <value>Range index can not from end.</value>
+    <comment>范围索引不能从结尾开始。</comment>
+  </data>
   <data name="StreamClosed" xml:space="preserve">
     <value>Cannot read from a closed '{0}'.</value>
     <comment>流已关闭。</comment>

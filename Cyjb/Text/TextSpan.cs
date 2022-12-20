@@ -1,3 +1,5 @@
+using System.Data.Common;
+
 namespace Cyjb.Text;
 
 /// <summary>
@@ -111,6 +113,22 @@ public readonly struct TextSpan : IComparable<TextSpan>, IEquatable<TextSpan>
 	{
 		start = this.start;
 		end = this.end;
+	}
+
+	/// <summary>
+	/// 允许从 <see cref="Range"/> 隐式转换为 <see cref="TextSpan"/>。
+	/// </summary>
+	/// <param name="range">要转换的范围。</param>
+	/// <returns>转换得到的 <see cref="TextSpan"/>。</returns>
+	/// <exception cref="ArgumentException"><paramref name="range"/>
+	/// 包含从结尾进行的索引。</exception>
+	public static implicit operator TextSpan(Range range)
+	{
+		if(range.Start.IsFromEnd ||range.End.IsFromEnd)
+		{
+			throw new ArgumentException(Resources.RangeIndexFromEnd, nameof(range));
+		}
+		return new TextSpan(range.Start.Value, range.End.Value);
 	}
 
 	#region 范围操作

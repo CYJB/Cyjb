@@ -331,4 +331,17 @@ public class UnitTestTextSpan
 		Assert.AreEqual(new TextSpan(1, 200), TextSpan.Combine(
 			new TextSpan(40, 40), new TextSpan(1, 2), new TextSpan(100, 200)));
 	}
+
+	/// <summary>
+	/// 对从 <see cref="Range"/> 转换到 <see cref="TextSpan"/> 进行测试。
+	/// </summary>
+	[TestMethod]
+	public void TestFromRange()
+	{
+		Assert.AreEqual(new TextSpan(0, 0), (TextSpan)(0..0));
+		Assert.AreEqual(new TextSpan(0, 1), (TextSpan)(0..1));
+		Assert.AreEqual(new TextSpan(0, 10), (TextSpan)(0..10));
+		Assert.ThrowsException<ArgumentException>(() => (TextSpan)(0..^1));
+		Assert.ThrowsException<ArgumentException>(() => (TextSpan)(^3..^1));
+	}
 }
