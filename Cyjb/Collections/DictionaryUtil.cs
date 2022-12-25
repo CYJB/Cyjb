@@ -6,7 +6,7 @@ namespace Cyjb.Collections;
 /// <summary>
 /// 提供对 <see cref="IDictionary{TKey, TValue}"/> 的扩展方法。
 /// </summary>
-public static class IDictionaryUtil
+public static class DictionaryUtil
 {
 	/// <summary>
 	/// 返回当前字典的只读包装。
