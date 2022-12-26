@@ -80,7 +80,7 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	}
 
 	/// <summary>
-	/// 获取队列距指定偏移处的元素。
+	/// 获取或设置队列距指定偏移处的元素。
 	/// </summary>
 	/// <param name="offset">要获取的元素从零开始的偏移。</param>
 	/// <value>指定偏移处的元素。</value>
@@ -88,28 +88,12 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	/// <see cref="ListQueue{T}"/> 中的有效偏移。</exception>
 	public T this[int offset]
 	{
-		get
-		{
-			if (offset < 0)
-			{
-				throw CommonExceptions.ArgumentNegative(offset);
-			}
-			else if (offset >= count)
-			{
-				throw CommonExceptions.ArgumentOutOfRange(offset);
-			}
-			int index = offset + head;
-			int len = items.Length;
-			if (index >= len)
-			{
-				index -= len;
-			}
-			return items[index];
-		}
+		get => items[GetIndex(offset)];
+		set => items[GetIndex(offset)] = value;
 	}
 
 	/// <summary>
-	/// 获取队列距指定偏移处的元素。
+	/// 获取或设置队列距指定偏移处的元素。
 	/// </summary>
 	/// <param name="offset">要获取的元素从零开始的偏移。</param>
 	/// <value>指定偏移处的元素。</value>
@@ -117,21 +101,8 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	/// <see cref="ListQueue{T}"/> 中的有效偏移。</exception>
 	public T this[Index offset]
 	{
-		get
-		{
-			int index = (offset.IsFromEnd ? count - offset.Value : offset.Value);
-			if (index < 0 || index >= count)
-			{
-				throw CommonExceptions.ArgumentOutOfRange(offset);
-			}
-			index += head;
-			int len = items.Length;
-			if (index >= len)
-			{
-				index -= len;
-			}
-			return items[index];
-		}
+		get => items[GetIndex(offset)];
+		set => items[GetIndex(offset)] = value;
 	}
 
 	/// <summary>
@@ -355,6 +326,55 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 		items = newArr;
 		head = 0;
 		tail = ((count != capacity) ? count : 0);
+	}
+
+	/// <summary>
+	/// 返回指定偏移对应的列表索引。
+	/// </summary>
+	/// <param name="offset">要获取的从零开始的偏移。</param>
+	/// <returns>指定偏移对应的列表索引。</returns>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> 不是 
+	/// <see cref="ListQueue{T}"/> 中的有效偏移。</exception>
+	private int GetIndex(int offset)
+	{
+		if (offset < 0)
+		{
+			throw CommonExceptions.ArgumentNegative(offset);
+		}
+		else if (offset >= count)
+		{
+			throw CommonExceptions.ArgumentOutOfRange(offset);
+		}
+		int index = offset + head;
+		int len = items.Length;
+		if (index >= len)
+		{
+			index -= len;
+		}
+		return index;
+	}
+
+	/// <summary>
+	/// 返回指定偏移对应的列表索引。
+	/// </summary>
+	/// <param name="offset">要获取的从零开始的偏移。</param>
+	/// <returns>指定偏移对应的列表索引。</returns>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> 不是 
+	/// <see cref="ListQueue{T}"/> 中的有效偏移。</exception>
+	private int GetIndex(Index offset)
+	{
+		int index = (offset.IsFromEnd ? count - offset.Value : offset.Value);
+		if (index < 0 || index >= count)
+		{
+			throw CommonExceptions.ArgumentOutOfRange(offset);
+		}
+		index += head;
+		int len = items.Length;
+		if (index >= len)
+		{
+			index -= len;
+		}
+		return index;
 	}
 
 	/// <summary>
