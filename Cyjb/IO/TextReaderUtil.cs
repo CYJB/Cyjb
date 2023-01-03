@@ -24,6 +24,20 @@ public static class TextReaderUtil
 	}
 
 	/// <summary>
+	/// 组合指定的多个文本读取器，返回按顺序依次读取的新文本读取器。
+	/// </summary>
+	/// <param name="sources">要组合的源文本读取器或字符串。</param>
+	/// <returns>组合后的文本读取器。</returns>
+	public static TextReader Combine(IEnumerable<Variant<TextReader, string>> sources)
+	{
+		if (sources == null)
+		{
+			return TextReader.Null;
+		}
+		return new CombinedTextReader(sources.Select(GetTextReader));
+	}
+
+	/// <summary>
 	/// 返回指定源相关的文本读取器。
 	/// </summary>
 	/// <param name="source">文本读取器或字符串。</param>
