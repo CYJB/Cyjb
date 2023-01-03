@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace TestCyjb.Text;
 
 /// <summary>
-/// <see cref="TextSpan"/> 类的单元测试。
+/// <see cref="TextSpan"/> 结构的单元测试。
 /// </summary>
 [TestClass]
 public class UnitTestTextSpan

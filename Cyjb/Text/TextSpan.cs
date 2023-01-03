@@ -6,6 +6,11 @@ namespace Cyjb.Text;
 public readonly struct TextSpan : IComparable<TextSpan>, IEquatable<TextSpan>
 {
 	/// <summary>
+	/// 空的文本范围 [0, 0)。
+	/// </summary>
+	public readonly static TextSpan Empty = new();
+
+	/// <summary>
 	/// 返回恰好可以包含指定两个文本范围的最小范围。
 	/// </summary>
 	/// <param name="first">要组合的第一个文本范围。</param>
@@ -122,7 +127,7 @@ public readonly struct TextSpan : IComparable<TextSpan>, IEquatable<TextSpan>
 	/// 包含从结尾进行的索引。</exception>
 	public static implicit operator TextSpan(Range range)
 	{
-		if(range.Start.IsFromEnd ||range.End.IsFromEnd)
+		if (range.Start.IsFromEnd || range.End.IsFromEnd)
 		{
 			throw new ArgumentException(Resources.RangeIndexFromEnd, nameof(range));
 		}
