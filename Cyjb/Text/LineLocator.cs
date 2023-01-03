@@ -15,9 +15,9 @@ namespace Cyjb.Text;
 public sealed class LineLocator
 {
 	/// <summary>
-	/// 表示 Tab 的宽度。
+	/// 表示 Tab 的宽度标记。
 	/// </summary>
-	public const int TabWidth = 3;
+	public const int TabSizeMark = 3;
 
 	/// <summary>
 	/// Tab 的宽度。
@@ -198,7 +198,7 @@ public sealed class LineLocator
 			}
 			else
 			{
-				int width = ch == '\t' ? TabWidth : ch.Width();
+				int width = ch == '\t' ? TabSizeMark : ch.Width();
 				if (last.Width == width)
 				{
 					continue;
@@ -257,7 +257,7 @@ public sealed class LineLocator
 			{
 				return Column;
 			}
-			if (Width == TabWidth)
+			if (Width == TabSizeMark)
 			{
 				int result = Column + cnt * tabSize;
 				// Tab 需要向下约到 tabSize 的整数倍。

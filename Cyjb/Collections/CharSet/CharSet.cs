@@ -867,10 +867,7 @@ public sealed partial class CharSet : SetBase<char>, ICharSet, IEquatable<CharSe
 	/// <returns>当前集合的字符串表示。</returns>
 	public override string ToString()
 	{
-		if (text == null)
-		{
-			text = CharSetConfig.ToString(this);
-		}
+		text ??= CharSetConfig.ToString(this);
 		return text;
 	}
 }
