@@ -1,17 +1,21 @@
+using System.Diagnostics;
+
 namespace Cyjb.Text;
 
 /// <summary>
 /// 表示行位置的范围。
 /// </summary>
-public struct LinePositionSpan : IComparable<LinePositionSpan>, IEquatable<LinePositionSpan>
+public readonly struct LinePositionSpan : IComparable<LinePositionSpan>, IEquatable<LinePositionSpan>
 {
 	/// <summary>
 	/// 起始行位置。
 	/// </summary>
+	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	private readonly LinePosition start;
 	/// <summary>
 	/// 结束起始行位置（不含）。
 	/// </summary>
+	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	private readonly LinePosition end;
 
 	/// <summary>
