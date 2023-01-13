@@ -20,7 +20,7 @@ public class UnitTestLineLocator
 		Assert.AreEqual(new LinePosition(1, 1, 2), locator.GetPosition(1));
 		Assert.AreEqual(new LinePosition(1, 10, 11), locator.GetPosition(10));
 
-		locator.Read("abcd一二三四	1	2	3	中文	123	1234\n\t1\r");
+		locator.Read("abcd一二三四\t1\t2\t3\t中文\t123\t1234\n\t1\r");
 		/*
 abcd一二三四	1	2	1	中文	123	1234\n
 	1\r");
@@ -53,10 +53,10 @@ abcd一二三四	1	2	1	中文	123	1234\n
 		Assert.AreEqual(new LinePosition(1, 25, 44), locator.GetPosition(25));
 		Assert.AreEqual(new LinePosition(1, 26, 45), locator.GetPosition(26));
 		Assert.AreEqual(new LinePosition(2, 0, 1), locator.GetPosition(27));
-		Assert.AreEqual(new LinePosition(2, 1, 2), locator.GetPosition(28));
-		Assert.AreEqual(new LinePosition(2, 2, 3), locator.GetPosition(29));
-		Assert.AreEqual(new LinePosition(2, 3, 3), locator.GetPosition(30));
-		Assert.AreEqual(new LinePosition(2, 4, 3), locator.GetPosition(31));
+		Assert.AreEqual(new LinePosition(2, 1, 5), locator.GetPosition(28));
+		Assert.AreEqual(new LinePosition(2, 2, 6), locator.GetPosition(29));
+		Assert.AreEqual(new LinePosition(2, 3, 6), locator.GetPosition(30));
+		Assert.AreEqual(new LinePosition(2, 4, 6), locator.GetPosition(31));
 
 		locator.Read("1234\r");
 		Assert.AreEqual(new LinePosition(3, 0, 1), locator.GetPosition(30));

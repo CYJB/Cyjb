@@ -179,20 +179,20 @@ public sealed class LineLocator
 					int column = last.GetColumn(character, tabSize);
 					lastLineColumn.Add(new ColumnInfo(character, column, 0));
 				}
-				idx++;
 				if (ch == '\r')
 				{
-					if (idx < len && chars[idx] == '\n')
+					int nextIdx = idx + 1;
+					if (nextIdx < len && chars[nextIdx] == '\n')
 					{
 						idx++;
 					}
-					else if (idx >= len)
+					else if (nextIdx >= len)
 					{
 						lastWasCR = true;
 						break;
 					}
 				}
-				lineStart = index + idx;
+				lineStart = index + idx + 1;
 				AddLine(lineStart);
 				last = ColumnInfo.Default;
 			}
