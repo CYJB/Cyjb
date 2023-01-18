@@ -115,7 +115,7 @@ public readonly struct LinePositionSpan : IComparable<LinePositionSpan>, IEquata
 	/// <returns>如果当前对象等于 <paramref name="other"/>，则为 <c>true</c>；否则为 <c>false</c>。</returns>
 	public bool Equals(LinePositionSpan other)
 	{
-		return start.Equals(other) && end.Equals(other);
+		return start.Equals(other.Start) && end.Equals(other.end);
 	}
 
 	/// <summary>
