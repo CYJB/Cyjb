@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Reflection.Emit;
 using Cyjb.Reflection;
 
@@ -37,10 +37,7 @@ namespace Cyjb.Conversions
 			Type methodType = Method.GetParametersNoCopy()[0].ParameterType;
 			// 额外的入参转换
 			Conversion? conv = ConversionFactory.GetPreDefinedConversion(inputType, methodType);
-			if (conv != null)
-			{
-				conv.Emit(generator, inputType, methodType, isChecked);
-			}
+			conv?.Emit(generator, inputType, methodType, isChecked);
 			generator.EmitCall(Method);
 			methodType = Method.ReturnType;
 			// 额外的出参转换

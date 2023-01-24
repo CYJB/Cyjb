@@ -77,10 +77,7 @@ public static class ListUtil
 		{
 			return false;
 		}
-		if (comparer == null)
-		{
-			comparer = Comparer<T>.Default;
-		}
+		comparer ??= Comparer<T>.Default;
 		int cur = count - 1;
 		while (true)
 		{
@@ -118,10 +115,7 @@ public static class ListUtil
 		{
 			return false;
 		}
-		if (comparer == null)
-		{
-			comparer = Comparer<T>.Default;
-		}
+		comparer ??= Comparer<T>.Default;
 		int cur = count - 1;
 		while (true)
 		{
@@ -304,10 +298,7 @@ public static class ListUtil
 	private static int BinarySearchInternal<T>(this IList<T> list, int index, int length,
 		T value, IComparer<T>? comparer)
 	{
-		if (comparer == null)
-		{
-			comparer = Comparer<T>.Default;
-		}
+		comparer ??= Comparer<T>.Default;
 		try
 		{
 			int low = index;
@@ -433,10 +424,7 @@ public static class ListUtil
 	private static int BinarySearchInternal<TSource, TResult>(this IList<TSource> list, int index, int length,
 		TResult value, Func<TSource, TResult> selector, IComparer<TResult>? comparer)
 	{
-		if (comparer == null)
-		{
-			comparer = Comparer<TResult>.Default;
-		}
+		comparer ??= Comparer<TResult>.Default;
 		try
 		{
 			int low = index;

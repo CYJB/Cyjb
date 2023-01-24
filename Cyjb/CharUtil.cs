@@ -78,22 +78,20 @@ namespace Cyjb
 		private static bool IsVisibleUnicode(char ch)
 		{
 			UnicodeCategory category = char.GetUnicodeCategory(ch);
-			switch (category)
+			return category switch
 			{
-				case UnicodeCategory.Control:
-				case UnicodeCategory.SpaceSeparator:
-				case UnicodeCategory.Format:
-				case UnicodeCategory.NonSpacingMark:
-				case UnicodeCategory.OtherNotAssigned:
-				case UnicodeCategory.EnclosingMark:
-				case UnicodeCategory.SpacingCombiningMark:
-				case UnicodeCategory.LineSeparator:
-				case UnicodeCategory.ParagraphSeparator:
-				case UnicodeCategory.Surrogate:
-					return false;
-				default:
-					return true;
-			}
+				UnicodeCategory.Control
+				or UnicodeCategory.SpaceSeparator
+				or UnicodeCategory.Format
+				or UnicodeCategory.NonSpacingMark
+				or UnicodeCategory.OtherNotAssigned
+				or UnicodeCategory.EnclosingMark
+				or UnicodeCategory.SpacingCombiningMark
+				or UnicodeCategory.LineSeparator
+				or UnicodeCategory.ParagraphSeparator
+				or UnicodeCategory.Surrogate => false,
+				_ => true,
+			};
 		}
 
 		/// <summary>

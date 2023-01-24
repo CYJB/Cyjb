@@ -175,10 +175,7 @@ public sealed partial class CharSet : SetBase<char>, ICharSet, IEquatable<CharSe
 	/// 如果该字符的全部大小写都已在集内，则为 <c>false</c>。</returns>
 	public bool AddIgnoreCase(char ch, CultureInfo? culture = null)
 	{
-		if (culture == null)
-		{
-			culture = CultureInfo.InvariantCulture;
-		}
+		culture ??= CultureInfo.InvariantCulture;
 		int oldCount = count;
 		Add(ch);
 		TextInfo textInfo = culture.TextInfo;
@@ -218,10 +215,7 @@ public sealed partial class CharSet : SetBase<char>, ICharSet, IEquatable<CharSe
 		{
 			throw CommonExceptions.ArgumentMinMaxValue(nameof(start), nameof(end));
 		}
-		if (culture == null)
-		{
-			culture = CultureInfo.InvariantCulture;
-		}
+		culture ??= CultureInfo.InvariantCulture;
 		int oldCount = count;
 		Add(start, end);
 		CaseConverter.GetLowercaseConverter(culture).ConvertRange(start, end, this);
@@ -235,10 +229,7 @@ public sealed partial class CharSet : SetBase<char>, ICharSet, IEquatable<CharSe
 	/// <param name="culture">大小写转换使用的区域信息。</param>
 	public void AddLowercase(CultureInfo? culture = null)
 	{
-		if (culture == null)
-		{
-			culture = CultureInfo.InvariantCulture;
-		}
+		culture ??= CultureInfo.InvariantCulture;
 		CaseConverter converter = CaseConverter.GetLowercaseConverter(culture);
 		for (int i = 0; i < CharSetConfig.TopLen; i++)
 		{
@@ -262,10 +253,7 @@ public sealed partial class CharSet : SetBase<char>, ICharSet, IEquatable<CharSe
 	/// <param name="culture">大小写转换使用的区域信息。</param>
 	public void AddUppercase(CultureInfo? culture = null)
 	{
-		if (culture == null)
-		{
-			culture = CultureInfo.InvariantCulture;
-		}
+		culture ??= CultureInfo.InvariantCulture;
 		CaseConverter converter = CaseConverter.GetUppercaseConverter(culture);
 		for (int i = 0; i < CharSetConfig.TopLen; i++)
 		{

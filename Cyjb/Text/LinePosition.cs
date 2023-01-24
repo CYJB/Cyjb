@@ -3,7 +3,7 @@ namespace Cyjb.Text;
 /// <summary>
 /// 表示行位置。
 /// </summary>
-public struct LinePosition : IComparable<LinePosition>, IEquatable<LinePosition>
+public readonly struct LinePosition : IComparable<LinePosition>, IEquatable<LinePosition>
 {
 	/// <summary>
 	/// 行号，从 <c>1</c> 开始。

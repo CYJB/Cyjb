@@ -81,10 +81,7 @@ public class PrivateType
 	{
 		ArgumentNullException.ThrowIfNull(name);
 		Array? arr = (Array?)InvokeStatic(name, BindingFlags.GetField | BindingFlags.GetProperty, null, CultureInfo.InvariantCulture);
-		if (arr != null)
-		{
-			arr.SetValue(value, indices);
-		}
+		arr?.SetValue(value, indices);
 	}
 
 	/// <summary>

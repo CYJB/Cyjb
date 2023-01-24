@@ -5,8 +5,6 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Security;
-using System.Security.Permissions;
 using Cyjb;
 using Cyjb.Collections.ObjectModel;
 
@@ -22,7 +20,7 @@ namespace TestCyjb.Collections.TestCharSet
 	/// <seealso href="http://www.cnblogs.com/cyjb/archive/p/BitCharSet.html">
 	/// 《基于树状位压缩数组的字符集合》</seealso>
 	[Serializable]
-	public sealed class OldBitCharSet : SetBase<char>, ISerializable
+	public sealed class OldBitCharSet : SetBase<char>
 	{
 
 		#region 常量定义
@@ -217,14 +215,6 @@ namespace TestCyjb.Collections.TestCharSet
 		public CultureInfo Culture
 		{
 			get { return culture; }
-		}
-		/// <summary>
-		/// 对象不变量。
-		/// </summary>
-		[ContractInvariantMethod]
-		private void ObjectInvariant()
-		{
-			Contract.Invariant(this.data != null && this.data.Length == TopLen);
 		}
 
 		#region 数据操作
@@ -1075,32 +1065,6 @@ namespace TestCyjb.Collections.TestCharSet
 		}
 
 		#endregion // IEnumerable<char> 成员
-
-		#region ISerializable 成员
-
-		/// <summary>
-		/// 使用将目标对象序列化所需的数据填充 <see cref="SerializationInfo"/>。
-		/// </summary>
-		/// <param name="info">要填充数据的 <see cref="SerializationInfo"/>。
-		/// </param>
-		/// <param name="context">此序列化的目标。</param>
-		/// <exception cref="SecurityException">调用方没有所要求的权限。</exception>
-		/// <exception cref="ArgumentNullException"><paramref name="info"/> 参数为 <c>null</c>。</exception>
-		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
-		void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
-		{
-			ArgumentNullException.ThrowIfNull(info, "info");
-			Contract.EndContractBlock();
-			info.AddValue("Data", this.data);
-			info.AddValue("Count", this.count);
-			info.AddValue("IgnoreCase", this.ignoreCase);
-			if (this.ignoreCase)
-			{
-				info.AddValue("Culture", this.culture);
-			}
-		}
-
-		#endregion
 
 	}
 }

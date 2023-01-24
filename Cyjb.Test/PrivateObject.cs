@@ -9,7 +9,7 @@ namespace Cyjb.Test;
 /// 允许测试代码调用被测代码的方法和属性，这些方法和属性由于不是 public 的而不可访问。
 /// </summary>
 /// <remarks>MSTest 并未在 .NET 下提供 PrivateObject，这里提供一个单独的实现。</remarks>
-/// <seealso cref="https://github.com/microsoft/testfx/blob/main/src/TestFramework/Extension.Desktop/PrivateObject.cs"/>
+/// <seealso href="https://github.com/microsoft/testfx/blob/main/src/TestFramework/Extension.Desktop/PrivateObject.cs"/>
 public class PrivateObject
 {
 	/// <summary>
@@ -148,10 +148,7 @@ public class PrivateObject
 	{
 		ArgumentNullException.ThrowIfNull(name);
 		Array? arr = (Array?)Invoke(name, BindingFlags.GetField | BindingFlags.GetProperty, null, CultureInfo.InvariantCulture);
-		if (arr != null)
-		{
-			arr.SetValue(value, indices);
-		}
+		arr?.SetValue(value, indices);
 	}
 
 	/// <summary>

@@ -37,10 +37,7 @@ public static class CollectionAssertUtil
 	public static void AreEqual<T>(this CollectionAssert assert, ICollection<T>? expected, ICollection<T>? actual,
 		IEqualityComparer<T>? comparer, string? message, params object?[] parameters)
 	{
-		if (comparer == null)
-		{
-			comparer = EqualityComparer<T>.Default;
-		}
+		comparer ??= EqualityComparer<T>.Default;
 		if (!AreEqual(expected, actual, comparer, out string resultInfo))
 		{
 			if (message == null)
@@ -129,10 +126,7 @@ public static class CollectionAssertUtil
 	public static void AreEquivalent<T>(this CollectionAssert assert, ICollection<T>? expected, ICollection<T>? actual,
 		IEqualityComparer<T>? comparer, string? message, params object?[] parameters)
 	{
-		if (comparer == null)
-		{
-			comparer = EqualityComparer<T>.Default;
-		}
+		comparer ??= EqualityComparer<T>.Default;
 		if (!AreEquivalent(expected, actual, comparer, out string resultInfo))
 		{
 			if (message == null)

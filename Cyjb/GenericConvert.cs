@@ -77,10 +77,7 @@ namespace Cyjb
 			/// </summary>
 			public Delegate GetGenericConverter(Type inputType, Type outputType)
 			{
-				if (genericConverter == null)
-				{
-					genericConverter = BuildConverter(inputType, outputType, false, true);
-				}
+				genericConverter ??= BuildConverter(inputType, outputType, false, true);
 				return genericConverter;
 			}
 
