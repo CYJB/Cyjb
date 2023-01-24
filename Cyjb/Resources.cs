@@ -36,10 +36,7 @@ internal partial class Resources
 	{
 		get
 		{
-			if (resourceManager is null)
-			{
-				resourceManager = new ResourceManager("Cyjb.Resources", typeof(Resources).Assembly);
-			}
+			resourceManager ??= new ResourceManager("Cyjb.Resources", typeof(Resources).Assembly);
 			return resourceManager;
 		}
 	}

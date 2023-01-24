@@ -104,10 +104,7 @@ internal partial class <#= resxClassName #>
 	{
 		get
 		{
-			if (resourceManager is null)
-			{
-				resourceManager = new ResourceManager("<#= resxNamespace #>.<#= resxClassName #>", typeof(<#= resxClassName #>).Assembly);
-			}
+			resourceManager ??= new ResourceManager("<#= resxNamespace #>.<#= resxClassName #>", typeof(<#= resxClassName #>).Assembly);
 			return resourceManager;
 		}
 	}
