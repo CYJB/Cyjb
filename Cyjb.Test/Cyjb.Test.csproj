@@ -16,6 +16,8 @@
 	<Version>$(VersionPrefix)</Version>
 	<VersionPrefix>1.0.1</VersionPrefix>
 	<Authors>CYJB</Authors>
+	<IncludeSymbols>true</IncludeSymbols>
+	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
