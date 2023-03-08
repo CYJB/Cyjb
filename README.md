@@ -2,6 +2,7 @@ Cyjb
 ====
 
 [![](https://img.shields.io/nuget/v/Cyjb.svg)](https://www.nuget.org/packages/Cyjb)
+[![codecov](https://codecov.io/gh/CYJB/Cyjb/branch/master/graph/badge.svg?token=0nRtjN0j1i)](https://codecov.io/gh/CYJB/Cyjb)
 
 提供基础的功能扩展，基于 .NET 6。
 
