@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Reflection.Emit;
 using Cyjb.Conversions;
 
@@ -334,6 +334,8 @@ namespace Cyjb.Reflection
 					// 前面保证了不存在 null 类型。
 					il.EmitLoadParameter(optionalArgs[i]!, index, optionalArgs[i]!);
 				}
+				// 带有可变参数时，不优化 tailCall，避免参数信息丢失。
+				optimizeTailcall = false;
 			}
 			return optimizeTailcall;
 		}
