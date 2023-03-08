@@ -5,8 +5,6 @@ VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cyjb", "Cyjb\Cyjb.csproj", "{9F2C4D8E-EDBB-4074-85DD-204C2F0157D0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTest", "ConsoleTest\ConsoleTest.csproj", "{10DF7639-1C2B-4CA1-B03F-E1C06FDB1A8E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestCyjb", "TestCyjb\TestCyjb.csproj", "{8BB1F787-D029-4E8B-8D3A-83EE950E3E97}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EEDBC819-334A-45DB-AAEF-0FB7C148B684}"
@@ -14,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cyjb.Test", "Cyjb.Test\Cyjb.Test.csproj", "{881298FA-59BB-4613-A2FB-2F917F7C9154}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cyjb.Test", "Cyjb.Test\Cyjb.Test.csproj", "{881298FA-59BB-4613-A2FB-2F917F7C9154}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,10 +24,6 @@ Global
 		{9F2C4D8E-EDBB-4074-85DD-204C2F0157D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F2C4D8E-EDBB-4074-85DD-204C2F0157D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F2C4D8E-EDBB-4074-85DD-204C2F0157D0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{10DF7639-1C2B-4CA1-B03F-E1C06FDB1A8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{10DF7639-1C2B-4CA1-B03F-E1C06FDB1A8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{10DF7639-1C2B-4CA1-B03F-E1C06FDB1A8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{10DF7639-1C2B-4CA1-B03F-E1C06FDB1A8E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8BB1F787-D029-4E8B-8D3A-83EE950E3E97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8BB1F787-D029-4E8B-8D3A-83EE950E3E97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BB1F787-D029-4E8B-8D3A-83EE950E3E97}.Release|Any CPU.ActiveCfg = Release|Any CPU

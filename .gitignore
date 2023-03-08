@@ -7,6 +7,8 @@ Properties
 
 # mstest test results
 TestResults
+CodeCoverage
+coverage.cobertura.xml
 
 # test project
 ConsoleTest
