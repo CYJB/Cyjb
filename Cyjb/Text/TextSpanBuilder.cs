@@ -25,13 +25,13 @@ public sealed class TextSpanBuilder
 			start = index;
 			end = index;
 		}
-		else if (start > index)
-		{
-			start = index;
-		}
-		else if (end < index)
+		else if (index >= end)
 		{
 			end = index;
+		}
+		else if (index < start)
+		{
+			start = index;
 		}
 	}
 
