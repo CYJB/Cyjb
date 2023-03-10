@@ -1,16 +1,34 @@
-using Cyjb.Collections;
-
 namespace Cyjb.Text;
 
 /// <summary>
 /// 提供将位置线性映射到其它范围的能力。
 /// </summary>
-public class LocationMap
+public sealed class LocationMap
 {
+	/// <summary>
+	/// 映射的索引。
+	/// </summary>
+	private readonly List<int> indexMap = new();
 	/// <summary>
 	/// 映射关系。
 	/// </summary>
-	protected readonly List<MapItem> map = new();
+	private readonly List<MapItem> map = new();
+	/// <summary>
+	/// 当前映射所在的索引。
+	/// </summary>
+	private int mapIndex = 0;
+	/// <summary>
+	/// 当前映射。
+	/// </summary>
+	private MapItem curMap;
+	/// <summary>
+	/// 当前映射的索引。
+	/// </summary>
+	private int curIndex = 0;
+	/// <summary>
+	/// 下一个映射的索引。
+	/// </summary>
+	private int nextIndex;
 
 	/// <summary>
 	/// 使用指定的位置映射关系初始化 <see cref="Text.LocationMap"/> 类的新实例。
@@ -33,13 +51,22 @@ public class LocationMap
 				else
 				{
 					// 添加当前映射。
+					indexMap.Add(cur.Item1);
 					this.map.Add(new MapItem(cur, next.Item2));
 					return next;
 				}
 			});
 			// 添加最后一个映射。
+			indexMap.Add(last.Item1);
 			this.map.Add(new MapItem(last, int.MaxValue));
+			curMap = this.map[0];
+			curIndex = indexMap[0];
 		}
+		else
+		{
+			curMap = new MapItem(new Tuple<int, int>(0, 0), int.MaxValue);
+		}
+		FindNextMap();
 	}
 
 	/// <summary>
@@ -47,15 +74,28 @@ public class LocationMap
 	/// </summary>
 	/// <param name="location">要映射的位置。</param>
 	/// <returns>映射后的位置。</returns>
-	public virtual int MapLocation(int location)
+	public int MapLocation(int location)
 	{
-		int idx = map.BinarySearch(location, (lmap) => lmap.Index);
+		if (location >= curIndex)
+		{
+			// 在当前映射范围之后，需要切换到下一映射。
+			while (location >= nextIndex)
+			{
+				mapIndex++;
+				curIndex = indexMap[mapIndex];
+				curMap = map[mapIndex];
+				FindNextMap();
+			}
+			return curMap.MapLocation(location);
+		}
+		// 在当前映射范围之前，二分查找。
+		int idx = indexMap.BinarySearch(0, mapIndex, location, Comparer<int>.Default);
 		if (idx < 0)
 		{
 			idx = ~idx;
 			if (idx == 0)
 			{
-				// 在首个映射之前，什么都不做。
+				// 在首个索引之前，什么都不做。
 				return location;
 			}
 			idx--;
@@ -64,18 +104,25 @@ public class LocationMap
 	}
 
 	/// <summary>
+	/// 寻找下一个索引。
+	/// </summary>
+	private void FindNextMap()
+	{
+		if ((mapIndex + 1) < indexMap.Count)
+		{
+			nextIndex = indexMap[mapIndex + 1];
+		}
+		else
+		{
+			nextIndex = int.MaxValue;
+		}
+	}
+
+	/// <summary>
 	/// 位置映射。
 	/// </summary>
-	protected readonly struct MapItem
+	private readonly struct MapItem
 	{
-		/// <summary>
-		/// 当前映射的起始索引。
-		/// </summary>
-		public readonly int Index;
-		/// <summary>
-		/// 当前映射结果的结束索引。
-		/// </summary>
-		private readonly int endMappedIndex;
 		/// <summary>
 		/// 当前映射的偏移。
 		/// </summary>
@@ -84,17 +131,20 @@ public class LocationMap
 		/// 是否直接映射到 offset。
 		/// </summary>
 		private readonly bool mapToOffset;
+		/// <summary>
+		/// 当前映射结果的结束索引。
+		/// </summary>
+		private readonly int endIndex;
 
 		/// <summary>
 		/// 使用指定的映射和结束位置初始化 <see cref="MapItem"/> 结构的新实例。
 		/// </summary>
 		/// <param name="curMap">当前映射。</param>
-		/// <param name="endMappedIndex">当前映射结果的结束位置。</param>
-		public MapItem(Tuple<int, int> curMap, int endMappedIndex)
+		/// <param name="nextMapIndex">下一个映射结果的结束位置。</param>
+		public MapItem(Tuple<int, int> curMap, int nextMapIndex)
 		{
-			Index = curMap.Item1;
-			this.endMappedIndex = endMappedIndex;
-			if (curMap.Item2 >= endMappedIndex)
+			endIndex = nextMapIndex - 1;
+			if (curMap.Item2 >= nextMapIndex)
 			{
 				// 当前映射的起始位置已经超过了结束位置，那么总是直接映射到起始位置。
 				offset = curMap.Item2;
@@ -122,21 +172,12 @@ public class LocationMap
 			{
 				location += offset;
 				// 避免超出结束位置。
-				if (location >= endMappedIndex)
+				if (location > endIndex)
 				{
-					location = endMappedIndex - 1;
+					location = endIndex;
 				}
 				return location;
 			}
-		}
-
-		/// <summary>
-		/// 返回当前对象的字符串表示形式。
-		/// </summary>
-		/// <returns>当前对象的字符串表示形式。</returns>
-		public override string ToString()
-		{
-			return $"[{Index} -> {Index + offset}]";
 		}
 	}
 }
