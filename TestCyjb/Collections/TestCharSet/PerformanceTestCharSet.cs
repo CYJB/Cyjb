@@ -17,8 +17,9 @@ namespace TestCyjb.Collections
 		/// <summary>
 		/// 对 <see cref="CharSet"/> 的添加性能进行测试。
 		/// </summary>
+		/// <remarks>默认禁用。</remarks>
 		[TestMethod]
-		public void TestPerformance()
+		private void TestPerformance()
 		{
 			Random random = Random.Shared;
 			List<(bool isAdd, char ch)> charOperation = new();
