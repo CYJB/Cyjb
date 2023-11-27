@@ -191,6 +191,372 @@ public static class StringUtil
 
 	#endregion // Escape
 
+	#region NaturalCompare
+
+	/// <summary>
+	/// 比较两个字符串，字符串中的数字部分会按照数字顺序比较。
+	/// </summary>
+	/// <param name="strA">要比较的第一个字符串。</param>
+	/// <param name="strB">要比较的第二个字符串。</param>
+	/// <param name="comparisonType">比较中要使用的规则。</param>
+	/// <returns>一个 32 位带符号整数，指示两个字符串之间的顺序。
+	/// <list type="table">
+	/// <listheader>
+	/// <term>值</term>
+	/// <description>条件</description>
+	/// </listheader>
+	/// <item>
+	/// <term>小于零</term>
+	/// <description><paramref name="strA"/> 在排序顺序中位于 <paramref name="strB"/> 之前。</description>
+	/// </item>
+	/// <item>
+	/// <term>零</term>
+	/// <description><paramref name="strA"/> 和 <paramref name="strB"/> 在排序顺序中的位置相同。</description>
+	/// </item>
+	/// <item>
+	/// <term>大于零</term>
+	/// <description><paramref name="strA"/> 在排序顺序中位于 <paramref name="strB"/> 之后。</description>
+	/// </item>
+	/// </list>
+	/// </returns>
+	public static int NaturalCompare(string? strA, string? strB, StringComparison comparisonType = StringComparison.CurrentCulture)
+	{
+		if (strA == strB)
+		{
+			return 0;
+		}
+		if (strA == null)
+		{
+			return -1;
+		}
+		else if (strB == null)
+		{
+			return 1;
+		}
+		CultureInfo? culture = null;
+		CompareOptions options = CompareOptions.None;
+		switch (comparisonType)
+		{
+			case StringComparison.CurrentCulture:
+				culture = CultureInfo.CurrentCulture;
+				break;
+			case StringComparison.CurrentCultureIgnoreCase:
+				culture = CultureInfo.CurrentCulture;
+				options = CompareOptions.IgnoreCase;
+				break;
+			case StringComparison.InvariantCulture:
+				culture = CultureInfo.InvariantCulture;
+				break;
+			case StringComparison.InvariantCultureIgnoreCase:
+				culture = CultureInfo.InvariantCulture;
+				options = CompareOptions.IgnoreCase;
+				break;
+			case StringComparison.Ordinal:
+				options = CompareOptions.Ordinal;
+				break;
+			case StringComparison.OrdinalIgnoreCase:
+				options = CompareOptions.OrdinalIgnoreCase;
+				break;
+		}
+		return NaturalCompareInternal(strA, strB, culture, options);
+	}
+
+	/// <summary>
+	/// 比较两个字符串，字符串中的数字部分会按照数字顺序比较。
+	/// </summary>
+	/// <param name="strA">要比较的第一个字符串。</param>
+	/// <param name="strB">要比较的第二个字符串。</param>
+	/// <param name="ignoreCase">是否在比较过程中忽略大小写。</param>
+	/// <param name="culture">区域性特定的比较信息。如果 <paramref name="culture"/> 为 <c>null</c>，
+	/// 则使用当前区域性。</param>
+	/// <returns>一个 32 位带符号整数，指示两个字符串之间的顺序。
+	/// <list type="table">
+	/// <listheader>
+	/// <term>值</term>
+	/// <description>条件</description>
+	/// </listheader>
+	/// <item>
+	/// <term>小于零</term>
+	/// <description><paramref name="strA"/> 在排序顺序中位于 <paramref name="strB"/> 之前。</description>
+	/// </item>
+	/// <item>
+	/// <term>零</term>
+	/// <description><paramref name="strA"/> 和 <paramref name="strB"/> 在排序顺序中的位置相同。</description>
+	/// </item>
+	/// <item>
+	/// <term>大于零</term>
+	/// <description><paramref name="strA"/> 在排序顺序中位于 <paramref name="strB"/> 之后。</description>
+	/// </item>
+	/// </list>
+	/// </returns>
+	public static int NaturalCompare(string? strA, string? strB, bool ignoreCase, CultureInfo? culture)
+	{
+		if (strA == strB)
+		{
+			return 0;
+		}
+		if (strA == null)
+		{
+			return -1;
+		}
+		else if (strB == null)
+		{
+			return 1;
+		}
+		return NaturalCompareInternal(strA, strB, culture, ignoreCase ? CompareOptions.IgnoreCase : CompareOptions.None);
+	}
+
+	/// <summary>
+	/// 比较两个字符串，字符串中的数字部分会按照数字顺序比较。
+	/// </summary>
+	/// <param name="strA">要比较的第一个字符串。</param>
+	/// <param name="strB">要比较的第二个字符串。</param>
+	/// <param name="culture">区域性特定的比较信息。如果 <paramref name="culture"/> 为 <c>null</c>，
+	/// 则使用当前区域性。</param>
+	/// <param name="options">要在执行比较时使用的选项（如忽略大小写或符号）。</param>
+	/// <returns>一个 32 位带符号整数，指示两个字符串之间的顺序。
+	/// <list type="table">
+	/// <listheader>
+	/// <term>值</term>
+	/// <description>条件</description>
+	/// </listheader>
+	/// <item>
+	/// <term>小于零</term>
+	/// <description><paramref name="strA"/> 在排序顺序中位于 <paramref name="strB"/> 之前。</description>
+	/// </item>
+	/// <item>
+	/// <term>零</term>
+	/// <description><paramref name="strA"/> 和 <paramref name="strB"/> 在排序顺序中的位置相同。</description>
+	/// </item>
+	/// <item>
+	/// <term>大于零</term>
+	/// <description><paramref name="strA"/> 在排序顺序中位于 <paramref name="strB"/> 之后。</description>
+	/// </item>
+	/// </list>
+	/// </returns>
+	public static int NaturalCompare(string? strA, string? strB, CultureInfo? culture, CompareOptions options)
+	{
+		if (strA == strB)
+		{
+			return 0;
+		}
+		if (strA == null)
+		{
+			return -1;
+		}
+		else if (strB == null)
+		{
+			return 1;
+		}
+		return NaturalCompareInternal(strA, strB, culture, options);
+	}
+
+	/// <summary>
+	/// 比较两个字符串，字符串中的数字部分会按照数字顺序比较。
+	/// </summary>
+	/// <param name="strA">要比较的第一个字符串。</param>
+	/// <param name="strB">要比较的第二个字符串。</param>
+	/// <param name="culture">区域性特定的比较信息。如果 <paramref name="culture"/> 为 <c>null</c>，
+	/// 则使用当前区域性。</param>
+	/// <param name="options">要在执行比较时使用的选项（如忽略大小写或符号）。</param>
+	/// <returns>一个 32 位带符号整数，指示两个字符串之间的顺序。
+	/// <list type="table">
+	/// <listheader>
+	/// <term>值</term>
+	/// <description>条件</description>
+	/// </listheader>
+	/// <item>
+	/// <term>小于零</term>
+	/// <description><paramref name="strA"/> 在排序顺序中位于 <paramref name="strB"/> 之前。</description>
+	/// </item>
+	/// <item>
+	/// <term>零</term>
+	/// <description><paramref name="strA"/> 和 <paramref name="strB"/> 在排序顺序中的位置相同。</description>
+	/// </item>
+	/// <item>
+	/// <term>大于零</term>
+	/// <description><paramref name="strA"/> 在排序顺序中位于 <paramref name="strB"/> 之后。</description>
+	/// </item>
+	/// </list>
+	/// </returns>
+	private static int NaturalCompareInternal(string strA, string strB, CultureInfo? culture, CompareOptions options)
+	{
+		IEnumerator<NaturalPart> secondEnum = SplitNaturalPart(strB).GetEnumerator();
+		foreach (NaturalPart part in SplitNaturalPart(strA))
+		{
+			if (secondEnum.MoveNext())
+			{
+				int result = part.Compare(strA, secondEnum.Current, strB, culture, options);
+				if (result != 0)
+				{
+					return result;
+				}
+			}
+			else
+			{
+				// 第一个字符串更长。
+				return 1;
+			}
+		}
+		if (secondEnum.MoveNext())
+		{
+			// 第二个字符串更长。
+			return -1;
+		}
+		else
+		{
+			// 两个字符串等长。
+			return 0;
+		}
+	}
+
+	/// <summary>
+	/// ASCII 数字字符数组。
+	/// </summary>
+	private static readonly char[] AsciiDigits = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+
+	/// <summary>
+	/// 返回指定字符是否是 ASCII 的 0-9。
+	/// </summary>
+	/// <param name="ch">要检查的字符。</param>
+	/// <returns><paramref name="ch"/> 是否是 ASCII 的 0-9。</returns>
+	private static bool IsAsciiDigit(char ch)
+	{
+		return ch >= '0' && ch <= '9';
+	}
+
+	/// <summary>
+	/// 自然比较的部分。
+	/// </summary>
+	private readonly struct NaturalPart
+	{
+		/// <summary>
+		/// 部分的起始位置。
+		/// </summary>
+		private readonly int start;
+		/// <summary>
+		/// 部分的结束位置。
+		/// </summary>
+		private readonly int end;
+		/// <summary>
+		/// 部分是否是数字。
+		/// </summary>
+		private readonly bool isNumber;
+
+		/// <summary>
+		/// 初始化自然比较的部分。
+		/// </summary>
+		/// <param name="start">的起始位置。</param>
+		/// <param name="end">的结束位置。</param>
+		/// <param name="isNumber">是否是数字。</param>
+		public NaturalPart(int start, int end, bool isNumber)
+		{
+			this.start = start;
+			this.end = end;
+			this.isNumber = isNumber;
+		}
+
+		/// <summary>
+		/// 当前部分的长度。
+		/// </summary>
+		private int Length => end - start;
+
+		/// <summary>
+		/// 与另一个部分比较。
+		/// </summary>比
+		/// <param name="str">当前部分对应的字符串。</param>
+		/// <param name="otherPart">要比较的部分。</param>
+		/// <param name="otherStr">要比较的部分对应的字符串。</param>
+		/// <param name="culture">区域性特定的比较信息。如果 <paramref name="culture"/> 为 <c>null</c>，
+		/// 则使用当前区域性。</param>
+		/// <param name="options">要在执行比较时使用的选项（如忽略大小写或符号）。</param>
+		/// <returns>一个 32 位带符号整数，指示两个字符串之间的顺序。</returns>
+		public int Compare(string str, NaturalPart otherPart, string otherStr, CultureInfo? culture, CompareOptions options)
+		{
+			if (isNumber)
+			{
+				if (otherPart.isNumber)
+				{
+					// 比较数字大小。
+					ReadOnlySpan<char> spanA = str.AsSpan(start, Length);
+					int prefixZeroA = TrimPrefixZero(ref spanA);
+					ReadOnlySpan<char> spanB = otherStr.AsSpan(otherPart.start, otherPart.Length);
+					int prefixZeroB = TrimPrefixZero(ref spanB);
+					int result = spanA.Length - spanB.Length;
+					if (result == 0)
+					{
+						// 数字直接按 Unicode 比较即可。
+						result = spanA.CompareTo(spanB, StringComparison.Ordinal);
+						if (result == 0)
+						{
+							// 数字相同时，比较前导 0 的个数。
+							result = prefixZeroA - prefixZeroB;
+						}
+					}
+					return result;
+				}
+				else
+				{
+					// 另一个部分的首字符一定不是数字，直接与 '0' 比较大小即可。
+					return '0'.CompareTo(otherStr[otherPart.start]);
+				}
+			}
+			else if (otherPart.isNumber)
+			{
+				// 当前部分的首字符一定不是数字，直接与 '0' 比较大小即可。
+				return str[start].CompareTo('0');
+			}
+			else
+			{
+				// 比较字符串顺序。
+				return string.Compare(str, start, otherStr, otherPart.start, Math.Max(Length, otherPart.Length),
+					culture, options);
+			}
+		}
+	}
+
+	/// <summary>
+	/// 按照文本和数字分割字符串。
+	/// </summary>
+	private static IEnumerable<NaturalPart> SplitNaturalPart(string fileName)
+	{
+		int len = fileName.Length;
+		for (int i = 0; i < len;)
+		{
+			int idx = fileName.IndexOfAny(AsciiDigits, i);
+			if (idx >= 0)
+			{
+				if (idx > i)
+				{
+					yield return new NaturalPart(i, idx, false);
+				}
+				for (i = idx + 1; i < len && IsAsciiDigit(fileName[i]); i++) ;
+				yield return new NaturalPart(idx, i, true);
+			}
+			else
+			{
+				// 剩余部分全部是普通字符串。
+				yield return new NaturalPart(i, len, false);
+				break;
+			}
+		}
+	}
+
+	/// <summary>
+	/// 移除指定字符串的前导 0。
+	/// </summary>
+	/// <param name="str">要移除前导 0 的字符串。</param>
+	/// <returns>已移除的前导 0 个数。</returns>
+	private static int TrimPrefixZero(ref ReadOnlySpan<char> str)
+	{
+		int i = 0;
+		for (; i < str.Length && str[i] == '0'; i++) ;
+		str = str[i..];
+		return i;
+	}
+
+	#endregion // NaturalCompare
+
 	/// <summary>
 	/// 返回指定字符串的字符顺序是相反的字符串。
 	/// </summary>

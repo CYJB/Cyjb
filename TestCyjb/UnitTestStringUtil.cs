@@ -1,3 +1,5 @@
+using System;
+using System.Globalization;
 using Cyjb;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -69,6 +71,62 @@ namespace TestCyjb
 		public void TestUnicodeUnescape(string? str, string? expected)
 		{
 			Assert.AreEqual(expected, str.UnicodeUnescape());
+		}
+
+		/// <summary>
+		/// 对 <see cref="StringUtil.NaturalCompare"/> 方法进行测试。
+		/// </summary>
+		[DataTestMethod]
+		public void TestNaturalCompare()
+		{
+			string?[] names =
+			{
+				null,
+				"",
+				"+",
+				"123",
+				"@",
+				"abc",
+				"abc%100c",
+				"abc9",
+				"abc09",
+				"abc09c",
+				"abc10",
+				"abc10a",
+				"abc11",
+				"abc0934567def",
+				"abc00934567def",
+				"abc934568def",
+				"abc0000000310385126973def",
+				"abc01038512697342def",
+				"abc1038512697343def",
+				"abc1038512697343454.1def",
+				"abc@9c",
+				"abcd",
+				"abcd.efg.123.fa",
+				"abcu9c",
+				"abcu8179846723569127560912803571829369231057801273986512730571283aa",
+				"abcu00000000008179846723569127560912803571829369231057801273986512730571284aa",
+			};
+			for (int i = 0; i < names.Length; i++)
+			{
+				for (int j = 0; j < names.Length; j++)
+				{
+					int result = StringUtil.NaturalCompare(names[i], names[j], StringComparison.Ordinal);
+					if (i < j)
+					{
+						Assert.IsTrue(result < 0, "{0} < {1}", names[i], names[j]);
+					}
+					else if (i > j)
+					{
+						Assert.IsTrue(result > 0, "{0} > {1}", names[i], names[j]);
+					}
+					else
+					{
+						Assert.AreEqual(0, result, "{0} == {1}", names[i], names[j]);
+					}
+				}
+			}
 		}
 
 		/// <summary>
