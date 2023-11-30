@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using Cyjb.Conversions;
 
 namespace Cyjb;
 
@@ -31,6 +32,26 @@ public static class StringUtil
 		{
 			return str;
 		}
+		return str.AsSpan().UnicodeEscape(escapeVisibleUnicode);
+	}
+
+	/// <summary>
+	/// 返回当前字符串的 Unicode 转义字符串。
+	/// </summary>
+	/// <param name="str">要进行转义的字符串。</param>
+	/// <param name="escapeVisibleUnicode">是否转义可见的 Unicode 字符，默认为 <c>true</c>。</param>
+	/// <returns>转义后的字符串。</returns>
+	/// <remarks>
+	/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），不会发生改变。</para>
+	/// <para>对于某些特殊字符（\0, \, \a, \b, \f, \n, \r, \t, \v），会替换为其转义形式。</para>
+	/// <para>对于其它字符，会替换为其十六进制转义形式（\u0000）。</para>
+	/// </remarks>
+	public static string UnicodeEscape(this ReadOnlySpan<char> str, bool escapeVisibleUnicode = true)
+	{
+		if (str.IsEmpty)
+		{
+			return string.Empty;
+		}
 		StringBuilder builder = new(str.Length * 2);
 		for (int i = 0; i < str.Length; i++)
 		{
@@ -54,32 +75,49 @@ public static class StringUtil
 		{
 			return str;
 		}
+		if (str.IndexOf('\\') < 0)
+		{
+			return str.ToString();
+		}
+		return str.AsSpan().UnicodeUnescape();
+	}
+
+	/// <summary>
+	/// 将字符串中的 \u,\U 和 \x 转义转换为对应的字符。
+	/// </summary>
+	/// <param name="str">要转换的字符串。</param>
+	/// <returns>转换后的字符串。</returns>
+	/// <remarks>
+	/// <para>解码方法支持 \x00，\u0000 和 \U00000000 转义。使用 \U 转义时，大于 0x10FFFF 的值不被支持，会被舍弃。</para>
+	/// <para>如果不满足上面的情况，则不会进行转义，也不会报错。</para></remarks>
+	public static string UnicodeUnescape(this ReadOnlySpan<char> str)
+	{
+		if (str.IsEmpty)
+		{
+			return string.Empty;
+		}
 		int idx = str.IndexOf('\\');
 		if (idx < 0)
 		{
-			return str;
+			return str.ToString();
 		}
-		int len = str.Length, start = 0;
-		StringBuilder builder = new(len);
+		StringBuilder builder = new(str.Length);
 		while (idx >= 0)
 		{
 			// 添加当前 '\' 之前的字符串。
-			if (idx > start)
+			if (idx > 0)
 			{
-				builder.Append(str, start, idx - start);
-				start = idx;
+				builder.Append(str[..idx]);
+				str = str[idx..];
 			}
-			// 跳过 '\' 字符。
-			idx++;
-			if (idx >= len)
+			// '\' 后没有其它字符，不是有效的转义。
+			if (str.Length <= 1)
 			{
 				break;
 			}
 			// Unicode 转义需要的十六进制字符的长度。
 			int hexLen = 0;
-			bool parsed = true;
-			char ch = str[idx];
-			switch (ch)
+			switch (str[1])
 			{
 				case 'x':
 					// \x 后面必须是 2 位。
@@ -121,17 +159,16 @@ public static class StringUtil
 					builder.Append('\v');
 					break;
 				default:
-					// 其它未支持的转义
-					parsed = false;
+					// 其它未支持的转义，添加未被解析的字符。
+					builder.Append(str[..2]);
 					break;
 			}
-			idx++;
 			if (hexLen > 0)
 			{
 				// Unicode 反转义。
-				if (CheckHexLength(str, idx, hexLen))
+				if (CheckHexLength(str[2..], hexLen))
 				{
-					int charNum = System.Convert.ToInt32(str.Substring(idx, hexLen), 16);
+					int charNum = BaseConvert.ToInt32(str[2..(2 + hexLen)], 16);
 					if (charNum < 0xFFFF)
 					{
 						// 单个字符。
@@ -142,27 +179,20 @@ public static class StringUtil
 						// 代理项对的字符。
 						builder.Append(char.ConvertFromUtf32(charNum & 0x1FFFFF));
 					}
-					idx += hexLen;
+					// 后面会统一跳过两个字符，只要跳过 hexLen 即可。
+					str = str[hexLen..];
 				}
 				else
 				{
-					parsed = false;
+					builder.Append(str[..2]);
 				}
 			}
-			if (!parsed)
-			{
-				// 添加其他未被解析的字符。
-				builder.Append('\\');
-				builder.Append(ch);
-			}
-			start = idx;
-			idx = str.IndexOf('\\', idx);
+			// 跳过已被解析或添加的字符。
+			str = str[2..];
+			idx = str.IndexOf('\\');
 		}
 		// 添加剩余的字符串。
-		if (start < len)
-		{
-			builder.Append(str, start, len - start);
-		}
+		builder.Append(str);
 		return builder.ToString();
 	}
 
@@ -170,18 +200,17 @@ public static class StringUtil
 	/// 检查字符串指定索引位置之后是否包含指定个数的十六进制字符。
 	/// </summary>
 	/// <param name="str">要检查十六进制字符个数的字符串。</param>
-	/// <param name="index">要开始计算十六进制字符个数的起始索引。</param>
 	/// <param name="maxLength">需要的十六进制字符个数。</param>
 	/// <returns>如果包含指定个数的十六进制字符，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-	private static bool CheckHexLength(string str, int index, int maxLength)
+	private static bool CheckHexLength(ReadOnlySpan<char> str, int maxLength)
 	{
-		if (index + maxLength > str.Length)
+		if (maxLength > str.Length)
 		{
 			return false;
 		}
-		for (int i = 0; i < maxLength; i++, index++)
+		for (int i = 0; i < maxLength; i++)
 		{
-			if (!Uri.IsHexDigit(str[index]))
+			if (!Uri.IsHexDigit(str[i]))
 			{
 				return false;
 			}
@@ -570,42 +599,41 @@ public static class StringUtil
 		{
 			return str;
 		}
-		int len = str.Length;
-		int end = len - 1;
-		int i = 0;
-		char[] strArr = new char[len];
-		while (end >= 0)
+		return string.Create(str.Length, str.Length, (Span<char> span, int len) =>
 		{
-			switch (CharUnicodeInfo.GetUnicodeCategory(str[i]))
+			int end = len - 1;
+			int i = 0;
+			while (end >= 0)
 			{
-				case UnicodeCategory.Surrogate:
-				case UnicodeCategory.NonSpacingMark:
-				case UnicodeCategory.SpacingCombiningMark:
-				case UnicodeCategory.EnclosingMark:
-					// 字符串中包含组合字符，翻转时需要保证组合字符的顺序。
-					// 为了能够包含基字符，回退一位。
-					if (i > 0)
-					{
-						i--;
-						end++;
-					}
-					int start = i;
-					TextElementEnumerator textElementEnumerator = StringInfo.GetTextElementEnumerator(str, start);
-					textElementEnumerator.MoveNext();
-					int idx = start + textElementEnumerator.ElementIndex;
-					while (end >= 0)
-					{
-						i = idx;
-						idx = textElementEnumerator.MoveNext() ? start + textElementEnumerator.ElementIndex : len;
-						for (int j = idx - 1; j >= i; strArr[end--] = str[j--]) ;
-					}
-					goto EndReverse;
+				switch (CharUnicodeInfo.GetUnicodeCategory(str[i]))
+				{
+					case UnicodeCategory.Surrogate:
+					case UnicodeCategory.NonSpacingMark:
+					case UnicodeCategory.SpacingCombiningMark:
+					case UnicodeCategory.EnclosingMark:
+						// 字符串中包含组合字符，翻转时需要保证组合字符的顺序。
+						// 为了能够包含基字符，回退一位。
+						if (i > 0)
+						{
+							i--;
+							end++;
+						}
+						int start = i;
+						TextElementEnumerator textElementEnumerator = StringInfo.GetTextElementEnumerator(str, start);
+						textElementEnumerator.MoveNext();
+						int idx = start + textElementEnumerator.ElementIndex;
+						while (end >= 0)
+						{
+							i = idx;
+							idx = textElementEnumerator.MoveNext() ? start + textElementEnumerator.ElementIndex : len;
+							for (int j = idx - 1; j >= i; span[end--] = str[j--]) ;
+						}
+						return;
+				}
+				// 直接复制。
+				span[end--] = str[i++];
 			}
-			// 直接复制。
-			strArr[end--] = str[i++];
-		}
-	EndReverse:
-		return new string(strArr);
+		});
 	}
 
 	/// <summary>

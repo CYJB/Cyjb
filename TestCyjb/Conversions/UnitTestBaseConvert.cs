@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cyjb.Conversions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -14,7 +14,6 @@ namespace TestCyjb.Conversions
 		/// 对 <see cref="BaseConvert.ToSByte"/> 和 <see cref="BaseConvert.ToString(sbyte,int)"/> 方法进行测试。
 		/// </summary>
 		[DataTestMethod]
-		[DataRow(null, 10, 0)]
 		[DataRow("0", 10, 0)]
 		[DataRow("0", 13, 0)]
 		[DataRow("1", 3, 1)]
@@ -30,20 +29,23 @@ namespace TestCyjb.Conversions
 		[DataRow("4m", 36, -90)]
 		[DataRow("9b", 27, -2)]
 		[DataRow("9c", 27, -1)]
-		public void TestSByte(string? value, int fromBase, int expected)
+		[DataRow("12", 16, 18)]
+		[DataRow("0x7B", 16, 123)]
+		[DataRow("0X99", 16, -103)]
+		public void TestSByte(string value, int fromBase, int expected)
 		{
 			Assert.AreEqual((sbyte)expected, BaseConvert.ToSByte(value, fromBase));
-			if (value != null)
+			if (fromBase == 16 && (value.StartsWith("0x") || value.StartsWith("0X")))
 			{
-				Assert.AreEqual(value.ToUpper(), BaseConvert.ToString((sbyte)expected, fromBase));
+				value = value[2..];
 			}
+			Assert.AreEqual(value.ToUpper(), BaseConvert.ToString((sbyte)expected, fromBase));
 		}
 
 		/// <summary>
 		/// 对 <see cref="BaseConvert.ToByte"/> 和 <see cref="BaseConvert.ToString(byte,int)"/> 方法进行测试。
 		/// </summary>
 		[DataTestMethod]
-		[DataRow(null, 10, 0)]
 		[DataRow("0", 3, 0)]
 		[DataRow("0", 10, 0)]
 		[DataRow("1", 3, 1)]
@@ -59,20 +61,23 @@ namespace TestCyjb.Conversions
 		[DataRow("9c", 27, 255)]
 		[DataRow("255", 10, 255)]
 		[DataRow("f0", 17, 255)]
-		public void TestByte(string? value, int fromBase, int expected)
+		[DataRow("12", 16, 18)]
+		[DataRow("0x7B", 16, 123)]
+		[DataRow("0X99", 16, 153)]
+		public void TestByte(string value, int fromBase, int expected)
 		{
 			Assert.AreEqual((byte)expected, BaseConvert.ToByte(value, fromBase));
-			if (value != null)
+			if (fromBase == 16 && (value.StartsWith("0x") || value.StartsWith("0X")))
 			{
-				Assert.AreEqual(value.ToUpper(), BaseConvert.ToString((byte)expected, fromBase));
+				value = value[2..];
 			}
+			Assert.AreEqual(value.ToUpper(), BaseConvert.ToString((byte)expected, fromBase));
 		}
 
 		/// <summary>
 		/// 对 <see cref="BaseConvert.ToInt16"/> 和 <see cref="BaseConvert.ToString(short,int)"/> 方法进行测试。
 		/// </summary>
 		[DataTestMethod]
-		[DataRow(null, 10, 0)]
 		[DataRow("0", 3, 0)]
 		[DataRow("0", 10, 0)]
 		[DataRow("1", 3, 1)]
@@ -89,20 +94,23 @@ namespace TestCyjb.Conversions
 		[DataRow("y0e", 36, -21458)]
 		[DataRow("38o5", 27, -2)]
 		[DataRow("38o6", 27, -1)]
-		public void TestInt16(string? value, int fromBase, int expected)
+		[DataRow("12", 16, 18)]
+		[DataRow("0x7B", 16, 123)]
+		[DataRow("0X99", 16, 153)]
+		public void TestInt16(string value, int fromBase, int expected)
 		{
 			Assert.AreEqual((short)expected, BaseConvert.ToInt16(value, fromBase));
-			if (value != null)
+			if (fromBase == 16 && (value.StartsWith("0x") || value.StartsWith("0X")))
 			{
-				Assert.AreEqual(value.ToUpper(), BaseConvert.ToString((short)expected, fromBase));
+				value = value[2..];
 			}
+			Assert.AreEqual(value.ToUpper(), BaseConvert.ToString((short)expected, fromBase));
 		}
 
 		/// <summary>
 		/// 对 <see cref="BaseConvert.ToUInt16"/> 和 <see cref="BaseConvert.ToString(ushort,int)"/> 方法进行测试。
 		/// </summary>
 		[DataTestMethod]
-		[DataRow(null, 10, 0)]
 		[DataRow("0", 3, 0)]
 		[DataRow("0", 10, 0)]
 		[DataRow("1", 3, 1)]
@@ -119,20 +127,23 @@ namespace TestCyjb.Conversions
 		[DataRow("38o6", 27, 65535)]
 		[DataRow("65535", 10, 65535)]
 		[DataRow("1r5U", 33, 65535)]
-		public void TestUInt16(string? value, int fromBase, int expected)
+		[DataRow("12", 16, 18)]
+		[DataRow("0x7B", 16, 123)]
+		[DataRow("0X99", 16, 153)]
+		public void TestUInt16(string value, int fromBase, int expected)
 		{
 			Assert.AreEqual((ushort)expected, BaseConvert.ToUInt16(value, fromBase));
-			if (value != null)
+			if (fromBase == 16 && (value.StartsWith("0x") || value.StartsWith("0X")))
 			{
-				Assert.AreEqual(value.ToUpper(), BaseConvert.ToString((ushort)expected, fromBase));
+				value = value[2..];
 			}
+			Assert.AreEqual(value.ToUpper(), BaseConvert.ToString((ushort)expected, fromBase));
 		}
 
 		/// <summary>
 		/// 对 <see cref="BaseConvert.ToInt32"/> 和 <see cref="BaseConvert.ToString(int,int)"/> 方法进行测试。
 		/// </summary>
 		[DataTestMethod]
-		[DataRow(null, 10, 0)]
 		[DataRow("0", 3, 0)]
 		[DataRow("0", 10, 0)]
 		[DataRow("1", 3, 1)]
@@ -150,20 +161,23 @@ namespace TestCyjb.Conversions
 		[DataRow("1elf616", 36, -1235678902)]
 		[DataRow("b28jpdk", 27, -2)]
 		[DataRow("b28jpdl", 27, -1)]
-		public void TestInt32(string? value, int fromBase, int expected)
+		[DataRow("12", 16, 18)]
+		[DataRow("0x7B", 16, 123)]
+		[DataRow("0X99", 16, 153)]
+		public void TestInt32(string value, int fromBase, int expected)
 		{
 			Assert.AreEqual(expected, BaseConvert.ToInt32(value, fromBase));
-			if (value != null)
+			if (fromBase == 16 && (value.StartsWith("0x") || value.StartsWith("0X")))
 			{
-				Assert.AreEqual(value.ToUpper(), BaseConvert.ToString(expected, fromBase));
+				value = value[2..];
 			}
+			Assert.AreEqual(value.ToUpper(), BaseConvert.ToString(expected, fromBase));
 		}
 
 		/// <summary>
 		/// 对 <see cref="BaseConvert.ToUInt32"/> 和 <see cref="BaseConvert.ToString(sbyte,uint)"/> 方法进行测试。
 		/// </summary>
 		[DataTestMethod]
-		[DataRow(null, 10, 0)]
 		[DataRow("0", 3, 0)]
 		[DataRow("0", 10, 0)]
 		[DataRow("1", 3, 1)]
@@ -181,20 +195,23 @@ namespace TestCyjb.Conversions
 		[DataRow("b28jpdl", 27, 4294967295)]
 		[DataRow("4294967295", 10, 4294967295)]
 		[DataRow("hek2mgk", 25, 4294967295)]
-		public void TestUInt32(string? value, int fromBase, object expected)
+		[DataRow("12", 16, 18)]
+		[DataRow("0x7B", 16, 123)]
+		[DataRow("0X99", 16, 153)]
+		public void TestUInt32(string value, int fromBase, object expected)
 		{
 			Assert.AreEqual(Convert.ToUInt32(expected), BaseConvert.ToUInt32(value, fromBase));
-			if (value != null)
+			if (fromBase == 16 && (value.StartsWith("0x") || value.StartsWith("0X")))
 			{
-				Assert.AreEqual(value.ToUpper(), BaseConvert.ToString(Convert.ToUInt32(expected), fromBase));
+				value = value[2..];
 			}
+			Assert.AreEqual(value.ToUpper(), BaseConvert.ToString(Convert.ToUInt32(expected), fromBase));
 		}
 
 		/// <summary>
 		/// 对 <see cref="BaseConvert.ToInt64"/> 和 <see cref="BaseConvert.ToString(sbyte,long)"/> 方法进行测试。
 		/// </summary>
 		[DataTestMethod]
-		[DataRow(null, 10, 0)]
 		[DataRow("0", 3, 0)]
 		[DataRow("0", 10, 0)]
 		[DataRow("1", 3, 1)]
@@ -212,20 +229,23 @@ namespace TestCyjb.Conversions
 		[DataRow("26tvjyybszf7h", 36, -8071017880399937603)]
 		[DataRow("4Eo8hfam6fllmn", 27, -2)]
 		[DataRow("4Eo8hfam6fllmo", 27, -1)]
-		public void TestInt64(string? value, int fromBase, object expected)
+		[DataRow("12", 16, 18)]
+		[DataRow("0x7B", 16, 123)]
+		[DataRow("0X99", 16, 153)]
+		public void TestInt64(string value, int fromBase, object expected)
 		{
 			Assert.AreEqual(Convert.ToInt64(expected), BaseConvert.ToInt64(value, fromBase));
-			if (value != null)
+			if (fromBase == 16 && (value.StartsWith("0x") || value.StartsWith("0X")))
 			{
-				Assert.AreEqual(value.ToUpper(), BaseConvert.ToString(Convert.ToInt64(expected), fromBase));
+				value = value[2..];
 			}
+			Assert.AreEqual(value.ToUpper(), BaseConvert.ToString(Convert.ToInt64(expected), fromBase));
 		}
 
 		/// <summary>
 		/// 对 <see cref="BaseConvert.ToUInt64"/> 和 <see cref="BaseConvert.ToString(sbyte,ulong)"/> 方法进行测试。
 		/// </summary>
 		[DataTestMethod]
-		[DataRow(null, 10, 0)]
 		[DataRow("0", 3, 0)]
 		[DataRow("0", 10, 0)]
 		[DataRow("1", 3, 1)]
@@ -243,13 +263,17 @@ namespace TestCyjb.Conversions
 		[DataRow("18446744073709551614", 10, 18446744073709551614)]
 		[DataRow("7b7n2pcniokcge", 26, 18446744073709551614)]
 		[DataRow("4Eo8hfam6fllmo", 27, 18446744073709551615)]
-		public void TestUInt64(string? value, int fromBase, object expected)
+		[DataRow("12", 16, 18)]
+		[DataRow("0x7B", 16, 123)]
+		[DataRow("0X99", 16, 153)]
+		public void TestUInt64(string value, int fromBase, object expected)
 		{
 			Assert.AreEqual(Convert.ToUInt64(expected), BaseConvert.ToUInt64(value, fromBase));
-			if (value != null)
+			if (fromBase == 16 && (value.StartsWith("0x") || value.StartsWith("0X")))
 			{
-				Assert.AreEqual(value.ToUpper(), BaseConvert.ToString(Convert.ToUInt64(expected), fromBase));
+				value = value[2..];
 			}
+			Assert.AreEqual(value.ToUpper(), BaseConvert.ToString(Convert.ToUInt64(expected), fromBase));
 		}
 
 		/// <summary>
