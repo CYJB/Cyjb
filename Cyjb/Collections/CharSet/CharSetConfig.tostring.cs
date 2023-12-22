@@ -87,8 +87,8 @@ internal static partial class CharSetConfig
 	/// <returns><paramref name="charSet"/> 的字符串表示。</returns>
 	public static string ToString(ICharSet charSet)
 	{
-		StringBuilder builder = new();
-		builder.Append('[');
+		ValueList<char> builder = new(stackalloc char[ValueListUtil.StackallocCharSizeLimit]);
+		builder.Add('[');
 		// 允许通过 UnicodeCategory 压缩字符串表示形式。
 		List<UnicodeCategoryInfo> infos = new(UnicodeCategoryInfos.Value);
 		List<UnicodeCategoryInfo> nextInfos = new();
@@ -132,27 +132,29 @@ internal static partial class CharSetConfig
 		}
 		negate.ExceptWith(charSet);
 		// 输出剩余字符
-		PrintChars(chars, builder);
+		PrintChars(chars, ref builder);
 		// 输出 Unicode 类别
 		if (categories.Count > 0)
 		{
 			categories.Sort();
 			foreach (UnicodeCategory category in categories)
 			{
-				builder.Append(@"\p{");
-				builder.Append(category.GetName());
-				builder.Append('}');
+				builder.Add(@"\p{");
+				builder.Add(category.GetName());
+				builder.Add('}');
 			}
 		}
 		// 输出排除字符
 		if (negate.Count > 0)
 		{
-			builder.Append("-[");
-			PrintChars(negate, builder);
-			builder.Append(']');
+			builder.Add("-[");
+			PrintChars(negate, ref builder);
+			builder.Add(']');
 		}
-		builder.Append(']');
-		return builder.ToString();
+		builder.Add(']');
+		string result = builder.ToString();
+		builder.Dispose();
+		return result;
 	}
 
 	/// <summary>
@@ -160,18 +162,18 @@ internal static partial class CharSetConfig
 	/// </summary>
 	/// <param name="set">要打印的字符集合。</param>
 	/// <param name="builder">字符串输出。</param>
-	private static void PrintChars(CharSet set, StringBuilder builder)
+	private static void PrintChars(CharSet set, ref ValueList<char> builder)
 	{
 		foreach (var (start, end) in set.Ranges())
 		{
-			builder.Append(start.UnicodeEscape(false));
+			builder.Add(start.UnicodeEscape(false));
 			if (start < end)
 			{
 				if (start + 1 < end)
 				{
-					builder.Append('-');
+					builder.Add('-');
 				}
-				builder.Append(end.UnicodeEscape(false));
+				builder.Add(end.UnicodeEscape(false));
 			}
 		}
 	}
