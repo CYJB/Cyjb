@@ -181,6 +181,16 @@ public readonly partial struct StringView : IEnumerable<char>
 	}
 
 	/// <summary>
+	/// 允许从 <see cref="StringView"/> 隐式转换为 <see cref="ReadOnlySpan{T}"/>。
+	/// </summary>
+	/// <param name="value">要转换的字符串视图。</param>
+	/// <returns>转换得到的 <see cref="ReadOnlySpan{T}"/>。</returns>
+	public static implicit operator ReadOnlySpan<char>(StringView value)
+	{
+		return value.AsSpan();
+	}
+
+	/// <summary>
 	/// 返回当前对象的字符串表示形式。
 	/// </summary>
 	/// <returns>当前对象的字符串表示形式。</returns>
