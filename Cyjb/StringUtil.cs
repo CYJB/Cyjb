@@ -32,7 +32,7 @@ public static class StringUtil
 		{
 			return str;
 		}
-		return str.AsSpan().UnicodeEscape(escapeVisibleUnicode);
+		return UnicodeEscapeInternal(str, escapeVisibleUnicode) ?? str;
 	}
 
 	/// <summary>
@@ -52,13 +52,75 @@ public static class StringUtil
 		{
 			return string.Empty;
 		}
-		int capacity = str.Length * 2;
+		return UnicodeEscapeInternal(str, escapeVisibleUnicode) ?? str.ToString();
+	}
+
+	/// <summary>
+	/// 返回当前字符串视图的 Unicode 转义字符串。
+	/// </summary>
+	/// <param name="view">要进行转义的字符串视图。</param>
+	/// <param name="escapeVisibleUnicode">是否转义可见的 Unicode 字符，默认为 <c>true</c>。</param>
+	/// <returns>转义后的字符串。</returns>
+	/// <remarks>
+	/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），不会发生改变。</para>
+	/// <para>对于某些特殊字符（\0, \, \a, \b, \f, \n, \r, \t, \v），会替换为其转义形式。</para>
+	/// <para>对于其它字符，会替换为其十六进制转义形式（\u0000）。</para>
+	/// </remarks>
+	public static StringView UnicodeEscape(this StringView view, bool escapeVisibleUnicode = true)
+	{
+		if (view.IsEmpty)
+		{
+			return StringView.Empty;
+		}
+		string? result = UnicodeEscapeInternal(view.AsSpan(), escapeVisibleUnicode);
+		if (result == null)
+		{
+			return view;
+		}
+		else
+		{
+			return result;
+		}
+	}
+
+	/// <summary>
+	/// 返回当前字符串的 Unicode 转义字符串。
+	/// </summary>
+	/// <param name="span">要进行转义的字符串。</param>
+	/// <param name="escapeVisibleUnicode">是否转义可见的 Unicode 字符，默认为 <c>true</c>。</param>
+	/// <returns>转义后的字符串。如果不需要被转移，则返回 <c>null</c>。</returns>
+	/// <remarks>
+	/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），不会发生改变。</para>
+	/// <para>对于某些特殊字符（\0, \, \a, \b, \f, \n, \r, \t, \v），会替换为其转义形式。</para>
+	/// <para>对于其它字符，会替换为其十六进制转义形式（\u0000）。</para>
+	/// </remarks>
+	private static string? UnicodeEscapeInternal(this ReadOnlySpan<char> span, bool escapeVisibleUnicode = true)
+	{
+		if (span.IsEmpty)
+		{
+			return null;
+		}
+		int i = 0;
+		for (; i < span.Length; i++)
+		{
+			if (span[i].NeedUnicodeEscape(escapeVisibleUnicode))
+			{
+				break;
+			}
+		}
+		if (i >= span.Length)
+		{
+			// 没有需要转义的字符。
+			return null;
+		}
+		int capacity = span.Length * 2;
 		using ValueList<char> builder = capacity <= ValueList.StackallocCharSizeLimit
 			? new(stackalloc char[capacity])
 			: new(capacity);
-		for (int i = 0; i < str.Length; i++)
+		builder.Add(span[..i]);
+		for (; i < span.Length; i++)
 		{
-			builder.Add(str[i].UnicodeEscape(escapeVisibleUnicode));
+			builder.Add(span[i].UnicodeEscape(escapeVisibleUnicode));
 		}
 		return builder.ToString();
 	}
@@ -78,11 +140,7 @@ public static class StringUtil
 		{
 			return str;
 		}
-		if (str.IndexOf('\\') < 0)
-		{
-			return str.ToString();
-		}
-		return str.AsSpan().UnicodeUnescape();
+		return UnicodeUnescapeInternal(str) ?? str;
 	}
 
 	/// <summary>
@@ -99,30 +157,72 @@ public static class StringUtil
 		{
 			return string.Empty;
 		}
-		int idx = str.IndexOf('\\');
+		return UnicodeUnescapeInternal(str) ?? str.ToString();
+	}
+
+	/// <summary>
+	/// 将字符串视图中的 \u,\U 和 \x 转义转换为对应的字符。
+	/// </summary>
+	/// <param name="view">要转换的字符串视图。</param>
+	/// <returns>转换后的字符串视图。</returns>
+	/// <remarks>
+	/// <para>解码方法支持 \x00，\u0000 和 \U00000000 转义。使用 \U 转义时，大于 0x10FFFF 的值不被支持，会被舍弃。</para>
+	/// <para>如果不满足上面的情况，则不会进行转义，也不会报错。</para></remarks>
+	public static StringView UnicodeUnescape(this StringView view)
+	{
+		if (view.IsEmpty)
+		{
+			return StringView.Empty;
+		}
+		string? result = UnicodeUnescapeInternal(view.AsSpan());
+		if (result == null)
+		{
+			return view;
+		}
+		else
+		{
+			return result;
+		}
+	}
+
+	/// <summary>
+	/// 将字符串中的 \u,\U 和 \x 转义转换为对应的字符。
+	/// </summary>
+	/// <param name="span">要转换的字符串。</param>
+	/// <returns>转换后的字符串。如果不需要转换，则返回 <c>null</c>。</returns>
+	/// <remarks>
+	/// <para>解码方法支持 \x00，\u0000 和 \U00000000 转义。使用 \U 转义时，大于 0x10FFFF 的值不被支持，会被舍弃。</para>
+	/// <para>如果不满足上面的情况，则不会进行转义，也不会报错。</para></remarks>
+	private static string? UnicodeUnescapeInternal(this ReadOnlySpan<char> span)
+	{
+		if (span.IsEmpty)
+		{
+			return null;
+		}
+		int idx = span.IndexOf('\\');
 		if (idx < 0)
 		{
-			return str.ToString();
+			return null;
 		}
-		using ValueList<char> builder = str.Length <= ValueList.StackallocCharSizeLimit
-			? new(stackalloc char[str.Length])
-			: new(str.Length);
+		using ValueList<char> builder = span.Length <= ValueList.StackallocCharSizeLimit
+			? new(stackalloc char[span.Length])
+			: new(span.Length);
 		while (idx >= 0)
 		{
 			// 添加当前 '\' 之前的字符串。
 			if (idx > 0)
 			{
-				builder.Add(str[..idx]);
-				str = str[idx..];
+				builder.Add(span[..idx]);
+				span = span[idx..];
 			}
 			// '\' 后没有其它字符，不是有效的转义。
-			if (str.Length <= 1)
+			if (span.Length <= 1)
 			{
 				break;
 			}
 			// Unicode 转义需要的十六进制字符的长度。
 			int hexLen = 0;
-			switch (str[1])
+			switch (span[1])
 			{
 				case 'x':
 					// \x 后面必须是 2 位。
@@ -165,15 +265,15 @@ public static class StringUtil
 					break;
 				default:
 					// 其它未支持的转义，添加未被解析的字符。
-					builder.Add(str[..2]);
+					builder.Add(span[..2]);
 					break;
 			}
 			if (hexLen > 0)
 			{
 				// Unicode 反转义。
-				if (CheckHexLength(str[2..], hexLen))
+				if (CheckHexLength(span[2..], hexLen))
 				{
-					int charNum = BaseConvert.ToInt32(str[2..(2 + hexLen)], 16);
+					int charNum = BaseConvert.ToInt32(span[2..(2 + hexLen)], 16);
 					if (charNum < 0xFFFF)
 					{
 						// 单个字符。
@@ -185,19 +285,19 @@ public static class StringUtil
 						builder.Add(char.ConvertFromUtf32(charNum & 0x1FFFFF));
 					}
 					// 后面会统一跳过两个字符，只要跳过 hexLen 即可。
-					str = str[hexLen..];
+					span = span[hexLen..];
 				}
 				else
 				{
-					builder.Add(str[..2]);
+					builder.Add(span[..2]);
 				}
 			}
 			// 跳过已被解析或添加的字符。
-			str = str[2..];
-			idx = str.IndexOf('\\');
+			span = span[2..];
+			idx = span.IndexOf('\\');
 		}
 		// 添加剩余的字符串。
-		builder.Add(str);
+		builder.Add(span);
 		return builder.ToString();
 	}
 

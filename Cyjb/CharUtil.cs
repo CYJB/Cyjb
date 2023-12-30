@@ -66,7 +66,42 @@ public static class CharUtil
 			'\r' => @"\r",
 			'\t' => @"\t",
 			'\v' => @"\v",
-			_ => escapeVisibleUnicode || !IsVisibleUnicode(ch) ? $"\\u{((uint)ch).ToString(16).PadLeft(4, '0')}" : ch.ToString(),
+			_ => escapeVisibleUnicode || !IsVisibleUnicode(ch) ? $"\\u{((uint)ch).ToString(16).PadLeft(4, '0')}" : ch.ToString(CultureInfo.InvariantCulture),
+		};
+	}
+
+	/// <summary>
+	/// 返回当前字符的 Unicode 字符是否需要被转义。
+	/// </summary>
+	/// <param name="ch">要检查是否需要转义的字符。</param>
+	/// <param name="escapeVisibleUnicode">是否转义可见的 Unicode 字符，默认为 <c>true</c>。</param>
+	/// <returns>如果字符需要被转义，则返回 <c>true</c>；不需要被转义则返回 <c>false</c>。</returns>
+	/// <remarks>
+	/// <para>对于 ASCII 可见字符（从 0x20 空格到 0x7E ~ 符号），会返回原始字符。</para>
+	/// <para>对于某些特殊字符（\0, \, \a, \b, \f, \n, \r, \t, \v）以及自定义的字符，会返回其转义形式。</para>
+	/// <para>对于其它字符，会返回其十六进制转义形式（\u0000）。</para>
+	/// </remarks>
+	public static bool NeedUnicodeEscape(this char ch, bool escapeVisibleUnicode = true)
+	{
+		if (ch == '\\')
+		{
+			return true;
+		}
+		else if (ch >= ' ' && ch <= '~')
+		{
+			return false;
+		}
+		return ch switch
+		{
+			'\0' => true,
+			'\a' => true,
+			'\b' => true,
+			'\f' => true,
+			'\n' => true,
+			'\r' => true,
+			'\t' => true,
+			'\v' => true,
+			_ => escapeVisibleUnicode || !IsVisibleUnicode(ch),
 		};
 	}
 
