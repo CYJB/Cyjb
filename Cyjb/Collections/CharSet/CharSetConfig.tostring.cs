@@ -87,7 +87,7 @@ internal static partial class CharSetConfig
 	/// <returns><paramref name="charSet"/> 的字符串表示。</returns>
 	public static string ToString(ICharSet charSet)
 	{
-		ValueList<char> builder = new(stackalloc char[ValueListUtil.StackallocCharSizeLimit]);
+		ValueList<char> builder = new(stackalloc char[ValueList.StackallocCharSizeLimit]);
 		builder.Add('[');
 		// 允许通过 UnicodeCategory 压缩字符串表示形式。
 		List<UnicodeCategoryInfo> infos = new(UnicodeCategoryInfos.Value);

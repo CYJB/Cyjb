@@ -129,6 +129,10 @@
     <value>More than one property is found with the specified name and matching the specified binding constraints.</value>
     <comment>找到多个有指定名称且与指定绑定约束匹配的属性。</comment>
   </data>
+  <data name="ArgumentEmptyString" xml:space="preserve">
+    <value>The value cannot be an empty string.</value>
+    <comment>参数不能为空字符串。</comment>
+  </data>
   <data name="ArgumentMinMaxValue" xml:space="preserve">
     <value>'{0}' cannot be greater than '{1}'.</value>
     <comment>参数上下界不能颠倒。</comment>
@@ -288,6 +292,10 @@
   <data name="NoParsibleDigits" xml:space="preserve">
     <value>Could not find any recognizable digits.</value>
     <comment>未能找到任何可识别的数字。</comment>
+  </data>
+  <data name="NotSupportedStringComparison" xml:space="preserve">
+    <value>The string comparison type passed in is currently not supported.</value>
+    <comment>不支持的字符串比较规则。</comment>
   </data>
   <data name="OverflowByte" xml:space="preserve">
     <value>Value was either too large or too small for a Byte.</value>

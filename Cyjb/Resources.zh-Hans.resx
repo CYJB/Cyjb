@@ -129,6 +129,10 @@
     <value>找到多个有指定名称且与指定绑定约束匹配的属性。</value>
     <comment>找到多个有指定名称且与指定绑定约束匹配的属性。</comment>
   </data>
+  <data name="ArgumentEmptyString" xml:space="preserve">
+    <value>值不能为空字符串。</value>
+    <comment>参数不能为空字符串。</comment>
+  </data>
   <data name="ArgumentMinMaxValue" xml:space="preserve">
     <value>“{0}”不能大于“{1}”。</value>
     <comment>参数上下界不能颠倒。</comment>
@@ -288,6 +292,10 @@
   <data name="NoParsibleDigits" xml:space="preserve">
     <value>未能找到任何可识别的数字。</value>
     <comment>未能找到任何可识别的数字。</comment>
+  </data>
+  <data name="NotSupportedStringComparison" xml:space="preserve">
+    <value>不支持的字符串比较类型。</value>
+    <comment>不支持的字符串比较规则。</comment>
   </data>
   <data name="OverflowByte" xml:space="preserve">
     <value>值对于 Byte 太大或太小。</value>

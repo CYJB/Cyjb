@@ -4,56 +4,40 @@ using System.Runtime.CompilerServices;
 namespace Cyjb.Collections;
 
 /// <summary>
-/// 允许在栈上分配的列表，要求在不使用后主动调用 <see cref="Dispose"/> 方法回收空间。
+/// 使用 <see cref="ArrayPool{T}"/> 存储元素的列表，要求在不使用后主动调用 <see cref="Dispose"/> 方法回收空间。
 /// </summary>
 /// <typeparam name="T">列表中的元素类型。</typeparam>
-/// <remarks>适合临时使用列表的场景，使用栈上分配的数组来避免内存回收；也支持利用
-/// <see cref="ArrayPool{T}"/> 自动扩容。</remarks>
-public ref struct ValueList<T>
+/// <remarks>适合临时使用列表，但又无法使用栈上分配的 <see cref="ValueList{T}"/> 的场景。</remarks>
+public class PooledList<T> : IDisposable
 {
 	/// <summary>
-	/// 需要归还到 ArrayPool 中的数组。
+	/// 列表的数组。
 	/// </summary>
-	private T[]? arrayFromPool;
-	/// <summary>
-	/// 当前列表切片。
-	/// </summary>
-	private Span<T> span;
+	private T[] array;
 	/// <summary>
 	/// 当前列表包含的长度。
 	/// </summary>
 	private int length = 0;
 
 	/// <summary>
-	/// 使用指定的初始缓冲区初始化 <see cref="ValueList{T}"/> 结构的新实例。
-	/// </summary>
-	/// <param name="initialBuffer">初始缓冲区。</param>
-	public ValueList(Span<T> initialBuffer)
-	{
-		arrayFromPool = null;
-		span = initialBuffer;
-	}
-
-	/// <summary>
-	/// 使用指定的初始容量初始化 <see cref="ValueList{T}"/> 结构的新实例。
+	/// 使用指定的初始容量初始化 <see cref="PooledList{T}"/> 类的新实例。
 	/// </summary>
 	/// <param name="initialCapacity">初始容量。</param>
-	public ValueList(int initialCapacity)
+	public PooledList(int initialCapacity = 4)
 	{
-		arrayFromPool = ArrayPool<T>.Shared.Rent(initialCapacity);
-		span = arrayFromPool;
+		array = ArrayPool<T>.Shared.Rent(initialCapacity);
 	}
 
 	/// <summary>
 	/// 获取当前列表的长度。
 	/// </summary>
 	/// <value>当前列表的长度。</value>
-	public readonly int Length => length;
+	public int Length => length;
 
 	/// <summary>
 	/// 获取当前列表的容量。
 	/// </summary>
-	public readonly int Capacity => span.Length;
+	public int Capacity => array.Length;
 
 	/// <summary>
 	/// 获取指定索引处元素的引用。
@@ -69,7 +53,7 @@ public ref struct ValueList<T>
 			{
 				throw CommonExceptions.ArgumentIndexOutOfRange(index);
 			}
-			return ref span[index];
+			return ref array[index];
 		}
 	}
 
@@ -77,7 +61,7 @@ public ref struct ValueList<T>
 	/// 返回当前列表的切片。
 	/// </summary>
 	/// <returns>当前列表的切片。</returns>
-	public readonly Span<T> AsSpan() => span[..length];
+	public Span<T> AsSpan() => array.AsSpan(0, length);
 
 	/// <summary>
 	/// 返回当前列表的切片。
@@ -85,13 +69,13 @@ public ref struct ValueList<T>
 	/// <param name="start">切片的起始索引。</param>
 	/// <returns>当前列表的切片。</returns>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/> 不是当前列表的有效索引。</exception>
-	public readonly Span<T> AsSpan(int start)
+	public Span<T> AsSpan(int start)
 	{
 		if (start < 0 || start > length)
 		{
 			throw CommonExceptions.ArgumentIndexOutOfRange(start);
 		}
-		return span[start..length];
+		return array.AsSpan(start, length - start);
 	}
 
 	/// <summary>
@@ -102,18 +86,17 @@ public ref struct ValueList<T>
 	/// <returns>当前列表的切片。</returns>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/> 或 <c>start + length</c>
 	/// 不是当前列表的有效索引。</exception>
-	public readonly Span<T> AsSpan(int start, int length)
+	public Span<T> AsSpan(int start, int length)
 	{
 		if (start < 0)
 		{
 			throw CommonExceptions.ArgumentIndexOutOfRange(start);
 		}
-		int end = start + length;
-		if (length < 0 || end > this.length)
+		if (length < 0 || start + length > this.length)
 		{
 			throw CommonExceptions.ArgumentCountOutOfRange(length);
 		}
-		return span[start..end];
+		return array.AsSpan(start, length);
 	}
 
 	/// <summary>
@@ -125,7 +108,7 @@ public ref struct ValueList<T>
 	{
 		int idx = length;
 		// 避免额外的索引检查 https://github.com/dotnet/runtime/issues/72004
-		Span<T> data = span;
+		Span<T> data = array;
 		if (idx < data.Length)
 		{
 			data[idx] = item;
@@ -145,7 +128,7 @@ public ref struct ValueList<T>
 	public void Add(ReadOnlySpan<T> items)
 	{
 		int idx = length;
-		Span<T> data = span;
+		Span<T> data = array;
 		if (items.Length == 1 && idx < data.Length)
 		{
 			data[idx] = items[0];
@@ -165,11 +148,11 @@ public ref struct ValueList<T>
 	private void AddMulti(ReadOnlySpan<T> items)
 	{
 		int finalLength = length + items.Length;
-		if (finalLength > span.Length)
+		if (finalLength > array.Length)
 		{
 			Grow(items.Length);
 		}
-		items.CopyTo(span[length..]);
+		items.CopyTo(array.AsSpan(length));
 		length = finalLength;
 	}
 
@@ -184,11 +167,11 @@ public ref struct ValueList<T>
 		if (count > 0)
 		{
 			int finalLength = length + count;
-			if (finalLength > span.Length)
+			if (finalLength > array.Length)
 			{
 				Grow(count);
 			}
-			span.Slice(length, count).Fill(item);
+			array.AsSpan(length, count).Fill(item);
 			length = finalLength;
 		}
 		else if (count < 0)
@@ -209,12 +192,12 @@ public ref struct ValueList<T>
 		{
 			int idx = length;
 			int finalLength = length + count;
-			if (finalLength > span.Length)
+			if (finalLength > array.Length)
 			{
 				Grow(count);
 			}
 			length = finalLength;
-			return span.Slice(idx, count);
+			return array.AsSpan(idx, count);
 		}
 		else if (count == 0)
 		{
@@ -239,15 +222,15 @@ public ref struct ValueList<T>
 			throw CommonExceptions.ArgumentIndexOutOfRange(index);
 		}
 		int finalLength = length + 1;
-		if (finalLength > span.Length)
+		if (finalLength > array.Length)
 		{
 			Grow(1);
 		}
 		if (index < length)
 		{
-			span[index..length].CopyTo(span[(index + 1)..]);
+			Array.Copy(array, index, array, index + 1, length - index);
 		}
-		span[index] = item;
+		array[index] = item;
 		length = finalLength;
 	}
 
@@ -265,15 +248,15 @@ public ref struct ValueList<T>
 		}
 		int count = items.Length;
 		int finalLength = length + count;
-		if (finalLength > span.Length)
+		if (finalLength > array.Length)
 		{
 			Grow(count);
 		}
 		if (index < length)
 		{
-			span[index..length].CopyTo(span[(index + count)..]);
+			Array.Copy(array, index, array, index + count, length - index);
 		}
-		items.CopyTo(span[index..]);
+		items.CopyTo(array.AsSpan(index));
 		length = finalLength;
 	}
 
@@ -294,15 +277,15 @@ public ref struct ValueList<T>
 		if (count > 0)
 		{
 			int finalLength = length + count;
-			if (finalLength > span.Length)
+			if (finalLength > array.Length)
 			{
 				Grow(count);
 			}
 			if (index < length)
 			{
-				span[index..length].CopyTo(span[(index + count)..]);
+				Array.Copy(array, index, array, index + count, length - index);
 			}
-			span.Slice(index, count).Fill(item);
+			array.AsSpan(index, count).Fill(item);
 			length = finalLength;
 		}
 		else if (count < 0)
@@ -328,16 +311,16 @@ public ref struct ValueList<T>
 		if (count > 0)
 		{
 			int finalLength = length + count;
-			if (finalLength > span.Length)
+			if (finalLength > array.Length)
 			{
 				Grow(count);
 			}
 			if (index < length)
 			{
-				span[index..length].CopyTo(span[(index + count)..]);
+				Array.Copy(array, index, array, index + count, length - index);
 			}
 			length = finalLength;
-			return span.Slice(index, count);
+			return array.AsSpan(index, count);
 		}
 		else if (count == 0)
 		{
@@ -363,7 +346,7 @@ public ref struct ValueList<T>
 		}
 		if (end < length)
 		{
-			span[end..length].CopyTo(span[index..]);
+			Array.Copy(array, end, array, index, length - end);
 		}
 		length--;
 	}
@@ -388,7 +371,7 @@ public ref struct ValueList<T>
 		}
 		if (end < length)
 		{
-			span[end..length].CopyTo(span[index..]);
+			Array.Copy(array, end, array, index, length - end);
 		}
 		length -= count;
 	}
@@ -406,18 +389,18 @@ public ref struct ValueList<T>
 	/// </summary>
 	/// <param name="destination">要复制到的目标 <see cref="Span{T}"/>。</param>
 	/// <exception cref="ArgumentException"><paramref name="destination"/> 短于当前列表。</exception>
-	public readonly void CopyTo(Span<T> destination)
+	public void CopyTo(Span<T> destination)
 	{
-		span[..length].CopyTo(destination);
+		array.AsSpan(0, length).CopyTo(destination);
 	}
 
 	/// <summary>
 	/// 返回一个循环访问当前列表的枚举器。
 	/// </summary>
 	/// <returns>可用于循环访问当前列表的枚举器。</returns>
-	public readonly Span<T>.Enumerator GetEnumerator()
+	public Span<T>.Enumerator GetEnumerator()
 	{
-		return span[..length].GetEnumerator();
+		return array.AsSpan(0, length).GetEnumerator();
 	}
 
 	/// <summary>
@@ -431,7 +414,7 @@ public ref struct ValueList<T>
 		{
 			throw CommonExceptions.ArgumentOutOfRange(capacity);
 		}
-		else if (capacity > span.Length)
+		else if (capacity > array.Length)
 		{
 			Grow(capacity - length);
 		}
@@ -441,9 +424,9 @@ public ref struct ValueList<T>
 	/// 返回对于可用于固定的 <typeparamref name="T"/> 类型的对象的引用。
 	/// </summary>
 	/// <returns>返回对索引 <c>0</c> 处元素的引用，如果列表为空，则为 <c>null</c>。</returns>
-	public readonly ref T GetPinnableReference()
+	public ref T GetPinnableReference()
 	{
-		return ref span[..length].GetPinnableReference();
+		return ref array.AsSpan(0, length).GetPinnableReference();
 	}
 
 	/// <summary>
@@ -452,9 +435,9 @@ public ref struct ValueList<T>
 	/// <param name="destination">要复制到的目标 <see cref="Span{T}"/>。</param>
 	/// <param name="itemsWritten">已复制的元素个数；如果无法复制，则返回 0。</param>
 	/// <returns>是否成功复制元素。</returns>
-	public readonly bool TryCopyTo(Span<T> destination, out int itemsWritten)
+	public bool TryCopyTo(Span<T> destination, out int itemsWritten)
 	{
-		if (span[..length].TryCopyTo(destination))
+		if (array.AsSpan(0, length).TryCopyTo(destination))
 		{
 			itemsWritten = length;
 			return true;
@@ -470,18 +453,18 @@ public ref struct ValueList<T>
 	/// 将当前列表的内容复制到新数组中。
 	/// </summary>
 	/// <returns>包含当前列表中数据的数组。</returns>
-	public readonly T[] ToArray()
+	public T[] ToArray()
 	{
-		return span[..length].ToArray();
+		return array.AsSpan(0, length).ToArray();
 	}
 
 	/// <summary>
 	/// 返回当前元素的字符串表示形式。
 	/// </summary>
 	/// <returns>当前元素的字符串表示形式。</returns>
-	public override readonly string ToString()
+	public override string ToString()
 	{
-		return span[..length].ToString();
+		return array.AsSpan(0, length).ToString();
 	}
 
 	/// <summary>
@@ -490,14 +473,9 @@ public ref struct ValueList<T>
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void Dispose()
 	{
-		T[]? toReturn = arrayFromPool;
-		// 避免后续被误用。
-		this = default;
-		if (toReturn != null)
-		{
-			arrayFromPool = null;
-			ArrayPool<T>.Shared.Return(toReturn);
-		}
+		ArrayPool<T>.Shared.Return(array);
+		array = Array.Empty<T>();
+		length = 0;
 	}
 
 	/// <summary>
@@ -509,7 +487,7 @@ public ref struct ValueList<T>
 	{
 		int idx = length;
 		Grow(1);
-		span[idx] = item;
+		array[idx] = item;
 		length = idx + 1;
 	}
 
@@ -521,18 +499,14 @@ public ref struct ValueList<T>
 	private void Grow(int count)
 	{
 		const uint ArrayMaxLength = 0x7FFFFFC7; // 等于 Array.MaxLength
-		uint requiredLength = (uint)(span.Length + count);
-		uint doubleLength = span.Length == 0 ? 4 : Math.Min((uint)span.Length * 2, ArrayMaxLength);
+		uint requiredLength = (uint)(array.Length + count);
+		uint doubleLength = array.Length == 0 ? 4 : Math.Min((uint)array.Length * 2, ArrayMaxLength);
 		int newCapacity = (int)Math.Max(requiredLength, doubleLength);
 
-		T[] poolArray = ArrayPool<T>.Shared.Rent(newCapacity);
-		span[..length].CopyTo(poolArray);
-		T[]? toReturn = arrayFromPool;
-		span = arrayFromPool = poolArray;
-		if (toReturn != null)
-		{
-			ArrayPool<T>.Shared.Return(toReturn);
-		}
+		T[] newArray = ArrayPool<T>.Shared.Rent(newCapacity);
+		Array.Copy(array, newArray, length);
+		ArrayPool<T>.Shared.Return(array);
+		array = newArray;
 	}
 }
 

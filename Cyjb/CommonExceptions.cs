@@ -9,6 +9,20 @@ namespace Cyjb;
 public static class CommonExceptions
 {
 
+	#region 字符串异常
+
+	/// <summary>
+	/// 返回参数不能是空字符串的异常。
+	/// </summary>
+	/// <param name="paramName">异常参数的名称。</param>
+	/// <returns><see cref="ArgumentException"/> 对象。</returns>
+	public static ArgumentException ArgumentEmptyString(string? paramName = null)
+	{
+		return new ArgumentException(Resources.ArgumentEmptyString, paramName);
+	}
+
+	#endregion // 字符串异常
+
 	#region 数值异常
 
 	/// <summary>

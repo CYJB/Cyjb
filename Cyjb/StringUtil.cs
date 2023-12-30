@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Text;
 using System.Text.RegularExpressions;
+using Cyjb.Collections;
 using Cyjb.Conversions;
 
 namespace Cyjb;
@@ -52,10 +52,13 @@ public static class StringUtil
 		{
 			return string.Empty;
 		}
-		StringBuilder builder = new(str.Length * 2);
+		int capacity = str.Length * 2;
+		using ValueList<char> builder = capacity <= ValueList.StackallocCharSizeLimit
+			? new(stackalloc char[capacity])
+			: new(capacity);
 		for (int i = 0; i < str.Length; i++)
 		{
-			builder.Append(str[i].UnicodeEscape(escapeVisibleUnicode));
+			builder.Add(str[i].UnicodeEscape(escapeVisibleUnicode));
 		}
 		return builder.ToString();
 	}
@@ -101,13 +104,15 @@ public static class StringUtil
 		{
 			return str.ToString();
 		}
-		StringBuilder builder = new(str.Length);
+		using ValueList<char> builder = str.Length <= ValueList.StackallocCharSizeLimit
+			? new(stackalloc char[str.Length])
+			: new(str.Length);
 		while (idx >= 0)
 		{
 			// 添加当前 '\' 之前的字符串。
 			if (idx > 0)
 			{
-				builder.Append(str[..idx]);
+				builder.Add(str[..idx]);
 				str = str[idx..];
 			}
 			// '\' 后没有其它字符，不是有效的转义。
@@ -132,35 +137,35 @@ public static class StringUtil
 					hexLen = 8;
 					break;
 				case '0':
-					builder.Append('\0');
+					builder.Add('\0');
 					break;
 				case '\\':
-					builder.Append('\\');
+					builder.Add('\\');
 					break;
 				case 'a':
-					builder.Append('\a');
+					builder.Add('\a');
 					break;
 				case 'b':
-					builder.Append('\b');
+					builder.Add('\b');
 					break;
 				case 'f':
-					builder.Append('\f');
+					builder.Add('\f');
 					break;
 				case 'n':
-					builder.Append('\n');
+					builder.Add('\n');
 					break;
 				case 'r':
-					builder.Append('\r');
+					builder.Add('\r');
 					break;
 				case 't':
-					builder.Append('\t');
+					builder.Add('\t');
 					break;
 				case 'v':
-					builder.Append('\v');
+					builder.Add('\v');
 					break;
 				default:
 					// 其它未支持的转义，添加未被解析的字符。
-					builder.Append(str[..2]);
+					builder.Add(str[..2]);
 					break;
 			}
 			if (hexLen > 0)
@@ -172,19 +177,19 @@ public static class StringUtil
 					if (charNum < 0xFFFF)
 					{
 						// 单个字符。
-						builder.Append((char)charNum);
+						builder.Add((char)charNum);
 					}
 					else
 					{
 						// 代理项对的字符。
-						builder.Append(char.ConvertFromUtf32(charNum & 0x1FFFFF));
+						builder.Add(char.ConvertFromUtf32(charNum & 0x1FFFFF));
 					}
 					// 后面会统一跳过两个字符，只要跳过 hexLen 即可。
 					str = str[hexLen..];
 				}
 				else
 				{
-					builder.Append(str[..2]);
+					builder.Add(str[..2]);
 				}
 			}
 			// 跳过已被解析或添加的字符。
@@ -192,7 +197,7 @@ public static class StringUtil
 			idx = str.IndexOf('\\');
 		}
 		// 添加剩余的字符串。
-		builder.Append(str);
+		builder.Add(str);
 		return builder.ToString();
 	}
 
@@ -585,6 +590,49 @@ public static class StringUtil
 	}
 
 	#endregion // NaturalCompare
+
+	#region View
+
+	/// <summary>
+	/// 返回当前字符串的视图。
+	/// </summary>
+	/// <param name="text">要创建视图的字符串。</param>
+	/// <returns>字符串的视图。</returns>
+	/// <remarks>如果 <paramref name="text"/> 为 <c>null</c>，会返回空视图。</remarks>
+	public static StringView AsView(this string? text)
+	{
+		return new StringView(text);
+	}
+
+	/// <summary>
+	/// 创建指定字符串从指定索引开始的视图。
+	/// </summary>
+	/// <param name="text">要创建视图的字符串。</param>
+	/// <param name="start">视图的起始索引。</param>
+	/// <returns>字符串的视图。</returns>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/> 小于 <c>0</c> 或大于 <c>text.Length</c>。</exception>
+	/// <remarks>如果 <paramref name="text"/> 为 <c>null</c>，会返回空视图。</remarks>
+	public static StringView AsView(this string? text, int start)
+	{
+		return new StringView(text, start);
+	}
+
+	/// <summary>
+	/// 创建指定字符串从指定索引开始的视图。
+	/// </summary>
+	/// <param name="text">要创建视图的字符串。</param>
+	/// <param name="start">视图的起始索引。</param>
+	/// <param name="length">视图的长度。</param>
+	/// <returns>字符串的视图。</returns>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/> 小于 <c>0</c> 或大于 <c>text.Length</c>。</exception>
+	/// <exception cref="ArgumentOutOfRangeException"><c>start + length</c> 表示的位置不在 <paramref name="text"/> 范围内。</exception>
+	/// <remarks>如果 <paramref name="text"/> 为 <c>null</c>，会返回空视图。</remarks>
+	public static StringView AsView(this string? text, int start, int length)
+	{
+		return new StringView(text, start, length);
+	}
+
+	#endregion // View
 
 	/// <summary>
 	/// 返回指定字符串的字符顺序是相反的字符串。

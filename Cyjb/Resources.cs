@@ -73,6 +73,11 @@ internal partial class Resources
 	internal static string AmbiguousMatchProperty => ResourceManager.GetString("AmbiguousMatchProperty", resourceCulture)!;
 	
 	/// <summary>
+	/// 返回类似 <c>The value cannot be an empty string.</c> 的本地化字符串。
+	/// </summary>
+	internal static string ArgumentEmptyString => ResourceManager.GetString("ArgumentEmptyString", resourceCulture)!;
+	
+	/// <summary>
 	/// 返回类似 <c>'{0}' cannot be greater than '{1}'.</c> 的本地化字符串。
 	/// </summary>
 	internal static string ArgumentMinMaxValue(object? arg0, object? arg1)
@@ -310,6 +315,11 @@ internal partial class Resources
 	/// 返回类似 <c>Could not find any recognizable digits.</c> 的本地化字符串。
 	/// </summary>
 	internal static string NoParsibleDigits => ResourceManager.GetString("NoParsibleDigits", resourceCulture)!;
+	
+	/// <summary>
+	/// 返回类似 <c>The string comparison type passed in is currently not supported.</c> 的本地化字符串。
+	/// </summary>
+	internal static string NotSupportedStringComparison => ResourceManager.GetString("NotSupportedStringComparison", resourceCulture)!;
 	
 	/// <summary>
 	/// 返回类似 <c>Value was either too large or too small for a Byte.</c> 的本地化字符串。
