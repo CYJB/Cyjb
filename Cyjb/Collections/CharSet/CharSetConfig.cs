@@ -10,7 +10,7 @@ internal static partial class CharSetConfig
 	/// </summary>
 	private const int CharBitLength = 16;
 	/// <summary>
-	/// 数组项可以存储的字节数，<see cref="ulong"/> 可以存储 64 中情况（2^6）。
+	/// 数组项可以存储的字节数，<see cref="ulong"/> 可以存储 64 种情况（2^6）。
 	/// </summary>
 	private const int ItemBitLength = 6;
 	/// <summary>
