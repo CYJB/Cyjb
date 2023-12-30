@@ -1,7 +1,4 @@
-using System.Diagnostics;
 using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Runtime.Intrinsics;
 using System.Text;
 using Cyjb.Collections;
 
@@ -9,6 +6,30 @@ namespace Cyjb;
 
 public readonly partial struct StringView
 {
+	/// <summary>
+	/// 返回从指定位置开始指定长度的子字符串视图。
+	/// </summary>
+	/// <param name="startIndex">子字符串视图的起始位置。</param>
+	/// <param name="length">子字符串视图的长度。</param>
+	/// <returns>子字符串视图。</returns>
+	/// <remarks>该方法是为了支持 <see cref="Range"/> 操作。</remarks>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/>
+	/// 小于零或大于当前字符串视图的长度。</exception>
+	/// <exception cref="ArgumentOutOfRangeException"><c>startIndex + length</c>
+	/// 表示的位置不在当前字符串视图内。</exception>
+	public StringView Slice(int startIndex, int length)
+	{
+		if (startIndex < 0)
+		{
+			throw CommonExceptions.ArgumentIndexOutOfRange(startIndex);
+		}
+		if (length < 0 || startIndex + length > this.length)
+		{
+			throw CommonExceptions.ArgumentCountOutOfRange(length);
+		}
+		return new StringView(text, start + startIndex, length);
+	}
+
 	/// <summary>
 	/// 返回一个新的字符串视图，在当前字符串视图中的指定索引位置插入指定的字符串。
 	/// </summary>
