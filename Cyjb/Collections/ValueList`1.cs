@@ -153,7 +153,7 @@ public ref struct ValueList<T>
 		}
 		else
 		{
-			AddMulti(items);
+			AddMulti(ref items);
 		}
 	}
 
@@ -161,15 +161,14 @@ public ref struct ValueList<T>
 	/// 将指定的多个元素添加到当前列表中。
 	/// </summary>
 	/// <param name="items">要添加到当前列表的多个元素。</param>
-	[MethodImpl(MethodImplOptions.NoInlining)]
-	private void AddMulti(ReadOnlySpan<T> items)
+	private void AddMulti(ref ReadOnlySpan<T> items)
 	{
 		int finalLength = length + items.Length;
 		if (finalLength > span.Length)
 		{
 			Grow(items.Length);
 		}
-		items.CopyTo(span[length..]);
+		items.CopyTo(span.Slice(length));
 		length = finalLength;
 	}
 
@@ -504,7 +503,6 @@ public ref struct ValueList<T>
 	/// 扩容并添加指定的项。
 	/// </summary>
 	/// <param name="item">要添加的项。</param>
-	[MethodImpl(MethodImplOptions.NoInlining)]
 	private void GrowAndAdd(T item)
 	{
 		int idx = length;
@@ -517,7 +515,6 @@ public ref struct ValueList<T>
 	/// 扩容当前列表，至少会扩容指定长度。
 	/// </summary>
 	/// <param name="count">要扩容的长度</param>
-	[MethodImpl(MethodImplOptions.NoInlining)]
 	private void Grow(int count)
 	{
 		const uint ArrayMaxLength = 0x7FFFFFC7; // 等于 Array.MaxLength

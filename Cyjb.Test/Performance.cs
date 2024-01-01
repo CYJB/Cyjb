@@ -91,6 +91,8 @@ public sealed class Performance
 	/// <returns></returns>
 	public static Result Measure(string name, int iteration, Action action)
 	{
+		// 代码预热。
+		action();
 		GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
 		int[] collectionCount = new int[GC.MaxGeneration + 1];
 		for (int i = 0; i <= GC.MaxGeneration; i++)
