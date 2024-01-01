@@ -127,16 +127,17 @@ public class PooledList<T> : IDisposable
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void Add(ReadOnlySpan<T> items)
 	{
+		int itemLength = items.Length;
 		int idx = length;
 		Span<T> data = array;
-		if (items.Length == 1 && idx < data.Length)
+		if (itemLength == 1 && idx < data.Length)
 		{
 			data[idx] = items[0];
 			length = idx + 1;
 		}
 		else
 		{
-			AddMulti(ref items);
+			AddMulti(items, itemLength);
 		}
 	}
 
@@ -144,12 +145,14 @@ public class PooledList<T> : IDisposable
 	/// 将指定的多个元素添加到当前列表中。
 	/// </summary>
 	/// <param name="items">要添加到当前列表的多个元素。</param>
-	private void AddMulti(ref ReadOnlySpan<T> items)
+	/// <param name="itemLength">添加的元素个数。</param>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	private void AddMulti(ReadOnlySpan<T> items, int itemLength)
 	{
-		int finalLength = length + items.Length;
+		int finalLength = length + itemLength;
 		if (finalLength > array.Length)
 		{
-			Grow(items.Length);
+			Grow(itemLength);
 		}
 		items.CopyTo(array.AsSpan(length));
 		length = finalLength;
@@ -481,6 +484,7 @@ public class PooledList<T> : IDisposable
 	/// 扩容并添加指定的项。
 	/// </summary>
 	/// <param name="item">要添加的项。</param>
+	[MethodImpl(MethodImplOptions.NoInlining)]
 	private void GrowAndAdd(T item)
 	{
 		int idx = length;
@@ -493,6 +497,7 @@ public class PooledList<T> : IDisposable
 	/// 扩容当前列表，至少会扩容指定长度。
 	/// </summary>
 	/// <param name="count">要扩容的长度</param>
+	[MethodImpl(MethodImplOptions.NoInlining)]
 	private void Grow(int count)
 	{
 		const uint ArrayMaxLength = 0x7FFFFFC7; // 等于 Array.MaxLength
