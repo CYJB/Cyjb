@@ -1252,7 +1252,6 @@ public readonly partial struct StringView
 	{
 		int endIdx = start + length - 1;
 		int startIdx = start;
-		int i;
 		if (trimStart)
 		{
 			for (; startIdx <= endIdx && trimChars.Contains(text[startIdx]); startIdx++) ;
