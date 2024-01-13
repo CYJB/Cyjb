@@ -95,19 +95,28 @@ public sealed class LineLocator
 		ColumnInfo columnInfo = ColumnInfo.Default;
 		if (columnInfos.Count > 0)
 		{
-			int colIndex = columnInfos.BinarySearch(character, (columnInfo) => columnInfo.Character);
-			if (colIndex < 0)
+			// 先检查最后一个列号。
+			ColumnInfo last = columnInfos[^1];
+			if (character >= last.Character)
 			{
-				colIndex = ~colIndex;
-				// 需要好插入到 0 表示 ColumnInfo.Default。
-				if (colIndex > 0)
-				{
-					columnInfo = columnInfos[colIndex - 1];
-				}
+				columnInfo = last;
 			}
 			else
 			{
-				columnInfo = columnInfos[colIndex];
+				int colIndex = columnInfos.BinarySearch(character, (columnInfo) => columnInfo.Character);
+				if (colIndex < 0)
+				{
+					colIndex = ~colIndex;
+					// 需要插入到 0 表示 ColumnInfo.Default。
+					if (colIndex > 0)
+					{
+						columnInfo = columnInfos[colIndex - 1];
+					}
+				}
+				else
+				{
+					columnInfo = columnInfos[colIndex];
+				}
 			}
 		}
 		return new LinePosition(line + 1, character, columnInfo.GetColumn(character, tabSize));
@@ -250,7 +259,7 @@ public sealed class LineLocator
 		/// <param name="character">要检查的字符索引。</param>
 		/// <param name="tabSize">Tab 的宽度。</param>
 		/// <returns>指定字符索引的列号。</returns>
-		public int GetColumn(int character, int tabSize)
+		public readonly int GetColumn(int character, int tabSize)
 		{
 			int cnt = character - Character;
 			if (cnt == 0)
@@ -260,7 +269,7 @@ public sealed class LineLocator
 			if (Width == TabSizeMark)
 			{
 				int result = Column + cnt * tabSize;
-				// Tab 需要向下约到 tabSize 的整数倍。
+				// Tab 需要向下取整到 tabSize 的整数倍。
 				result = tabSize * ((result - 1) / tabSize) + 1;
 				return result;
 			}
