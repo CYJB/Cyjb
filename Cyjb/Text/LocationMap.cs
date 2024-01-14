@@ -87,22 +87,31 @@ public sealed class LocationMap
 			}
 			else
 			{
+				int offset = 0;
 				last = map.Aggregate((cur, next) =>
 				{
+					var (nextIndex, nextMappedIndex) = next;
 					// 合并连续的映射。
-					if (next.Item1 == next.Item2)
+					if (nextIndex == nextMappedIndex)
 					{
+						offset += nextIndex;
 						return cur;
 					}
 					else
 					{
 						// 添加当前映射。
-						int index = cur.Item1;
-						int mappedIndex = cur.Item2;
-						int nextMappedIndex = mappedIndex + next.Item2; 
+						var (index, mappedIndex) = cur;
+						nextIndex += index;
+						nextMappedIndex += mappedIndex;
+						if (offset > 0)
+						{
+							nextIndex += offset;
+							nextMappedIndex += offset;
+							offset = 0;
+						}
 						indexMap.Add(index);
 						this.map.Add(new MapItem(index, mappedIndex, nextMappedIndex));
-						return new Tuple<int, int>(next.Item1 + index, nextMappedIndex);
+						return new Tuple<int, int>(nextIndex, nextMappedIndex);
 					}
 				});
 			}
