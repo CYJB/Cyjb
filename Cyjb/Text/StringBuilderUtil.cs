@@ -411,4 +411,15 @@ public static class StringBuilderUtil
 
 	#endregion // IndexOf
 
+	/// <summary>
+	/// 向当前 <see cref="StringBuilder"/> 中追加指定的字符串视图。
+	/// </summary>
+	/// <param name="text">要修改的 <see cref="StringBuilder"/> 实例。</param>
+	/// <param name="value">要追加的字符串视图。</param>
+	/// <returns>完成追加操作后的 <paramref name="text"/>。</returns>
+	public static StringBuilder Append(this StringBuilder text, StringView value)
+	{
+		text.Append(value.AsSpan());
+		return text;
+	}
 }
