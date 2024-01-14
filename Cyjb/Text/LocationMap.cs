@@ -1,6 +1,29 @@
 namespace Cyjb.Text;
 
 /// <summary>
+/// 位置映射关系的类型。
+/// </summary>
+public enum LocationMapType
+{
+	/// <summary>
+	/// 索引映射模式，映射关系的每一项都是索引。
+	/// </summary>
+	/// <remarks>
+	/// <c>{1, 10}, {3, 20}</c> 表示索引 <c>1</c> 映射到 <c>10</c>；
+	/// 索引 <c>3</c> 映射到 <c>20</c>。
+	/// </remarks>
+	Index,
+	/// <summary>
+	/// 偏移映射模式，映射关系的每一项都是偏移。
+	/// </summary>
+	/// <remarks>
+	/// <c>{1, 10}, {3, 20}</c> 表示索引 <c>1</c> 映射到 <c>10</c>；
+	/// 索引 <c>4</c>（偏移 <c>1 + 3</c>） 映射到 <c>30</c>（偏移 <c>10 + 20</c>）。
+	/// </remarks>
+	Offset,
+}
+
+/// <summary>
 /// 提供将位置线性映射到其它范围的能力。
 /// </summary>
 public sealed class LocationMap
@@ -35,36 +58,63 @@ public sealed class LocationMap
 	/// </summary>
 	/// <param name="map">位置映射关系，会将 <see cref="Tuple{T1, T2}.Item1"/> 映射为
 	/// <see cref="Tuple{T1, T2}.Item2"/>。未列出的值会根据之前最近的映射关系线性变换。</param>
-	/// <example>假设映射关系是 <c>{0, 10}</c>，会将索引 <c>0</c> 映射到 <c>10</c>，
-	/// 索引 <c>1</c> 映射到 <c>11</c>，索引 <c>10</c> 映射到 <c>20</c>，并依此类推。</example>
-	public LocationMap(IEnumerable<Tuple<int, int>> map)
+	/// <param name="type">映射关系的类型。</param>
+	public LocationMap(IEnumerable<Tuple<int, int>> map, LocationMapType type)
 	{
 		if (map.Any())
 		{
-			Tuple<int, int> last = map.OrderBy(tuple => tuple.Item1).Aggregate((cur, next) =>
+			Tuple<int, int> last;
+			if (type == LocationMapType.Index)
 			{
-				// 合并连续的映射。
-				if (next.Item1 - cur.Item1 == next.Item2 - cur.Item2)
+				last = map.OrderBy(tuple => tuple.Item1).Aggregate((cur, next) =>
 				{
-					return cur;
-				}
-				else
+					// 合并连续的映射。
+					int index = cur.Item1;
+					int mappedIndex = cur.Item2;
+					int nextMappedIndex = next.Item2;
+					if (next.Item1 - index == nextMappedIndex - mappedIndex)
+					{
+						return cur;
+					}
+					else
+					{
+						// 添加当前映射。
+						indexMap.Add(index);
+						this.map.Add(new MapItem(index, mappedIndex, nextMappedIndex));
+						return next;
+					}
+				});
+			}
+			else
+			{
+				last = map.Aggregate((cur, next) =>
 				{
-					// 添加当前映射。
-					indexMap.Add(cur.Item1);
-					this.map.Add(new MapItem(cur, next.Item2));
-					return next;
-				}
-			});
+					// 合并连续的映射。
+					if (next.Item1 == next.Item2)
+					{
+						return cur;
+					}
+					else
+					{
+						// 添加当前映射。
+						int index = cur.Item1;
+						int mappedIndex = cur.Item2;
+						int nextMappedIndex = mappedIndex + next.Item2; 
+						indexMap.Add(index);
+						this.map.Add(new MapItem(index, mappedIndex, nextMappedIndex));
+						return new Tuple<int, int>(next.Item1 + index, nextMappedIndex);
+					}
+				});
+			}
 			// 添加最后一个映射。
 			indexMap.Add(last.Item1);
-			this.map.Add(new MapItem(last, int.MaxValue));
+			this.map.Add(new MapItem(last.Item1, last.Item2, int.MaxValue));
 			curMap = this.map[0];
 			curIndex = indexMap[0];
 		}
 		else
 		{
-			curMap = new MapItem(new Tuple<int, int>(0, 0), int.MaxValue);
+			curMap = new MapItem(0, 0, int.MaxValue);
 		}
 		FindNextMap();
 	}
@@ -139,20 +189,21 @@ public sealed class LocationMap
 		/// <summary>
 		/// 使用指定的映射和结束位置初始化 <see cref="MapItem"/> 结构的新实例。
 		/// </summary>
-		/// <param name="curMap">当前映射。</param>
-		/// <param name="nextMapIndex">下一个映射结果的结束位置。</param>
-		public MapItem(Tuple<int, int> curMap, int nextMapIndex)
+		/// <param name="index">当前索引。</param>
+		/// <param name="mappedIndex">要映射到的索引。</param>
+		/// <param name="nextMappedIndex">下一个映射结果的结束位置。</param>
+		public MapItem(int index, int mappedIndex, int nextMappedIndex)
 		{
-			endIndex = nextMapIndex - 1;
-			if (curMap.Item2 >= nextMapIndex)
+			endIndex = nextMappedIndex - 1;
+			if (mappedIndex >= nextMappedIndex)
 			{
 				// 当前映射的起始位置已经超过了结束位置，那么总是直接映射到起始位置。
-				offset = curMap.Item2;
+				offset = mappedIndex;
 				mapToOffset = true;
 			}
 			else
 			{
-				offset = curMap.Item2 - curMap.Item1;
+				offset = mappedIndex - index;
 				mapToOffset = false;
 			}
 		}
