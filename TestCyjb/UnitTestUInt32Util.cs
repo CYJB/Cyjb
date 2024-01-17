@@ -352,6 +352,63 @@ namespace TestCyjb
 		}
 
 		/// <summary>
+		/// 对 <see cref="UInt32Util.CountTrailingBits(uint)"/> 方法进行测试。
+		/// </summary>
+		[DataTestMethod]
+		[DataRow(0, 0)]
+		[DataRow(0x80000000, 1)]
+		[DataRow(0x40000000, 0)]
+		[DataRow(0xC0000000, 2)]
+		[DataRow(0x20000000, 0)]
+		[DataRow(0xA0000000, 1)]
+		[DataRow(0xE0000000, 3)]
+		[DataRow(0x10000000, 0)]
+		[DataRow(0x90000000, 1)]
+		[DataRow(0xF0000000, 4)]
+		[DataRow(0x8000000, 0)]
+		[DataRow(0x88000000, 1)]
+		[DataRow(0xF8000000, 5)]
+		[DataRow(0x4000000, 0)]
+		[DataRow(0x84000000, 1)]
+		[DataRow(0x24000000, 0)]
+		[DataRow(0xD4000000, 2)]
+		[DataRow(0xFC000000, 6)]
+		[DataRow(0x2000000, 0)]
+		[DataRow(0x82000000, 1)]
+		[DataRow(0xFE000000, 7)]
+		[DataRow(0x1000000, 0)]
+		[DataRow(0x81000000, 1)]
+		[DataRow(0xF9000000, 5)]
+		[DataRow(0x5000000, 0)]
+		[DataRow(0xC5000000, 2)]
+		[DataRow(0xE5000000, 3)]
+		[DataRow(0xF5000000, 4)]
+		[DataRow(0x6D000000, 0)]
+		[DataRow(0xFD000000, 6)]
+		[DataRow(0xFF000000, 8)]
+		[DataRow(0x800000, 0)]
+		[DataRow(0x80800000, 1)]
+		[DataRow(0xFF800000, 9)]
+		[DataRow(0x400000, 0)]
+		[DataRow(0xFFC00000, 10)]
+		[DataRow(0x200000, 0)]
+		[DataRow(0xFFFFFFFC, 30)]
+		[DataRow(0x2, 0)]
+		[DataRow(0x80000002, 1)]
+		[DataRow(0xF7FFFFFE, 4)]
+		[DataRow(0xFFFFFFFE, 31)]
+		[DataRow(0x1, 0)]
+		[DataRow(0xFFFFFFF7, 28)]
+		[DataRow(0xF7FFFFFF, 4)]
+		[DataRow(0x7FFFFFFF, 0)]
+		[DataRow(0xFFFFFFFF, 32)]
+
+		public void TestCountLeadingBits(object value, int target)
+		{
+			Assert.AreEqual(target, UInt32Util.CountLeadingBits(Convert.ToUInt32(value)));
+		}
+
+		/// <summary>
 		/// 对 <see cref="UInt32Util.CeilingPowerOf2(uint)"/> 方法进行测试。
 		/// </summary>
 		[DataTestMethod]

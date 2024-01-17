@@ -5,7 +5,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestCyjb.Collections;
 
-
 /// <summary>
 /// <see cref="ValueList{T}"/> 类的单元测试。
 /// </summary>

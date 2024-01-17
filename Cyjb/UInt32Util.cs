@@ -218,10 +218,10 @@ public static class UInt32Util
 	}
 
 	/// <summary>
-	/// 计算指定 <see cref="uint"/> 的二进制表示中末尾连续 <c>0</c> 的个数。
+	/// 计算指定 <see cref="uint"/> 的二进制表示中末尾（低位）连续 <c>0</c> 的个数。
 	/// </summary>
 	/// <param name="value">要计算的 <see cref="uint"/> 。</param>
-	/// <returns><paramref name="value"/> 的二进制表示中末尾连续 <c>0</c> 的个数。</returns>
+	/// <returns><paramref name="value"/> 的二进制表示中末尾（低位）连续 <c>0</c> 的个数。</returns>
 	[CLSCompliant(false)]
 	public static int CountTrailingZeroBits(this uint value)
 	{
@@ -229,10 +229,10 @@ public static class UInt32Util
 	}
 
 	/// <summary>
-	/// 计算指定 <see cref="uint"/> 的二进制表示中末尾连续 <c>1</c> 的个数。
+	/// 计算指定 <see cref="uint"/> 的二进制表示中末尾（低位）连续 <c>1</c> 的个数。
 	/// </summary>
 	/// <param name="value">要计算的 <see cref="uint"/> 。</param>
-	/// <returns><paramref name="value"/> 二进制表示中末尾连续 <c>1</c> 的个数。</returns>
+	/// <returns><paramref name="value"/> 二进制表示中末尾（低位）连续 <c>1</c> 的个数。</returns>
 	[CLSCompliant(false)]
 	public static int CountTrailingBits(this uint value)
 	{
@@ -242,6 +242,34 @@ public static class UInt32Util
 			return 32;
 		}
 		return BitOperations.PopCount((value ^ (value + 1U)) >> 1);
+	}
+
+	/// <summary>
+	/// 计算指定 <see cref="uint"/> 的二进制表示中开头（高位）连续 <c>0</c> 的个数。
+	/// </summary>
+	/// <param name="value">要计算的 <see cref="uint"/> 。</param>
+	/// <returns><paramref name="value"/> 的二进制表示中开头（高位）连续 <c>0</c> 的个数。</returns>
+	[CLSCompliant(false)]
+	public static int CountLeadingZeroBits(this uint value)
+	{
+		return BitOperations.LeadingZeroCount(value);
+	}
+
+	/// <summary>
+	/// 计算指定 <see cref="uint"/> 的二进制表示中开头（高位）连续 <c>1</c> 的个数。
+	/// </summary>
+	/// <param name="value">要计算的 <see cref="uint"/> 。</param>
+	/// <returns><paramref name="value"/> 二进制表示中开头（高位）连续 <c>1</c> 的个数。</returns>
+	[CLSCompliant(false)]
+	public static int CountLeadingBits(this uint value)
+	{
+		if ((value & 0x80000000) == 0)
+		{
+			return 0;
+		}
+		value ^= value >> 1;
+		value &= 0x7FFFFFFF;
+		return BitOperations.LeadingZeroCount(value);
 	}
 
 	/// <summary>

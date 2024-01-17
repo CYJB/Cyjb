@@ -209,8 +209,23 @@ namespace TestCyjb.Collections
 			List<bool> list = new(bitList);
 			for (int i = 0; i < list.Count; i++)
 			{
-				Assert.AreEqual(list.IndexOf(true, i), bitList.IndexOf(true, i), "indexOf(true, {0})", i);
-				Assert.AreEqual(list.IndexOf(false, i), bitList.IndexOf(false, i), "indexOf(false, {0})", i);
+				Assert.AreEqual(list.IndexOf(true, i), bitList.IndexOf(true, i), "IndexOf(true, {0})", i);
+				Assert.AreEqual(list.IndexOf(false, i), bitList.IndexOf(false, i), "IndexOf(false, {0})", i);
+			}
+		}
+
+		/// <summary>
+		/// 对 <see cref="BitList.LastIndexOf(bool, int)"/> 方法进行测试。
+		/// </summary>
+		[TestMethod]
+		public void TestLastIndexOf()
+		{
+			BitList bitList = new(new uint[] { 0x8222780, 0xFF222780, uint.MaxValue, 0, 0, 0xFE2224A0, 0x90000007 });
+			List<bool> list = new(bitList);
+			for (int i = 31; i < list.Count; i++)
+			{
+				Assert.AreEqual(list.LastIndexOf(true, i), bitList.LastIndexOf(true, i), "LastIndexOf(true, {0})", i);
+				Assert.AreEqual(list.LastIndexOf(false, i), bitList.LastIndexOf(false, i), "LastIndexOf(false, {0})", i);
 			}
 		}
 

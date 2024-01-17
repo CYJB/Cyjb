@@ -175,11 +175,13 @@ namespace Cyjb.Collections
 		/// <param name="startIndex">要定位的起始索引。</param>
 		/// <returns>如果在 <see cref="BitList"/> 中找到 <paramref name="item"/>，
 		/// 则为该项的索引；否则为 <c>-1</c>。</returns>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/>
+		/// 超出了当前列表的有效范围。</exception>
 		public int IndexOf(bool item, int startIndex)
 		{
-			if (startIndex >= count)
+			if (startIndex < 0 || startIndex >= count)
 			{
-				return -1;
+				throw CommonExceptions.ArgumentIndexOutOfRange(startIndex);
 			}
 			int start = startIndex >> IndexShift;
 			int end = count >> IndexShift;
@@ -225,6 +227,68 @@ namespace Cyjb.Collections
 				}
 			}
 			return idx > count ? -1 : idx;
+		}
+
+		/// <summary>
+		/// 确定 <see cref="BitList"/> 中特定项最后一次出现的索引。
+		/// </summary>
+		/// <param name="item">要在 <see cref="BitList"/> 中定位的对象。</param>
+		/// <returns>如果在 <see cref="BitList"/> 中找到 <paramref name="item"/>，
+		/// 则为该项最后一次出现的索引；否则为 <c>-1</c>。</returns>
+		public int LastIndexOf(bool item)
+		{
+			return LastIndexOf(item, count - 1);
+		}
+
+		/// <summary>
+		/// 确定 <see cref="BitList"/> 中特定项最后一次出现的索引。
+		/// </summary>
+		/// <param name="item">要在 <see cref="BitList"/> 中定位的对象。</param>
+		/// <param name="startIndex">要定位的起始索引。</param>
+		/// <returns>如果在 <see cref="BitList"/> 中找到 <paramref name="item"/>，
+		/// 则为该项最后一次出现的索引；否则为 <c>-1</c>。</returns>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/>
+		/// 超出了当前列表的有效范围。</exception>
+		public int LastIndexOf(bool item, int startIndex)
+		{
+			if (startIndex < 0 || startIndex >= count)
+			{
+				throw CommonExceptions.ArgumentIndexOutOfRange(startIndex);
+			}
+			int start = startIndex >> IndexShift;
+			if (item)
+			{
+				uint value = items[start] & GetMask((startIndex & IndexMask) + 1);
+				if (value > 0U)
+				{
+					return ((start + 1) << IndexShift) - 1 - value.CountLeadingZeroBits();
+				}
+				for (int i = start - 1; i >= 0; i--)
+				{
+					value = items[i];
+					if (value > 0U)
+					{
+						return ((i + 1) << IndexShift) - 1 - value.CountLeadingZeroBits();
+					}
+				}
+			}
+			else
+			{
+				uint value = items[start] | ~GetMask((startIndex & IndexMask) + 1);
+				if (value < uint.MaxValue)
+				{
+					return ((start + 1) << IndexShift) - 1 - value.CountLeadingBits();
+				}
+				for (int i = start - 1; i >= 0; i--)
+				{
+					value = items[i];
+					if (value < uint.MaxValue)
+					{
+						return ((i + 1) << IndexShift) - 1 - value.CountLeadingBits();
+					}
+				}
+			}
+			return -1;
 		}
 
 		/// <summary>
@@ -1339,6 +1403,10 @@ namespace Cyjb.Collections
 		/// <returns>掩码。</returns>
 		private static uint GetMask(int maskSize)
 		{
+			if (maskSize == UnitSize)
+			{
+				return uint.MaxValue;
+			}
 			return (1U << maskSize) - 1U;
 		}
 
