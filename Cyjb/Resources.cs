@@ -161,6 +161,14 @@ internal partial class Resources
 	internal static string CollectionCountDiffer => ResourceManager.GetString("CollectionCountDiffer", resourceCulture)!;
 	
 	/// <summary>
+	/// 返回类似 <c>An item with the same key has already been added. Key: {0}</c> 的本地化字符串。
+	/// </summary>
+	internal static string CollectionDuplicateKey(object? arg0)
+	{
+		return string.Format(resourceCulture, ResourceManager.GetString("CollectionDuplicateKey", resourceCulture)!, Format(arg0));
+	}
+	
+	/// <summary>
 	/// 返回类似 <c>'{0}' may not be empty.</c> 的本地化字符串。
 	/// </summary>
 	internal static string CollectionEmpty(object? arg0)
@@ -185,6 +193,14 @@ internal partial class Resources
 	/// 返回类似 <c>Collection is read-only.</c> 的本地化字符串。
 	/// </summary>
 	internal static string CollectionReadOnly => ResourceManager.GetString("CollectionReadOnly", resourceCulture)!;
+	
+	/// <summary>
+	/// 返回类似 <c>The given key '{0}' was not present in the dictionary.</c> 的本地化字符串。
+	/// </summary>
+	internal static string DictionaryKeyNotFound(object? arg0)
+	{
+		return string.Format(resourceCulture, ResourceManager.GetString("DictionaryKeyNotFound", resourceCulture)!, Format(arg0));
+	}
 	
 	/// <summary>
 	/// 返回类似 <c>A parameter with the same name has already existed.</c> 的本地化字符串。

@@ -185,6 +185,10 @@
     <value>Collection element count must be the same as current colection.</value>
     <comment>集合元素数必须与当前集合相同。</comment>
   </data>
+  <data name="CollectionDuplicateKey" xml:space="preserve">
+    <value>An item with the same key has already been added. Key: {0}</value>
+    <comment>已经添加了相同键的元素。</comment>
+  </data>
   <data name="CollectionEmpty" xml:space="preserve">
     <value>'{0}' may not be empty.</value>
     <comment>集合不能为空。</comment>
@@ -200,6 +204,10 @@
   <data name="CollectionReadOnly" xml:space="preserve">
     <value>Collection is read-only.</value>
     <comment>集合是只读的。</comment>
+  </data>
+  <data name="DictionaryKeyNotFound" xml:space="preserve">
+    <value>The given key '{0}' was not present in the dictionary.</value>
+    <comment>字典的键不存在。</comment>
   </data>
   <data name="DuplicateName" xml:space="preserve">
     <value>A parameter with the same name has already existed.</value>

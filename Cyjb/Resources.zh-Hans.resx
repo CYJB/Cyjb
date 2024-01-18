@@ -185,6 +185,10 @@
     <value>集合的元素数必须与当前集合相同。</value>
     <comment>集合元素数必须与当前集合相同。</comment>
   </data>
+  <data name="CollectionDuplicateKey" xml:space="preserve">
+    <value>已经添加了具有相同键的元素。键：{0}</value>
+    <comment>已经添加了相同键的元素。</comment>
+  </data>
   <data name="CollectionEmpty" xml:space="preserve">
     <value>“{0}”不能为空。</value>
     <comment>集合不能为空。</comment>
@@ -200,6 +204,10 @@
   <data name="CollectionReadOnly" xml:space="preserve">
     <value>集合是只读的。</value>
     <comment>集合是只读的。</comment>
+  </data>
+  <data name="DictionaryKeyNotFound" xml:space="preserve">
+    <value>字典中不存在指定的键“{0}”。</value>
+    <comment>字典的键不存在。</comment>
   </data>
   <data name="DuplicateName" xml:space="preserve">
     <value>具有相同名称的参数已经存在。</value>

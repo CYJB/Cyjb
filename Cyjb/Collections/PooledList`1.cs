@@ -8,7 +8,7 @@ namespace Cyjb.Collections;
 /// </summary>
 /// <typeparam name="T">列表中的元素类型。</typeparam>
 /// <remarks>适合临时使用列表，但又无法使用栈上分配的 <see cref="ValueList{T}"/> 的场景。</remarks>
-public class PooledList<T> : IDisposable
+public sealed class PooledList<T> : IDisposable
 {
 	/// <summary>
 	/// 列表的数组。
@@ -478,6 +478,7 @@ public class PooledList<T> : IDisposable
 		ArrayPool<T>.Shared.Return(array);
 		array = Array.Empty<T>();
 		length = 0;
+		GC.SuppressFinalize(this);
 	}
 
 	/// <summary>
