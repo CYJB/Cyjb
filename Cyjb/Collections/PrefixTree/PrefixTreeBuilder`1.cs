@@ -23,7 +23,6 @@ internal class PrefixTreeBuilder<TValue>
 	/// <summary>
 	/// 前缀树节点列表。
 	/// </summary>
-	/// </remarks>
 	private readonly List<int> nodes = new();
 	/// <summary>
 	/// 节点的索引。
