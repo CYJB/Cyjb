@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using Cyjb.Collections.ObjectModel;
 
 namespace Cyjb.Collections;
@@ -11,24 +12,23 @@ namespace Cyjb.Collections;
 public class ReadOnlyPrefixTree<TValue> : ReadOnlyDictionaryBase<string, TValue>
 {
 	/// <summary>
-	/// 值索引是否不存在的掩码。
-	/// </summary>
-	private const ulong ValueIndexMask = 0x8000000000000000;
-	/// <summary>
 	/// 当前前缀树包含的元素。
 	/// </summary>
 	private readonly KeyValuePair<string, TValue>[] items;
 	/// <summary>
 	/// 当前前缀树的节点列表。
 	/// </summary>
-	/// <remarks>使用 <see cref="ulong"/> 的低 32 位表示节点的基索引，高 32 位表示节点对应的值；
-	/// 若没有对应的值，则高 32 位为 -1。</remarks>
-	private readonly ulong[] nodes;
+	/// <remarks>使用 <c>node[i]</c> 表示节点的子节点信息；最低的一位（<c>node[i] &amp; 1</c>）表示是否包含值，
+	/// 若包含值则 <c>node[i+1]</c> 即为值的索引；最低的倒数第二位（<c>node[i] &amp; 2</c>）表示是否使用路径压缩，
+	/// 若未使用路径压缩则 <c>node[i] >> 2</c> 表示子节点的基索引，若使用路径压缩则 <c>node[i] >> 2</c> 表示路径压缩的长度，
+	/// 从 <c>node[i+1]</c>（如果有值则为 <c>node[i+2]</c>）之后开始指定长度 <c>char</c> 的内容即为路径压缩的字符串内容，
+	/// 并四字节对齐后跟下一节点的信息。</remarks>
+	private readonly int[] nodes;
 	/// <summary>
 	/// 当前前缀树的转移列表。
 	/// </summary>
-	/// <remarks>使用 <see cref="ulong"/> 的低 32 位表示 check，高 32 位表示 next。</remarks>
-	private readonly ulong[] trans;
+	/// <remarks>使用 <c>node[i]</c> 表示 <c>check</c>，<c>node[i+1]</c> 表示 <c>next</c>。</remarks>
+	private readonly int[] trans;
 	/// <summary>
 	/// 转移列表的长度。
 	/// </summary>
@@ -149,24 +149,21 @@ public class ReadOnlyPrefixTree<TValue> : ReadOnlyDictionaryBase<string, TValue>
 	public bool TryMatchShortest(ReadOnlySpan<char> text, out KeyValuePair<string, TValue> pair)
 	{
 		int nodeIdx = 0;
-		// 支持空字符串作为 key。
-		ulong value = nodes[nodeIdx];
-		if ((value & ValueIndexMask) == 0)
+		if ((nodes[nodeIdx] & 1) == 1)
 		{
-			pair = items[unchecked((int)(value >> 32))];
+			pair = items[nodes[nodeIdx + 1]];
 			return true;
 		}
-		foreach (char ch in text)
+		while (text.Length > 0)
 		{
-			nodeIdx = Next(nodeIdx, ch);
+			nodeIdx = Next(ref text, nodeIdx);
 			if (nodeIdx < 0)
 			{
 				break;
 			}
-			value = nodes[nodeIdx];
-			if ((value & ValueIndexMask) == 0)
+			else if ((nodes[nodeIdx] & 1) == 1)
 			{
-				pair = items[unchecked((int)(value >> 32))];
+				pair = items[nodes[nodeIdx + 1]];
 				return true;
 			}
 		}
@@ -185,23 +182,20 @@ public class ReadOnlyPrefixTree<TValue> : ReadOnlyDictionaryBase<string, TValue>
 	{
 		int nodeIdx = 0;
 		int lastMatch = -1;
-		// 支持空字符串作为 key。
-		ulong value = nodes[nodeIdx];
-		if ((value & ValueIndexMask) == 0)
+		if ((nodes[nodeIdx] & 1) == 1)
 		{
-			lastMatch = unchecked((int)(value >> 32));
+			lastMatch = nodes[nodeIdx + 1];
 		}
-		foreach (char ch in text)
+		while (text.Length > 0)
 		{
-			nodeIdx = Next(nodeIdx, ch);
+			nodeIdx = Next(ref text, nodeIdx);
 			if (nodeIdx < 0)
 			{
 				break;
 			}
-			value = nodes[nodeIdx];
-			if ((value & ValueIndexMask) == 0)
+			else if ((nodes[nodeIdx] & 1) == 1)
 			{
-				lastMatch = unchecked((int)(value >> 32));
+				lastMatch = nodes[nodeIdx + 1];
 			}
 		}
 		if (lastMatch == -1)
@@ -243,39 +237,75 @@ public class ReadOnlyPrefixTree<TValue> : ReadOnlyDictionaryBase<string, TValue>
 	/// </summary>
 	/// <param name="key">要检查的键。</param>
 	/// <returns>值的索引，如果不存在则返回 <c>-1</c>。</returns>
-	private int GetValueIndex(string key)
+	private int GetValueIndex(ReadOnlySpan<char> key)
 	{
 		int nodeIdx = 0;
-		foreach (char ch in key)
+		while (key.Length > 0)
 		{
-			nodeIdx = Next(nodeIdx, ch);
+			nodeIdx = Next(ref key, nodeIdx);
 			if (nodeIdx < 0)
+			{
+				// 无相应子节点。
+				return -1;
+			}
+		}
+		if ((nodes[nodeIdx] & 1) == 0)
+		{
+			// 无对应 value。
+			return -1;
+		}
+		else
+		{
+			return nodes[nodeIdx + 1];
+		}
+	}
+
+	/// <summary>
+	/// 返回指定文本对应的子节点。
+	/// </summary>
+	/// <param name="text">要检查的文本。</param>
+	/// <param name="nodeIdx">当前节点索引。</param>
+	/// <returns>子节点索引，如果不存在则返回 <c>-1</c>。</returns>
+	private int Next(ref ReadOnlySpan<char> text, int nodeIdx)
+	{
+		int baseIndex = nodes[nodeIdx];
+		if ((baseIndex & 2) == 0)
+		{
+			// 是路径压缩。
+			nodeIdx += (baseIndex & 1) + 1;
+			baseIndex >>= 2;
+			if (baseIndex == 0)
+			{
+				// 空的路径压缩，表示无子节点。
+				return -1;
+			}
+			ReadOnlySpan<char> path = MemoryMarshal.Cast<int, char>(nodes.AsSpan(nodeIdx));
+			path = path[..baseIndex];
+			if (!text.StartsWith(path))
+			{
+				return -1;
+			}
+			text = text.Slice(baseIndex);
+			return nodeIdx + (baseIndex + 1) / 2;
+		}
+		else
+		{
+			// 是普通转移。
+			baseIndex = ((baseIndex >> 2) + text[0]) << 1;
+			if (baseIndex < 0 || baseIndex >= transLength)
+			{
+				return -1;
+			}
+			if (trans[baseIndex] == nodeIdx)
+			{
+				text = text.Slice(1);
+				return trans[baseIndex + 1];
+			}
+			else
 			{
 				return -1;
 			}
 		}
-		return unchecked((int)(uint)(nodes[nodeIdx] >> 32));
-	}
-
-	/// <summary>
-	/// 返回指定节点指定转移的子节点。
-	/// </summary>
-	/// <param name="node">要检查的节点。</param>
-	/// <param name="idx">要检查的转移。</param>
-	/// <returns>子节点，如果不存在则返回 <c>-1</c>。</returns>
-	private int Next(int node, int idx)
-	{
-		idx += unchecked((int)(uint)nodes[node]);
-		if (idx < 0 || idx >= transLength)
-		{
-			return -1;
-		}
-		ulong result = trans[idx];
-		if ((uint)result == node)
-		{
-			return unchecked((int)(result >> 32));
-		}
-		return -1;
 	}
 
 	/// <summary>

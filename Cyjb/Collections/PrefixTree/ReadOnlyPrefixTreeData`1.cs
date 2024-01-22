@@ -14,11 +14,11 @@ public readonly struct ReadOnlyPrefixTreeData<TValue>
 	/// <summary>
 	/// 前缀树的节点列表。
 	/// </summary>
-	public readonly ulong[] Nodes;
+	public readonly int[] Nodes;
 	/// <summary>
 	/// 前缀树的转移列表。
 	/// </summary>
-	public readonly ulong[] Trans;
+	public readonly int[] Trans;
 
 	/// <summary>
 	/// 初始化只读前缀的数据。
@@ -26,7 +26,7 @@ public readonly struct ReadOnlyPrefixTreeData<TValue>
 	/// <param name="items">前缀树包含的元素。</param>
 	/// <param name="nodes">前缀树的节点列表。</param>
 	/// <param name="trans">前缀树的转移列表。</param>
-	public ReadOnlyPrefixTreeData(KeyValuePair<string, TValue>[] items, ulong[] nodes, ulong[] trans)
+	public ReadOnlyPrefixTreeData(KeyValuePair<string, TValue>[] items, int[] nodes, int[] trans)
 	{
 		Items = items;
 		Nodes = nodes;
