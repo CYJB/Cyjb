@@ -8,23 +8,27 @@ namespace Cyjb.Collections;
 /// 假设使用 <c>node[id]</c> 来表示 <c>id</c> 对应的子节点，使用三数组表示时，若
 /// <c>base[node]</c> 在 <c>check</c> 范围内，且 <c>check[base[node] + id] == node</c>，那么
 /// <c>node[id] = next[base[node] + id]</c>；否则不存在 <c>node[id]</c>。</para>
-/// <para>要求子节点的 key 不能重复，且子节点的索引必须大于等于零。</para>
-/// </remarks>
-/// <typeparam name="T">节点的类型。</typeparam>
-public sealed class TripleArrayCompress<T>
+/// <para>要求下一节点的 key 不能重复，且子节点的索引必须大于等于零。</para></remarks>
+/// <typeparam name="TCur">当前节点的类型。</typeparam>
+/// <typeparam name="TNext">下一节点的类型。</typeparam>
+public class TripleArrayCompress<TCur, TNext>
 {
 	/// <summary>
-	/// 表示无效的节点。
+	/// 表示无效的当前节点。
 	/// </summary>
-	private readonly T invalidNode;
+	private readonly TCur invalidCur;
+	/// <summary>
+	/// 表示无效的下一节点。
+	/// </summary>
+	private readonly TNext invalidNext;
 	/// <summary>
 	/// 子节点列表。
 	/// </summary>
-	private readonly List<T> next = new();
+	private readonly List<TNext> next = new();
 	/// <summary>
 	/// 状态检查。
 	/// </summary>
-	private readonly List<T> check = new();
+	private readonly List<TCur> check = new();
 	/// <summary>
 	/// 子节点索引的匹配模式。
 	/// </summary>
@@ -39,23 +43,25 @@ public sealed class TripleArrayCompress<T>
 	private int nextSpaceIndex = 0;
 
 	/// <summary>
-	/// 使用表示无效的节点初始化 <see cref="TripleArrayCompress{T}"/> 类的新实例。
+	/// 使用表示无效的节点值初始化 <see cref="TripleArrayCompress{T}"/> 类的新实例。
 	/// </summary>
-	/// <param name="invalidNode">表示无效的节点。</param>
-	public TripleArrayCompress(T invalidNode)
+	/// <param name="invalidCur">表示无效的当前节点。</param>
+	/// <param name="invalidNext">表示无效的下一节点。</param>
+	public TripleArrayCompress(TCur invalidCur, TNext invalidNext)
 	{
-		this.invalidNode = invalidNode;
+		this.invalidCur = invalidCur;
+		this.invalidNext = invalidNext;
 	}
 
 	/// <summary>
 	/// 获取子节点列表。
 	/// </summary>
-	public List<T> Next => next;
+	public List<TNext> Next => next;
 
 	/// <summary>
 	/// 获取状态检查列表。
 	/// </summary>
-	public List<T> Check => check;
+	public List<TCur> Check => check;
 
 	/// <summary>
 	/// 添加指定的节点。
@@ -63,7 +69,7 @@ public sealed class TripleArrayCompress<T>
 	/// <param name="currentNode">当前节点。</param>
 	/// <param name="children">子节点列表，会被多次遍历因此请视情况使用缓存。</param>
 	/// <returns>指定节点的基线索引。</returns>
-	public int AddNode(T currentNode, IEnumerable<KeyValuePair<int, T>> children)
+	public int AddNode(TCur currentNode, IEnumerable<KeyValuePair<int, TNext>> children)
 	{
 		pattern.Clear();
 		// 找到最小的子节点索引。
@@ -89,6 +95,10 @@ public sealed class TripleArrayCompress<T>
 		if (minIndex > 0)
 		{
 			pattern.RemoveRange(0, minIndex);
+		}
+		else if (minIndex < 0)
+		{
+			pattern.InsertRange(0, -minIndex, false);
 		}
 		int baseIndex = FindSpace() - minIndex;
 		foreach (var (idx, childNode) in children)
@@ -123,8 +133,8 @@ public sealed class TripleArrayCompress<T>
 		int addedCount = spaceIndex + count - next.Count;
 		if (addedCount > 0)
 		{
-			next.AddRange(Enumerable.Repeat(invalidNode, addedCount));
-			check.AddRange(Enumerable.Repeat(invalidNode, addedCount));
+			next.AddRange(Enumerable.Repeat(invalidNext, addedCount));
+			check.AddRange(Enumerable.Repeat(invalidCur, addedCount));
 		}
 		return spaceIndex;
 	}
