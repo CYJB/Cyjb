@@ -305,7 +305,7 @@ public readonly partial struct StringView : IEnumerable<char>
 	{
 		for (int i = 0, j = start; i < length; i++, j++)
 		{
-			yield return text[i];
+			yield return text[j];
 		}
 	}
 
