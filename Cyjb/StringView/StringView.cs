@@ -32,9 +32,17 @@ public readonly partial struct StringView : IEnumerable<char>
 	/// <remarks>如果 <paramref name="text"/> 为 <c>null</c>，会返回空视图。</remarks>
 	public StringView(string? text)
 	{
-		this.text = text ?? string.Empty;
 		start = 0;
-		length = this.text.Length;
+		if (text == null)
+		{
+			this.text = string.Empty;
+			length = 0;
+		}
+		else
+		{
+			this.text = text;
+			length = text.Length;
+		}
 	}
 
 	/// <summary>
@@ -53,11 +61,11 @@ public readonly partial struct StringView : IEnumerable<char>
 			length = 0;
 			return;
 		}
-		if (start < 0 || start > text.Length)
+		length = text.Length - start;
+		if (start < 0 || length < 0)
 		{
 			throw CommonExceptions.ArgumentIndexOutOfRange(start);
 		}
-		length = text.Length - start;
 		if (length > 0)
 		{
 			this.text = text;
