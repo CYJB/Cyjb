@@ -184,6 +184,7 @@ namespace TestCyjb
 				.AppendUTF32Char(0x2FFFF)
 				.AppendUTF32Char(0x30000)
 				.AppendUTF32Char(0x3FFFD)
+				.AppendUTF32Char(0xE0020)
 				.AppendUTF32Char(0x3FFFE)
 				;
 			string target = text.ToString();
@@ -236,6 +237,8 @@ namespace TestCyjb
 			Assert.AreEqual(2, CharUtil.Width(target, ref index));
 			// 0x3FFFD
 			Assert.AreEqual(2, CharUtil.Width(target, ref index));
+			// 0xE0020
+			Assert.AreEqual(0, CharUtil.Width(target, ref index));
 			// 0x3FFFE
 			Assert.AreEqual(1, CharUtil.Width(target, ref index));
 		}
