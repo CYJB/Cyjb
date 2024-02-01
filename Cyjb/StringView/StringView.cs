@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Cyjb;
 
@@ -180,7 +179,7 @@ public readonly partial struct StringView : IEnumerable<char>
 	/// 且首尾相接时表示可以连接，返回 <c>true</c>，并将连接结果通过 <paramref name="result"/> 返回；
 	/// 或者两个字符串视图其中之一为空，不需要连接时也会返回 <c>true</c>；
 	/// 否则返回 <c>false</c>，<paramref name="result"/> 会返回空。</returns>
-	public bool TryConcat(StringView other, [MaybeNullWhen(false)] out StringView result)
+	public bool TryConcat(StringView other, out StringView result)
 	{
 		if (length == 0)
 		{
