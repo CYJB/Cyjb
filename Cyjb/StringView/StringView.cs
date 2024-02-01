@@ -1,9 +1,10 @@
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Cyjb;
 
 /// <summary>
-/// 表示字符串视图，其行为类似 <see cref="Memory{T}"/>，但支持类似 <see cref="string"/> 的接口。
+/// 表示字符串视图，其行为类似 <see cref="ReadOnlyMemory{T}"/>，但支持类似 <see cref="string"/> 的接口。
 /// </summary>
 public readonly partial struct StringView : IEnumerable<char>
 {
@@ -168,6 +169,36 @@ public readonly partial struct StringView : IEnumerable<char>
 	public bool TryCopyTo(Span<char> destination)
 	{
 		return AsSpan().TryCopyTo(destination);
+	}
+
+	/// <summary>
+	/// 尝试连接指定的字符串视图。
+	/// </summary>
+	/// <param name="other">要连接的字符串视图。</param>
+	/// <param name="result">连接的结果字符串视图。</param>
+	/// <returns>如果当前字符串视图与 <paramref name="other"/> 是从相同字符串创建的，
+	/// 且首尾相接时表示可以连接，返回 <c>true</c>，并将连接结果通过 <paramref name="result"/> 返回；
+	/// 或者两个字符串视图其中之一为空，不需要连接时也会返回 <c>true</c>；
+	/// 否则返回 <c>false</c>，<paramref name="result"/> 会返回空。</returns>
+	public bool TryConcat(StringView other, [MaybeNullWhen(false)] out StringView result)
+	{
+		if (length == 0)
+		{
+			result = other;
+			return true;
+		}
+		else if (other.length == 0)
+		{
+			result = this;
+			return true;
+		}
+		else if (text == other.text && start + length == other.start)
+		{
+			result = new StringView(text, start, length + other.length);
+			return true;
+		}
+		result = Empty;
+		return false;
 	}
 
 	/// <summary>

@@ -836,6 +836,25 @@ public class UnitTestStringView
 		CollectionAssert.AreEqual("abc".ToCharArray(), "0abc3".AsView(1, 3).ToCharArray());
 	}
 
+	/// <summary>
+	/// 对 <see cref="StringView.TryConcat"/> 进行测试。
+	/// </summary>
+	[TestMethod]
+	public void TestTryConcat()
+	{
+		Assert.IsFalse("foo".AsView().TryConcat("bar", out var _));
+		Assert.IsFalse("foo".AsView().TryConcat("foo", out var _));
+		Assert.IsFalse("foobar".AsView(0, 3).TryConcat("foobar".AsView(2, 2), out var _));
+		Assert.IsTrue("foo".AsView().TryConcat("", out var result));
+		Assert.AreEqual("foo", result);
+		Assert.IsTrue(StringView.Empty.TryConcat("bar", out result));
+		Assert.AreEqual("bar", result);
+		Assert.IsTrue("foobar".AsView(0, 3).TryConcat("foobar".AsView(3), out result));
+		Assert.AreEqual("foobar", result);
+		Assert.IsTrue("foobar".AsView(1, 2).TryConcat("foobar".AsView(3, 2), out result));
+		Assert.AreEqual("ooba", result);
+	}
+
 	private static readonly CultureInfo[] TestCultures = new CultureInfo[] {
 		CultureInfo.InvariantCulture,
 		new("en-US"),
