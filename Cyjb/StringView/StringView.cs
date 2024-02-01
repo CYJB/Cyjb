@@ -260,6 +260,7 @@ public readonly partial struct StringView : IEnumerable<char>
 	/// </summary>
 	/// <param name="start">开始切片处的索引。</param>
 	/// <param name="length">切片所需的长度。</param>
+	/// <returns>字符串视图的 <see cref="ReadOnlySpan{T}"/> 表示形式。</returns>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/> 小于 <c>0</c> 或大于 <see cref="Length"/>。</exception>
 	/// <exception cref="ArgumentOutOfRangeException"><c>start + length</c> 表示的位置不在当前字符串视图范围内。</exception>
 	public ReadOnlySpan<char> AsSpan(int start, int length)
@@ -308,6 +309,7 @@ public readonly partial struct StringView : IEnumerable<char>
 	/// </summary>
 	/// <param name="start">开始切片处的索引。</param>
 	/// <param name="length">切片所需的长度。</param>
+	/// <returns>字符串视图的 <see cref="ReadOnlyMemory{T}"/> 表示形式。</returns>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/> 小于 <c>0</c> 或大于 <see cref="Length"/>。</exception>
 	/// <exception cref="ArgumentOutOfRangeException"><c>start + length</c> 表示的位置不在当前字符串视图范围内。</exception>
 	public ReadOnlyMemory<char> AsMemory(int start, int length)
