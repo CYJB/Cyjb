@@ -167,7 +167,7 @@ public sealed class LineLocator
 		// 检查 \r\n
 		if (lastWasCR)
 		{
-			if (chars[idx] == '\n')
+			if (chars[0] == '\n')
 			{
 				idx++;
 			}
