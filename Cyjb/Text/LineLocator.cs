@@ -37,6 +37,10 @@ public sealed class LineLocator
 	/// </summary>
 	private readonly List<ColumnInfo> lastLineColumn = new();
 	/// <summary>
+	/// 最后一列的信息。
+	/// </summary>
+	private ColumnInfo lastColumnInfo = ColumnInfo.Default;
+	/// <summary>
 	/// 当前字符索引。
 	/// </summary>
 	private int index = 0;
@@ -159,7 +163,7 @@ public sealed class LineLocator
 	/// <param name="chars">要读取的字符范围。</param>
 	public void Read(ReadOnlySpan<char> chars)
 	{
-		if (chars.Length == 0)
+		if (chars.IsEmpty)
 		{
 			return;
 		}
@@ -174,7 +178,7 @@ public sealed class LineLocator
 			AddLine(index + idx);
 			lastWasCR = false;
 		}
-		ColumnInfo last = lastLineColumn.Count > 0 ? lastLineColumn[^1] : ColumnInfo.Default;
+		ColumnInfo last = lastColumnInfo;
 		int lineStart = lineStarts[^1];
 		int len = chars.Length;
 		for (; idx < len; idx++)
@@ -186,19 +190,20 @@ public sealed class LineLocator
 				{
 					int character = index + idx - lineStart;
 					int column = last.GetColumn(character, tabSize);
-					lastLineColumn.Add(new ColumnInfo(character, column, 0));
+					lastColumnInfo = new ColumnInfo(character, column, 0);
+					lastLineColumn.Add(lastColumnInfo);
 				}
 				if (ch == '\r')
 				{
 					int nextIdx = idx + 1;
-					if (nextIdx < len && chars[nextIdx] == '\n')
-					{
-						idx++;
-					}
-					else if (nextIdx >= len)
+					if (nextIdx >= len)
 					{
 						lastWasCR = true;
 						break;
+					}
+					else if (chars[nextIdx] == '\n')
+					{
+						idx = nextIdx;
 					}
 				}
 				lineStart = index + idx + 1;
@@ -215,6 +220,7 @@ public sealed class LineLocator
 				int character = index + idx - lineStart;
 				int column = last.GetColumn(character, tabSize);
 				last = new ColumnInfo(character, column, width);
+				lastColumnInfo = last;
 				lastLineColumn.Add(last);
 			}
 		}
@@ -239,6 +245,7 @@ public sealed class LineLocator
 			lastLineColumn.Clear();
 		}
 		lineColumns.Add(lastLineColumn);
+		lastColumnInfo = ColumnInfo.Default;
 	}
 
 	/// <summary>
