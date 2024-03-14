@@ -596,7 +596,18 @@ public static class CharUtil
 	/// </overloads>
 	public static int Width(this char ch)
 	{
-		if (ch <= 0x20FF)
+		if (ch < 0x7F)
+		{
+			if (ch <= 0x1F)
+			{
+				return 0;
+			}
+			else
+			{
+				return 1;
+			}
+		}
+		else if (ch <= 0x20FF)
 		{
 			if (ch >= 0x1100 && ch <= 0x115F)
 			{
