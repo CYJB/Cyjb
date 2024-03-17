@@ -54,11 +54,21 @@ public sealed class LocationMap
 	private int nextIndex;
 
 	/// <summary>
+	/// 初始化 <see cref="Text.LocationMap"/> 类的新实例。
+	/// </summary>
+	public LocationMap()
+	{
+		curMap = new MapItem(0, 0, int.MaxValue);
+		nextIndex = int.MaxValue;
+	}
+
+	/// <summary>
 	/// 使用指定的位置映射关系初始化 <see cref="Text.LocationMap"/> 类的新实例。
 	/// </summary>
 	/// <param name="map">位置映射关系，会将 <see cref="Tuple{T1, T2}.Item1"/> 映射为
 	/// <see cref="Tuple{T1, T2}.Item2"/>。未列出的值会根据之前最近的映射关系线性变换。</param>
 	/// <param name="type">映射关系的类型。</param>
+	/// <exception cref="ArgumentOutOfRangeException">使用偏移映射模式时，偏移小于 <c>0</c>。</exception>
 	public LocationMap(IEnumerable<Tuple<int, int>> map, LocationMapType type)
 	{
 		if (map.Any())
@@ -90,19 +100,23 @@ public sealed class LocationMap
 				int offset = 0;
 				last = map.Aggregate((cur, next) =>
 				{
-					var (nextIndex, nextMappedIndex) = next;
-					// 合并连续的映射。
-					if (nextIndex == nextMappedIndex)
+					var (nextOffset, nextMappedOffset) = next;
+					if (nextOffset < 0)
 					{
-						offset += nextIndex;
+						throw CommonExceptions.ArgumentNegative(nextOffset, nameof(map));
+					}
+					// 合并连续的映射。
+					if (nextOffset == nextMappedOffset)
+					{
+						offset += nextOffset;
 						return cur;
 					}
 					else
 					{
 						// 添加当前映射。
 						var (index, mappedIndex) = cur;
-						nextIndex += index;
-						nextMappedIndex += mappedIndex;
+						int nextIndex = index + nextOffset;
+						int nextMappedIndex = mappedIndex + nextMappedOffset;
 						if (offset > 0)
 						{
 							nextIndex += offset;
@@ -126,6 +140,132 @@ public sealed class LocationMap
 			curMap = new MapItem(0, 0, int.MaxValue);
 		}
 		FindNextMap();
+	}
+
+	/// <summary>
+	/// 添加指定的位置映射。
+	/// </summary>
+	/// <param name="location">要映射的位置。</param>
+	/// <param name="mappedLocation">映射到的位置。</param>
+	/// <remarks>从 <paramref name="location"/> 映射到 <paramref name="mappedLocation"/>。</remarks>
+	public void Add(int location, int mappedLocation)
+	{
+		if (indexMap.Count == 0)
+		{
+			indexMap.Add(location);
+			curMap = new MapItem(location, mappedLocation, int.MaxValue);
+			map.Add(curMap);
+			curIndex = location;
+			nextIndex = int.MaxValue;
+			return;
+		}
+		int idx = indexMap.BinarySearch(location);
+		if (idx < 0)
+		{
+			// 插入新映射。
+			idx = ~idx;
+			MapItem newItem;
+			if (idx > 0)
+			{
+				MapItem prev = map[idx - 1];
+				newItem = new(location, mappedLocation, prev.NextMappedIndex);
+				if (prev.Offset == newItem.Offset)
+				{
+					// 如果偏移相同，说明新位置映射与原有映射是连续的，不需要添加新映射。
+					return;
+				}
+			}
+			else
+			{
+				int nextMappedIndex = map[idx].GetMappedIndex(indexMap[idx]);
+				newItem = new(location, mappedLocation, nextMappedIndex);
+			}
+			indexMap.Insert(idx, location);
+			map.Insert(idx, newItem);
+			if (idx <= mapIndex)
+			{
+				mapIndex++;
+			}
+		}
+		else
+		{
+			// 修改现有映射。
+			map[idx] = map[idx].UpdateMappedIndex(location, mappedLocation);
+			if (mapIndex == idx)
+			{
+				curMap = map[idx];
+			}
+		}
+		// 修正前一映射。
+		if (idx > 0)
+		{
+			idx--;
+			int index = indexMap[idx];
+			map[idx] = map[idx].UpdateNextMappedIndex(index, mappedLocation);
+			if (mapIndex == idx)
+			{
+				curMap = map[idx];
+				nextIndex = location;
+			}
+		}
+	}
+
+	/// <summary>
+	/// 添加指定的位置偏移映射。
+	/// </summary>
+	/// <param name="offset">要映射的偏移。</param>
+	/// <param name="mappedOffset">映射到的偏移。</param>
+	/// <remarks>假设已有的最后一项映射是从 <c>x</c> 映射到 <c>y</c>，那么 <see cref="AddOffset"/>
+	/// 会添加一项从 <c>x + <paramref name="offset"/></c> 到
+	/// <c>y + <paramref name="mappedOffset"/></c> 的映射。</remarks>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> 小于 <c>0</c>。</exception>
+	public void AddOffset(int offset, int mappedOffset)
+	{
+		if (offset < 0)
+		{
+			throw CommonExceptions.ArgumentNegative(offset);
+		}
+		if (offset == mappedOffset)
+		{
+			// 相同偏移，不需要修改。
+			return;
+		}
+		if (indexMap.Count == 0)
+		{
+			indexMap.Add(offset);
+			curMap = new MapItem(offset, mappedOffset, int.MaxValue);
+			map.Add(curMap);
+			curIndex = offset;
+			nextIndex = int.MaxValue;
+			return;
+		}
+		int idx = indexMap.Count - 1;
+		MapItem prev = map[idx];
+		int prevLocation = indexMap[idx];
+		int location = prevLocation + offset;
+		int mappedLocation = prev.GetMappedIndex(prevLocation) + mappedOffset;
+		if (offset == 0)
+		{
+			// 修改现有映射。
+			map[idx] = prev.UpdateMappedIndex(location, mappedLocation);
+			if (mapIndex == idx)
+			{
+				curMap = map[idx];
+			}
+		}
+		else
+		{
+			// 插入新映射。
+			indexMap.Add(location);
+			map.Add(new MapItem(location, mappedLocation, int.MaxValue));
+			// 修正前一映射。
+			map[idx] = prev.UpdateNextMappedIndex(prevLocation, mappedLocation);
+			if (mapIndex == idx)
+			{
+				curMap = map[idx];
+				nextIndex = location;
+			}
+		}
 	}
 
 	/// <summary>
@@ -200,7 +340,7 @@ public sealed class LocationMap
 		/// </summary>
 		/// <param name="index">当前索引。</param>
 		/// <param name="mappedIndex">要映射到的索引。</param>
-		/// <param name="nextMappedIndex">下一个映射结果的结束位置。</param>
+		/// <param name="nextMappedIndex">下一个映射要映射到的索引。</param>
 		public MapItem(int index, int mappedIndex, int nextMappedIndex)
 		{
 			endIndex = nextMappedIndex - 1;
@@ -214,6 +354,30 @@ public sealed class LocationMap
 			{
 				offset = mappedIndex - index;
 				mapToOffset = false;
+			}
+		}
+
+		/// <summary>
+		/// 获取当前映射的偏移。
+		/// </summary>
+		public int Offset => offset;
+		/// <summary>
+		/// 获取下一个要映射到的索引。
+		/// </summary>
+		public int NextMappedIndex => endIndex + 1;
+
+		/// <summary>
+		/// 获取当前要映射到的索引。
+		/// </summary>
+		public int GetMappedIndex(int index)
+		{
+			if (mapToOffset)
+			{
+				return offset;
+			}
+			else
+			{
+				return index + offset;
 			}
 		}
 
@@ -238,6 +402,34 @@ public sealed class LocationMap
 				}
 				return location;
 			}
+		}
+
+		/// <summary>
+		/// 更新当前映射要映射到的索引，并返回新的映射。
+		/// </summary>
+		/// <param name="index">当前映射的索引。</param>
+		/// <param name="mappedIndex">要映射到的索引。</param>
+		/// <returns>新的映射。</returns>
+		public MapItem UpdateMappedIndex(int index, int mappedIndex)
+		{
+			int nextMappedIndex = endIndex + 1;
+			return new MapItem(index, mappedIndex, nextMappedIndex);
+		}
+
+		/// <summary>
+		/// 更新下一个映射要映射到的索引，并返回新的映射。
+		/// </summary>
+		/// <param name="index">当前映射的索引。</param>
+		/// <param name="nextMappedIndex">下一个映射要映射到的索引。</param>
+		/// <returns>新的映射。</returns>
+		public MapItem UpdateNextMappedIndex(int index, int nextMappedIndex)
+		{
+			int mappedIndex = offset;
+			if (!mapToOffset)
+			{
+				mappedIndex = offset + index;
+			}
+			return new MapItem(index, mappedIndex, nextMappedIndex);
 		}
 	}
 }
