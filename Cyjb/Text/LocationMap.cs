@@ -1,3 +1,5 @@
+using Cyjb.Collections;
+
 namespace Cyjb.Text;
 
 /// <summary>
@@ -58,7 +60,7 @@ public sealed class LocationMap
 	/// </summary>
 	public LocationMap()
 	{
-		curMap = new MapItem(0, 0, int.MaxValue);
+		curMap = MapItem.Empty;
 		nextIndex = int.MaxValue;
 	}
 
@@ -137,7 +139,7 @@ public sealed class LocationMap
 		}
 		else
 		{
-			curMap = new MapItem(0, 0, int.MaxValue);
+			curMap = MapItem.Empty;
 		}
 		FindNextMap();
 	}
@@ -303,6 +305,19 @@ public sealed class LocationMap
 	}
 
 	/// <summary>
+	/// 清除所有映射。
+	/// </summary>
+	public void Clear()
+	{
+		indexMap.Clear();
+		map.Clear();
+		mapIndex = 0;
+		curMap = MapItem.Empty;
+		curIndex = 0;
+		nextIndex = int.MaxValue;
+	}
+
+	/// <summary>
 	/// 寻找下一个索引。
 	/// </summary>
 	private void FindNextMap()
@@ -322,6 +337,11 @@ public sealed class LocationMap
 	/// </summary>
 	private readonly struct MapItem
 	{
+		/// <summary>
+		/// 空映射。
+		/// </summary>
+		public static readonly MapItem Empty = new(0, 0, int.MaxValue);
+
 		/// <summary>
 		/// 当前映射的偏移。
 		/// </summary>

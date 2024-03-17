@@ -13,7 +13,7 @@ namespace TestCyjb.Collections;
 public class UnitTestListQueue
 {
 	/// <summary>
-	/// 对 <see cref="ListQueue{T}"/> 的堆栈方法进行测试。
+	/// 对 <see cref="ListQueue{T}"/> 的队列方法进行测试。
 	/// </summary>
 	[TestMethod]
 	public void TestQueue()

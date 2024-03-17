@@ -6,12 +6,11 @@ using Cyjb.Collections.ObjectModel;
 namespace Cyjb.Collections;
 
 /// <summary>
-/// 表示同一任意类型的实例的大小可变的先进先出 (FIFO) 集合。
-/// 该集合还允许使用索引访问队列中的元素。
+/// 表示同一任意类型的实例的大小可变的双端队列，并允许使用索引访问队列中的元素。
 /// </summary>
 /// <remarks>使用循环数组实现。</remarks>
 /// <typeparam name="T">指定队列中的元素的类型。</typeparam>
-public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
+public class Deque<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 {
 	/// <summary>
 	/// 集合中的元素。
@@ -36,19 +35,19 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	private int version = 0;
 
 	/// <summary>
-	/// 初始化 <see cref="ListQueue{T}"/> 类的新实例。
+	/// 初始化 <see cref="Deque{T}"/> 类的新实例。
 	/// </summary>
-	public ListQueue()
+	public Deque()
 	{
 		items = Array.Empty<T>();
 	}
 
 	/// <summary>
-	/// 使用指定集合的元素初始化 <see cref="ListQueue{T}"/> 类的新实例。
+	/// 使用指定集合的元素初始化 <see cref="Deque{T}"/> 类的新实例。
 	/// </summary>
 	/// <param name="source">从中复制元素的集合。</param>
 	/// <exception cref="ArgumentNullException"><paramref name="source"/> 为 <c>null</c>。</exception>
-	public ListQueue(IEnumerable<T> source) : base(false)
+	public Deque(IEnumerable<T> source) : base(false)
 	{
 		ArgumentNullException.ThrowIfNull(source);
 		items = EnumerableUtil.ToArray(source, out count);
@@ -59,11 +58,11 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	}
 
 	/// <summary>
-	/// 使用指定的初始容量初始化 <see cref="ListQueue{T}"/> 类的新实例。
+	/// 使用指定的初始容量初始化 <see cref="Deque{T}"/> 类的新实例。
 	/// </summary>
 	/// <param name="capacity">初始容量。</param>
 	/// <exception cref="ArgumentException"><paramref name="capacity"/> 小于 <c>0</c>。</exception>
-	public ListQueue(int capacity) : base(false)
+	public Deque(int capacity) : base(false)
 	{
 		if (capacity < 0)
 		{
@@ -85,7 +84,7 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	/// <param name="offset">要获取的元素从零开始的偏移。</param>
 	/// <value>指定偏移处的元素。</value>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> 不是 
-	/// <see cref="ListQueue{T}"/> 中的有效偏移。</exception>
+	/// <see cref="Deque{T}"/> 中的有效偏移。</exception>
 	public T this[int offset]
 	{
 		get => items[GetIndex(offset)];
@@ -98,7 +97,7 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	/// <param name="offset">要获取的元素从零开始的偏移。</param>
 	/// <value>指定偏移处的元素。</value>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> 不是 
-	/// <see cref="ListQueue{T}"/> 中的有效偏移。</exception>
+	/// <see cref="Deque{T}"/> 中的有效偏移。</exception>
 	public T this[Index offset]
 	{
 		get => items[GetIndex(offset)];
@@ -125,17 +124,17 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	}
 
 	/// <summary>
-	/// 将指定元素添加到队列的末尾。
+	/// 将指定元素添加到队列的开始。
 	/// </summary>
 	/// <param name="item">要添加的元素。</param>
-	public void Enqueue(T item)
+	public void PushFront(T item)
 	{
 		if (count == items.Length)
 		{
 			Grow(count + 1);
 		}
-		items[tail] = item;
-		MoveNext(ref tail);
+		MovePrev(ref head);
+		items[head] = item;
 		count++;
 		version++;
 	}
@@ -145,7 +144,7 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	/// </summary>
 	/// <returns>队列开始处的元素。</returns>
 	/// <exception cref="InvalidOperationException">队列是空的。</exception>
-	public T Dequeue()
+	public T PopFront()
 	{
 		if (count == 0)
 		{
@@ -167,7 +166,7 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	/// </summary>
 	/// <param name="size">要删除的元素个数。</param>
 	/// <exception cref="InvalidOperationException"><paramref name="size"/> 不是队列的有效个数。</exception>
-	public void Dequeue(int size)
+	public void PopFront(int size)
 	{
 		if (size < 0 || size > count)
 		{
@@ -200,7 +199,7 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	/// </summary>
 	/// <returns>队列开始处的元素。</returns>
 	/// <exception cref="InvalidOperationException">队列是空的。</exception>
-	public T Peek()
+	public T PeekFront()
 	{
 		if (count == 0)
 		{
@@ -214,7 +213,7 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	/// </summary>
 	/// <param name="result">队列开始处的元素，如果不存在则为 <typeparamref name="T"/> 的默认值。</param>
 	/// <returns>如果队列不是空的，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-	public bool TryDequeue([NotNullWhen(true)] out T? result)
+	public bool TryPopFront([NotNullWhen(true)] out T? result)
 	{
 		if (count == 0)
 		{
@@ -237,7 +236,7 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	/// </summary>
 	/// <param name="result">队列开始处的元素，如果不存在则为 <typeparamref name="T"/> 的默认值。</param>
 	/// <returns>如果队列不是空的，则为 <c>true</c>；否则为 <c>false</c>。</returns>
-	public bool TryPeek([NotNullWhen(true)] out T? result)
+	public bool TryPeekFront([NotNullWhen(true)] out T? result)
 	{
 		if (count == 0)
 		{
@@ -245,6 +244,130 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 			return false;
 		}
 		result = items[head]!;
+		return true;
+	}
+
+	/// <summary>
+	/// 将指定元素添加到队列的末尾。
+	/// </summary>
+	/// <param name="item">要添加的元素。</param>
+	public void PushBack(T item)
+	{
+		if (count == items.Length)
+		{
+			Grow(count + 1);
+		}
+		items[tail] = item;
+		MoveNext(ref tail);
+		count++;
+		version++;
+	}
+
+	/// <summary>
+	/// 删除并返回队列末尾处的元素。
+	/// </summary>
+	/// <returns>队列末尾处的元素。</returns>
+	/// <exception cref="InvalidOperationException">队列是空的。</exception>
+	public T PopBack()
+	{
+		if (count == 0)
+		{
+			throw new InvalidOperationException(Resources.EmptyQueue);
+		}
+		MovePrev(ref tail);
+		T result = items[tail];
+		if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+		{
+			items[tail] = default!;
+		}
+		count--;
+		version++;
+		return result;
+	}
+
+	/// <summary>
+	/// 删除队列末尾处指定个数的元素。
+	/// </summary>
+	/// <param name="size">要删除的元素个数。</param>
+	/// <exception cref="InvalidOperationException"><paramref name="size"/> 不是队列的有效个数。</exception>
+	public void PopBack(int size)
+	{
+		if (size < 0 || size > count)
+		{
+			throw CommonExceptions.ArgumentOutOfRange(size);
+		}
+		int newTail = tail - size;
+		if (newTail > 0)
+		{
+			if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+			{
+				Array.Clear(items, newTail, size);
+			}
+		}
+		else
+		{
+			newTail += items.Length;
+			if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+			{
+				Array.Clear(items, newTail, items.Length - newTail);
+				Array.Clear(items, 0, tail);
+			}
+		}
+		tail = newTail;
+		count -= size;
+		version++;
+	}
+
+	/// <summary>
+	/// 返回队列末尾处的元素，但不将其移除。
+	/// </summary>
+	/// <returns>队列末尾处的元素。</returns>
+	/// <exception cref="InvalidOperationException">队列是空的。</exception>
+	public T PeekBack()
+	{
+		if (count == 0)
+		{
+			throw new InvalidOperationException(Resources.EmptyStack);
+		}
+		return items[GetItemIndex(tail - 1)];
+	}
+
+	/// <summary>
+	/// 尝试删除并返回队列末尾处的元素。
+	/// </summary>
+	/// <param name="result">队列末尾处的元素，如果不存在则为 <typeparamref name="T"/> 的默认值。</param>
+	/// <returns>如果队列不是空的，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+	public bool TryPopBack([NotNullWhen(true)] out T? result)
+	{
+		if (count == 0)
+		{
+			result = default;
+			return false;
+		}
+		MovePrev(ref tail);
+		result = items[tail]!;
+		if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+		{
+			items[tail] = default!;
+		}
+		count--;
+		version++;
+		return true;
+	}
+
+	/// <summary>
+	/// 尝试返回队列末尾处的元素，但不将其移除。
+	/// </summary>
+	/// <param name="result">队列末尾处的元素，如果不存在则为 <typeparamref name="T"/> 的默认值。</param>
+	/// <returns>如果队列不是空的，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+	public bool TryPeekBack([NotNullWhen(true)] out T? result)
+	{
+		if (count == 0)
+		{
+			result = default;
+			return false;
+		}
+		result = items[GetItemIndex(tail - 1)]!;
 		return true;
 	}
 
@@ -334,7 +457,7 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	/// <param name="offset">要获取的从零开始的偏移。</param>
 	/// <returns>指定偏移对应的列表索引。</returns>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> 不是 
-	/// <see cref="ListQueue{T}"/> 中的有效偏移。</exception>
+	/// <see cref="Deque{T}"/> 中的有效偏移。</exception>
 	private int GetIndex(int offset)
 	{
 		if (offset < 0)
@@ -355,12 +478,33 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	}
 
 	/// <summary>
+	/// 返回指定的列表索引。
 	/// 返回指定偏移对应的列表索引。
 	/// </summary>
 	/// <param name="offset">要获取的从零开始的偏移。</param>
 	/// <returns>指定偏移对应的列表索引。</returns>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> 不是 
-	/// <see cref="ListQueue{T}"/> 中的有效偏移。</exception>
+	/// <see cref="Deque{T}"/> 中的有效偏移。</exception>
+	private int GetItemIndex(int index)
+	{
+		if (index < 0)
+		{
+			return index + items.Length;
+		}
+		else if (index >= items.Length)
+		{
+			return index - items.Length;
+		}
+		return index;
+	}
+
+	/// <summary>
+	/// 返回指定偏移对应的列表索引。
+	/// </summary>
+	/// <param name="offset">要获取的从零开始的偏移。</param>
+	/// <returns>指定偏移对应的列表索引。</returns>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> 不是 
+	/// <see cref="Deque{T}"/> 中的有效偏移。</exception>
 	private int GetIndex(Index offset)
 	{
 		int index = (offset.IsFromEnd ? count - offset.Value : offset.Value);
@@ -395,6 +539,22 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 			int partLen = items.Length - head;
 			Array.Copy(items, head, array, arrayIndex, partLen);
 			Array.Copy(items, 0, array, arrayIndex + partLen, tail);
+		}
+	}
+
+	/// <summary>
+	/// 将指定索引前移一位。
+	/// </summary>
+	/// <param name="index">要前移的索引。</param>
+	private void MovePrev(ref int index)
+	{
+		if (index == 0)
+		{
+			index = items.Length - 1;
+		}
+		else
+		{
+			index--;
 		}
 	}
 
@@ -475,14 +635,14 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	}
 
 	/// <summary>
-	/// 队列的枚举器。
+	/// 双端队列的枚举器。
 	/// </summary>
 	private class Enumerator : EnumeratorBase<T>
 	{
 		/// <summary>
 		/// 要枚举的队列实例。
 		/// </summary>
-		private readonly ListQueue<T> queue;
+		private readonly Deque<T> deque;
 		/// <summary>
 		/// 创建枚举器时的队列版本。
 		/// </summary>
@@ -493,13 +653,13 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 		private int index;
 
 		/// <summary>
-		/// 使用指定的队列初始化 <see cref="Enumerator"/> 类的新实例。
+		/// 使用指定的双端队列初始化 <see cref="Enumerator"/> 类的新实例。
 		/// </summary>
-		/// <param name="queue">要枚举的队列实例。</param>
-		public Enumerator(ListQueue<T> queue)
+		/// <param name="deque">要枚举的双端队列实例。</param>
+		public Enumerator(Deque<T> deque)
 		{
-			this.queue = queue;
-			version = queue.version;
+			this.deque = deque;
+			version = deque.version;
 		}
 
 		#region EnumeratorBase<T> 成员
@@ -510,7 +670,7 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 		/// <returns>如果容器版本发生了变化，则为 <c>true</c>；否则返回 <c>false</c>。</returns>
 		protected override bool CheckVersionChanged()
 		{
-			return version != queue.version;
+			return version != deque.version;
 		}
 
 		/// <summary>
@@ -522,18 +682,18 @@ public class ListQueue<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 		/// 如果枚举数传递到集合的末尾，则为 <c>false</c>。</returns>
 		protected override bool MoveNext(bool initial, out T current)
 		{
-			if (index >= queue.count)
+			if (index >= deque.count)
 			{
 				current = default!;
 				return false;
 			}
-			int idx = index + queue.head;
-			int len = queue.items.Length;
+			int idx = index + deque.head;
+			int len = deque.items.Length;
 			if (idx >= len)
 			{
 				idx -= len;
 			}
-			current = queue.items[idx];
+			current = deque.items[idx];
 			index++;
 			return true;
 		}
