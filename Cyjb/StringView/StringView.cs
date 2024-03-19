@@ -209,6 +209,19 @@ public readonly partial struct StringView : IEnumerable<char>
 	}
 
 	/// <summary>
+	/// 返回字符串视图的原始字符串及其位置。
+	/// </summary>
+	/// <param name="text">原始字符串。</param>
+	/// <param name="start">视图的起始索引。</param>
+	/// <param name="length">视图的查高度。</param>
+	public void GetOrigin(out string text, out int start, out int length)
+	{
+		text = this.text;
+		start = this.start;
+		length = this.length;
+	}
+
+	/// <summary>
 	/// 允许从 <see cref="string"/> 隐式转换为 <see cref="StringView"/>。
 	/// </summary>
 	/// <param name="text">要转换的字符串。</param>

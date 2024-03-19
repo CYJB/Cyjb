@@ -54,6 +54,19 @@ public class UnitTestStringView
 	}
 
 	/// <summary>
+	/// 对创建 <see cref="StringView.GetOrigin"/> 方法进行测试。
+	/// </summary>
+	[TestMethod]
+	public void TestGetOrigin()
+	{
+		string text = "abcdefg";
+		text.AsView(1, 3).GetOrigin(out var originText, out var start, out var length);
+		Assert.AreSame(text, originText);
+		Assert.AreEqual(1, start);
+		Assert.AreEqual(3, length);
+	}
+
+	/// <summary>
 	/// 对 <see cref="StringView.AsSpan"/> 方法进行测试。
 	/// </summary>
 	[TestMethod]
