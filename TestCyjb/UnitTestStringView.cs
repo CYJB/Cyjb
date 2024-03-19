@@ -172,23 +172,47 @@ public class UnitTestStringView
 	{
 		StringView view = "abcaBc".AsView();
 		Assert.AreEqual(0, view.IndexOf('a'));
+		Assert.AreEqual(3, view.IndexOf('a', 1));
+		Assert.AreEqual(-1, view.IndexOf('a', 1, 2));
 		Assert.AreEqual(1, view.IndexOf('b'));
+		Assert.AreEqual(-1, view.IndexOf('b', 2));
+		Assert.AreEqual(1, view.IndexOf('b', 1, 3));
 		Assert.AreEqual(-1, view.IndexOf('C'));
+		Assert.AreEqual(-1, view.IndexOf('C', 3));
+		Assert.AreEqual(-1, view.IndexOf('C', 3, 3));
 		Assert.AreEqual(2, view.IndexOf('C', StringComparison.OrdinalIgnoreCase));
 		Assert.AreEqual(0, view.IndexOf("abc"));
+		Assert.AreEqual(-1, view.IndexOf("abc", 1));
+		Assert.AreEqual(0, view.IndexOf("abc", 0, 3));
 		Assert.AreEqual(-1, view.IndexOf("Abc"));
+		Assert.AreEqual(-1, view.IndexOf("Abc", 4));
+		Assert.AreEqual(-1, view.IndexOf("Abc", 4, 2));
 		Assert.AreEqual(3, view.IndexOf("aBc"));
+		Assert.AreEqual(3, view.IndexOf("aBc", 2));
+		Assert.AreEqual(-1, view.IndexOf("aBc", 2, 3));
 		Assert.AreEqual(0, view.IndexOf("Abc", StringComparison.OrdinalIgnoreCase));
 		Assert.AreEqual(-1, view.IndexOf('d'));
 
 		view = "0abcaBcd".AsView(1, 6);
 		Assert.AreEqual(0, view.IndexOf('a'));
+		Assert.AreEqual(3, view.IndexOf('a', 1));
+		Assert.AreEqual(-1, view.IndexOf('a', 1, 2));
 		Assert.AreEqual(1, view.IndexOf('b'));
+		Assert.AreEqual(-1, view.IndexOf('b', 2));
+		Assert.AreEqual(1, view.IndexOf('b', 1, 3));
 		Assert.AreEqual(-1, view.IndexOf('C'));
+		Assert.AreEqual(-1, view.IndexOf('C', 3));
+		Assert.AreEqual(-1, view.IndexOf('C', 3, 3));
 		Assert.AreEqual(2, view.IndexOf('C', StringComparison.OrdinalIgnoreCase));
 		Assert.AreEqual(0, view.IndexOf("abc"));
+		Assert.AreEqual(-1, view.IndexOf("abc", 1));
+		Assert.AreEqual(0, view.IndexOf("abc", 0, 3));
 		Assert.AreEqual(-1, view.IndexOf("Abc"));
+		Assert.AreEqual(-1, view.IndexOf("Abc", 4));
+		Assert.AreEqual(-1, view.IndexOf("Abc", 4, 2));
 		Assert.AreEqual(3, view.IndexOf("aBc"));
+		Assert.AreEqual(3, view.IndexOf("aBc", 2));
+		Assert.AreEqual(-1, view.IndexOf("aBc", 2, 3));
 		Assert.AreEqual(0, view.IndexOf("Abc", StringComparison.OrdinalIgnoreCase));
 		Assert.AreEqual(-1, view.IndexOf('d'));
 	}
@@ -201,11 +225,17 @@ public class UnitTestStringView
 	{
 		StringView view = "abcaBc".AsView();
 		Assert.AreEqual(0, view.IndexOfAny(new char[] { 'a', 'b' }));
+		Assert.AreEqual(1, view.IndexOfAny(new char[] { 'a', 'b' }, 1));
+		Assert.AreEqual(3, view.IndexOfAny(new char[] { 'a', 'b' }, 2));
+		Assert.AreEqual(-1, view.IndexOfAny(new char[] { 'a', 'b' }, 2, 1));
 		Assert.AreEqual(1, view.IndexOfAny(new char[] { 'b', 'c' }));
 		Assert.AreEqual(-1, view.IndexOfAny(new char[] { 'C' }));
 
 		view = "0abcaBcd".AsView(1, 6);
 		Assert.AreEqual(0, view.IndexOfAny(new char[] { 'a', 'b' }));
+		Assert.AreEqual(1, view.IndexOfAny(new char[] { 'a', 'b' }, 1));
+		Assert.AreEqual(3, view.IndexOfAny(new char[] { 'a', 'b' }, 2));
+		Assert.AreEqual(-1, view.IndexOfAny(new char[] { 'a', 'b' }, 2, 1));
 		Assert.AreEqual(1, view.IndexOfAny(new char[] { 'b', 'c' }));
 		Assert.AreEqual(-1, view.IndexOfAny(new char[] { 'C' }));
 	}
@@ -218,23 +248,39 @@ public class UnitTestStringView
 	{
 		StringView view = "abcaBc".AsView();
 		Assert.AreEqual(3, view.LastIndexOf('a'));
+		Assert.AreEqual(-1, view.LastIndexOf('a', 4));
+		Assert.AreEqual(0, view.LastIndexOf('a', 0, 3));
 		Assert.AreEqual(1, view.LastIndexOf('b'));
+		Assert.AreEqual(1, view.LastIndexOf('b', 1));
+		Assert.AreEqual(-1, view.LastIndexOf('b', 2, 3));
 		Assert.AreEqual(-1, view.LastIndexOf('C'));
 		Assert.AreEqual(5, view.LastIndexOf('C', StringComparison.OrdinalIgnoreCase));
 		Assert.AreEqual(0, view.LastIndexOf("abc"));
+		Assert.AreEqual(-1, view.LastIndexOf("abc", 1));
 		Assert.AreEqual(-1, view.LastIndexOf("Abc"));
 		Assert.AreEqual(3, view.LastIndexOf("aBc"));
+		Assert.AreEqual(3, view.LastIndexOf("aBc", 3));
+		Assert.AreEqual(-1, view.LastIndexOf("aBc", 3, 2));
+		Assert.AreEqual(3, view.LastIndexOf("aBc", 3, 3));
 		Assert.AreEqual(3, view.LastIndexOf("Abc", StringComparison.OrdinalIgnoreCase));
 		Assert.AreEqual(-1, view.LastIndexOf('d'));
 
 		view = "0abcaBcd".AsView(1, 6);
 		Assert.AreEqual(3, view.LastIndexOf('a'));
+		Assert.AreEqual(-1, view.LastIndexOf('a', 4));
+		Assert.AreEqual(0, view.LastIndexOf('a', 0, 3));
 		Assert.AreEqual(1, view.LastIndexOf('b'));
+		Assert.AreEqual(1, view.LastIndexOf('b', 1));
+		Assert.AreEqual(-1, view.LastIndexOf('b', 2, 3));
 		Assert.AreEqual(-1, view.LastIndexOf('C'));
 		Assert.AreEqual(5, view.LastIndexOf('C', StringComparison.OrdinalIgnoreCase));
 		Assert.AreEqual(0, view.LastIndexOf("abc"));
+		Assert.AreEqual(-1, view.LastIndexOf("abc", 1));
 		Assert.AreEqual(-1, view.LastIndexOf("Abc"));
 		Assert.AreEqual(3, view.LastIndexOf("aBc"));
+		Assert.AreEqual(3, view.LastIndexOf("aBc", 3));
+		Assert.AreEqual(-1, view.LastIndexOf("aBc", 3, 2));
+		Assert.AreEqual(3, view.LastIndexOf("aBc", 3, 3));
 		Assert.AreEqual(3, view.LastIndexOf("Abc", StringComparison.OrdinalIgnoreCase));
 		Assert.AreEqual(-1, view.LastIndexOf('d'));
 	}
@@ -247,11 +293,15 @@ public class UnitTestStringView
 	{
 		StringView view = "abcaBc".AsView();
 		Assert.AreEqual(3, view.LastIndexOfAny(new char[] { 'a', 'b' }));
+		Assert.AreEqual(-1, view.LastIndexOfAny(new char[] { 'a', 'b' }, 4));
+		Assert.AreEqual(1, view.LastIndexOfAny(new char[] { 'a', 'b' }, 1, 2));
 		Assert.AreEqual(5, view.LastIndexOfAny(new char[] { 'b', 'c' }));
 		Assert.AreEqual(-1, view.LastIndexOfAny(new char[] { 'C' }));
 
 		view = "0abcaBcd".AsView(1, 6);
 		Assert.AreEqual(3, view.LastIndexOfAny(new char[] { 'a', 'b' }));
+		Assert.AreEqual(-1, view.LastIndexOfAny(new char[] { 'a', 'b' }, 4));
+		Assert.AreEqual(1, view.LastIndexOfAny(new char[] { 'a', 'b' }, 1, 2));
 		Assert.AreEqual(5, view.LastIndexOfAny(new char[] { 'b', 'c' }));
 		Assert.AreEqual(-1, view.LastIndexOfAny(new char[] { 'C' }));
 	}
