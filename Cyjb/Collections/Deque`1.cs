@@ -478,13 +478,10 @@ public class Deque<T> : ReadOnlyCollectionBase<T>, IReadOnlyList<T>
 	}
 
 	/// <summary>
-	/// 返回指定的列表索引。
-	/// 返回指定偏移对应的列表索引。
+	/// 返回指定索引对应的数组项索引。
 	/// </summary>
-	/// <param name="offset">要获取的从零开始的偏移。</param>
-	/// <returns>指定偏移对应的列表索引。</returns>
-	/// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> 不是 
-	/// <see cref="Deque{T}"/> 中的有效偏移。</exception>
+	/// <param name="index">要获取的从零开始的索引。</param>
+	/// <returns>指定索引对应的数组项索引。</returns>
 	private int GetItemIndex(int index)
 	{
 		if (index < 0)
