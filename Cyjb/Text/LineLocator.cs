@@ -31,11 +31,11 @@ public sealed class LineLocator
 	/// <summary>
 	/// 每行的宽度信息，[0..^1] 总是 ColumnInfo[]，[^1] 总是指向 lastLine。
 	/// </summary>
-	private readonly List<IList<ColumnInfo>> lineColumns = new();
+	private readonly List<LineInfo> lineInfoList = new();
 	/// <summary>
 	/// 最后一行的宽度信息。
 	/// </summary>
-	private readonly List<ColumnInfo> lastLineColumn = new();
+	private LineInfo lastLineInfo = new();
 	/// <summary>
 	/// 最后一列的信息。
 	/// </summary>
@@ -72,7 +72,7 @@ public sealed class LineLocator
 		this.tabSize = tabSize;
 		// 首行索引总是 0
 		lineStarts.Add(0);
-		lineColumns.Add(lastLineColumn);
+		lineInfoList.Add(lastLineInfo);
 	}
 
 	/// <summary>
@@ -95,34 +95,8 @@ public sealed class LineLocator
 		}
 		int line = GetLine(index);
 		int character = index - lineStarts[line];
-		IList<ColumnInfo> columnInfos = lineColumns[line];
-		ColumnInfo columnInfo = ColumnInfo.Default;
-		if (columnInfos.Count > 0)
-		{
-			// 先检查最后一个列号。
-			ColumnInfo last = columnInfos[^1];
-			if (character >= last.Character)
-			{
-				columnInfo = last;
-			}
-			else
-			{
-				int colIndex = columnInfos.BinarySearch(character, (columnInfo) => columnInfo.Character);
-				if (colIndex < 0)
-				{
-					colIndex = ~colIndex;
-					// 需要插入到 0 表示 ColumnInfo.Default。
-					if (colIndex > 0)
-					{
-						columnInfo = columnInfos[colIndex - 1];
-					}
-				}
-				else
-				{
-					columnInfo = columnInfos[colIndex];
-				}
-			}
-		}
+		ColumnInfo columnInfo = lineInfoList[line].FindColumnInfo(character);
+		// 先检查最后一个列号。
 		return new LinePosition(line + 1, character, columnInfo.GetColumn(character, tabSize));
 	}
 
@@ -178,7 +152,6 @@ public sealed class LineLocator
 			AddLine(index + idx);
 			lastWasCR = false;
 		}
-		ColumnInfo last = lastColumnInfo;
 		int lineStart = lineStarts[^1];
 		int len = chars.Length;
 		for (; idx < len; idx++)
@@ -186,12 +159,12 @@ public sealed class LineLocator
 			char ch = chars[idx];
 			if (ch.IsAnyLineSeparator())
 			{
-				if (last.Width != 0)
+				if (lastColumnInfo.Width != 0)
 				{
 					int character = index + idx - lineStart;
-					int column = last.GetColumn(character, tabSize);
+					int column = lastColumnInfo.GetColumn(character, tabSize);
 					lastColumnInfo = new ColumnInfo(character, column, 0);
-					lastLineColumn.Add(lastColumnInfo);
+					lastLineInfo.Add(lastColumnInfo);
 				}
 				if (ch == '\r')
 				{
@@ -208,23 +181,22 @@ public sealed class LineLocator
 				}
 				lineStart = index + idx + 1;
 				AddLine(lineStart);
-				last = ColumnInfo.Default;
 			}
 			else
 			{
 				int width = ch == '\t' ? TabSizeMark : ch.Width();
-				if (last.Width == width)
+				if (lastColumnInfo.Width == width)
 				{
 					continue;
 				}
 				int character = index + idx - lineStart;
-				int column = last.GetColumn(character, tabSize);
-				last = new ColumnInfo(character, column, width);
-				lastColumnInfo = last;
-				lastLineColumn.Add(last);
+				int column = lastColumnInfo.GetColumn(character, tabSize);
+				lastColumnInfo = new ColumnInfo(character, column, width);
+				lastLineInfo.Add(lastColumnInfo);
 			}
 		}
 		index += len;
+		lineInfoList[^1] = lastLineInfo;
 	}
 
 	/// <summary>
@@ -234,18 +206,110 @@ public sealed class LineLocator
 	private void AddLine(int index)
 	{
 		lineStarts.Add(index);
-		int end = lineColumns.Count - 1;
-		if (lastLineColumn.Count == 0)
-		{
-			lineColumns[end] = Array.Empty<ColumnInfo>();
-		}
-		else
-		{
-			lineColumns[end] = lastLineColumn.ToArray();
-			lastLineColumn.Clear();
-		}
-		lineColumns.Add(lastLineColumn);
+		int end = lineInfoList.Count - 1;
+		lineInfoList[end] = lastLineInfo;
+		lastLineInfo.Clear();
+		lineInfoList.Add(lastLineInfo);
 		lastColumnInfo = ColumnInfo.Default;
+	}
+
+	/// <summary>
+	/// 行的信息。
+	/// </summary>
+	private struct LineInfo
+	{
+		/// <summary>
+		/// 最后一列的信息。
+		/// </summary>
+		private ColumnInfo lastColumn;
+		/// <summary>
+		/// 其它列的信息。
+		/// </summary>
+		private List<ColumnInfo>? columns;
+
+		/// <summary>
+		/// 初始化 <see cref="LineInfo"/> 结构的新实例。
+		/// </summary>
+		public LineInfo()
+		{
+			lastColumn = ColumnInfo.Default;
+			columns = null;
+		}
+
+		/// <summary>
+		/// 寻找指定字符位置对应的列信息。
+		/// </summary>
+		/// <param name="character">字符位置。</param>
+		/// <returns>列信息。</returns>
+		public readonly ColumnInfo FindColumnInfo(int character)
+		{
+			// 先检查最后一个列号。
+			if (character >= lastColumn.Character)
+			{
+				return lastColumn;
+			}
+			else if (columns == null)
+			{
+				return ColumnInfo.Default;
+			}
+			else if (columns.Count == 1)
+			{
+				ColumnInfo columnInfo = columns[0];
+				if (character >= columnInfo.Character)
+				{
+					return columnInfo;
+				}
+				else
+				{
+					return ColumnInfo.Default;
+				}
+			}
+			int colIndex = columns.BinarySearch(character, (columnInfo) => columnInfo.Character);
+			if (colIndex < 0)
+			{
+				colIndex = ~colIndex;
+				// 需要插入到 0 表示 ColumnInfo.Default。
+				if (colIndex > 0)
+				{
+					return columns[colIndex - 1];
+				}
+				else
+				{
+					return ColumnInfo.Default;
+				}
+			}
+			else
+			{
+				return columns[colIndex];
+			}
+		}
+
+		/// <summary>
+		/// 添加指定的列信息。
+		/// </summary>
+		/// <param name="columnInfo">要添加的列信息。</param>
+		public void Add(ColumnInfo columnInfo)
+		{
+			if (lastColumn == ColumnInfo.Default)
+			{
+				lastColumn = columnInfo;
+			}
+			else
+			{
+				columns ??= new List<ColumnInfo>();
+				columns.Add(lastColumn);
+				lastColumn = columnInfo;
+			}
+		}
+
+		/// <summary>
+		/// 重置当前列信息。
+		/// </summary>
+		public void Clear()
+		{
+			lastColumn = ColumnInfo.Default;
+			columns = null;
+		}
 	}
 
 	/// <summary>
