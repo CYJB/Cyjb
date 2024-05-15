@@ -9,7 +9,7 @@ internal static partial class CharSetConfig
 	/// <summary>
 	/// 简化字符集合字符串表示用到的 Unicode 类别。
 	/// </summary>
-	private class UnicodeCategoryInfo
+	private sealed class UnicodeCategoryInfo
 	{
 		/// <summary>
 		/// 使用指定的 Unicode 类别和相应字符集合初始化 <see cref="UnicodeCategoryInfo"/> 类的新实例。
@@ -75,8 +75,8 @@ internal static partial class CharSetConfig
 			UnicodeCategory.ClosePunctuation.GetChars(),
 			UnicodeCategory.OpenPunctuation, UnicodeCategory.ClosePunctuation
 			);
-		// 按字符个数从小到大排序。
-		Array.Sort(infos, (left, right) => left.Chars.Count - right.Chars.Count);
+		// 按字符个数从大到小排序。
+		Array.Sort(infos, (left, right) => right.Chars.Count - left.Chars.Count);
 		return infos;
 	});
 
@@ -87,68 +87,71 @@ internal static partial class CharSetConfig
 	/// <returns><paramref name="charSet"/> 的字符串表示。</returns>
 	public static string ToString(ICharSet charSet)
 	{
-		ValueList<char> builder = new(stackalloc char[ValueList.StackallocCharSizeLimit]);
-		builder.Add('[');
 		// 允许通过 UnicodeCategory 压缩字符串表示形式。
+		using ValueList<UnicodeCategory> categories = new(stackalloc UnicodeCategory[30]);
 		List<UnicodeCategoryInfo> infos = new(UnicodeCategoryInfos.Value);
-		List<UnicodeCategoryInfo> nextInfos = new();
-		List<UnicodeCategory> categories = new();
-		CharSet chars = new(charSet);
-		CharSet negate = new();
+		CharSet positive = new(charSet);
+		CharSet negated = new();
 		bool changed = true;
 		while (changed)
 		{
 			changed = false;
-			foreach (UnicodeCategoryInfo info in infos)
+			for (int i = infos.Count - 1; i >= 0; i--)
 			{
+				UnicodeCategoryInfo info = infos[i];
 				IReadOnlySet<char> catChars = info.Chars;
 				// 允许最多尝试 10% 的排除字符。
-				if (1.1 * chars.Count < catChars.Count)
+				if (1.1 * positive.Count < catChars.Count)
 				{
 					// 字符个数不足，后面 Unicode 类别的字符个数更多，可以全部跳过。
+					infos.RemoveRange(0, i);
 					break;
 				}
-				if (!chars.Overlaps(catChars))
+				if (!positive.Overlaps(catChars))
 				{
+					infos.RemoveAt(i);
 					continue;
 				}
 				// 确保应用 Unicode 类别后能够减少范围和字符个数。
 				// 不满足要求的需要在后面重复检测，避免遗漏。
-				CharSet applied = chars ^ catChars;
-				if (applied.RangeCount() > chars.RangeCount() || applied.Count > chars.Count)
+				CharSet applied = positive ^ catChars;
+				if (applied.RangeCount() > positive.RangeCount() || applied.Count > positive.Count)
 				{
-					nextInfos.Add(info);
 					continue;
 				}
-				negate.UnionWith(applied);
-				chars.ExceptWith(catChars);
-				categories.AddRange(info.Categories);
+				negated.UnionWith(applied);
+				positive.ExceptWith(catChars);
+				for (int j = 0; j < info.Categories.Length; j++)
+				{
+					categories.Add(info.Categories[j]);
+				}
 				changed = true;
+				infos.RemoveAt(i);
 			}
-			var temp = infos;
-			infos = nextInfos;
-			nextInfos = temp;
-			nextInfos.Clear();
 		}
-		negate.ExceptWith(charSet);
+		negated.ExceptWith(charSet);
+
+		ValueList<char> builder = new(stackalloc char[ValueList.StackallocCharSizeLimit]);
+		builder.Add('[');
 		// 输出剩余字符
-		PrintChars(chars, ref builder);
+		PrintChars(positive, ref builder);
 		// 输出 Unicode 类别
-		if (categories.Count > 0)
+		if (categories.Length > 0)
 		{
-			categories.Sort();
-			foreach (UnicodeCategory category in categories)
+			Span<UnicodeCategory> span = categories.AsSpan();
+			span.Sort();
+			for (int i = 0; i < span.Length; i++)
 			{
 				builder.Add(@"\p{");
-				builder.Add(category.GetName());
+				builder.Add(span[i].GetName());
 				builder.Add('}');
 			}
 		}
 		// 输出排除字符
-		if (negate.Count > 0)
+		if (negated.Count > 0)
 		{
 			builder.Add("-[");
-			PrintChars(negate, ref builder);
+			PrintChars(negated, ref builder);
 			builder.Add(']');
 		}
 		builder.Add(']');

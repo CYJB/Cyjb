@@ -23,4 +23,10 @@
     <ProjectReference Include="..\Cyjb\Cyjb.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="spec.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
