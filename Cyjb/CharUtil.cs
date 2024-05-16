@@ -45,29 +45,22 @@ public static class CharUtil
 	/// <para>对于某些特殊字符（\0, \, \a, \b, \f, \n, \r, \t, \v）以及自定义的字符，会返回其转义形式。</para>
 	/// <para>对于其它字符，会返回其十六进制转义形式（\u0000）。</para>
 	/// </remarks>
-	public static string UnicodeEscape(this char ch, bool escapeVisibleUnicode = true)
+	public static string UnicodeEscape(this char ch, bool escapeVisibleUnicode = true) => ch switch
 	{
-		if (ch == '\\')
-		{
-			return @"\\";
-		}
-		else if (ch >= ' ' && ch <= '~')
-		{
-			return ch.ToString(CultureInfo.InvariantCulture);
-		}
-		return ch switch
-		{
-			'\0' => @"\0",
-			'\a' => @"\a",
-			'\b' => @"\b",
-			'\f' => @"\f",
-			'\n' => @"\n",
-			'\r' => @"\r",
-			'\t' => @"\t",
-			'\v' => @"\v",
-			_ => escapeVisibleUnicode || !IsVisibleUnicode(ch) ? $"\\u{((uint)ch).ToString(16).PadLeft(4, '0')}" : ch.ToString(CultureInfo.InvariantCulture),
-		};
-	}
+		'\0' => @"\0",
+		'\a' => @"\a",
+		'\b' => @"\b",
+		'\f' => @"\f",
+		'\n' => @"\n",
+		'\r' => @"\r",
+		'\t' => @"\t",
+		'\v' => @"\v",
+		'\\' => @"\\",
+		>= ' ' and <= '~' => ch.ToString(CultureInfo.InvariantCulture),
+		_ => escapeVisibleUnicode || !IsVisibleUnicode(ch)
+			? $"\\u{((uint)ch).ToString(16).PadLeft(4, '0')}"
+			: ch.ToString(CultureInfo.InvariantCulture),
+	};
 
 	/// <summary>
 	/// 返回当前字符的 Unicode 字符是否需要被转义。
@@ -80,29 +73,20 @@ public static class CharUtil
 	/// <para>对于某些特殊字符（\0, \, \a, \b, \f, \n, \r, \t, \v）以及自定义的字符，会返回其转义形式。</para>
 	/// <para>对于其它字符，会返回其十六进制转义形式（\u0000）。</para>
 	/// </remarks>
-	public static bool NeedUnicodeEscape(this char ch, bool escapeVisibleUnicode = true)
+	public static bool NeedUnicodeEscape(this char ch, bool escapeVisibleUnicode = true) => ch switch
 	{
-		if (ch == '\\')
-		{
-			return true;
-		}
-		else if (ch >= ' ' && ch <= '~')
-		{
-			return false;
-		}
-		return ch switch
-		{
-			'\0' => true,
-			'\a' => true,
-			'\b' => true,
-			'\f' => true,
-			'\n' => true,
-			'\r' => true,
-			'\t' => true,
-			'\v' => true,
-			_ => escapeVisibleUnicode || !IsVisibleUnicode(ch),
-		};
-	}
+		'\0' => true,
+		'\a' => true,
+		'\b' => true,
+		'\f' => true,
+		'\n' => true,
+		'\r' => true,
+		'\t' => true,
+		'\v' => true,
+		'\\' => true,
+		>= ' ' and <= '~' => false,
+		_ => escapeVisibleUnicode || !IsVisibleUnicode(ch),
+	};
 
 	/// <summary>
 	/// 返回指定的字符是否是可见的 Unicode 字符。
@@ -195,6 +179,11 @@ public static class CharUtil
 		{
 			return (WordASCIILookup[ch >> 3] & (1 << (ch & 7))) != 0;
 		}
+		// U+200C ZERO WIDTH NON-JOINER and U+200D ZERO WIDTH JOINER.
+		if (ch == '\u200C' || ch == '\u200D')
+		{
+			return true;
+		}
 		UnicodeCategory category = char.GetUnicodeCategory(ch);
 		if (category <= UnicodeCategory.NonSpacingMark ||
 			category == UnicodeCategory.DecimalDigitNumber ||
@@ -202,8 +191,7 @@ public static class CharUtil
 		{
 			return true;
 		}
-		// U+200C ZERO WIDTH NON-JOINER and U+200D ZERO WIDTH JOINER.
-		return ch == '\u200C' || ch == '\u200D';
+		return false;
 	}
 
 	#region Width
